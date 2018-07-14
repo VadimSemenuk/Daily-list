@@ -1,0 +1,29 @@
+.removable-text-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+
+    .text-wrapper {
+        overflow: hidden;
+        flex: 1;
+
+        &.crossed {
+            input {
+                text-decoration: line-through; 
+            } 
+        }
+
+        input {
+            width: 100%;          
+        }
+    }
+    
+    button {
+        width: 30px;
+        height: 30px;
+
+        img {
+            width: 14px;
+            height: 14px;
+        }
+    } 
+}

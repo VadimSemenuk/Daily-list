@@ -1,0 +1,43 @@
+.notes-list-wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    .notes-list-swiper {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        & > div {   
+            display: flex;  
+            height: 100%; 
+        }
+
+        .notes-list-item-wrapper {
+            overflow-y: auto;
+        }
+
+        .no-content {
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: 16px;
+            color: #827777;
+        }
+    }
+
+    .fab {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        border-radius: 100px;
+        background: #333;
+        width: 50px;
+        height: 50px;
+        box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .4);
+
+        img {
+            height: 27px;
+        }
+    }
+}

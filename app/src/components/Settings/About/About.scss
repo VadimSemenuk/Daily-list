@@ -1,0 +1,15 @@
+.about-wrapper {
+    .setting-item {
+        strong {
+            margin-top: 12px;
+            display: block;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+    .setting-item.copyright {
+        display: block;
+    }
+}

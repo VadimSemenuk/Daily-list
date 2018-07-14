@@ -1,0 +1,37 @@
+header {
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 12px;
+    flex-basis: 48px;
+    flex-shrink: 0;
+
+    .buttons {
+        position: relative;
+        left: 5px;
+        display: flex;
+        align-items: center;
+
+        button, 
+        .button {
+            margin-left: 10px;
+        }
+    }
+
+    .current-date {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        top: -2px;
+        
+        .day {
+            font-size: 1.44em;
+            padding: 0px;
+        }
+        .date {
+            font-size: 0.94em;
+            padding: 0px;
+        }
+    }
+}

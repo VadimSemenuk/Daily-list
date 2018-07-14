@@ -1,0 +1,96 @@
+.note-wrapper {
+    margin: 10px;
+    padding: 10px;
+    position: relative;
+    display: block;
+    border: 1px solid #e0d9d9;
+    background: #f9f9f9;
+    border-radius: 4px;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding-right: 40px;
+    padding-left: 13px;
+
+    min-height: 90px;
+    max-height: 110px;
+
+    &.expanded {
+        max-height: none;
+    }
+
+    .tag {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        left: 0;
+    }
+
+    .note-header {
+        // position: relative;
+        // top: -3px;
+
+        margin-top: -3px;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+
+        .note-header-time-wrapper {
+            display: flex;
+            font-size: 0.86em;
+            color: #6f6868;
+            align-items: center;        
+
+            .divider {
+                display: inline-block;
+                padding: 0 5px;
+            }
+        }
+
+        .notification-identifier {
+            width: 8px;
+            height: 8px;
+            background: #e83b3b;
+            border-radius: 8px;
+            margin-left: 10px;
+        }
+    }
+
+    /* action buttons */
+    .more-button {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+
+        img {
+            height: 18px;
+        }
+    }
+    .note-finish-checkbox {
+        position: absolute;
+        top: 42px;
+        right: 0px;
+    }
+
+    /* title */
+    .note-title {
+        font-size: 1.3em;
+    }
+
+    // item data
+    .item-data-text {
+        padding-top: 5px;
+    }
+
+    .attached-image {
+        width: 100%;
+        height: auto;
+        margin-top: 5px;
+    }
+    .attached-image-label {
+        margin-top: 5px;
+        display: block;        
+        text-decoration: underline;
+        font-size: 0.86em;
+    }
+}

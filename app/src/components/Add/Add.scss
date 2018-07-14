@@ -1,0 +1,85 @@
+.add-wrapper {
+    background: #fff;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    padding: 10px 0;
+    padding-bottom: 0px;
+
+    .add-content-wrapper {
+        padding: 0 10px;
+        flex-grow: 1;
+        overflow-y: auto;  
+        
+        .attached-image-wrapper {
+            position: relative;
+
+            .attached-image {
+                width: 100%;
+                height: auto;
+            }
+
+            button {
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: rgba(0, 0, 0, .4);
+
+                img {
+                    width: 18px;
+                    height: 18px;
+                }
+            }
+        }
+
+        .add-actions-wrapper {
+            display: flex;
+            padding: 10px 0;
+
+            button {
+                flex: 1;
+                font-size: 14px;
+                color: #aaa;
+
+                &.camera-button {
+                    flex-basis: 60px;
+                    flex-shrink: 0;
+                    flex-grow: 0;
+                    
+                    img {
+                        height: 30px;
+                        margin: auto;
+                    }
+                }
+
+                img {
+                    height: 28px;
+                    margin: 0;
+                }
+                span {
+                    padding-left: 10px;
+                    display: flex;
+                    align-items: center;
+                }
+            }
+        }
+    }
+    .add-additionals-wrapper {
+        flex-basis: 120px;
+        flex-shrink: 0;
+        height: 120px;  
+        background: #eee;  
+        
+        & > .set-time-wrapper {
+            padding: 0 10px;
+        }
+    }
+}
+
+.time-wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

@@ -1,0 +1,15 @@
+.fast-add-wrapper {
+    background-color: #efefef;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    
+    textarea {
+        background: transparent;
+        min-height: auto;
+    }
+
+    button {
+        flex-shrink: 0;    
+    }
+}

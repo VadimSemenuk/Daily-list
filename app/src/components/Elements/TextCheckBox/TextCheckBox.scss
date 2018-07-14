@@ -1,0 +1,21 @@
+.textcheckbox-wrapper {
+    display: flex;
+    align-items: center;
+
+    .checkbox input {
+        width: 19px;
+        height: 19px;
+        padding: 0;
+        margin: 0;
+        display: block;
+    }
+
+    .text {
+        padding-left: 7px;
+        overflow: hidden;
+
+        &.crossed {
+            text-decoration: line-through;
+        }
+    }
+}

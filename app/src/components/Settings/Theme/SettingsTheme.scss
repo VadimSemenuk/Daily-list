@@ -1,0 +1,45 @@
+.settings-visual-wrapper {
+    height: 100%;    
+    padding: 10px;
+
+    .settings-visual-item {       
+        .settings-visual-item-title {
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .themes-list {
+            flex: 1;
+            display: flex;
+            overflow-x: auto;
+        
+            .theme-item-wrapper {
+                flex-shrink: 0;
+    
+                &.active {
+                    transform: scale(1.2);
+                    
+                }
+                .theme-item {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 16px;
+                    position: relative;
+                    -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+                }
+            }
+
+            .theme-item-random .theme-item {
+                border: 1px solid #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                    height: 20px;
+                }
+            }
+        }
+    }
+}
