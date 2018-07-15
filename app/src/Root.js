@@ -25,6 +25,19 @@ class Root extends Component {
         this.state = { }
     }
 
+    componentDidMount() {
+        this.setKeyoardEvents();
+    }
+
+    setKeyoardEvents() {
+        window.addEventListener('keyboardDidShow', () => {
+            document.querySelector(".hide-with-active-keyboard").classList.add("hidden");
+        });
+        window.addEventListener('keyboardDidHide', () => {
+            document.querySelector(".hide-with-active-keyboard").classList.remove("hidden");            
+        });
+    }
+
     onAddRequest = () => this.addRef.getWrappedInstance && this.addRef.getWrappedInstance().onSubmit();
 
     onCalendarRequest = () => this.noteListRef.getWrappedInstance && this.noteListRef.getWrappedInstance().triggerCalendar();    

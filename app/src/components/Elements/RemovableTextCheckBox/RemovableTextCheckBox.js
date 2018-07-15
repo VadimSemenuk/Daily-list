@@ -16,13 +16,12 @@ export default class RemovableTextCheckBox extends PureComponent {
                     checked={this.props.value}
                     onChange={this.onValueChange}
                 />
-                <div className={`text-wrapper ${this.props.value ? "crossed" : ""}`}>
-                    <input 
-                        type="text"
-                        onChange={this.onTextChange}
-                        value={this.props.textValue}
-                    />
-                </div>
+                <input 
+                    type="text"
+                    onChange={this.onTextChange}
+                    value={this.props.textValue}
+                    className={`content-input ${this.props.value ? "crossed" : ""}`}
+                />
                 <button onClick={this.props.onListItemRemove}>
                     <img
                         src={require('../../../media/img/remove.png')} 

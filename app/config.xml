@@ -40,4 +40,5 @@
     <plugin name="cordova-plugin-local-notification" spec="^0.9.0-beta.2" />
     <engine name="android" spec="^7.1.0" />
     <plugin name="cordova-plugin-android-imei" spec="^1.0.0" />
+    <plugin name="cordova-plugin-keyboard" spec="^1.2.0" />
 </widget>

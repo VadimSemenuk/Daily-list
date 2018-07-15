@@ -214,7 +214,7 @@ class Add extends Component {
                         </button> 
                     </div>
                 </div>
-                <div className="add-additionals-wrapper">
+                <div className="add-additionals-wrapper hide-with-active-keyboard">
                     <TimeSet
                         onStateChange={(time) => this.setState({...time})} 
                         notificate={this.state.notificate}
