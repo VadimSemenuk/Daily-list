@@ -7,17 +7,17 @@ import './Tag.scss';
 export default class Tag extends Component {
     render() {   
         return (
-            <div className="tags-wrapper">
+            <div className="color-picker-list-wrapper">
                 {
                     tagsService.getTags().map((a, i) => {
                         return (
                             <button 
-                                className={`tag-wrapper ${this.props.value === a ? "active" : ""}`}
+                                className={`color-item-wrapper ${this.props.value === a ? "active" : ""}`}
                                 key={i}
                                 onClick={() => this.props.onStateChange(tagsService.getTagByIndex(i))}
                             >
                                 <div 
-                                    className="tag"
+                                    className="color-item"
                                     style={{backgroundColor: a}}
                                 ></div>
                             </button>

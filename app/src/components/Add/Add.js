@@ -12,11 +12,6 @@ import Tag from './Tag/Tag';
 
 import './Add.scss';
 
-let modalClass = {
-    modal: "modal",
-    overlay: "modal-overlay"
-}
-
 class Add extends Component {
     constructor(props) {
         super(props);
@@ -238,7 +233,10 @@ class Add extends Component {
                     onClose={() => this.setState({pictureSourceModal: false})}
                     center
                     showCloseIcon={false}
-                    classNames={modalClass}
+                    classNames={{
+                        modal: "modal",
+                        overlay: "modal-overlay"
+                    }}
                     animationDuration={0}
                 >
                     <div className="modal-inner actions-modal-inner">

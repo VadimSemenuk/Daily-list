@@ -37,7 +37,7 @@ body {
     overflow-y: auto;
 }
 
-// button theming
+// button
 button > img {
     margin: auto;
 }
@@ -86,10 +86,6 @@ button,
         height: 32px;
         width: auto;
     }
-}
-.modal-action-button {
-    width: auto;
-    padding: 0 10px;
 }
 button.pick,
 .button.pick {
@@ -251,4 +247,38 @@ select {
     justify-content: center;
     align-items: center;
     height: 100%;
+}
+
+// color picker
+.color-picker-list-wrapper {
+    display: flex;
+    overflow-x: auto;
+    padding: 5px 0;
+    margin-top: 5px;
+
+    .color-item-wrapper {
+        flex-shrink: 0;
+
+        &.active {
+            .color-item {
+                background-image: url("./media/img/tick.svg");
+                background-size: 14px;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+        }
+        &:first-child {
+            .color-item {
+                border: 1px solid #000;
+            }
+        }
+        .color-item {
+            width: 36px;
+            height: 36px;
+            border-radius: 20px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+    }
 }

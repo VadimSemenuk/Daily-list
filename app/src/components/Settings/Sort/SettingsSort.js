@@ -28,7 +28,7 @@ class SettingsSort extends Component {
     render() {
         return (
             <div className="settings-sort-wrapper settings-page-wrapper scroll">
-                <div className="settings-sort-section">
+                <div className="settings-sort-section setting-section">
                     <div className="settings-sort-section-title">Сортировка:</div>
                     <div className="settings-sort-item setting-item">
                         <Radio 
@@ -67,7 +67,7 @@ class SettingsSort extends Component {
                         <span>По убыванию времени добавления</span>
                     </div>
                 </div>
-                <div className="settings-sort-section">
+                <div className="settings-sort-section setting-section">
                     <div className="settings-sort-section-title">Завершенные заметки:</div>
                     <div className="settings-sort-item setting-item">
                         <Radio 

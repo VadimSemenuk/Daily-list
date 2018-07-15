@@ -2,14 +2,29 @@
     background: #fff;
     padding: 10px;
 
+    .setting-section {
+        padding: 10px 0;
+        overflow: hidden;
+        border-bottom: 1px solid #eceaea;        
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item {
+            border-bottom: none;        
+        }
+    }
+
     .setting-item {
-        padding: 12px 0;
+        padding: 16px 0;
         flex: 1;
         align-items: center;
-        border-bottom: 1px solid #e0d9d9;
+        border-bottom: 1px solid #eceaea;
         display: flex;
         width: 100%;
         font-size: 1em;
+        height: unset;
 
         &:last-child {
             border-bottom: none;

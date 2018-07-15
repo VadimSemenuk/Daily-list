@@ -4,6 +4,8 @@ import {connect} from 'react-redux';
 
 import * as AppActions from '../../../actions'; 
 
+import Switch from '../../Elements/Switch/Switch';
+
 import themesService from '../../../services/themes.service';
 
 import './SettingsTheme.scss';
@@ -35,7 +37,7 @@ class SettingsTheme extends Component {
             <div className="settings-visual-wrapper settings-page-wrapper scroll">
                 <div className="settings-visual-item setting-item">
                     <span className="settings-visual-item-title">Тема:</span>
-                    <div className="themes-list">
+                    <div className="color-picker-list-wrapper">
                         <button 
                             className={`theme-item-wrapper theme-item-random ${this.props.settings.theme.id === -1 ? "active" : ""}`} 
                             onClick={() => this.onThemeSelect(-1)}
@@ -53,11 +55,11 @@ class SettingsTheme extends Component {
                             this.state.colors.map((a, i) => (
                                 <button 
                                     key={i} 
-                                    className={`theme-item-wrapper ${this.props.settings.theme.id === a.id ? "active" : ""}`} 
+                                    className={`color-item-wrapper ${this.props.settings.theme.id === a.id ? "active" : ""}`} 
                                     onClick={() => this.onThemeSelect(a.id)}
                                 >
                                     <div 
-                                        className="theme-item"
+                                        className="color-item"
                                         style={{backgroundColor: a.header}}
                                     ></div>
                                 </button>
@@ -84,6 +86,13 @@ class SettingsTheme extends Component {
                             <option value="18">18</option>                            
                         </select>
                     </div>
+                </div>
+                <div className="setting-item">
+                    <span className="setting-item-text">Поле быстрого добавления</span>
+                    <Switch 
+                        checked={this.props.settings.fastAdd}
+                        onChange={(e) => this.props.setSetting('fastAdd', +e)}
+                    />
                 </div>
             </div>
         );

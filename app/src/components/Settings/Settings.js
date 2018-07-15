@@ -27,13 +27,6 @@ class Settings extends Component {
                         onChange={(e) => this.props.setSetting('defaultNotification', +e)}
                     />
                 </div>
-                <div className="setting-item">
-                    <span className="setting-item-text">Поле быстрого добавления</span>
-                    <Switch 
-                        checked={this.props.settings.fastAdd}
-                        onChange={(e) => this.props.setSetting('fastAdd', +e)}
-                    />
-                </div>
                 <button 
                     className="setting-item touchable"
                     onClick={() => this.props.history.push(`${this.props.match.url}/sort`)}                                
