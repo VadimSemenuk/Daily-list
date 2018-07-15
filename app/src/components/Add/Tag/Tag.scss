@@ -9,7 +9,10 @@
 
         &.active {
             .tag {
-                transform: scale(1.2);
+                background-image: url("../../../media/img/tick.svg");
+                background-size: 14px;
+                background-repeat: no-repeat;
+                background-position: center;
             }
         }
         &:first-child {
@@ -18,9 +21,9 @@
             }
         }
         .tag {
-            width: 30px;
-            height: 30px;
-            border-radius: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 20px;
             position: relative;
             box-sizing: border-box;
         }

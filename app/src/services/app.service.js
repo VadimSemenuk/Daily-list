@@ -142,7 +142,7 @@ class AppService {
             if (window.cordova) {
                 window.cordova.plugins.IMEI((err, imei) => err ? reject(err) : resolve(imei)) 
             } else {
-                resolve("1")
+                resolve("2")
             }
         })          
     }

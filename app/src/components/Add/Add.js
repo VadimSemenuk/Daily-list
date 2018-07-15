@@ -6,9 +6,6 @@ import Modal from 'react-responsive-modal';
 
 import * as AppActions from '../../actions'; 
 
-import notificationService from '../../services/notification.service';
-import backupService from '../../services/backup.service';
-
 import RemovableTextCheckBox from '../Elements/RemovableTextCheckBox/RemovableTextCheckBox';
 import TimeSet from './TimeSet/TimeSet';
 import Tag from './Tag/Tag';
@@ -110,22 +107,11 @@ class Add extends Component {
         let note = this.getInputsValues();
 
         if (this.props.match.path === "/edit") { 
-            notificationService.clear(note.key);           
-            if (note.notificate) {
-                notificationService.set(note);
-            };
             await this.props.updateNote(this.props.location.state.dateIndex, this.props.location.state.noteIndex, note);
         } else {         
             note.added = this.props.date;
             note.finished = 0;
             let action = await this.props.addNote(note, this.props.location.state.dateIndex);
-            if (note.notificate) {
-                notificationService.set(action.note);
-            };
-
-            if (this.props.settings.autoBackup && action.note.key % 5 === 0) {
-                backupService.makeBackup();       
-            }
         }
 
         this.props.history.goBack();

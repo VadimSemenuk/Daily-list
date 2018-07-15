@@ -5,7 +5,6 @@ import moment from "moment";
 import ReactSwipe from 'react-swipe';
 import Modal from 'react-responsive-modal';
 
-import notificationService from '../../services/notification.service';
 import synchronizationService from '../../services/synchronization.service';
 import appService from "../../services/app.service";
 import authService from "../../services/auth.service";
@@ -16,8 +15,6 @@ import LightCalendar from '../Calendar/LightCalendar/LightCalendar';
 import Calendar from '../Calendar/Calendar/Calendar';
 
 import * as AppActions from '../../actions'; 
-
-import backupService from '../../services/backup.service';
 
 import './NotesList.scss';
 import pasteImg from "../../media/img/insert.svg"
@@ -111,7 +108,6 @@ class NotesList extends PureComponent {
             this.state.listItemDialogVisible.noteIndex, 
             this.state.listItemDialogVisible.note        
         );
-        notificationService.clear(this.state.listItemDialogVisible.note.key);
         this.closeDialog();              
     }
 
@@ -123,10 +119,6 @@ class NotesList extends PureComponent {
                 added: moment(this.props.currentDate).valueOf()
             }
         )), this.activePageIndex);
-
-        if (action.note.notificate) {
-            notificationService.set(action.note);
-        };
         
         this.setState({
             copyBuffer: null
@@ -175,9 +167,6 @@ class NotesList extends PureComponent {
 
     onFastAdd = async (note) => {
         let action = await this.props.addNote(note, this.activePageIndex);
-        if (this.props.settings.autoBackup && action.note.key % 5 === 0) {
-            backupService.makeBackup();       
-        }
     }
 
     onDateSelect = (e) => {

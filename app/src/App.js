@@ -26,22 +26,14 @@ export default class App extends Component {
     }
 
     async initApp() {
-        try {
-            if (window.cordova) {
-                await new Promise((resolve) => document.addEventListener("deviceready", resolve, false))  
-            }
-
-            await this.initDB();
-            window.DEVICE_IMEI = await appService.getDeviceIMEI();
-            let settings = await settingsService.getSettings();
-            this.setState({
-                settings
-            })
-            store = await initStore();
-        }  catch (err) {
-            console.warn(err);
+        if (window.cordova) {
+            await new Promise((resolve) => document.addEventListener("deviceready", resolve, false));
         }
 
+        await this.initDB();
+        await this.initSettings();
+        window.DEVICE_IMEI = await appService.getDeviceIMEI();
+        store = await initStore();
         this.setState({
             appReady: true
 		});
@@ -50,6 +42,16 @@ export default class App extends Component {
     async initDB() {
         window.db = await DB();
         await appService.createDB();
+    }
+
+    async initSettings() {
+        let settings = await settingsService.getSettings();
+        this.setState({settings});
+
+        document.querySelector("body").style.fontSize = settings.fontSize + "px";
+        if (window.cordova && window.cordova.platformId === 'android') {
+            window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
+        }
     }
 
     render() {

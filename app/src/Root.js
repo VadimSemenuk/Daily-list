@@ -37,14 +37,6 @@ class Root extends Component {
         }
     }
 
-    componentDidMount() {
-        document.querySelector("body").style.fontSize = this.props.settings.fontSize + "px";
-        
-        if (window.cordova && window.cordova.platformId === 'android') {
-            window.StatusBar.backgroundColorByHexString(this.props.settings.theme.statusBar);
-        }
-    }
-
     render() {
         return (
             <HashRouter>

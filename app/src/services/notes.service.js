@@ -4,6 +4,7 @@ import config from "../config/config";
 import uuid from "uuid/v1";
 import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
+import notificationService from "./notification.service";
 
 class NotesService {
     async getDayNotes(date, settings) {
@@ -47,7 +48,8 @@ class NotesService {
             uuid: noteUUID,
             dynamicFields: JSON.stringify(addedNote.dynamicFields),
             finished: false,
-            lastActionTime: actionTime
+            lastActionTime: actionTime,
+            isSynced: 0
         }   
         let noteToLocalInsert = {
             ...noteToRemoteInsert,
@@ -55,13 +57,19 @@ class NotesService {
             finished: +noteToRemoteInsert.finished,            
             lastAction: "ADD",
             userId: authService.getUserId(),
-            isLastActionSynced: 0
+            isLastActionSynced: 0,
+            isSynced: 0            
         }
 
-        let inserted = this.insertNote(noteToLocalInsert);
+        let inserted = await this.insertNote(noteToLocalInsert);
         if (!inserted) {
             return
         }
+
+        notificationService.clear(inserted.insertId);           
+        if (addedNote.notificate) {
+            notificationService.set(inserted.insertId, addedNote);
+        };
 
         if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(inserted.insertId));
@@ -78,7 +86,7 @@ class NotesService {
         let insert = await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, lastAction, lastActionTime, userId, isSynced, isLastActionSynced)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title, 
@@ -173,6 +181,11 @@ class NotesService {
             return
         }
 
+        notificationService.clear(note.key);           
+        if (note.notificate) {
+            notificationService.set(note.key, note);
+        };
+
         if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             fetch(`${config.apiURL}/notes/dynamic-fields`, {
                 method: "POST",
@@ -210,6 +223,8 @@ class NotesService {
         if (!del) {
             return
         }  
+
+        notificationService.clear(note.key);           
 
         if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             fetch(`${config.apiURL}/notes`, {

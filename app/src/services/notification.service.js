@@ -1,5 +1,5 @@
 class NotificationService {
-    set = (data) => {
+    set = (id, data) => {
         if (!window.cordova) return
 
         window.cordova.plugins.notification.local.hasPermission((granted) => { 
@@ -7,7 +7,7 @@ class NotificationService {
                 title: data.title || 'Уведомление о заметке',
                 text: this.getMessgae(data),
                 trigger: { at: new Date(data.startTime.valueOf()) },
-                id: data.key                
+                id                
             });
         });       
     }
