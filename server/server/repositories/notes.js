@@ -20,6 +20,8 @@ module.exports = class {
             await client.query('COMMIT;');
         } catch(err) {
             console.log(err);
+        } finally {
+            client.release();
         }
     }
 
@@ -49,6 +51,8 @@ module.exports = class {
             await client.query('COMMIT;');
         } catch(err) {
             console.log(err);
+        } finally {
+            client.release();
         }
     }
 
@@ -66,6 +70,8 @@ module.exports = class {
             await client.query('COMMIT;');
         } catch(err) {
             console.log(err);
+        } finally {
+            client.release();
         }
     }
 
@@ -83,6 +89,8 @@ module.exports = class {
             await client.query('COMMIT;');
         } catch(err) {
             console.log(err);
+        } finally {
+            client.release();
         }
     }
 
@@ -100,6 +108,8 @@ module.exports = class {
             await client.query('COMMIT;');
         } catch(err) {
             console.log(err);
+        } finally {
+            client.release();
         }
     }
 
