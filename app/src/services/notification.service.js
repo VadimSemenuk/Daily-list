@@ -1,6 +1,8 @@
 class NotificationService {
     set = (id, data) => {
-        if (!window.cordova) return
+        if (!window.cordova) {
+            return
+        }
 
         window.cordova.plugins.notification.local.hasPermission((granted) => { 
             window.cordova.plugins.notification.local.schedule({
@@ -13,14 +15,16 @@ class NotificationService {
     }
 
     clear = (id) => {
-        if (!window.cordova) return
+        if (!window.cordova) {
+            return
+        }
         
         window.cordova.plugins.notification.local.clear(id)
     }
 
     getMessgae(data) {
-        let startTime = "", 
-            endTime = "";
+        let startTime = "";
+        let endTime = "";
         if (data.startTime) {
             startTime = data.startTime.format("HH:mm")
         };

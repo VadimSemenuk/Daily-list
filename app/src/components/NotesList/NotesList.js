@@ -368,7 +368,8 @@ function sort (data, settings) {
     function getNotesCompareFn() {
         if (settings.sort === 1) {
             return (a, b) => {
-                let aVal = 0, bVal = 0;
+                let aVal = 0; 
+                let bVal = 0;
                 if (a.startTime) {
                     aVal = a.startTime.valueOf();
                 }
@@ -380,7 +381,8 @@ function sort (data, settings) {
         }
         if (settings.sort === 2) {
             return (a, b) => {
-                let aVal = 0, bVal = 0;
+                let aVal = 0;
+                let bVal = 0;
                 if (a.startTime) {
                     aVal = a.startTime.valueOf();
                 }

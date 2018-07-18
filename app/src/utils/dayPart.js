@@ -3,16 +3,16 @@ import moment from "moment";
 export function getDayPartName(m = moment()) {	
 	if(!m || !m.isValid()) { return; } 
 	
-	var split_afternoon = 12;
-	var split_evening = 17;
+	var splitAfternoon = 12;
+	var splitEvening = 17;
 	var currentHour = parseFloat(m.format("HH"));
 	
-	if(currentHour >= split_afternoon && currentHour <= split_evening) {
+	if(currentHour >= splitAfternoon && currentHour <= splitEvening) {
 		return {
             part: 1,
             name: "день"
         };
-	} else if(currentHour >= split_evening) {
+	} else if(currentHour >= splitEvening) {
         return {
             part: 2,
             name: "вечер"
