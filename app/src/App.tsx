@@ -27,17 +27,6 @@ type AppState = {
 }
 
 export default class App extends React.Component<{}, AppState> {
-    // constructor(props: any) {
-    //     super(props);
-
-    //     this.state = {
-    //         appReady: false
-    //     }
-    // }
-
-    // public render() {
-    //     return <div>hi</div>
-    // }
     constructor(props: any) {
         super(props);
 

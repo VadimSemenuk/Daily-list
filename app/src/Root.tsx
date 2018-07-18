@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import * as React from "react";
 import {HashRouter, Route, Redirect} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -18,39 +18,46 @@ import Troubleshooting from './components/Settings/Troubleshooting/Troubleshooti
 import About from './components/Settings/About/About';
 import SynchronizationLoader from "./components/Elements/SynchronizationLoader/SynchronizationLoader";
 
-class Root extends Component {
-    constructor(props) {
+type RootProps = {
+    password: any;
+}
+
+class Root extends React.Component<RootProps, any> {
+    constructor(props: any) {
         super(props);
 
         this.state = { }
     }
 
-    componentDidMount() {
+    private addRef: any;
+    private noteListRef: any;
+
+    public componentDidMount() {
         this.setKeyoardEvents();
     }
 
-    setKeyoardEvents() {
+    private setKeyoardEvents() {
         window.addEventListener('keyboardDidShow', () => {
-            document.querySelector(".hide-with-active-keyboard").classList.add("hidden");
+            (document.querySelector(".hide-with-active-keyboard") as HTMLElement).classList.add("hidden");
         });
         window.addEventListener('keyboardDidHide', () => {
-            document.querySelector(".hide-with-active-keyboard").classList.remove("hidden");            
+            (document.querySelector(".hide-with-active-keyboard") as HTMLElement).classList.remove("hidden");            
         });
     }
 
-    onAddRequest = () => this.addRef.getWrappedInstance && this.addRef.getWrappedInstance().onSubmit();
+    public onAddRequest = () => this.addRef.getWrappedInstance && this.addRef.getWrappedInstance().onSubmit();
 
-    onCalendarRequest = () => this.noteListRef.getWrappedInstance && this.noteListRef.getWrappedInstance().triggerCalendar();    
+    public onCalendarRequest = () => this.noteListRef.getWrappedInstance && this.noteListRef.getWrappedInstance().triggerCalendar();    
 
-    onDateSelect = (date) => this.noteListRef.getWrappedInstance && this.noteListRef.getWrappedInstance().setDate(date);        
+    public onDateSelect = (date: any) => this.noteListRef.getWrappedInstance && this.noteListRef.getWrappedInstance().setDate(date);        
 
-    getDateIndex = () => {
+    public getDateIndex = () => {
         if (this.noteListRef.getWrappedInstance) {
             return this.noteListRef.getWrappedInstance().activePageIndex
         }
     }
 
-    render() {
+    public render() {
         return (
             <HashRouter>
                 <div className="app-wrapper">
@@ -141,15 +148,16 @@ class Root extends Component {
     }
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state: any, props: any) {
     return {
         settings: state.settings,
         password: state.password
     }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: any) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null)(Root);
+// export default connect(mapStateToProps, mapDispatchToProps, null)(Root);
+export default connect(mapStateToProps, mapDispatchToProps)(Root);
