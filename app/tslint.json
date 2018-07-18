@@ -12,5 +12,12 @@
     "no-shadowed-variable": false,
     "no-unused-expression": false,
     "no-bitwise": false
+  },
+  "rules": {
+    "interface-name" : [true, "never-prefix"],
+    "prefer-const": false,
+    "ordered-imports": false,
+    "interface-over-type-literal": false,
+    "member-ordering": false
   }
 }
