@@ -17,7 +17,8 @@ export default class App extends Component {
         super();
 
         this.state = {
-            appReady: false
+            appReady: false,
+            settings: null
         }
     }
 
@@ -47,7 +48,9 @@ export default class App extends Component {
     async initSettings() {
         let settings = await settingsService.getSettings();
         this.setState({settings});
+    }
 
+    applyInitSettings(settings) {
         document.querySelector("body").style.fontSize = settings.fontSize + "px";
         if (window.cordova && window.cordova.platformId === 'android') {
             window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
