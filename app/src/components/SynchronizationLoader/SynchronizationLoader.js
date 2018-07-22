@@ -3,7 +3,7 @@ import { BeatLoader } from 'react-spinners';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import * as AppActions from '../../../actions'; 
+import * as AppActions from '../../actions'; 
 
 import "./SynchronizationLoader.scss";
 

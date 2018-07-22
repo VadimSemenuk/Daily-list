@@ -6,17 +6,17 @@ import {connect} from 'react-redux';
 import * as AppActions from './actions'; 
 
 import Header from './components/Header/Header';
-import NotesList from './components/NotesList/NotesList';
-import Add from './components/Add/Add';
-import Password from './components/Password/Password';
-import Settings from './components/Settings/Settings';
-import SettingsTheme from './components/Settings/Theme/SettingsTheme';
-import SettingsSort from './components/Settings/Sort/SettingsSort';
-import SettingsPassword from './components/Settings/Password/SettingsPassword';
-import SettingsBackup from './components/Settings/Backup/SettingsBackup';
-import Troubleshooting from './components/Settings/Troubleshooting/Troubleshooting';
-import About from './components/Settings/About/About';
-import SynchronizationLoader from "./components/Elements/SynchronizationLoader/SynchronizationLoader";
+import NotesList from './pages/NotesList/NotesList';
+import Add from './pages/Add/Add';
+import Password from './pages/Password/Password';
+import Settings from './pages/Settings/Settings';
+import SettingsTheme from './pages/Theme/SettingsTheme';
+import SettingsSort from './pages/Sort/SettingsSort';
+import SettingsPassword from './pages/Password/SettingsPassword';
+import SettingsBackup from './pages/Backup/SettingsBackup';
+import Troubleshooting from './pages/Troubleshooting/Troubleshooting';
+import About from './pages/About/About';
+import SynchronizationLoader from "./components/SynchronizationLoader/SynchronizationLoader";
 
 class Root extends Component {
     constructor(props) {
@@ -37,103 +37,68 @@ class Root extends Component {
             document.querySelector(".hide-with-active-keyboard").classList.remove("hidden");            
         });
     }
-
-    onAddRequest = () => this.addRef.getWrappedInstance && this.addRef.getWrappedInstance().onSubmit();
-
-    onCalendarRequest = () => this.noteListRef.getWrappedInstance && this.noteListRef.getWrappedInstance().triggerCalendar();    
-
-    onDateSelect = (date) => this.noteListRef.getWrappedInstance && this.noteListRef.getWrappedInstance().setDate(date);        
-
-    getDateIndex = () => {
-        if (this.noteListRef.getWrappedInstance) {
-            return this.noteListRef.getWrappedInstance().activePageIndex
-        }
-    }
-
+       
     render() {
         return (
             <HashRouter>
                 <div className="app-wrapper">
-                    <Header 
-                        onAddRequest={this.onAddRequest}
-                        onCalendarRequest={this.onCalendarRequest}  
-                        getDateIndex={this.getDateIndex}     
-                        onDateSelect={this.onDateSelect}                 
+                    {
+                        !this.props.password &&
+                        <Redirect from="/" to="/password"/>           
+                    }             
+                    <Route 
+                        path="/" 
+                        component={NotesList}
                     />
-                    <div className="app-content">
-                        {
-                            !this.props.password &&
-                            <Redirect from="/" to="/password"/>           
-                        }             
-                        <Route 
-                            path="/" 
-                            render={(props) => (
-                                <NotesList
-                                    ref={(a) => this.noteListRef = a} 
-                                    {...props} 
-                                />
-                            )}
-                        />
-                        <Route 
-                            exact 
-                            path="/add" 
-                            render={(props) => (
-                                <Add
-                                    ref={(a) => this.addRef = a} 
-                                    {...props} 
-                                />
-                            )}
-                        />
-                        <Route 
-                            exact 
-                            path="/edit" 
-                            render={(props) => (
-                                <Add
-                                    ref={(a) => this.addRef = a} 
-                                    {...props} 
-                                />
-                            )}
-                        />  
-                        <Route 
-                            exact 
-                            path="/password" 
-                            component={Password}
-                        /> 
-                        <Route 
-                            path="/settings" 
-                            component={Settings} 
-                        />
-                        <Route 
-                            exact 
-                            path="/settings/sort" 
-                            component={SettingsSort} 
-                        />  
-                        <Route 
-                            exact 
-                            path="/settings/theme" 
-                            component={SettingsTheme} 
-                        />       
-                        <Route 
-                            exact 
-                            path="/settings/password" 
-                            component={SettingsPassword} 
-                        />     
-                        <Route 
-                            exact 
-                            path="/settings/backup" 
-                            component={SettingsBackup} 
-                        />    
-                        <Route 
-                            exact 
-                            path="/settings/troubleshooting" 
-                            component={Troubleshooting} 
-                        />    
-                        <Route 
-                            exact 
-                            path="/settings/about" 
-                            component={About} 
-                        />                                              
-                    </div> 
+                    <Route 
+                        exact 
+                        path="/add" 
+                        component={Add}
+                    />
+                    <Route 
+                        exact 
+                        path="/edit" 
+                        component={Add}
+                    />  
+                    <Route 
+                        exact 
+                        path="/password" 
+                        component={Password}
+                    /> 
+                    <Route 
+                        path="/settings" 
+                        component={Settings} 
+                    />
+                    <Route 
+                        exact 
+                        path="/settings/sort" 
+                        component={SettingsSort} 
+                    />  
+                    <Route 
+                        exact 
+                        path="/settings/theme" 
+                        component={SettingsTheme} 
+                    />       
+                    <Route 
+                        exact 
+                        path="/settings/password" 
+                        component={SettingsPassword} 
+                    />     
+                    <Route 
+                        exact 
+                        path="/settings/backup" 
+                        component={SettingsBackup} 
+                    />    
+                    <Route 
+                        exact 
+                        path="/settings/troubleshooting" 
+                        component={Troubleshooting} 
+                    />    
+                    <Route 
+                        exact 
+                        path="/settings/about" 
+                        component={About} 
+                    />                                              
                     <SynchronizationLoader />
                 </div>
             </HashRouter>

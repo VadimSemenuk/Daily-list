@@ -1,8 +1,8 @@
 import React, {PureComponent} from 'react';
 import moment from "moment";
 
-import TextCheckBox from '../../Elements/TextCheckBox/TextCheckBox';
-import CustomCheckBox from '../../Elements/CustomCheckBox/CustomCheckBox';
+import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
+import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 
 import './ListItem.scss';
 
