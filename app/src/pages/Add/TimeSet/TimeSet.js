@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import moment from 'moment';
 
-import Switch from "../../Elements/Switch/Switch"
+import Switch from "../../../components/Switch/Switch"
 
 import './TimeSet.scss';
 

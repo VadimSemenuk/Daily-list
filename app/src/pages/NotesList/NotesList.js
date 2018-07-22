@@ -11,8 +11,9 @@ import authService from "../../services/auth.service";
 
 import FastAdd from '../Add/FastAdd/FastAdd';
 import DayNotesList from './DayNotesList/DayNotesList';
-import LightCalendar from '../Calendar/LightCalendar/LightCalendar';
-import Calendar from '../Calendar/Calendar/Calendar';
+import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
+import Calendar from '../../components/Calendar/Calendar/Calendar';
+import Header from '../../components/Header/Header';
 
 import * as AppActions from '../../actions'; 
 
@@ -177,87 +178,106 @@ class NotesList extends PureComponent {
         this.setState({calendar: !this.state.calendar})
     }
 
+    onAddPageRequest = () => {
+        this.props.history.push({
+            pathname: `/add`,
+            state: { dateIndex: this.activePageIndex }
+        })
+    }
+
+    onTodaySelect = () => {
+        this.setDate(moment().startOf("day"))
+    }
+
     render() {
-        // console.log("notes lists container render");
         return (
-            <div className="notes-list-wrapper">
-                {   
-                    !this.state.calendar && 
-                    <LightCalendar 
-                        settings={this.props.settings}
-                        onDateSet={this.setDate}
-                        currentDate={this.props.currentDate}
-                    />
-                }
-                {
-                    this.state.calendar &&
-                    <Calendar 
-                        currentDate={this.props.currentDate}
-                        settings={this.props.settings}
-                        onDateSet={this.setDate}
-                    />
-                }
-                <ReactSwipe 
-                    ref={this.setSliderRef}
-                    className="notes-list-swiper" 
-                    swipeOptions={{
-                        continuous: true,
-                        startSlide: 1,
-                        callback: this.onSliderChange,
-                        transitionEnd: this.onTransitionEnd 
-                    }} 
-                    key={this.props.notes.length}
-                >
-                    {
-                        [null, null, null].map((a, i) => (
-                            <div className="notes-list-item-wrapper" key={i}>
-                                <DayNotesList 
-                                    notes={this.props.notes[i]} 
-                                    index={i}
-                                    onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                    onItemFinishChange={this.props.setNoteCheckedState}
-                                    onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                />
-                            </div>
-                        ))
-                    }
-                </ReactSwipe>
-
-                <Modal 
-                    open={this.state.listItemDialogVisible ? true : false} 
-                    onClose={this.closeDialog}
-                    center
-                    showCloseIcon={false}
-                    classNames={modalClass}
-                    animationDuration={0}
-                >
-                    <div className="modal-inner note-actions-modal-inner actions-modal-inner">
-                        <button onClick={this.onEditRequest}>Редактировать</button>
-                        <button onClick={this.onListItemRemove}>Удалить</button>
-                        <button onClick={this.onCopyRequest}>Копировать</button>                        
-                    </div>
-                </Modal>
-
-                {
-                    this.state.copyBuffer && 
-                    <button 
-                        className="fab"
-                        onClick={this.pasteCopy}
-                    >
-                        <img 
-                            src={pasteImg}
-                            alt="insert"
+            <div className="page-wrapper">
+                <Header
+                    page="notes"
+                    showCurrentDate={true}
+                    onAddPageRequest={this.onAddPageRequest}
+                    onCalendarRequest={this.triggerCalendar}
+                    onSelectToday={this.onTodaySelect}
+                />
+                <div className="notes-list-wrapper page-content">
+                    {   
+                        !this.state.calendar && 
+                        <LightCalendar 
+                            settings={this.props.settings}
+                            onDateSet={this.setDate}
+                            currentDate={this.props.currentDate}
                         />
-                    </button>
-                }
+                    }
+                    {
+                        this.state.calendar &&
+                        <Calendar 
+                            currentDate={this.props.currentDate}
+                            settings={this.props.settings}
+                            onDateSet={this.setDate}
+                        />
+                    }
+                    <ReactSwipe 
+                        ref={this.setSliderRef}
+                        className="notes-list-swiper" 
+                        swipeOptions={{
+                            continuous: true,
+                            startSlide: 1,
+                            callback: this.onSliderChange,
+                            transitionEnd: this.onTransitionEnd 
+                        }} 
+                        key={this.props.notes.length}
+                    >
+                        {
+                            [null, null, null].map((a, i) => (
+                                <div className="notes-list-item-wrapper" key={i}>
+                                    <DayNotesList 
+                                        notes={this.props.notes[i]} 
+                                        index={i}
+                                        onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                        onItemFinishChange={this.props.setNoteCheckedState}
+                                        onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                    />
+                                </div>
+                            ))
+                        }
+                    </ReactSwipe>
 
-                {
-                    !!this.props.settings.fastAdd && 
-                    <FastAdd 
-                        currentDate={this.props.currentDate}
-                        onSubmit={this.onFastAdd}
-                    />   
-                }
+                    <Modal 
+                        open={this.state.listItemDialogVisible ? true : false} 
+                        onClose={this.closeDialog}
+                        center
+                        showCloseIcon={false}
+                        classNames={modalClass}
+                        animationDuration={0}
+                    >
+                        <div className="modal-inner note-actions-modal-inner actions-modal-inner">
+                            <button onClick={this.onEditRequest}>Редактировать</button>
+                            <button onClick={this.onListItemRemove}>Удалить</button>
+                            <button onClick={this.onCopyRequest}>Копировать</button>                        
+                        </div>
+                    </Modal>
+
+                    {
+                        this.state.copyBuffer && 
+                        <button 
+                            className="fab"
+                            onClick={this.pasteCopy}
+                        >
+                            <img 
+                                src={pasteImg}
+                                alt="insert"
+                            />
+                        </button>
+                    }
+
+                    {
+                        !!this.props.settings.fastAdd && 
+                        <FastAdd 
+                            currentDate={this.props.currentDate}
+                            onSubmit={this.onFastAdd}
+                        />   
+                    }
+                </div>
             </div>
         )
     }

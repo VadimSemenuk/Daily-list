@@ -18,13 +18,9 @@ body {
     height: 100%;        
     display: flex;
     flex-direction: column;
-}
-.app-content {
-    flex: 1;
-    overflow: hidden;
     position: relative;
 }
-.app-content > div {
+.page-wrapper {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -32,6 +28,8 @@ body {
     right: 0;
     background: #fff;
     z-index: 100;
+    display: flex;
+    flex-direction: column;
 }
 .scroll {
     overflow-y: auto;
