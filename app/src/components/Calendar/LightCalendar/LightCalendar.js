@@ -17,11 +17,21 @@ export default class LightCalendar extends Component {
         this.state={
             data: initDates,
             selectedDay: moment(this.props.currentDate).isoWeekday(),
-            selectedWeekStartDate: initDates[1].valueOf()
+            selectedWeekStartDate: initDates[1].valueOf(),
+            weekDates: this.getWeekDates()
         }
 
         this.activePageIndex = 1;  
         this.prevPageIndex = 1;
+    }
+
+    getWeekDates() {
+        // start date++ 7 times
+        return [
+            [21, 22, 23, 24, 25, 26, 27],
+            [21, 22, 23, 24, 25, 26, 27],
+            [21, 22, 23, 24, 25, 26, 27]            
+        ]
     }
 
     setDate(selectedDay, selectedWeekStartDate, date) {
@@ -126,8 +136,7 @@ export default class LightCalendar extends Component {
                                     className="light-calendar-swiper-item"
                                 >
                                     {
-                                        [1, 2, 3, 4, 5, 6, 7].map((a, i) => {
-                                            let date = moment(starWeektDate).day(a);
+                                        this.state.weekDates[i].map((a, i) => {
                                             let active = visible && this.state.selectedDay === a;
 
                                             return (
@@ -139,9 +148,9 @@ export default class LightCalendar extends Component {
                                                     {   
                                                         false 
                                                         &&
-                                                        <span className="light-calendar-date-day">{date.format('ddd')}</span>
+                                                        <span className="light-calendar-date-day">{days[i]}</span>
                                                     }
-                                                    <span className="light-calendar-date-number">{date.format('DD')}</span>                            
+                                                    <span className="light-calendar-date-number">{date}</span>                            
                                                 </button> 
                                             ) 
                                         })
