@@ -18,7 +18,6 @@ export default class LightCalendar extends Component {
             weeks,
             selectedDayNumber: moment(this.props.currentDate).isoWeekday() - 1,
             selectedWeekStartDate: moment(this.props.currentDate).startOf('isoWeek').valueOf(),
-
             monthName: this.getMonthName(weeks[1][0], weeks[1][6])
         }
 
@@ -84,14 +83,19 @@ export default class LightCalendar extends Component {
             selectedDayNumber, 
             selectedWeekStartDate: moment(selectedDayDate).startOf("isoWeek").valueOf()
         })
+
+        this.props.onDateSet(moment(selectedDayDate));
     }
 
     // componentWillReceiveProps(nextProps) {
     //     let selectedWeekStartDate = moment(nextProps.currentDate).startOf('isoWeek').valueOf();
-    //     let selectedDay = moment(nextProps.currentDate).isoWeekday();   
+    //     let selectedDayNumber = moment(nextProps.currentDate).isoWeekday();   
 
-    //     if (selectedWeekStartDate === this.state.data[this.activePageIndex].valueOf()) {
-    //         this.setState({selectedDay, selectedWeekStartDate});
+    //     if (selectedWeekStartDate === this.state.weeks[this.activePageIndex][0].msDate) {
+    //         this.setState({
+    //             selectedDayNumber, 
+    //             selectedWeekStartDate
+    //         });
     //     } else {
     //         let initDates;
     //         if (this.activePageIndex === 2) {
@@ -159,7 +163,6 @@ export default class LightCalendar extends Component {
                                         week={week} 
                                         visible={visible}
                                         selectedDayNumber={this.state.selectedDayNumber}
-                                        
                                         onSelect={this.setDate} 
                                     />
                                 </div>

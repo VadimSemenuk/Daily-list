@@ -1,12 +1,6 @@
 import React, {PureComponent} from 'react';
 
 export default class WeekDatesRow extends PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.state = { }
-    }
-
     render() {
         return (
             <div className="light-calendar-swiper-item">
