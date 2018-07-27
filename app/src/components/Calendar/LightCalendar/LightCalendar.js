@@ -4,6 +4,8 @@ import moment from 'moment';
 
 import './LightCalendar.scss';
 
+import WeekDatesRow from "./WeekDatesRow";
+
 const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
 export default class LightCalendar extends Component {
@@ -48,13 +50,6 @@ export default class LightCalendar extends Component {
         ]
     }
 
-    setDate(selectedDayNumber, selectedDayDate) {
-        this.setState({
-            selectedDayNumber, 
-            selectedWeekStartDate: moment(selectedDayDate).startOf("isoWeek").valueOf()
-        })
-    }
-
     onSlideChange = ({index, nextIndex, side}) => {       
         let weeks = this.state.weeks.slice();
 
@@ -82,6 +77,13 @@ export default class LightCalendar extends Component {
         } else {
             return weekStartDayMonthName
         }
+    }
+
+    setDate = (selectedDayNumber, selectedDayDate) => {
+        this.setState({
+            selectedDayNumber, 
+            selectedWeekStartDate: moment(selectedDayDate).startOf("isoWeek").valueOf()
+        })
     }
 
     // componentWillReceiveProps(nextProps) {
@@ -152,25 +154,14 @@ export default class LightCalendar extends Component {
                             const visible = week[0].msDate === this.state.selectedWeekStartDate;                                                                                 
 
                             return (
-                                <div 
-                                    key={i}
-                                    className="light-calendar-swiper-item"
-                                >
-                                    {
-                                        week.map((date, i) => {
-                                            let active = visible && this.state.selectedDayNumber === i;
-
-                                            return (
-                                                <button 
-                                                    className={`light-calendar-date ${active ? 'active' : ''}`}
-                                                    key={i} 
-                                                    onClick={() => this.setDate(i, date)}
-                                                >        
-                                                    <span className="light-calendar-date-number">{date.monthDayNumber}</span>                            
-                                                </button> 
-                                            ) 
-                                        })
-                                    }
+                                <div key={i}>
+                                    <WeekDatesRow 
+                                        week={week} 
+                                        visible={visible}
+                                        selectedDayNumber={this.state.selectedDayNumber}
+                                        
+                                        onSelect={this.setDate} 
+                                    />
                                 </div>
                             )
                         })

@@ -1,21 +1,24 @@
 import React, {PureComponent} from 'react';
 
-export default class LightCalendar extends PureComponent {
+export default class WeekDatesRow extends PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.state = { }
+    }
+
     render() {
         return (
-            <div 
-                key={i}
-                className="light-calendar-swiper-item"
-            >
+            <div className="light-calendar-swiper-item">
                 {
-                    week.map((date, i) => {
-                        let active = visible && this.state.selectedDayNumber === i;
+                    this.props.week.map((date, i) => {
+                        const active = this.props.visible && this.props.selectedDayNumber === i;
 
                         return (
                             <button 
                                 className={`light-calendar-date ${active ? 'active' : ''}`}
                                 key={i} 
-                                onClick={() => this.setDate(i, date)}
+                                onClick={() => this.props.onSelect(i, date.msDate)}
                             >        
                                 <span className="light-calendar-date-number">{date.monthDayNumber}</span>                            
                             </button> 
