@@ -235,22 +235,15 @@ class Add extends Component {
                         />
                     </div>
 
-                    <Modal 
-                        open={this.state.pictureSourceModal} 
-                        onClose={() => this.setState({pictureSourceModal: false})}
-                        center
-                        showCloseIcon={false}
-                        classNames={{
-                            modal: "modal",
-                            overlay: "modal-overlay"
-                        }}
-                        animationDuration={0}
-                    >
-                        <div className="modal-inner actions-modal-inner">
-                            <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}>Открыть галерею</button>
-                            <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}>Сделать снимок</button>                       
-                        </div>
-                    </Modal>
+                    {
+                        this.state.pictureSourceModal && 
+                        <Modal onClose={() => this.setState({pictureSourceModal: false})}>
+                            <div className="modal-inner actions-modal-inner">
+                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}>Открыть галерею</button>
+                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}>Сделать снимок</button>                       
+                            </div>
+                        </Modal>
+                    }
                 </div>
             </div>
         );

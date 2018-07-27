@@ -180,66 +180,6 @@ select {
     }
 }
 
-// calendar
-.calendar-modal {
-    padding: 0px;
-    background: transparent;
-}
-.calendar {
-    font-family: 'Roboto';
-
-    .Cal__Weekdays__day {
-        padding: 7px 0;
-    }
-    .Cal__Header__root {
-        padding: 10px;
-        min-height: 80px;
-        z-index: 999;
-        border-radius: 0;
-
-        padding-bottom: 0px;
-        min-height: 70px;
-    }
-    .Cal__Today__chevron {
-        margin-left: 34px;
-    }
-
-    .Cal__Header__year {
-        font-size: 16px;
-    }
-    .Cal__Header__day {
-        font-size: 20px;
-        line-height: 34px;
-    }
-}
-
-// time
-.time-modal {
-    width: 100%;
-    max-width: 500px;
-    padding: 0px;
-    
-    .time_picker_container {
-        .time_picker_modal_container {
-            position: relative;
-            top: 0;
-            left: 0;
-            transform: none;
-            border-radius: 0;
-            box-shadow: none;
-            
-            .time_picker_modal_header {
-                border-radius: 0;            
-            }
-
-            .picker_container {
-                margin: 20px auto;
-                margin-bottom: 20px;
-            }
-        }
-    }
-}
-
 .init-loader-container {
     display: flex;
     justify-content: center;
