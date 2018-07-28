@@ -6,13 +6,13 @@ export default class WeekDatesRow extends PureComponent {
             <div className="light-calendar-swiper-item">
                 {
                     this.props.week.map((date, i) => {
-                        const active = this.props.visible && this.props.selectedDayNumber === i;
+                        let active = this.props.msSelectedDate === date.valueOf();
 
                         return (
                             <button 
                                 className={`light-calendar-date ${active ? 'active' : ''}`}
                                 key={i} 
-                                onClick={() => this.props.onSelect(i, date)}
+                                onClick={() => this.props.onSelect(date)}
                             >        
                                 <span className="light-calendar-date-number">{date.format("DD")}</span>                            
                             </button> 

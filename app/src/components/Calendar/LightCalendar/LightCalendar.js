@@ -12,13 +12,12 @@ export default class LightCalendar extends Component {
     constructor(props) {
         super(props);
 
-        const currentDate = moment(this.props.currentDate);
-        const weeks = this.generateWeeksSequence(currentDate.startOf('isoWeek'));
+        let msSelectedDate = moment(this.props.currentDate).startOf("day").valueOf();
+        let weeks = this.generateWeeksSequence(moment(msSelectedDate).startOf('isoWeek'));
 
         this.state = {
             weeks,
-            selectedDayNumber: currentDate.isoWeekday() - 1,
-            selectedWeekStartDate: currentDate.startOf('isoWeek').valueOf(),
+            msSelectedDate,
             monthName: this.getMonthName(weeks[1][0], weeks[1][6])
         }
 
@@ -38,7 +37,7 @@ export default class LightCalendar extends Component {
         return [
             this.generateWeekDates(moment(weekStartDate).subtract(1, 'week')),
             this.generateWeekDates(moment(weekStartDate)),
-            this.generateWeekDates(moment(weekStartDate).add(1, 'week')),            
+            this.generateWeekDates(moment(weekStartDate).add(1, 'week'))         
         ]
     }
 
@@ -46,12 +45,12 @@ export default class LightCalendar extends Component {
         let weeks = this.state.weeks.slice();
 
         if (side === "left") {        
-            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).subtract(-1, 'week'));                       
+            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).subtract(1, 'week'));                       
         } else {   
             weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(1, 'week'));
         }
 
-        const monthName = this.getMonthName(weeks[index][0], weeks[index][6])
+        let monthName = this.getMonthName(weeks[index][0], weeks[index][6]);
         
         this.setState({
             weeks,
@@ -70,59 +69,58 @@ export default class LightCalendar extends Component {
         }
     }
 
-    setDate = (selectedDayNumber, selectedDayDate) => {
+    setDate = (date) => {
         this.setState({
-            selectedDayNumber, 
-            selectedWeekStartDate: moment(selectedDayDate).startOf("isoWeek").valueOf()
+            msSelectedDate: date.valueOf()
         })
 
-        this.props.onDateSet(moment(selectedDayDate));
+        this.props.onDateSet(moment(date));
     }
 
-    // componentWillReceiveProps(nextProps) {
-    //     let selectedWeekStartDate = moment(nextProps.currentDate).startOf('isoWeek').valueOf();
-    //     let selectedDayNumber = moment(nextProps.currentDate).isoWeekday();   
+    componentWillReceiveProps(nextProps) {
+        let msSelectedWeekStartDate = moment(nextProps.currentDate).startOf('isoWeek').valueOf();
 
-    //     if (selectedWeekStartDate === this.state.weeks[this.activePageIndex][0].msDate) {
-    //         this.setState({
-    //             selectedDayNumber, 
-    //             selectedWeekStartDate
-    //         });
-    //     } else {
-    //         let initDates;
-    //         if (this.activePageIndex === 2) {
-    //             initDates = [
-    //                 moment(nextProps.currentDate).startOf('isoWeek'),
-    //                 moment(nextProps.currentDate).add(1, 'week').startOf('isoWeek'),
-    //                 moment(nextProps.currentDate).subtract(1, 'week').startOf('isoWeek')
-    //             ]
-    //         } else if (this.activePageIndex === 0) {
-    //             initDates = [
-    //                 moment(nextProps.currentDate).subtract(1, 'week').startOf('isoWeek'),
-    //                 moment(nextProps.currentDate).startOf('isoWeek'),
-    //                 moment(nextProps.currentDate).add(1, 'week').startOf('isoWeek')
-    //             ]
-    //         } else {
-    //             initDates = [
-    //                 moment(nextProps.currentDate).add(1, 'week').startOf('isoWeek'),
-    //                 moment(nextProps.currentDate).subtract(1, 'week').startOf('isoWeek'), 
-    //                 moment(nextProps.currentDate).startOf('isoWeek')
-    //             ]
-    //         }
+        if (msSelectedWeekStartDate === this.state.weeks[this.activePageIndex][0].valueOf()) {
+            this.setState({
+                msSelectedDate: nextProps.currentDate.valueOf()
+            });
+        } else {
+            let weeks;
+            if (this.activePageIndex === 2) {
+                weeks = [
+                    this.generateWeekDates(moment(msSelectedWeekStartDate)),
+                    this.generateWeekDates(moment(msSelectedWeekStartDate).add(1, 'week')),   
+                    this.generateWeekDates(moment(msSelectedWeekStartDate).subtract(1, 'week')) 
+                ]
+            } else if (this.activePageIndex === 0) {
+                weeks = [
+                    this.generateWeekDates(moment(msSelectedWeekStartDate).subtract(1, 'week')), 
+                    this.generateWeekDates(moment(msSelectedWeekStartDate)),
+                    this.generateWeekDates(moment(msSelectedWeekStartDate).add(1, 'week'))
+                ]
+            } else {
+                weeks = [
+                    this.generateWeekDates(moment(msSelectedWeekStartDate).add(1, 'week')), 
+                    this.generateWeekDates(moment(msSelectedWeekStartDate).subtract(1, 'week')), 
+                    this.generateWeekDates(moment(msSelectedWeekStartDate))
+                ]
+            }
 
-    //         this.setState({
-    //             data: initDates,
-    //             selectedDay,
-    //             selectedWeekStartDate
-    //         }, () => {
-    //             if (selectedWeekStartDate > this.state.data[this.activePageIndex].valueOf()) {
-    //                 this.sliderRef.next();
-    //             } else if (selectedWeekStartDate < this.state.data[this.activePageIndex].valueOf()) {
-    //                 this.sliderRef.prev();            
-    //             }
-    //         })
-    //     }
-    // }
+            let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
+
+            this.setState({
+                weeks,
+                msSelectedDate: nextProps.currentDate.valueOf(),
+                monthName
+            }, () => {
+                if (msSelectedWeekStartDate > weeks[this.activePageIndex][0].valueOf()) {
+                    this.sliderRef.next();
+                } else {
+                    this.sliderRef.prev();            
+                }
+            })
+        }
+    }
 
     setSliderRef = (a) => {
         this.sliderRef = a;
@@ -155,14 +153,11 @@ export default class LightCalendar extends Component {
                 >
                     {
                         this.state.weeks.map((week, i) => {
-                            const visible = week[0].valueOf() === this.state.selectedWeekStartDate;                                                                                 
-
                             return (
                                 <div key={i}>
                                     <WeekDatesRow 
                                         week={week} 
-                                        visible={visible}
-                                        selectedDayNumber={this.state.selectedDayNumber}
+                                        msSelectedDate={this.state.msSelectedDate}
                                         onSelect={this.setDate} 
                                     />
                                 </div>
