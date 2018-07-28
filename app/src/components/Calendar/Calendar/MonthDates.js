@@ -17,7 +17,7 @@ export default class MonthDates extends PureComponent {
                                             return <div key={i} className="calendar-date"></div>
                                         }
 
-                                        let active = weekDay.valueOf() === this.props.selectedDateMS;
+                                        let active = weekDay.valueOf() === this.props.msSelectedDate;
                                         return (
                                             <button 
                                                 className={`calendar-date ${active ? 'active' : ''}`}

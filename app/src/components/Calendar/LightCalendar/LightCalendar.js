@@ -46,7 +46,7 @@ export default class LightCalendar extends Component {
         let weeks = this.state.weeks.slice();
 
         if (side === "left") {        
-            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(-1, 'week'));                       
+            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).subtract(-1, 'week'));                       
         } else {   
             weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(1, 'week'));
         }

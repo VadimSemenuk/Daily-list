@@ -7,13 +7,19 @@ import './Calendar.scss';
 import MonthDates from "./MonthDates";
 import WeekDays from "./WeekDays";
 
+import sliderChangeSide from "../../../utils/sliderChangeSide";
+
 export default class Calendar extends Component {
     constructor(props) {
         super(props);
 
-        this.state={
-            currentDate: moment(this.props.currentDate).startOf("day"),
-            selectedDateMS: moment(this.props.currentDate).startOf("day").valueOf(),
+        let msSelectedDate = moment(this.props.currentDate).startOf("day").valueOf();
+        let currentMonthStartDate = moment(msSelectedDate).startOf("month");        
+
+        this.state = {
+            monthes: this.getMonthes(currentMonthStartDate),
+            currentMonthStartDate,
+            msSelectedDate
         }
 
         this.activePageIndex = 1;  
@@ -21,23 +27,34 @@ export default class Calendar extends Component {
     }
 
     onSlideChange = ({index, nextIndex, side}) => {   
-        let currentDate;
+        let nextMonthes = this.state.monthes.slice();
+        let nextCurrentMonthStartDate;
         
         if (side === "left") {
-            currentDate = moment(this.state.currentDate).subtract(1, 'month');   
+            nextCurrentMonthStartDate = moment(this.state.currentMonthStartDate).subtract(1, 'month');
+            nextMonthes[nextIndex] = this.getMonthDays(moment(nextCurrentMonthStartDate).subtract(1, 'month'));   
         } else {   
-            currentDate = moment(this.state.currentDate).add(1, 'month');   
+            nextCurrentMonthStartDate = moment(this.state.currentMonthStartDate).add(1, 'month');
+            nextMonthes[nextIndex] = this.getMonthDays(moment(nextCurrentMonthStartDate).add(1, 'month'));  
         }
 
         this.setState({
-            currentDate
+            monthes: nextMonthes,
+            currentMonthStartDate: nextCurrentMonthStartDate
         })
     }
 
-    getMonthDays = (date) => {
-        let monthStartDate = moment(date).startOf('month');   
-        let monthEndDate = moment(date).endOf('month');              
-        let daysInMonth = moment(date).daysInMonth();               
+    getMonthes = (startMonthDate) => {
+        return [
+            this.getMonthDays(moment(startMonthDate).subtract(1, 'month')),
+            this.getMonthDays(moment(startMonthDate)),
+            this.getMonthDays(moment(startMonthDate).add(1, "month"))
+        ]
+    }
+
+    getMonthDays = (monthStartDate) => {
+        let monthEndDate = moment(monthStartDate).endOf('month');              
+        let daysInMonth = monthStartDate.daysInMonth();               
         let monthStartDateWeekDay = monthStartDate.isoWeekday();
         let monthEndDateWeekDay = monthEndDate.isoWeekday() + 1;        
 
@@ -66,33 +83,19 @@ export default class Calendar extends Component {
         return monthData;
     }
 
-    getMonthesCount = (date) => {
-        if (this.activePageIndex === 2) {
-            return [
-                moment(date).add(1, 'month'),
-                moment(date).subtract(1, 'month'),
-                moment(date)
-            ];
-        } else if (this.activePageIndex === 0) {
-            return [
-                moment(date),
-                moment(date).add(1, "month"),
-                moment(date).subtract(1, 'month')
-            ];
-        } else {
-            return [
-                moment(date).subtract(1, 'month'),
-                moment(date),
-                moment(date).add(1, "month")
-            ];
-        }
-    }
-
     onDateSet = (date) => {
         this.setState({
-            selectedDateMS: date.valueOf()
+            msSelectedDate: date.valueOf()
         })
         this.props.onDateSet(moment(date))
+    }
+    
+    onSliderChange = (e) => {
+        let action = sliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
+        this.prevPageIndex = action.prevPageIndex;
+        this.activePageIndex = action.activePageIndex;
+
+        this.onSlideChange(action);
     }
 
     render() {
@@ -101,7 +104,7 @@ export default class Calendar extends Component {
                 className="calendar-wrapper"
                 style={{background: this.props.settings.theme.header, borderColor: this.props.settings.theme.header}}
             >
-                <div className="calendar-month-name">{this.state.currentDate.locale("ru").format("MMMM")}</div>
+                <div className="calendar-month-name">{this.state.currentMonthStartDate.locale("ru").format("MMMM")}</div>
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}
@@ -114,9 +117,7 @@ export default class Calendar extends Component {
                     key={3}
                 >
                     {
-                        this.getMonthesCount(this.state.currentDate).map((monthDate, i) => {
-                            let monthWeeks = this.getMonthDays(monthDate);
-
+                        this.state.monthes.map((monthWeeks, i) => {
                             return (
                                 <div
                                     key={i}
@@ -124,7 +125,7 @@ export default class Calendar extends Component {
                                 >
                                     <MonthDates
                                         monthWeeks={monthWeeks}
-                                        selectedDateMS={this.state.selectedDateMS}
+                                        msSelectedDate={this.state.msSelectedDate}
                                         onSelect={this.onDateSet}
                                     /> 
                                 </div>  
@@ -134,52 +135,5 @@ export default class Calendar extends Component {
                 </ReactSwipe>  
             </div>
         )
-    }
-
-    onSliderChange = (a, event) => {             
-        let action = this.getSlideAction(a);                
-        this.onSlideChange(action);
-    }
-
-    getSlideAction = (index) => {
-        if (index === 0 && this.activePageIndex === 2) {
-            return this.onSliderRigth(index);
-        } else if (index === 2 && this.activePageIndex === 0) {
-            return this.onSliderLeft(index);
-        } else if (this.activePageIndex < index) {
-            return this.onSliderRigth(index);                
-        } else if (this.activePageIndex > index) {
-            return this.onSliderLeft(index);                
-        } else if (this.prevPageIndex > index) {          
-            return this.onSliderRigth(index);   
-        } else if (this.prevPageIndex < index) {                      
-            return this.onSliderLeft(index);            
-        }
-    }
-
-    onSliderRigth = (index) => {                                                                                             
-        let nextIndex = index + 1;
-        if (nextIndex > 2) {
-            nextIndex = 0;
-        };
-        this.prevPageIndex = this.activePageIndex;
-        this.activePageIndex = index; 
-        return {
-            index, nextIndex, 
-            side: 'right'
-        }
-    }
-
-    onSliderLeft = (index) => {                                                                    
-        let nextIndex = index - 1;
-        if (nextIndex < 0) {
-            nextIndex = 2;
-        };
-        this.prevPageIndex = this.activePageIndex;        
-        this.activePageIndex = index; 
-        return {
-            index, nextIndex, 
-            side: 'left'
-        }
     }
 }
