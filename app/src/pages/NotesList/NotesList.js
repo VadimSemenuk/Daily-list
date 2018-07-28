@@ -113,7 +113,7 @@ class NotesList extends PureComponent {
     }
 
     pasteCopy = async () => {
-        let action = await this.props.addNote(JSON.parse(JSON.stringify(
+        await this.props.addNote(JSON.parse(JSON.stringify(
             {
                 ...this.state.copyBuffer, 
                 finished: false, 
@@ -166,8 +166,8 @@ class NotesList extends PureComponent {
         this.sliderRef = a;
     }
 
-    onFastAdd = async (note) => {
-        let action = await this.props.addNote(note, this.activePageIndex);
+    onFastAdd = (note) => {
+        this.props.addNote(note, this.activePageIndex);
     }
 
     onDateSelect = (e) => {

@@ -107,7 +107,7 @@ class Add extends Component {
         } else {         
             note.added = this.props.date;
             note.finished = 0;
-            let action = await this.props.addNote(note, this.props.location.state.dateIndex);
+            await this.props.addNote(note, this.props.location.state.dateIndex);
         }
 
         this.props.history.goBack();

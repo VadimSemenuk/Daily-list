@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 
 import * as AppActions from './actions'; 
 
-import Header from './components/Header/Header';
 import NotesList from './pages/NotesList/NotesList';
 import Add from './pages/Add/Add';
 import Password from './pages/Password/Password';
