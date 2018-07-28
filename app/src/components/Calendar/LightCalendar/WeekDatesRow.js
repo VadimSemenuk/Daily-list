@@ -12,9 +12,9 @@ export default class WeekDatesRow extends PureComponent {
                             <button 
                                 className={`light-calendar-date ${active ? 'active' : ''}`}
                                 key={i} 
-                                onClick={() => this.props.onSelect(i, date.msDate)}
+                                onClick={() => this.props.onSelect(i, date)}
                             >        
-                                <span className="light-calendar-date-number">{date.monthDayNumber}</span>                            
+                                <span className="light-calendar-date-number">{date.format("DD")}</span>                            
                             </button> 
                         ) 
                     })

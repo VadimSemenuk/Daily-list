@@ -6,18 +6,19 @@ import './LightCalendar.scss';
 
 import WeekDatesRow from "./WeekDatesRow";
 
-const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+import sliderChangeSide from "../../../utils/sliderChangeSide";
 
 export default class LightCalendar extends Component {
     constructor(props) {
         super(props);
 
-        const weeks = this.generateWeeksSequence();
+        const currentDate = moment(this.props.currentDate);
+        const weeks = this.generateWeeksSequence(currentDate.startOf('isoWeek'));
 
         this.state = {
             weeks,
-            selectedDayNumber: moment(this.props.currentDate).isoWeekday() - 1,
-            selectedWeekStartDate: moment(this.props.currentDate).startOf('isoWeek').valueOf(),
+            selectedDayNumber: currentDate.isoWeekday() - 1,
+            selectedWeekStartDate: currentDate.startOf('isoWeek').valueOf(),
             monthName: this.getMonthName(weeks[1][0], weeks[1][6])
         }
 
@@ -25,37 +26,29 @@ export default class LightCalendar extends Component {
         this.prevPageIndex = 1;
     }
 
-    generateWeekDate(date, weekDayNumber) {
-        return {
-            monthDayNumber: date.date(),
-            msDate: date.valueOf()
-        }
-    }
-
-    generateWeekDates(dateOfWeek) {
-        let weekStartDate = moment(dateOfWeek).startOf('isoWeek');
-        let weekDates = [this.generateWeekDate(weekStartDate, 0)];
+    generateWeekDates(weekStartDate) {
+        let weekDates = [weekStartDate];
         for (let a = 2; a < 8; a++) {
-            weekDates.push(this.generateWeekDate(moment(weekStartDate).day(a), a - 1));
+            weekDates.push(moment(weekStartDate).day(a));
         }
         return weekDates;
     }
 
-    generateWeeksSequence(dateOfWeek) {
+    generateWeeksSequence(weekStartDate) {
         return [
-            this.generateWeekDates(moment(dateOfWeek).subtract(1, 'week')),
-            this.generateWeekDates(moment(dateOfWeek)),
-            this.generateWeekDates(moment(dateOfWeek).add(1, 'week')),            
+            this.generateWeekDates(moment(weekStartDate).subtract(1, 'week')),
+            this.generateWeekDates(moment(weekStartDate)),
+            this.generateWeekDates(moment(weekStartDate).add(1, 'week')),            
         ]
     }
 
-    onSlideChange = ({index, nextIndex, side}) => {       
+    onSlideChange = ({index, nextIndex, side}) => {   
         let weeks = this.state.weeks.slice();
 
         if (side === "left") {        
-            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0].msDate).add(-1, 'week'));                       
+            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(-1, 'week'));                       
         } else {   
-            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0].msDate).add(1, 'week'));
+            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(1, 'week'));
         }
 
         const monthName = this.getMonthName(weeks[index][0], weeks[index][6])
@@ -67,11 +60,10 @@ export default class LightCalendar extends Component {
     }
 
     getMonthName(startWeekDate, endWeekDate) {
-        let weekStartDayMonthName = moment(startWeekDate.msDate).format('MMMM');
-        let weekEndDayMonthName;      
+        const weekStartDayMonthName = startWeekDate.locale("ru").format('MMMM');   
+        const weekEndDayMonthName = endWeekDate.locale("ru").format('MMMM');
         
-        if (startWeekDate.monthDayNumber > endWeekDate.monthDayNumber) {
-            weekEndDayMonthName = moment(endWeekDate.msDate).format('MMMM');
+        if (weekStartDayMonthName !== weekEndDayMonthName) {
             return `${weekStartDayMonthName} - ${weekEndDayMonthName}`
         } else {
             return weekStartDayMonthName
@@ -136,6 +128,14 @@ export default class LightCalendar extends Component {
         this.sliderRef = a;
     }
 
+    onSliderChange = (e) => {
+        const action = sliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
+        this.prevPageIndex = action.prevPageIndex;
+        this.activePageIndex = action.activePageIndex;
+
+        this.onSlideChange(action);
+    }
+
     render() {
         return (
             <div  
@@ -155,7 +155,7 @@ export default class LightCalendar extends Component {
                 >
                     {
                         this.state.weeks.map((week, i) => {
-                            const visible = week[0].msDate === this.state.selectedWeekStartDate;                                                                                 
+                            const visible = week[0].valueOf() === this.state.selectedWeekStartDate;                                                                                 
 
                             return (
                                 <div key={i}>
@@ -172,52 +172,5 @@ export default class LightCalendar extends Component {
                 </ReactSwipe>  
             </div>
         )
-    }
-
-    onSliderChange = (a, event) => {             
-        let action = this.getSlideAction(a);                
-        this.onSlideChange(action);
-    }
-
-    getSlideAction = (index) => {
-        if (index === 0 && this.activePageIndex === 2) {
-            return this.onSliderRigth(index);
-        } else if (index === 2 && this.activePageIndex === 0) {
-            return this.onSliderLeft(index);
-        } else if (this.activePageIndex < index) {
-            return this.onSliderRigth(index);                
-        } else if (this.activePageIndex > index) {
-            return this.onSliderLeft(index);                
-        } else if (this.prevPageIndex > index) {          
-            return this.onSliderRigth(index);   
-        } else if (this.prevPageIndex < index) {                      
-            return this.onSliderLeft(index);            
-        }
-    }
-
-    onSliderRigth = (index) => {                                                                                             
-        let nextIndex = index + 1;
-        if (nextIndex > 2) {
-            nextIndex = 0;
-        };
-        this.prevPageIndex = this.activePageIndex;
-        this.activePageIndex = index; 
-        return {
-            index, nextIndex, 
-            side: 'right'
-        }
-    }
-
-    onSliderLeft = (index) => {                                                                    
-        let nextIndex = index - 1;
-        if (nextIndex < 0) {
-            nextIndex = 2;
-        };
-        this.prevPageIndex = this.activePageIndex;        
-        this.activePageIndex = index; 
-        return {
-            index, nextIndex, 
-            side: 'left'
-        }
     }
 }
