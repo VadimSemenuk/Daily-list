@@ -4,10 +4,6 @@ import Modal from 'react-modal';
 import "./Modal.scss";
 
 export default class CustomModal extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         if (this.props.isOpen) {
             this.setBackButtonEventHandler();

@@ -1,16 +1,12 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
 import authService from "../../services/auth.service";
 
 import './SettingsBackup.scss';
-
-import exportIcon from '../../media/img/export.svg';
-import importIcon from '../../media/img/import.svg';
 
 import Header from '../../components/Header/Header';
 

@@ -44,7 +44,7 @@ class SynchronizationService {
         let settedNoteUUIDs = [];
 
         for (let newNote of newNotes) { 
-            let insert = await notesService.insertNote({
+            await notesService.insertNote({
                 ...newNote,
                 startTime: +newNote.startTime, 
                 endTime: +newNote.endTime, 
