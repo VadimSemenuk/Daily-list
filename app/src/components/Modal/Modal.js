@@ -1,31 +1,65 @@
 import React, {Component} from 'react';
-import Modal from 'react-responsive-modal';
+import Modal from 'react-modal';
 
-class Add extends Component {
+import "./Modal.scss";
+
+export default class CustomModal extends Component {
     constructor(props) {
         super(props);
     }
 
     componentDidMount() {
+        if (this.props.isOpen) {
+            this.setBackButtonEventHandler();
+        }
+    }
+
+    componentDidUpdate(prevState) {
+        if (this.props.isOpen) {
+            this.setBackButtonEventHandler();   
+        } else {
+            this.removeBackButtonEventHandler();               
+        }
     }
 
     componentWillUnmount() {
+        this.removeBackButtonEventHandler();        
+    }
+
+    setBackButtonEventHandler = () => {
+        document.addEventListener("keyup", this.onBackButtonClick)
+        document.addEventListener("backbutton", this.onBackButtonClick, false);
+    }
+
+    removeBackButtonEventHandler = () => {
+        document.removeEventListener("keyup", this.onBackButtonClick)
+        document.addEventListener("backbutton", this.onBackButtonClick, false);        
+    }
+
+    onBackButtonClick = (e) => {
+        console.log("BUTTON EVENT")
+        if (e.keyCode === 27) {
+            this.props.onRequestClose();
+        }
+    }
+
+    static init = () => {
+        Modal.setAppElement('#root');
     }
 
     render () {
         return (
-            <Modal
-                center
-                showCloseIcon={false}
-                classNames={{
-                    modal: "modal",
-                    overlay: "modal-overlay"
-                }}
+            <Modal 
+                isOpen={this.props.isOpen} 
+                onRequestClose={this.props.onRequestClose}
+                className={`modal ${this.props.className}`}
+                overlayClassName="modal-overlay"
                 animationDuration={0}
-                open={true} 
-                {...props}
+                shouldCloseOnOverlayClick={true}
+                shouldCloseOnEsc={false}
             >
-                <div className="modal-inner">                    
+                <div className={`modal-inner ${this.props.innerClassName}`}>
+                    {this.props.children}                        
                 </div>
             </Modal>
         )

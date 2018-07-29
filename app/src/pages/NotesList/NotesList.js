@@ -3,7 +3,6 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from "moment";
 import ReactSwipe from 'react-swipe';
-import Modal from 'react-responsive-modal';
 
 import synchronizationService from '../../services/synchronization.service';
 import appService from "../../services/app.service";
@@ -14,16 +13,12 @@ import DayNotesList from './DayNotesList/DayNotesList';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
+import Modal from '../../components/Modal/Modal';
 
 import * as AppActions from '../../actions'; 
 
 import './NotesList.scss';
 import pasteImg from "../../media/img/insert.svg"
-
-let modalClass = {
-    modal: "note-actions-modal modal",
-    overlay: "modal-overlay"
-}
 
 class NotesList extends PureComponent {
     constructor(props) {
@@ -243,18 +238,13 @@ class NotesList extends PureComponent {
                     </ReactSwipe>
 
                     <Modal 
-                        open={this.state.listItemDialogVisible ? true : false} 
-                        onClose={this.closeDialog}
-                        center
-                        showCloseIcon={false}
-                        classNames={modalClass}
-                        animationDuration={0}
+                        isOpen={this.state.listItemDialogVisible ? true : false} 
+                        onRequestClose={this.closeDialog}
+                        innerClassName="actions-modal-inner"
                     >
-                        <div className="modal-inner note-actions-modal-inner actions-modal-inner">
-                            <button onClick={this.onEditRequest}>Редактировать</button>
-                            <button onClick={this.onListItemRemove}>Удалить</button>
-                            <button onClick={this.onCopyRequest}>Копировать</button>                        
-                        </div>
+                        <button onClick={this.onEditRequest}>Редактировать</button>
+                        <button onClick={this.onListItemRemove}>Удалить</button>
+                        <button onClick={this.onCopyRequest}>Копировать</button>
                     </Modal>
 
                     {

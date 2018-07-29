@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Textarea from "react-textarea-autosize";
-import Modal from 'react-responsive-modal';
 
 import * as AppActions from '../../actions'; 
 
@@ -10,6 +9,7 @@ import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/Remova
 import TimeSet from './TimeSet/TimeSet';
 import Tag from './Tag/Tag';
 import Header from '../../components/Header/Header';
+import Modal from '../../components/Modal/Modal';
 
 import './Add.scss';
 
@@ -235,15 +235,14 @@ class Add extends Component {
                         />
                     </div>
 
-                    {
-                        this.state.pictureSourceModal && 
-                        <Modal onClose={() => this.setState({pictureSourceModal: false})}>
-                            <div className="modal-inner actions-modal-inner">
-                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}>Открыть галерею</button>
-                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}>Сделать снимок</button>                       
-                            </div>
-                        </Modal>
-                    }
+                    <Modal 
+                        isOpen={this.state.pictureSourceModal}
+                        onRequestClose={() => this.setState({pictureSourceModal: false})}
+                        innerClassName="actions-modal-inner"
+                    >
+                        <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}>Открыть галерею</button>
+                        <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}>Сделать снимок</button>                       
+                    </Modal>
                 </div>
             </div>
         );

@@ -1,0 +1,34 @@
+.modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 12;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 16px;
+}
+.modal {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px 0;
+    box-sizing: border-box;
+    background: #fff;
+    outline: none;
+
+    .actions-modal-inner {
+        button {
+            font-size: 1em;
+            width: 100%;
+            text-align: left;
+            justify-content: flex-start;
+            padding: 0 19px;
+            height: 46px;
+        }
+    }
+}

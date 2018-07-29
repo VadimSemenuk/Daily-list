@@ -31,7 +31,7 @@ body {
     left: 0;
     right: 0;
     background: #fff;
-    z-index: 100;
+    z-index: 10;
     display: flex;
     flex-direction: column;
 }
@@ -160,47 +160,6 @@ select {
 
 
 
-// MODAL
-.modal {
-    width: 100%;
-    max-width: 500px;
-    padding: 6px 0 !important;
-    box-sizing: border-box;
-}
-.actions-modal-inner {
-    button {
-        font-size: 1em;
-        width: 100%;
-        text-align: left;
-        justify-content: flex-start;
-        padding: 0 19px;
-        height: 46px;
-    }
-}
-.modal-overlay {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 16px;
-}
-.modal-action-buttons-wrapper {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 10px;
-
-    button {
-        display: inline-block;
-        font-size: 1em;
-    }
-}
-
-.init-loader-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-
-
 // COLOR PICKER
 .color-picker-list-wrapper {
     display: flex;
@@ -233,4 +192,13 @@ select {
         }
 
     }
+}
+
+
+// INIT LOADER
+.init-loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }

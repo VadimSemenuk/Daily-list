@@ -16,6 +16,7 @@ import SettingsBackup from './pages/Backup/SettingsBackup';
 import Troubleshooting from './pages/Troubleshooting/Troubleshooting';
 import About from './pages/About/About';
 import SynchronizationLoader from "./components/SynchronizationLoader/SynchronizationLoader";
+import Modal from "./components/Modal/Modal";
 
 class Root extends Component {
     constructor(props) {
@@ -26,6 +27,8 @@ class Root extends Component {
 
     componentDidMount() {
         this.setKeyoardEvents();
+
+        Modal.init();    
     }
 
     setKeyoardEvents() {
