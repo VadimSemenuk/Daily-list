@@ -6,65 +6,35 @@ import * as AppActions from '../../actions';
 
 import Switch from '../../components/Switch/Switch';
 import Header from '../../components/Header/Header';
+import { SwitchListItem, InsetListItem } from "../../components/ListItem/ListItem";
 
 import './Settings.scss';
 
-import arrowRight from '../../media/img/right-grey.svg';
-
 class Settings extends Component {
-	constructor(props) {
-        super(props);
-  
-        this.state = { }
-	}
-
 	render () {	
 		return (
             <div className="page-wrapper">
                 <Header />
-                <div className="settings-page-wrapper scroll">
-                    <div className="setting-item">
-                        <span className="setting-item-text">Включить уведомдение по умолчанию</span>
-                        <Switch 
-                            checked={this.props.settings.defaultNotification}
-                            onChange={(e) => this.props.setSetting('defaultNotification', +e)}
-                        />
-                    </div>
-                    <button 
-                        className="setting-item touchable"
-                        onClick={() => this.props.history.push(`${this.props.match.url}/sort`)}                                
-                    >
-                        <span className="setting-item-text">Отображение</span>
-                        <img 
-                            className="setting-item-img"
-                            src={arrowRight} 
-                            alt="in"
-                        /> 
-                    </button>
-                    <button
-                        className="setting-item touchable"
-                        onClick={() => this.props.history.push(`${this.props.match.url}/theme`)}
-                    >
-                        <span className="setting-item-text">Интерфейс</span>
-                        <img 
-                            className="setting-item-img"
-                            src={arrowRight} 
-                            alt="in"                        
-                        /> 
-                    </button>
-                    <button 
-                        className="setting-item touchable"
+                <div className="settings-page-wrapper scroll page-content padding">
+                    <SwitchListItem 
+                        text="Включить уведомдение по умолчанию"
+                        checked={this.props.settings.defaultNotification}
+                        onChange={(e) => this.props.setSetting('defaultNotification', +e)}
+                    />
+                    <InsetListItem 
+                        text="Отображение"
+                        onClick={() => this.props.history.push(`${this.props.match.url}/sort`)}  
+                    />
+                    <InsetListItem 
+                        text="Интерфейс"
+                        onClick={() => this.props.history.push(`${this.props.match.url}/theme`)} 
+                    />
+                    <InsetListItem 
+                        text="Синхронизация данных"
                         onClick={() => this.props.history.push(`${this.props.match.url}/backup`)}
-                    >
-                        <span className="setting-item-text">Синхронизация данных</span>
-                        <img 
-                            className="setting-item-img"
-                            src={arrowRight} 
-                            alt="in"                        
-                        /> 
-                    </button>
-                    <button 
-                        className="setting-item touchable"
+                    />
+                    <InsetListItem 
+                        text={this.props.settings.password === null ? 'Добавить пароль' : 'Удалить пароль'}
                         onClick={() => {
                             if (this.props.settings.password === null) {
                                 this.props.history.push({
@@ -77,36 +47,15 @@ class Settings extends Component {
                                 this.props.setSetting('password', null);
                             }
                         }}
-                    >
-                        <span className="setting-item-text">{this.props.settings.password === null ? 'Добавить пароль' : 'Удалить пароль'}</span>
-                        <img 
-                            className="setting-item-img"
-                            src={arrowRight} 
-                            alt="in"
-                        /> 
-                    </button>
-                    <button 
-                        className="setting-item touchable"
+                    />
+                    <InsetListItem 
+                        text="Устранение неисправностей"
                         onClick={() => this.props.history.push(`${this.props.match.url}/troubleshooting`)}
-                    >
-                        <span className="setting-item-text">Устранение неисправностей</span>
-                        <img 
-                            className="setting-item-img"
-                            src={arrowRight} 
-                            alt="in"
-                        /> 
-                    </button>
-                    <button 
-                        className="setting-item touchable"
+                    />
+                    <InsetListItem 
+                        text="О программе"
                         onClick={() => this.props.history.push(`${this.props.match.url}/about`)}
-                    >
-                        <span className="setting-item-text">О программе</span>
-                        <img 
-                            className="setting-item-img"
-                            src={arrowRight} 
-                            alt="in"
-                        /> 
-                    </button>
+                    />
                 </div>
             </div>
 		);

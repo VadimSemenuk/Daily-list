@@ -6,6 +6,7 @@ import * as AppActions from '../../actions';
 
 import Switch from '../../components/Switch/Switch';
 import Header from '../../components/Header/Header';
+import { SwitchListItem, InsetListItem } from "../../components/ListItem/ListItem";
 
 import themesService from '../../services/themes.service';
 
@@ -37,8 +38,13 @@ class SettingsTheme extends Component {
         return (
             <div className="page-wrapper">
                 <Header />
-                <div className="settings-visual-wrapper settings-page-wrapper scroll page-content">
-                    <div className="settings-visual-item setting-item">
+                <div className="scroll page-content padding">
+
+                    <ListItem 
+                        onClick={() => this.setState({ themeModal: true })}
+                    />
+
+                    <div className="list-item">
                         <span className="settings-visual-item-title">Тема:</span>
                         <div className="color-picker-list-wrapper">
                             <button 
@@ -90,13 +96,11 @@ class SettingsTheme extends Component {
                             </select>
                         </div>
                     </div>
-                    <div className="setting-item">
-                        <span className="setting-item-text">Поле быстрого добавления</span>
-                        <Switch 
-                            checked={this.props.settings.fastAdd}
-                            onChange={(e) => this.props.setSetting('fastAdd', +e)}
-                        />
-                    </div>
+                    <SwitchListItem 
+                         text="Поле быстрого добавления"  
+                         checked={this.props.settings.fastAdd}
+                        onChange={(e) => this.props.setSetting('fastAdd', +e)}     
+                    />
                 </div>
             </div>
         );

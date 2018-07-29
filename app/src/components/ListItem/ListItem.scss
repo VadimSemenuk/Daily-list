@@ -1,0 +1,33 @@
+.list-item {
+    padding: 16px 0;
+    flex: 1;
+    align-items: center;
+    border-bottom: 1px solid #eceaea;
+    display: flex;
+    width: 100%;
+    font-size: 1em;
+    height: unset;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .list-item-text {
+        color: #333;
+        flex: 1;
+        font-size: 1em;
+    }
+    .list-item-img {            
+        width: 14px;
+        height: 14px;
+        margin-right: 10px;
+    }
+    input[type=checkbox] {
+        width: 19px;
+        height: 19px;
+    }
+
+    &.inset-list-item {
+        text-align: left;
+    }
+}

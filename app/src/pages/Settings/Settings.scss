@@ -1,61 +1,21 @@
-.settings-page-wrapper {
-    background: #fff;
-    padding: 10px;
+.setting-section {
+    padding: 10px 0;
+    overflow: hidden;
+    border-bottom: 1px solid #eceaea;        
 
-    .setting-section {
-        padding: 10px 0;
-        overflow: hidden;
-        border-bottom: 1px solid #eceaea;        
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-        .setting-item {
-            border-bottom: none;        
-        }
+    &:last-child {
+        border-bottom: none;
     }
 
     .setting-item {
-        padding: 16px 0;
-        flex: 1;
-        align-items: center;
-        border-bottom: 1px solid #eceaea;
-        display: flex;
-        width: 100%;
-        font-size: 1em;
-        height: unset;
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-        &.touchable {
-            justify-content: space-between;
-            text-align: left;
-        }
-
-        .setting-item-text {
-            color: #333;
-            flex: 1;
-            font-size: 1em;
-        }
-        .setting-item-img {            
-            width: 14px;
-            height: 14px;
-            margin-right: 10px;
-        }
-        input[type=checkbox] {
-            width: 19px;
-            height: 19px;
-        }
+        border-bottom: none;        
     }
+}
 
-    .setting-item-block {
-        border-bottom: 1px solid #e0d9d9;
-        
-        .setting-item {
-            border: none; 
-        }
+.setting-item-block {
+    border-bottom: 1px solid #e0d9d9;
+    
+    .setting-item {
+        border: none; 
     }
 }

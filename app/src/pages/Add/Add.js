@@ -7,7 +7,7 @@ import * as AppActions from '../../actions';
 
 import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/RemovableTextCheckBox';
 import TimeSet from './TimeSet/TimeSet';
-import Tag from './Tag/Tag';
+import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
 import Modal from '../../components/Modal/Modal';
 
@@ -229,7 +229,7 @@ class Add extends Component {
                             endTime={this.state.endTime}
                             settings={this.props.settings}
                         />
-                        <Tag 
+                        <ColorPicker 
                             onStateChange={(tag) => this.setState({tag})}
                             value={this.state.tag}
                         />

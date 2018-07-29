@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 
-import tagsService from '../../../services/tags.service';
+import tagsService from '../../services/tags.service';
 
-import './Tag.scss';  
+import './ColorPicker.scss';  
 
-export default class Tag extends Component {
+export default class ColorPicker extends Component {
     render() {   
         return (
             <div className="color-picker-list-wrapper">
