@@ -16,12 +16,17 @@
 .modal {
     width: 100%;
     max-width: 500px;
-    padding: 10px 0;
     box-sizing: border-box;
     background: #fff;
     outline: none;
 
+    .modal-inner {
+        padding: 10px;
+    }
+
     .actions-modal-inner {
+        padding: 10px 0;
+
         button {
             font-size: 1em;
             width: 100%;

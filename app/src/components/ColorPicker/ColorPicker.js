@@ -1,30 +1,31 @@
-import React, {Component} from 'react';
-
-import tagsService from '../../services/tags.service';
+import React from 'react';
 
 import './ColorPicker.scss';  
 
-export default class ColorPicker extends Component {
-    render() {   
-        return (
-            <div className="color-picker-list-wrapper">
-                {
-                    tagsService.getTags().map((a, i) => {
-                        return (
-                            <button 
-                                className={`color-item-wrapper ${this.props.value === a ? "active" : ""}`}
-                                key={i}
-                                onClick={() => this.props.onStateChange(tagsService.getTagByIndex(i))}
-                            >
-                                <div 
-                                    className="color-item"
-                                    style={{backgroundColor: a}}
-                                ></div>
-                            </button>
-                        )
-                    })
+export default (props) => (
+    <div className={`color-picker-list-wrapper${props.disabled ? " disabled" : ""}`}>
+        {
+            props.colors.map((colorsItem, i) => {
+                let color = colorsItem;
+                let value = props.value;
+                if (props.field) {
+                    color = colorsItem[props.field];
+                    value = props.value[props.field];
                 }
-            </div>
-        )
-    }
-}
+
+                return (
+                    <button 
+                        className={`color-item-wrapper ${value === color ? "active" : ""}`}
+                        key={i}
+                        onClick={() => props.onSelect({color: colorsItem, index: i})}
+                    >
+                        <div 
+                            className="color-item"
+                            style={{backgroundColor: color}}
+                        ></div>
+                    </button>
+                )
+            })
+        }
+    </div>
+)

@@ -23,20 +23,15 @@ export default class CustomModal extends Component {
     }
 
     setBackButtonEventHandler = () => {
-        document.addEventListener("keyup", this.onBackButtonClick)
         document.addEventListener("backbutton", this.onBackButtonClick, false);
     }
 
     removeBackButtonEventHandler = () => {
-        document.removeEventListener("keyup", this.onBackButtonClick)
-        document.addEventListener("backbutton", this.onBackButtonClick, false);        
+        document.removeEventListener("backbutton", this.onBackButtonClick, false);        
     }
 
     onBackButtonClick = (e) => {
-        console.log("BUTTON EVENT")
-        if (e.keyCode === 27) {
-            this.props.onRequestClose();
-        }
+        this.props.onRequestClose();
     }
 
     static init = () => {

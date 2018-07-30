@@ -184,6 +184,12 @@ class NotesList extends PureComponent {
         this.setDate(moment().startOf("day"))
     }
 
+    onCalendarCloseRequest = () => {
+        this.setState({
+            calendar: false
+        })
+    }
+
     render() {
         return (
             <div className="page-wrapper">
@@ -209,6 +215,7 @@ class NotesList extends PureComponent {
                             currentDate={this.props.currentDate}
                             settings={this.props.settings}
                             onDateSet={this.setDate}
+                            onCloseRequest={this.onCalendarCloseRequest}
                         />
                     }
                     <ReactSwipe 

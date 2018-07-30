@@ -11,6 +11,8 @@ import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
 import Modal from '../../components/Modal/Modal';
 
+import tagsService from '../../services/tags.service';
+
 import './Add.scss';
 
 class Add extends Component {
@@ -30,6 +32,8 @@ class Add extends Component {
 
             pictureSourceModal: false
         }
+
+        this.tags = tagsService.getTags();
     }
 
     componentDidMount() {
@@ -230,8 +234,9 @@ class Add extends Component {
                             settings={this.props.settings}
                         />
                         <ColorPicker 
-                            onStateChange={(tag) => this.setState({tag})}
+                            onSelect={(e) => this.setState({tag: tagsService.getTagByIndex(e.index)})}
                             value={this.state.tag}
+                            colors={this.tags}
                         />
                     </div>
 

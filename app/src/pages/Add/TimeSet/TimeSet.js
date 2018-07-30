@@ -5,7 +5,7 @@ import Switch from "../../../components/Switch/Switch"
 
 import './TimeSet.scss';
 
-export default class Add extends Component {
+export default class TimeSet extends Component {
     constructor(props) {
         super(props);
 

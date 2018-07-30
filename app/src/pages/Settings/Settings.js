@@ -4,7 +4,6 @@ import {connect} from 'react-redux';
 
 import * as AppActions from '../../actions'; 
 
-import Switch from '../../components/Switch/Switch';
 import Header from '../../components/Header/Header';
 import { SwitchListItem, InsetListItem } from "../../components/ListItem/ListItem";
 

@@ -26,6 +26,14 @@ export default class Calendar extends Component {
         this.prevPageIndex = 1;
     }
 
+    componentDidMount() {
+        document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest)
+    }   
+
+    componentWillUnmount() {
+        document.querySelector(".notes-list-swiper").removeEventListener("click", this.props.onCloseRequest)
+    }
+
     onSlideChange = ({index, nextIndex, side}) => {   
         let nextMonthes = this.state.monthes.slice();
         let nextCurrentMonthStartDate;

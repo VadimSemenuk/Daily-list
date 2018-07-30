@@ -4,21 +4,25 @@ import {connect} from 'react-redux';
 
 import * as AppActions from '../../actions'; 
 
-import Switch from '../../components/Switch/Switch';
 import Header from '../../components/Header/Header';
-import { SwitchListItem, InsetListItem } from "../../components/ListItem/ListItem";
+import { SwitchListItem, ListItem, SelectListItem } from "../../components/ListItem/ListItem";
+import Modal from "../../components/Modal/Modal";
+import ColorPicker from '../../components/ColorPicker/ColorPicker';
 
 import themesService from '../../services/themes.service';
 
 import './SettingsTheme.scss';
+import '../../components/ColorPicker/ColorPicker.scss';
 
 class SettingsTheme extends Component {
 	constructor(props) {
         super(props);
 
         this.state = {
-            colors: themesService.getThemesList()
+
         }
+
+        this.themes = themesService.getThemesList();
     }
 
     onThemeSelect = (id) => {
@@ -39,63 +43,46 @@ class SettingsTheme extends Component {
             <div className="page-wrapper">
                 <Header />
                 <div className="scroll page-content padding">
-
                     <ListItem 
                         onClick={() => this.setState({ themeModal: true })}
+                        text="Тема"
+                        style={{padding: "10px 0"}}
+                        ValElement={() => (
+                            <div className="color-item-wrapper">
+                                <div 
+                                    className="color-item"
+                                    style={{backgroundColor: this.props.settings.theme.header}}
+                                ></div>
+                            </div>
+                        )}
                     />
 
-                    <div className="list-item">
-                        <span className="settings-visual-item-title">Тема:</span>
-                        <div className="color-picker-list-wrapper">
-                            <button 
-                                className={`theme-item-wrapper theme-item-random ${this.props.settings.theme.id === -1 ? "active" : ""}`} 
-                                onClick={() => this.onThemeSelect(-1)}
-                            >
-                                <div 
-                                    className="theme-item"
-                                >
-                                    <img 
-                                        src={require("../../media/img/shuffle.svg")}
-                                        alt="random"
-                                    />
-                                </div>
-                            </button>
-                            {
-                                this.state.colors.map((a, i) => (
-                                    <button 
-                                        key={i} 
-                                        className={`color-item-wrapper ${this.props.settings.theme.id === a.id ? "active" : ""}`} 
-                                        onClick={() => this.onThemeSelect(a.id)}
-                                    >
-                                        <div 
-                                            className="color-item"
-                                            style={{backgroundColor: a.header}}
-                                        ></div>
-                                    </button>
-                                ))
-                            }
-                        </div>
-                    </div>
-                    <div className="settings-visual-item setting-item">
-                        <span className="settings-visual-item-title setting-item-text">Размер шрифта:</span>
-                        <div className="font-size">
-                            <select 
-                                value={this.props.settings.fontSize}
-                                onChange={(e) => {
-                                    this.props.setSetting('fontSize', +e.target.value)
-                                    document.querySelector("body").style.fontSize = +e.target.value + "px";    
-                                }}
-                            >
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>                            
-                            </select>
-                        </div>
-                    </div>
+                    <Modal 
+                        isOpen={this.state.themeModal}
+                        onRequestClose={() => this.setState({themeModal: false})}
+                    >
+                        <SwitchListItem 
+                            text="Случайная тема"  
+                            checked={this.props.settings.theme === -1}
+                            onChange={(e) => this.onThemeSelect(-1)}     
+                        />
+                        <ColorPicker
+                            colors={this.themes}
+                            field="header"
+                            value={this.props.settings.theme}
+                            onSelect={(event) => this.onThemeSelect(event.color.id)}
+                            disabled={this.props.settings.theme === -1}
+                        />
+                    </Modal>
+
+                    <SelectListItem
+                        text="Размер шрифта"
+                        value={this.props.settings.fontSize}
+                        onSelect={(value) => {
+                            this.props.setSetting('fontSize', +value)
+                            document.querySelector("body").style.fontSize = +value + "px";    
+                        }}
+                    />
                     <SwitchListItem 
                          text="Поле быстрого добавления"  
                          checked={this.props.settings.fastAdd}
