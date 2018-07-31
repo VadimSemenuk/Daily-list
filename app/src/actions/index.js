@@ -1,18 +1,24 @@
 import notesService from "../services/notes.service.js";
+import notificationService from "./notification.service";
 import settingsService from "../services/settings.service.js";
 
 // notes
 export function addNote (note, dateIndex) {
     return function(dispatch) {
-        return notesService.addNote(note).then((note) => {
-            if (dateIndex !== undefined) {
+        return notesService.addNote(note)
+            .then((note) => {
+                notificationService.clear(note.key);           
+                if (note.notificate) {
+                    notificationService.set(note.key, note);
+                };
+            })
+            .then((note) => {
                 return dispatch({
                     type: "RECIVE_NOTE",
                     dateIndex,
                     note
                 })
-            }
-        });
+            })
     }
 }
 
@@ -40,11 +46,15 @@ export function updateNoteDynamicFields (dateIndex, noteIndex, note, dynamicFiel
 
 export function deleteNote (dateIndex, noteIndex, note) {
     return function(dispatch) {
-        return notesService.deleteNote(note).then(() => dispatch({
-            type: "DELETE_NOTE",
-            dateIndex, 
-            noteIndex
-        }));
+        return notesService.deleteNote(note)
+            .then((note) => {
+                notificationService.clear(note.key);  
+            })
+            .then(() => dispatch({
+                type: "DELETE_NOTE",
+                dateIndex, 
+                noteIndex
+            }))
     }
 }
 

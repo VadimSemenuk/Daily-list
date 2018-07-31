@@ -4,7 +4,6 @@ import config from "../config/config";
 import uuid from "uuid/v1";
 import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
-import notificationService from "./notification.service";
 
 class NotesService {
     async getDayNotes(date, settings) {
@@ -15,20 +14,20 @@ class NotesService {
             [date.valueOf(), authService.getUserId()]
         );              
 
-        if (select.rows) {
-            let result = select.rows;    
-            let parsed = []; 
-            for(let i = 0; i < result.length; i++) {
-                let item = result.item(i);
+        if (select.rows) {    
+            let notes = [];
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
                 item.dynamicFields = JSON.parse(item.dynamicFields);
                 ~item.startTime ? item.startTime = moment(item.startTime) : item.startTime = false;
                 ~item.endTime ? item.endTime = moment(item.endTime) : item.endTime = false;
                 ~item.added ? item.added = moment(item.added) : item.added = false;
                 item.finished = !!item.finished;
                 item.notificate = !!item.notificate;                
-                parsed.push(item);
+                
+                notes.push(item);
             }         
-            return parsed;
+            return notes;
         }
     }
 
@@ -65,11 +64,6 @@ class NotesService {
         if (!inserted) {
             return
         }
-
-        notificationService.clear(inserted.insertId);           
-        if (addedNote.notificate) {
-            notificationService.set(inserted.insertId, addedNote);
-        };
 
         if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(inserted.insertId));
@@ -181,11 +175,6 @@ class NotesService {
             return
         }
 
-        notificationService.clear(note.key);           
-        if (note.notificate) {
-            notificationService.set(note.key, note);
-        };
-
         if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             fetch(`${config.apiURL}/notes/dynamic-fields`, {
                 method: "POST",
@@ -222,9 +211,7 @@ class NotesService {
         ).catch((err) => console.warn(err));     
         if (!del) {
             return
-        }  
-
-        notificationService.clear(note.key);           
+        }         
 
         if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             fetch(`${config.apiURL}/notes`, {
@@ -307,17 +294,6 @@ class NotesService {
                 .then(() => synchronizationService.setSynced(note.key))                
                 .catch((err) => console.warn(err));
         }
-    }
-
-    async checkNoteExisting(id) {
-        let res = await executeSQL(
-            `SELECT id 
-            FROM Tasks 
-            WHERE id = ?;`,
-            [id]
-        ).catch((err) => console.log('Error: ', err));
-
-        return res.rows.length
     }
 }
 

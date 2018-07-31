@@ -261,8 +261,8 @@ function mapStateToProps(state, props) {
     }
 }
 
-function mapDispatchToProps(dispatch, s) {
+function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(Add);
+export default connect(mapStateToProps, mapDispatchToProps)(Add);
