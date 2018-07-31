@@ -64,16 +64,14 @@ class NotesList extends PureComponent {
             this.props.setListDate(
                 nextDate,
                 moment(nextDate).add(-1, "day"),
-                nextIndex,
-                this.props.settings
+                nextIndex
             )
         } else {   
             let nextDate = moment(this.props.currentDate).add(1, "day");
             this.props.setListDate(
                 nextDate,
                 moment(nextDate).add(1, "day"),
-                nextIndex,
-                this.props.settings                
+                nextIndex            
             )     
         }
     }
@@ -101,11 +99,7 @@ class NotesList extends PureComponent {
     }
 
     onListItemRemove = () => {
-        this.props.deleteNote(
-            this.state.listItemDialogVisible.dateIndex, 
-            this.state.listItemDialogVisible.noteIndex, 
-            this.state.listItemDialogVisible.note        
-        );
+        this.props.deleteNote(this.state.listItemDialogVisible.note);
         this.closeDialog();              
     }
 
@@ -213,10 +207,13 @@ class NotesList extends PureComponent {
                         key={this.props.notes.length}
                     >
                         {
-                            this.props.notes.map((note, i) => (
-                                <div className="notes-list-item-wrapper" key={i}>
+                            this.props.notes.map((dayNotes, i) => (
+                                <div 
+                                    className="notes-list-item-wrapper" 
+                                    key={i}
+                                >
                                     <DayNotesList 
-                                        notes={note} 
+                                        notes={dayNotes.items} 
                                         index={i}
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemFinishChange={this.props.setNoteCheckedState}
@@ -281,7 +278,7 @@ class NotesList extends PureComponent {
 }
 
 function mapStateToProps(state, props) {
-    sort(state.notes, state.settings);
+    // sort(state.notes, state.settings);
 
     return {
         notes: state.notes,

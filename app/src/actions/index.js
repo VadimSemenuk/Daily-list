@@ -3,7 +3,7 @@ import notificationService from "../services/notification.service";
 import settingsService from "../services/settings.service.js";
 
 // notes
-export function addNote (note, dateIndex) {
+export function addNote (note) {
     return function(dispatch) {
         return notesService.addNote(note)
             .then((note) => {
@@ -16,56 +16,50 @@ export function addNote (note, dateIndex) {
             .then((note) => {
                 return dispatch({
                     type: "RECIVE_NOTE",
-                    dateIndex,
                     note
                 })
             })
     }
 }
 
-export function setNoteCheckedState (dateIndex, noteIndex, note, state) {
+export function setNoteCheckedState (note, state) {
     return function(dispatch) {
         return notesService.setNoteCheckedState(note, state).then(() => dispatch({
             type: "SET_NOTE_CHECKED_STATE",
-            dateIndex,
-            noteIndex,
+            note,
             state
         }));
     }
 }
 
-export function updateNoteDynamicFields (dateIndex, noteIndex, note, dynamicFields) {
+export function updateNoteDynamicFields (note, dynamicFields) {
     return function(dispatch) {
         return notesService.updateNoteDynamicFields(note, dynamicFields).then(() => dispatch({
             type: "UPDATE_NOTE_DYNAMIC_FIELDS",
-            dateIndex, 
-            noteIndex,
+            note,
             dynamicFields
         }));
     }
 }
 
-export function deleteNote (dateIndex, noteIndex, note) {
+export function deleteNote (note) {
     return function(dispatch) {
         return notesService.deleteNote(note)
             .then((note) => {
                 notificationService.clear(note.key);  
                 return note;
             })
-            .then(() => dispatch({
+            .then((note) => dispatch({
                 type: "DELETE_NOTE",
-                dateIndex, 
-                noteIndex
+                note
             }))
     }
 }
 
-export function updateNote (dateIndex, noteIndex, note) {
+export function updateNote (note) {
     return function(dispatch) {
         return notesService.updateNote(note).then(() => dispatch({
             type: "UPDATE_NOTE",
-            dateIndex, 
-            noteIndex,
             note
         }))
     }
@@ -94,13 +88,13 @@ export function setDate (dates, dateIndex, settings) {
     }
 }
 
-export function setListDate (date, dateIndexDate, dateIndex, settings) {
+export function setListDate (date, preRenderDate, nextIndex) {
     return function(dispatch) {
-        return notesService.getDayNotes(dateIndexDate, settings).then((notes) => dispatch({
+        return notesService.getDayNotes(preRenderDate).then((notes) => dispatch({
             type: "SET_LIST_DATE",
-            date,
-            dateIndex,
-            notes
+            notes,
+            nextIndex,
+            date
         }));
     }
 }

@@ -27,13 +27,14 @@ export default class Note extends PureComponent {
     }
 
     onDynaicFieldChange = (i, v) => {
-        let dynamicFields = this.props.itemData.dynamicFields.slice();
-        dynamicFields[i].checked = v;
-        this.props.onDynaicFieldChange(this.props.dayIndex, this.props.index, this.props.itemData, dynamicFields);
+        let nextDynamicField = Object.assign({}, this.props.itemData.dynamicFields[i], { checked: v })
+        let nextDynamicFields = [...this.props.itemData.dynamicFields.slice(0, i), nextDynamicField, ...this.props.itemData.dynamicFields.slice(i + 1)];
+        
+        this.props.onDynaicFieldChange(this.props.itemData, nextDynamicFields);
     }
 
     onItemFinishChange = (v) => {
-        this.props.onItemFinishChange(this.props.dayIndex, this.props.index, this.props.itemData, v);
+        this.props.onItemFinishChange(this.props.itemData, v);
     }
 
     onItemActionsWindowRequest = (e) => {

@@ -6,7 +6,7 @@ import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
 
 class NotesService {
-    async getDayNotes(date, settings) {
+    async getDayNotes(date) {
         let select = await executeSQL(
             `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
             FROM Tasks
@@ -14,8 +14,9 @@ class NotesService {
             [date.valueOf(), authService.getUserId()]
         );              
 
+        let notes = [];
+
         if (select.rows) {    
-            let notes = [];
             for(let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
                 item.dynamicFields = JSON.parse(item.dynamicFields);
@@ -26,13 +27,17 @@ class NotesService {
                 item.notificate = !!item.notificate;                
                 
                 notes.push(item);
-            }         
-            return notes;
+            }
+        }
+
+        return {
+            date: date,
+            items: notes
         }
     }
 
-    async getNotesByDates (dates, settings) {
-        let tasks = dates.map((a) => this.getDayNotes(a, settings));
+    async getNotesByDates (dates) {
+        let tasks = dates.map((a) => this.getDayNotes(a));
         return await Promise.all(tasks);
     }
 
@@ -232,6 +237,8 @@ class NotesService {
                 .then(() => synchronizationService.setSynced(note.key))                            
                 .catch((err) => console.warn(err));
         }
+
+        return note
     }
 
     async updateNote(updatedNote) {
