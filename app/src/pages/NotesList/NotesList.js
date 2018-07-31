@@ -14,10 +14,11 @@ import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
 import Modal from '../../components/Modal/Modal';
+import Fab from '../../components/Fab/Fab';
 
 import * as AppActions from '../../actions'; 
 
-import sliderChangeSide from "../../../utils/sliderChangeSide";
+import sliderChangeSide from "../../utils/sliderChangeSide";
 
 import './NotesList.scss';
 
@@ -213,14 +214,15 @@ class NotesList extends PureComponent {
                     >
                         {
                             this.props.notes.map((note, i) => (
-                                <DayNotesList 
-                                    key={i}
-                                    notes={note} 
-                                    index={i}
-                                    onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                    onItemFinishChange={this.props.setNoteCheckedState}
-                                    onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                />
+                                <div className="notes-list-item-wrapper" key={i}>
+                                    <DayNotesList 
+                                        notes={note} 
+                                        index={i}
+                                        onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                        onItemFinishChange={this.props.setNoteCheckedState}
+                                        onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                    />
+                                </div>
                             ))
                         }
                     </ReactSwipe>

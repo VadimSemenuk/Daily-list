@@ -1,10 +1,12 @@
 import React from 'react';
 import pasteImg from "../../media/img/insert.svg";
 
-export default () => (
+import './Fab.scss';
+
+export default (props) => (
     <button 
         className="fab"
-        onClick={this.props.onClick}
+        onClick={props.onClick}
     >
         <img 
             src={pasteImg}

@@ -7,6 +7,8 @@ import * as AppActions from '../../actions';
 
 import './FastAdd.scss';
 
+import addImg from '../../media/img/add-grey.svg';
+
 class FastAdd extends Component {
     constructor(props) {
         super(props);
@@ -44,7 +46,7 @@ class FastAdd extends Component {
                 />
                 <button onClick={this.onFastAddSubmit}>
                     <img
-                        src={require('../../../media/img/add-grey.svg')} 
+                        src={addImg} 
                         alt="add"
                     />        
                 </button>  

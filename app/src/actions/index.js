@@ -1,5 +1,5 @@
 import notesService from "../services/notes.service.js";
-import notificationService from "./notification.service";
+import notificationService from "../services/notification.service";
 import settingsService from "../services/settings.service.js";
 
 // notes
@@ -11,6 +11,7 @@ export function addNote (note, dateIndex) {
                 if (note.notificate) {
                     notificationService.set(note.key, note);
                 };
+                return note;
             })
             .then((note) => {
                 return dispatch({
@@ -49,6 +50,7 @@ export function deleteNote (dateIndex, noteIndex, note) {
         return notesService.deleteNote(note)
             .then((note) => {
                 notificationService.clear(note.key);  
+                return note;
             })
             .then(() => dispatch({
                 type: "DELETE_NOTE",
