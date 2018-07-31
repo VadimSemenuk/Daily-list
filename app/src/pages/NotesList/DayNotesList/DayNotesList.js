@@ -3,18 +3,12 @@ import React, {PureComponent} from 'react';
 import ListItem from '../ListItem/ListItem';
 
 export default class DayNotesList extends PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.state = {}
-    }
-
     render() {
         // console.log("day list render");
         return (
-            <div>
+            <div className="notes-list-item-wrapper" >
                 {
-                    this.props.notes && this.props.notes.length ? 
+                    this.props.notes.length ? 
                     this.props.notes.map((a, i) => (
                         <ListItem 
                             key={a.key}

@@ -38,6 +38,7 @@ export default class Note extends PureComponent {
 
     onItemActionsWindowRequest = (e) => {
         e.stopPropagation();
+
         this.props.onItemActionsWindowRequest(this.props.dayIndex, this.props.index);
     }
 
@@ -97,7 +98,8 @@ export default class Note extends PureComponent {
                                         key={i}
                                         className="attached-image" 
                                         src={a.uri} 
-                                        alt="attachment" />
+                                        alt="attachment" 
+                                    />
                                 )
                             } else {
                                 return (

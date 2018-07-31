@@ -8,7 +8,7 @@ import synchronizationService from '../../services/synchronization.service';
 import appService from "../../services/app.service";
 import authService from "../../services/auth.service";
 
-import FastAdd from '../Add/FastAdd/FastAdd';
+import FastAdd from '../../components/FastAdd/FastAdd';
 import DayNotesList from './DayNotesList/DayNotesList';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
@@ -17,8 +17,9 @@ import Modal from '../../components/Modal/Modal';
 
 import * as AppActions from '../../actions'; 
 
+import sliderChangeSide from "../../../utils/sliderChangeSide";
+
 import './NotesList.scss';
-import pasteImg from "../../media/img/insert.svg"
 
 class NotesList extends PureComponent {
     constructor(props) {
@@ -157,18 +158,6 @@ class NotesList extends PureComponent {
         }
     }
 
-    setSliderRef = (a) => {
-        this.sliderRef = a;
-    }
-
-    onFastAdd = (note) => {
-        this.props.addNote(note, this.activePageIndex);
-    }
-
-    onDateSelect = (e) => {
-        this.setDate(e);
-    }
-
     triggerCalendar = () => {
         this.setState({calendar: !this.state.calendar})
     }
@@ -182,12 +171,6 @@ class NotesList extends PureComponent {
 
     onTodaySelect = () => {
         this.setDate(moment().startOf("day"))
-    }
-
-    onCalendarCloseRequest = () => {
-        this.setState({
-            calendar: false
-        })
     }
 
     render() {
@@ -215,11 +198,10 @@ class NotesList extends PureComponent {
                             currentDate={this.props.currentDate}
                             settings={this.props.settings}
                             onDateSet={this.setDate}
-                            onCloseRequest={this.onCalendarCloseRequest}
+                            onCloseRequest={this.triggerCalendar}
                         />
                     }
                     <ReactSwipe 
-                        ref={this.setSliderRef}
                         className="notes-list-swiper" 
                         swipeOptions={{
                             continuous: true,
@@ -230,16 +212,15 @@ class NotesList extends PureComponent {
                         key={this.props.notes.length}
                     >
                         {
-                            [null, null, null].map((a, i) => (
-                                <div className="notes-list-item-wrapper" key={i}>
-                                    <DayNotesList 
-                                        notes={this.props.notes[i]} 
-                                        index={i}
-                                        onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                        onItemFinishChange={this.props.setNoteCheckedState}
-                                        onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                    />
-                                </div>
+                            this.props.notes.map((note, i) => (
+                                <DayNotesList 
+                                    key={i}
+                                    notes={note} 
+                                    index={i}
+                                    onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                    onItemFinishChange={this.props.setNoteCheckedState}
+                                    onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                />
                             ))
                         }
                     </ReactSwipe>
@@ -256,22 +237,13 @@ class NotesList extends PureComponent {
 
                     {
                         this.state.copyBuffer && 
-                        <button 
-                            className="fab"
-                            onClick={this.pasteCopy}
-                        >
-                            <img 
-                                src={pasteImg}
-                                alt="insert"
-                            />
-                        </button>
+                        <Fab onClick={this.pasteCopy} />
                     }
 
                     {
                         !!this.props.settings.fastAdd && 
                         <FastAdd 
                             currentDate={this.props.currentDate}
-                            onSubmit={this.onFastAdd}
                         />   
                     }
                 </div>
@@ -295,54 +267,14 @@ class NotesList extends PureComponent {
         }
     }
 
-    onSliderChange = (a) => {     
-        this.slideChanged = true;    
-        let action = this.getSlideAction(a);                
-        if (this.onSlideChange) {
-            this.onSlideChange(action);
-        }
-    }
+    onSliderChange = (e) => {
+        this.slideChanged = true; 
 
-    getSlideAction = (index) => {
-        if (index === 0 && this.activePageIndex === 2) {
-            return this.onSliderRigth(index);
-        } else if (index === 2 && this.activePageIndex === 0) {
-            return this.onSliderLeft(index);
-        } else if (this.activePageIndex < index) {
-            return this.onSliderRigth(index);                
-        } else if (this.activePageIndex > index) {
-            return this.onSliderLeft(index);                
-        } else if (this.prevPageIndex > index) {          
-            return this.onSliderRigth(index);   
-        } else if (this.prevPageIndex < index) {                      
-            return this.onSliderLeft(index);            
-        }
-    }
+        const action = sliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
+        this.prevPageIndex = action.prevPageIndex;
+        this.activePageIndex = action.activePageIndex;
 
-    onSliderRigth = (index) => {                                                                                             
-        let nextIndex = index + 1;
-        if (nextIndex > 2) {
-            nextIndex = 0;
-        };
-        this.prevPageIndex = this.activePageIndex;
-        this.activePageIndex = index; 
-        return {
-            index, nextIndex, 
-            side: 'right'
-        }
-    }
-
-    onSliderLeft = (index) => {                                                                    
-        let nextIndex = index - 1;
-        if (nextIndex < 0) {
-            nextIndex = 2;
-        };
-        this.prevPageIndex = this.activePageIndex;        
-        this.activePageIndex = index; 
-        return {
-            index, nextIndex, 
-            side: 'left'
-        }
+        this.onSlideChange(action);
     }
 }
 

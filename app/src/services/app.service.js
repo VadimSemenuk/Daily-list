@@ -4,19 +4,20 @@ import moment from 'moment';
 import migrateService from "./migrate.service";
 import notesService from "./notes.service";
 
+import config from "../config/config";
+
 class AppService {
     async createDB () {
         try {
-            if ((await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks';`)).rows.length) {
+            let isTaskTablePresent = (await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks';`)).rows.length;
+            let isSucseedFirstLoadMarkPresent = localStorage.getItem(config.appId) && JSON.stringify(localStorage.getItem(config.appId)).firstLoadSucseed;
+
+            if (isTaskTablePresent || isSucseedFirstLoadMarkPresent) {
                 console.log('Using existing DB')
                 return
             }
     
             console.log('Filling DB'); 
-
-            await execureSQL('DROP TABLE IF EXISTS Settings;');
-            await execureSQL('DROP TABLE IF EXISTS Tasks;');           
-            console.log('DROP TABLES');
     
             await execureSQL(
                 `CREATE TABLE IF NOT EXISTS Tasks
@@ -75,6 +76,8 @@ class AppService {
             } else {
                 // this.addInitNote();            
             }
+
+            localStorage.setItem(config.appId, JSON.stringify({ firstLoadSucseed: true }))
         } catch (error) {
             console.log('Transaction error: ', error.message);
         }

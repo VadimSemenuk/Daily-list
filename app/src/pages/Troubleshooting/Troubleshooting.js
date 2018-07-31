@@ -38,7 +38,7 @@ export default class Troubleshooting extends Component {
                 <Header />
                 <div className="troubleshooting-page-wrapper settings-page-wrapper scroll">
                     <div className="troubleshooting-info">
-                        При возникновении неполадок в работе, преложениями по улучшению можно обратиться на email: vadim54787@gmail.com.
+                        Помошь при возникновении неполадок в работе, преложения по улучшению: vadim54787@gmail.com
                     </div>
 
                     <button 

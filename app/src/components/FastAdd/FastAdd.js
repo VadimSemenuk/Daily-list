@@ -1,9 +1,13 @@
 import React, {Component} from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import Textarea from "react-textarea-autosize";
+
+import * as AppActions from '../../actions'; 
 
 import './FastAdd.scss';
 
-export default class FastAdd extends Component {
+class FastAdd extends Component {
     constructor(props) {
         super(props);
 
@@ -13,7 +17,7 @@ export default class FastAdd extends Component {
     }
 
     onFastAddSubmit = () => {
-        this.props.onSubmit({
+        this.props.addNote({
             added: this.props.currentDate.startOf('day'),
             title: "", 
             dynamicFields: [
@@ -23,7 +27,7 @@ export default class FastAdd extends Component {
                 }
             ],
             notificate: false
-        });
+        }, this.props.activePageIndex);
         this.setState({
             fastAddInputValue: ""
         })
@@ -48,3 +52,13 @@ export default class FastAdd extends Component {
         )
     }
 }
+
+function mapStateToProps() {
+    return { }
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(AppActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FastAdd);
