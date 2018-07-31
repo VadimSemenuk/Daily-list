@@ -8,6 +8,12 @@ import * as AppActions from '../../actions';
 
 import './Header.scss';
 
+import AddImg from "../../media/img/add.svg";
+import CalendarImg from "../../media/img/calendar.svg";
+import LeftArrowImg from "../../media/img/left-arrow.svg";
+import CheckedImg from "../../media/img/checked.svg";
+import SettimgsImg from "../../media/img/settings.svg";
+
 function getDayNameFormatted (date) {
     let day = date.locale("ru").format('dddd');
     return day[0].toUpperCase() + day.slice(1);
@@ -60,22 +66,23 @@ class Header extends Component {
                                         onClick={this.props.onCalendarRequest}
                                     >
                                         <img 
-                                            src={require("../../media/img/calendar.svg")}
+                                            src={CalendarImg}
                                             alt="date"    
                                         />
                                     </button>
                                 )
                             case 1: 
                                 return (
-                                    <button
+                                    <Link
                                         key={a}                                
-                                        onClick={this.props.onAddPageRequest}
+                                        className="button" 
+                                        to={`/add`}
                                     >
                                         <img 
-                                            src={require("../../media/img/add.svg")}
+                                            src={AddImg}
                                             alt="date"    
                                         />
-                                    </button>                      
+                                    </Link>                    
                                 )
                             case 2:        
                                 return (                                       
@@ -85,7 +92,7 @@ class Header extends Component {
                                         onClick={this.props.history.goBack}
                                     >
                                         <img 
-                                            src={require("../../media/img/left-arrow.svg")}
+                                            src={LeftArrowImg}
                                             alt="date"    
                                         />
                                     </button>
@@ -97,7 +104,7 @@ class Header extends Component {
                                         onClick={this.props.onSubmit}
                                     >
                                         <img 
-                                            src={require("../../media/img/checked.svg")}
+                                            src={CheckedImg}
                                             alt="date"    
                                         />
                                     </button>    
@@ -110,7 +117,7 @@ class Header extends Component {
                                         to={`/settings`}
                                     >
                                         <img 
-                                            src={require("../../media/img/settings.svg")}
+                                            src={SettimgsImg}
                                             alt="date"    
                                         />
                                     </Link>
@@ -127,8 +134,7 @@ class Header extends Component {
 
 function mapStateToProps(state, props) {
     return {
-        settings: state.settings,
-        router: state.router
+        settings: state.settings
     }
 }
 

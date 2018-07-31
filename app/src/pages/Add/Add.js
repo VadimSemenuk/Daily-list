@@ -29,6 +29,8 @@ class Add extends Component {
             startTime: false,
             endTime: false,
             tag: 'transparent',
+            added: this.props.date,
+            finished: 0,
 
             pictureSourceModal: false
         }
@@ -107,11 +109,9 @@ class Add extends Component {
         let note = this.getInputsValues();
 
         if (this.props.match.path === "/edit") { 
-            await this.props.updateNote(this.props.location.state.dateIndex, this.props.location.state.noteIndex, note);
+            await this.props.updateNote(note);
         } else {         
-            note.added = this.props.date;
-            note.finished = 0;
-            await this.props.addNote(note, this.props.location.state.dateIndex);
+            await this.props.addNote(note);
         }
 
         this.props.history.goBack();

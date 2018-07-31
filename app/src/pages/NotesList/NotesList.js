@@ -76,18 +76,16 @@ class NotesList extends PureComponent {
         }
     }
 
-    onItemActionsWindowRequest = (dateIndex, noteIndex) => {
+    onItemActionsWindowRequest = (note) => {
         this.setState({
-            listItemDialogVisible: {
-                dateIndex, 
-                noteIndex,
-                note: this.props.notes[dateIndex][noteIndex]
-            }
+            listItemDialogVisible: { note }
         })
     }
 
     closeDialog = () => {
-        this.setState({listItemDialogVisible: false});
+        this.setState({
+            listItemDialogVisible: false
+        });
     }
 
     onEditRequest = () => {
@@ -110,7 +108,7 @@ class NotesList extends PureComponent {
                 finished: false, 
                 added: moment(this.props.currentDate).valueOf()
             }
-        )), this.activePageIndex);
+        )));
         
         this.setState({
             copyBuffer: null
@@ -118,8 +116,10 @@ class NotesList extends PureComponent {
     }
 
     onCopyRequest = () => {
-        let note = this.props.notes[this.state.listItemDialogVisible.dateIndex][this.state.listItemDialogVisible.noteIndex]
-        this.setState({copyBuffer: note, listItemDialogVisible: false});
+        this.setState({
+            copyBuffer: this.state.listItemDialogVisible.note, 
+            listItemDialogVisible: false
+        });
     }
 
     onImageShowRequest = (uri) => {
@@ -157,13 +157,6 @@ class NotesList extends PureComponent {
         this.setState({calendar: !this.state.calendar})
     }
 
-    onAddPageRequest = () => {
-        this.props.history.push({
-            pathname: `/add`,
-            state: { dateIndex: this.activePageIndex }
-        })
-    }
-
     onTodaySelect = () => {
         this.setDate(moment().startOf("day"))
     }
@@ -174,7 +167,6 @@ class NotesList extends PureComponent {
                 <Header
                     page="notes"
                     showCurrentDate={true}
-                    onAddPageRequest={this.onAddPageRequest}
                     onCalendarRequest={this.triggerCalendar}
                     onSelectToday={this.onTodaySelect}
                 />
@@ -232,6 +224,7 @@ class NotesList extends PureComponent {
                         <button onClick={this.onEditRequest}>Редактировать</button>
                         <button onClick={this.onListItemRemove}>Удалить</button>
                         <button onClick={this.onCopyRequest}>Копировать</button>
+                        
                     </Modal>
 
                     {

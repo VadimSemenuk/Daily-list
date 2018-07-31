@@ -40,7 +40,7 @@ export default class Note extends PureComponent {
     onItemActionsWindowRequest = (e) => {
         e.stopPropagation();
 
-        this.props.onItemActionsWindowRequest(this.props.dayIndex, this.props.index);
+        this.props.onItemActionsWindowRequest(this.props.itemData);
     }
 
     triggerExpanded = () => {
