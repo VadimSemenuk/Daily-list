@@ -2,21 +2,14 @@
     .troubleshooting-info {
         margin-bottom: 10px;
     }
-    .setting-item.active {
-        border-bottom: none;
-
-        .setting-item-img {
-            transform: rotate(90deg);
-        }
-    } 
 
     .issue-wrapper {
         margin-top: 20px;
-    }
-
-    img {
-        width: 90%;
-        margin: 5px auto;
-        display: block;
+        
+        img {
+            width: 90%;
+            margin: 10px auto;
+            display: block;
+        }
     }
 }

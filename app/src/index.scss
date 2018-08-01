@@ -38,6 +38,19 @@ body {
 .scroll {
     overflow-y: auto;
 }
+.page-content {
+    background: #fff;
+
+    &.padding {
+        padding: 10px;
+    }
+}
+
+
+
+.text-center {
+    text-align: center;
+}
 
 
 
@@ -86,6 +99,11 @@ button,
             background: transparent;
             color: #222;
         }
+
+        &.block {
+            width: 100%;
+            margin-top: 10px;
+        }
     }
 
     &.underlined {
@@ -118,13 +136,6 @@ button,
 
 }
 
-.page-content {
-    background: #fff;
-
-    &.padding {
-        padding: 10px;
-    }
-}
 
 
 // INPUTS
@@ -169,4 +180,18 @@ select {
     justify-content: center;
     align-items: center;
     height: 100%;
+}
+
+
+.padding .list-items-block {
+    position: relative;
+
+    &:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: -10px;
+        right: -10px;
+        border-bottom: 1px solid #eceaea;
+    }
 }

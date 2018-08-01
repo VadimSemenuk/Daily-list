@@ -31,4 +31,16 @@
     &.inset-list-item {
         text-align: left;
     }
+
+    &.trigger-list-item {
+        text-align: left;
+        
+        &.active {
+            border-bottom: none;
+
+            .list-item-img {            
+                transform: rotate(90deg);
+            }
+        }
+    }
 }

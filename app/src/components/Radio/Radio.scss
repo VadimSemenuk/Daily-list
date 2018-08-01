@@ -1,0 +1,43 @@
+.radio {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #414040;
+    border-radius: 10px;
+    position: relative;
+    display: block;
+
+    &.active .radio-inner{
+        opacity: 1;        
+    }
+
+    .radio-inner {
+        opacity: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -4px;
+        margin-left: -4px;
+        width: 8px;
+        height: 8px;
+        background: #414040;
+        border-radius: 10px;
+    }
+
+    input {
+        display: none;
+    }
+}
+.radio-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+    
+    span {
+        display: inline-block;
+        margin-left: 10px;
+    }
+}

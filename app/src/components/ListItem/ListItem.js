@@ -61,3 +61,17 @@ export let SelectListItem = (props) => (
         </select>
     </button>
 )
+
+export let TriggerListItem = (props) => (
+    <button 
+        className={`list-item trigger-list-item ${props.triggerValue ? " active" : ""}`}
+        onClick={props.onClick}                                
+    >
+        <span className="list-item-text">{props.text}</span>
+        <img 
+            className="list-item-img"
+            src={arrowRight} 
+            alt="in"
+        /> 
+    </button>
+)

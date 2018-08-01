@@ -1,18 +1,15 @@
-import React, { PureComponent } from 'react';
-import './Radio.css';
+import React from 'react';
+import './Radio.scss';
 
-class Radio extends PureComponent {
-  render() {
-    return (
-      <label className={`radio ${this.props.checked ? "active" : ""}`}>
-        <input 
-            {...this.props}
-            type="radio"         
-        />
-        <div className="radio-inner"></div>
-      </label>
-    );
-  }
-}
-
-export default Radio;
+export default (props) => (
+  <div className="radio-wrapper">
+    <label className={`radio ${props.checked ? "active" : ""}`}>
+      <input 
+          {...props}
+          type="radio"         
+      />
+      <div className="radio-inner"></div>
+    </label>
+    <span>{props.text}</span>
+  </div>
+);

@@ -115,9 +115,9 @@ class SettingsBackup extends Component {
 
     render () {
         return (
-            <div className="page-wrapper">
+            <div className="page-wrapper backup-page-wrapper">
                 <Header />
-                <div className="settings-backup-wrapper settings-page-wrapper scroll page-content">
+                <div className="scroll page-content padding">
                     <div className="backup-info">Данные будут привязаны к учетной записи. При входе в учетную запись с различных устройств данные будут синхронизированы.</div>
                 
                     {
@@ -150,10 +150,10 @@ class SettingsBackup extends Component {
                             />
                             <button 
                                 type="submit" 
-                                className="text"
+                                className="text block"
                             >Регистрация</button>
                             <button 
-                                className="text clear"
+                                className="text clear block"
                                 type="button"                            
                                 onClick={this.switchForms}
                             >Войти</button>                    
@@ -183,10 +183,10 @@ class SettingsBackup extends Component {
                             />
                             <button 
                                 type="submit" 
-                                className="text"
+                                className="text block"
                             >Войти</button>
                             <button 
-                                className="text clear" 
+                                className="text clear block" 
                                 type="button"
                                 onClick={this.switchForms}
                             >Регистрация</button>                    

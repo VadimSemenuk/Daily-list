@@ -14,7 +14,7 @@ class Settings extends Component {
 		return (
             <div className="page-wrapper">
                 <Header />
-                <div className="settings-page-wrapper scroll page-content padding">
+                <div className="scroll page-content padding">
                     <SwitchListItem 
                         text="Включить уведомдение по умолчанию"
                         checked={this.props.settings.defaultNotification}

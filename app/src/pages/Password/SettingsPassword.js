@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 
+import Header from "../../components/Header/Header";
+
 import './SettingsPassword.scss';
 
 export default class SettingsPassword extends Component {
@@ -34,21 +36,24 @@ export default class SettingsPassword extends Component {
 
     render () {
         return (
-            <div className="settings-password-wrapper scroll">
-                <input
-                    type="password"
-                    placeholder="Введите новый пароль"
-                    onChange={(e) => this.setState({password0: e.target.value})}
-                />
-                <input
-                    type="password"
-                    placeholder="Введите пароль повторно"
-                    onChange={(e) => this.setState({password1: e.target.value})}
-                />                
-                <button 
-                    className="text"
-                    onClick={this.onPassSet}
-                >Сохранить</button>       
+            <div className="page-wrapper">
+                <Header />
+                <div className="scroll page-content padding">
+                    <input
+                        type="password"
+                        placeholder="Введите новый пароль"
+                        onChange={(e) => this.setState({password0: e.target.value})}
+                    />
+                    <input
+                        type="password"
+                        placeholder="Введите пароль повторно"
+                        onChange={(e) => this.setState({password1: e.target.value})}
+                    />                
+                    <button 
+                        className="text block"
+                        onClick={this.onPassSet}
+                    >Сохранить</button>       
+                </div>
             </div>
         );
     }

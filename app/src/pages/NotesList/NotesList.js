@@ -92,7 +92,7 @@ class NotesList extends PureComponent {
         this.closeDialog();  
         this.props.history.push({
             pathname: "/edit",
-            state: { ...this.state.listItemDialogVisible }            
+            state: { ...this.state.listItemDialogVisible }
         })             
     }
 

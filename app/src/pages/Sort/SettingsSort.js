@@ -7,10 +7,21 @@ import * as AppActions from '../../actions';
 
 import Radio from '../../components/Radio/Radio';
 import Header from '../../components/Header/Header';
+import { InsetListItem } from "../../components/ListItem/ListItem";
+import Modal from "../../components/Modal/Modal";
 
 import './SettingsSort.scss';
 
 class SettingsSort extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            sortModal: false,
+            orderModal: false
+        }
+    }
+
     onValueSet = async (setting, v) => {
         await this.props.setSetting(setting, v);
     }
@@ -30,46 +41,34 @@ class SettingsSort extends Component {
         return (
             <div className="page-wrapper">
                 <Header />
-                <div className="settings-sort-wrapper settings-page-wrapper scroll page-content">
-                    <div className="settings-sort-section setting-section">
-                        <div className="settings-sort-section-title">Сортировка:</div>
+                <div className="scroll page-content padding">
+                    <InsetListItem 
+                        text="Сортировка"
+                        onClick={() => this.setState({sortModal: true})}
+                    />
+
+                    <Modal 
+                        isOpen={this.state.sortModal}
+                        onRequestClose={() => this.setState({sortModal: false})}
+                    >
                         <div className="settings-sort-item setting-item">
                             <Radio 
                                 name="sort"
                                 checked={this.props.settings.sort === 1}
                                 value={1}
                                 onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                text="По указанному времени"
                             />
-                            <span>По возрастанию указанному времени</span>
-                        </div> 
-                        <div className="settings-sort-item setting-item">
                             <Radio
                                 name="sort"
                                 checked={this.props.settings.sort === 2}
                                 value={2}                
                                 onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                text="По времени добавления"
                             />
-                            <span>По убыванию указанному времени вниз</span>
-                        </div> 
-                        <div className="settings-sort-item setting-item">
-                            <Radio 
-                                name="sort"
-                                checked={this.props.settings.sort === 3}
-                                value={3}                
-                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
-                            />
-                            <span>По возрастанию времени добавления</span>
-                        </div> 
-                        <div className="settings-sort-item setting-item">
-                            <Radio 
-                                name="sort"
-                                checked={this.props.settings.sort === 4}
-                                value={4}                
-                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
-                            />
-                            <span>По убыванию времени добавления</span>
                         </div>
-                    </div>
+                    </Modal>
+
                     <div className="settings-sort-section setting-section">
                         <div className="settings-sort-section-title">Завершенные заметки:</div>
                         <div className="settings-sort-item setting-item">
