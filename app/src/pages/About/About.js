@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import moment from "moment";
 
-import arrowRight from '../../media/img/right-grey.svg';
 import Logo from '../../media/img/logo.png';
 
 import Header from '../../components/Header/Header';

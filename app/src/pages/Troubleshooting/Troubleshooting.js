@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 
 import './Troubleshooting.scss';
 
-import arrowRight from '../../media/img/right-grey.svg';
-
 import Header from '../../components/Header/Header';
 import { InsetListItem, TriggerListItem } from "../../components/ListItem/ListItem";
 

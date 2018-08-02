@@ -30,14 +30,15 @@
 .radio-wrapper {
     display: flex;
     align-items: center;
-    padding: 10px 0;
-
-    &:last-of-type {
-        margin-bottom: 0;
-    }
     
     span {
         display: inline-block;
         margin-left: 10px;
+    }
+}
+
+.radio-group {
+    .radio-wrapper {
+        padding: 8px 0; 
     }
 }

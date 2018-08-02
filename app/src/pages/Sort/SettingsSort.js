@@ -7,7 +7,7 @@ import * as AppActions from '../../actions';
 
 import Radio from '../../components/Radio/Radio';
 import Header from '../../components/Header/Header';
-import { InsetListItem } from "../../components/ListItem/ListItem";
+import { InsetListItem, SwitchListItem } from "../../components/ListItem/ListItem";
 import Modal from "../../components/Modal/Modal";
 
 import './SettingsSort.scss';
@@ -18,7 +18,8 @@ class SettingsSort extends Component {
 
         this.state = {
             sortModal: false,
-            orderModal: false
+            orderModal: false,
+            finsModal: false
         }
     }
 
@@ -46,12 +47,11 @@ class SettingsSort extends Component {
                         text="Сортировка"
                         onClick={() => this.setState({sortModal: true})}
                     />
-
                     <Modal 
                         isOpen={this.state.sortModal}
                         onRequestClose={() => this.setState({sortModal: false})}
                     >
-                        <div className="settings-sort-item setting-item">
+                        <div className="radio-group">
                             <Radio 
                                 name="sort"
                                 checked={this.props.settings.sort === 1}
@@ -69,27 +69,37 @@ class SettingsSort extends Component {
                         </div>
                     </Modal>
 
-                    <div className="settings-sort-section setting-section">
-                        <div className="settings-sort-section-title">Завершенные заметки:</div>
-                        <div className="settings-sort-item setting-item">
+                    <InsetListItem 
+                        text="Порядок отображения"
+                        onClick={() => this.setState({orderModal: true})}
+                    />
+                    <Modal 
+                        isOpen={this.state.orderModal}
+                        onRequestClose={() => this.setState({orderModal: false})}
+                    >
+                        <div className="radio-group">
                             <Radio 
                                 name="sort"
-                                checked={this.props.settings.finishedSort === 1}
+                                checked={this.props.settings.sort === 1}
                                 value={1}
-                                onChange={(e) => this.onValueSet("finishedSort", +e.target.value)}
+                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                text="В прямом порядке"
                             />
-                            <span>Показывать</span>
-                        </div> 
-                        <div className="settings-sort-item setting-item">
-                            <Radio 
+                            <Radio
                                 name="sort"
-                                checked={this.props.settings.finishedSort === 2}
+                                checked={this.props.settings.sort === 2}
                                 value={2}                
-                                onChange={(e) => this.onValueSet("finishedSort", +e.target.value)}
+                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                text="В обратном порядке"
                             />
-                            <span>Перемещать вниз</span>
-                        </div> 
-                    </div>                
+                        </div>
+                    </Modal>
+
+                    <SwitchListItem 
+                        text="Перемещать завершенные вниз"  
+                        checked={this.props.settings.finishedSort}
+                        onChange={(e) => this.props.setSetting('finishedSort', +e)}     
+                    />            
                 </div>
             </div>
         );

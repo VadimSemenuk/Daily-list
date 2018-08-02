@@ -40,7 +40,7 @@ class SettingsTheme extends Component {
 
     render () {
         return (
-            <div className="page-wrapper">
+            <div className="page-wrapper theme-page-wrapper">
                 <Header />
                 <div className="scroll page-content padding">
                     <ListItem 

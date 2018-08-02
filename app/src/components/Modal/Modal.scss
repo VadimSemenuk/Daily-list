@@ -21,19 +21,20 @@
     outline: none;
 
     .modal-inner {
-        padding: 10px;
+        padding: 11px 16px;
     }
 
     .actions-modal-inner {
-        padding: 10px 0;
-
         button {
             font-size: 1em;
             width: 100%;
             text-align: left;
             justify-content: flex-start;
-            padding: 0 19px;
             height: 46px;
+            border-bottom: 1px solid #eceaea;
+        }
+        button:last-of-type {
+            border: none;
         }
     }
 }
