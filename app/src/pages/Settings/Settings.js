@@ -13,7 +13,7 @@ class Settings extends Component {
 	render () {	
 		return (
             <div className="page-wrapper">
-                <Header />
+                <Header title="Настройки" />
                 <div className="scroll page-content padding">
                     <SwitchListItem 
                         text="Включить уведомдение по умолчанию"

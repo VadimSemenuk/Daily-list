@@ -34,7 +34,7 @@ export default class Troubleshooting extends Component {
     render () {
         return (
             <div className="page-wrapper troubleshooting-page-wrapper">
-                <Header />
+                <Header title="Помощь" />
                 <div className="page-content scroll padding">
                     <InsetListItem 
                         text="Предыдущая версия"

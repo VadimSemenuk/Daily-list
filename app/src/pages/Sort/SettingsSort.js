@@ -41,7 +41,7 @@ class SettingsSort extends Component {
     render() {
         return (
             <div className="page-wrapper">
-                <Header />
+                <Header title="Отображение" />
                 <div className="scroll page-content padding">
                     <InsetListItem 
                         text="Сортировка"

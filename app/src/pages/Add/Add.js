@@ -132,8 +132,8 @@ class Add extends Component {
             <div className="page-wrapper">
                 <Header
                     page="add"
-                    showCurrentDate={true}
                     onSubmit={this.onSubmit}
+                    title="Добавить"
                 />
                 <div className="add-wrapper page-content">
                     <div className="add-content-wrapper">

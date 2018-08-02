@@ -41,7 +41,7 @@ let Header = (props) => (
                 <span className="date">{getMonthFormatted(moment())}</span> 
             </div> 
             :
-            <div className="page-name">{props.pageName}</div>
+            <div className="page-title">{props.title}</div>
         }
         <div className="buttons">
             {   

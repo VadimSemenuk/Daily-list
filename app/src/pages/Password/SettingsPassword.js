@@ -37,7 +37,7 @@ export default class SettingsPassword extends Component {
     render () {
         return (
             <div className="page-wrapper">
-                <Header />
+                <Header title="Пароль" />
                 <div className="scroll page-content padding">
                     <input
                         type="password"

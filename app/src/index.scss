@@ -7,9 +7,14 @@ html {
     height: 100%;
 }
 body {
-    font-family: 'Roboto';
+    // font-family: 'Montserrat', sans-serif;
+    // font-family: 'Open Sans', sans-serif;
+    font-family: "Roboto";
     color: #222;
     font-size: 14px;
+}
+button {
+    font-family: inherit;   
 }
 
 

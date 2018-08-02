@@ -41,7 +41,7 @@ class SettingsTheme extends Component {
     render () {
         return (
             <div className="page-wrapper theme-page-wrapper">
-                <Header />
+                <Header title="Интерфейс" />
                 <div className="scroll page-content padding">
                     <ListItem 
                         onClick={() => this.setState({ themeModal: true })}
