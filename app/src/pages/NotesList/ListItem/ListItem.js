@@ -4,6 +4,8 @@ import moment from "moment";
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 
+import AlarmImg from '../../../media/img/alarm.svg';
+
 import './ListItem.scss';
 
 function getTime (date) {
@@ -67,9 +69,16 @@ export default class Note extends PureComponent {
                     <div className="note-header-time-wrapper">
                         {this.props.itemData.startTime && <span>{getTime(this.props.itemData.startTime)}</span>} 
                         {this.props.itemData.endTime && <span className="divider">-</span>}
-                        {this.props.itemData.endTime && <span>{getTime(this.props.itemData.endTime)}</span>}                 
+                        {this.props.itemData.endTime && <span>{getTime(this.props.itemData.endTime)}</span>}                                                    
                     </div>
-                    {this.props.itemData.notificate ? <div className="notification-identifier"></div> : null}                                     
+                    {
+                        this.props.itemData.notificate &&
+                        <img 
+                            className="notification-identifier"
+                            src={AlarmImg}
+                            alr="notify"
+                        />
+                    }                                     
                 </div>
                 {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
                 {

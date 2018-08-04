@@ -134,6 +134,7 @@ class Add extends Component {
                     page="add"
                     onSubmit={this.onSubmit}
                     title="Добавить"
+                    title={this.props.match.path === "/edit" ? "Редактировать" : "Добавить"}
                 />
                 <div className="add-wrapper page-content">
                     <div className="add-content-wrapper">

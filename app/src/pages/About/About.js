@@ -61,7 +61,7 @@ export default class About extends Component {
                     <div className="text-center">
                         <strong>Ежедневник</strong>
                         <p>&#9400; Mamindeveloper, 2017</p>
-                        <p>vadim54787@gmail.com</p>                        
+                        <p>mamindeveloper@gmail.com</p>                        
                     </div> 
                     <div className="list-items-block">
                         <InsetListItem 

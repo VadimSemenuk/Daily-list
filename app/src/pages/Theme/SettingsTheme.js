@@ -14,19 +14,19 @@ import themesService from '../../services/themes.service';
 import './SettingsTheme.scss';
 import '../../components/ColorPicker/ColorPicker.scss';
 
+let themes = themesService.getThemesList();
+
 class SettingsTheme extends Component {
-	constructor(props) {
+    constructor(props) {
         super(props);
 
         this.state = {
-
+            themeModal: false
         }
-
-        this.themes = themesService.getThemesList();
     }
 
     onThemeSelect = (id) => {
-        let theme = themesService.getThemeByIndex(id);
+        let theme = themesService.getThemeById(id);
         if (window.cordova && window.cordova.platformId === 'android') {
             window.StatusBar.backgroundColorByHexString(theme.statusBar);
         }
@@ -38,13 +38,21 @@ class SettingsTheme extends Component {
         }
     }
 
+    onRandomThemeModeTrigger = (e) => {
+        if (e) {
+            this.onThemeSelect(-1);
+        } else {
+            this.onThemeSelect(this.props.settings.theme.realId);
+        }
+    }
+
     render () {
         return (
             <div className="page-wrapper theme-page-wrapper">
                 <Header title="Интерфейс" />
                 <div className="scroll page-content padding">
                     <ListItem 
-                        onClick={() => this.setState({ themeModal: true })}
+                        onClick={() => this.setState({themeModal: true})}
                         text="Тема"
                         style={{padding: "10px 0"}}
                         ValElement={() => (
@@ -63,15 +71,15 @@ class SettingsTheme extends Component {
                     >
                         <SwitchListItem 
                             text="Случайная тема"  
-                            checked={this.props.settings.theme === -1}
-                            onChange={(e) => this.onThemeSelect(-1)}     
+                            checked={this.props.settings.theme.id === -1}
+                            onChange={this.onRandomThemeModeTrigger}     
                         />
                         <ColorPicker
-                            colors={this.themes}
+                            colors={themes}
                             field="header"
                             value={this.props.settings.theme}
                             onSelect={(event) => this.onThemeSelect(event.color.id)}
-                            disabled={this.props.settings.theme === -1}
+                            disabled={this.props.settings.theme.id === -1}
                         />
                     </Modal>
 

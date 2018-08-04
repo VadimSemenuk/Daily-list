@@ -1,8 +1,7 @@
 import { randomInteger } from "../utils/randomNumber";
 
 class ThemesService {
-    colors = [
-        // #2b3b46
+    themes = [
         {
             id: 0,
             statusBar: '#030823',
@@ -90,19 +89,26 @@ class ThemesService {
             statusBar: '#000000',
             header: '#222222',
             body: '#fff'
+        },
+        {
+            id: 14,
+            statusBar: '#000000',
+            header: '#2b3b46',
+            body: '#fff'
         }
     ];
 
-    getThemeByIndex = (index) => {
-        if (index === -1) {
-            index = randomInteger(0, this.getThemesCount() - 1)
+    getThemeById = (id) => {
+        if (id === -1) {
+            let theme = this.themes[randomInteger(0, this.getThemesCount() - 1)];
+            return Object.assign({}, theme, {id: -1, realId: theme.id})
         };
-        return this.colors[index]
+        return this.themes.find((a) => a.id === id);
     }
 
-    getThemesList = () => this.colors;
+    getThemesList = () => [...this.themes];
 
-    getThemesCount = () => this.colors.length
+    getThemesCount = () => this.themes.length
 }
 
 let themesService = new ThemesService();

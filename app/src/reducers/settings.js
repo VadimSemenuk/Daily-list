@@ -1,9 +1,9 @@
 let init = {
     theme: {
         id: 0,
-        statusBar: '#030823',
-        header: '#00213C',
-        body: '#fff'
+        statusBar: null,
+        header: null,
+        body: null
     },
     defaultNotification: true,
     fastAdd: false,

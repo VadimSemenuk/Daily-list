@@ -15,7 +15,7 @@ class SetitngsService {
                 ...result, 
                 defaultNotification: !!result.defaultNotification,
                 fastAdd: !!result.fastAdd,
-                theme: themesService.getThemeByIndex(result.colorTheme)
+                theme: themesService.getThemeById(result.colorTheme)
             }
         } catch (err) {
             console.log('Error: ', err);
