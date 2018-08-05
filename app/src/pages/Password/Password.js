@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as AppActions from '../../actions'; 
-import { getGreeting } from "../../utils/dayPart"
+import {getGreeting} from "../../utils/dayPart"
+import {translate, Trans} from "react-i18next";
 
 import arrowRight from '../../media/img/right-grey.svg';
 
@@ -21,7 +22,7 @@ class Password extends Component {
         if (this.props.settings.password === this.state.password) {
             return true
         } else {
-            alert('Неверный пароль');
+            window.plugins.toast.showLongBottom(this.props.t("invalid-password"))
         }
     }
 
@@ -33,6 +34,8 @@ class Password extends Component {
     }
 
 	render () {	
+        let {t} = this.props;
+
 		return (
             <div className="password-wrapper">
                 <span className="greeting">{getGreeting()}</span>
@@ -40,7 +43,7 @@ class Password extends Component {
                 <div className="password-input-wrapper">
                     <input
                         type="password"
-                        placeholder="Введите пароль"
+                        placeholder={t("pass-in")}
                         onChange={(e) => this.setState({password: e.target.value})}
                     /> 
                     <button onClick={this.in}>
@@ -66,4 +69,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Password);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(Password));

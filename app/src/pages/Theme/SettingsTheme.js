@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import {translate, Trans} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
 import Header from '../../components/Header/Header';
-import { SwitchListItem, ListItem, SelectListItem } from "../../components/ListItem/ListItem";
+import {SwitchListItem, ListItem, SelectListItem} from "../../components/ListItem/ListItem";
 import Modal from "../../components/Modal/Modal";
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 
@@ -47,13 +48,15 @@ class SettingsTheme extends Component {
     }
 
     render () {
+        let {t} = this.props;
+
         return (
             <div className="page-wrapper theme-page-wrapper">
-                <Header title="Интерфейс" />
+                <Header title={t("interface")} />
                 <div className="scroll page-content padding">
                     <ListItem 
                         onClick={() => this.setState({themeModal: true})}
-                        text="Тема"
+                        text={t("theme")}
                         style={{padding: "10px 0"}}
                         ValElement={() => (
                             <div className="color-item-wrapper">
@@ -70,7 +73,7 @@ class SettingsTheme extends Component {
                         onRequestClose={() => this.setState({themeModal: false})}
                     >
                         <SwitchListItem 
-                            text="Случайная тема"  
+                            text={t("random-theme")}  
                             checked={this.props.settings.theme.id === -1}
                             onChange={this.onRandomThemeModeTrigger}     
                         />
@@ -84,7 +87,7 @@ class SettingsTheme extends Component {
                     </Modal>
 
                     <SelectListItem
-                        text="Размер шрифта"
+                        text={t("font-size")}
                         value={this.props.settings.fontSize}
                         onSelect={(value) => {
                             this.props.setSetting('fontSize', +value)
@@ -92,8 +95,8 @@ class SettingsTheme extends Component {
                         }}
                     />
                     <SwitchListItem 
-                         text="Поле быстрого добавления"  
-                         checked={this.props.settings.fastAdd}
+                        text={t("fast-add")}  
+                        checked={this.props.settings.fastAdd}
                         onChange={(e) => this.props.setSetting('fastAdd', +e)}     
                     />
                 </div>
@@ -112,4 +115,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsTheme);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(SettingsTheme));

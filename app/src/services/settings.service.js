@@ -24,9 +24,9 @@ class SetitngsService {
     }
 
     async setSetting (item, value) {  
-        if (item === "theme") {
-            value = value.id
-            item = "colorTheme";
+        switch(item) {
+            case("theme"): value = value.id;
+            case("sort"): value = JSON.stringify(value);
         }
         try {
             await executeSQL(

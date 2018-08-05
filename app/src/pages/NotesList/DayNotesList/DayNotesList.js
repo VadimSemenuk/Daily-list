@@ -1,9 +1,11 @@
 import React, {PureComponent} from 'react';
+import {translate, Trans} from "react-i18next";
 
 import ListItem from '../ListItem/ListItem';
 
-export default class DayNotesList extends PureComponent {
+class DayNotesList extends PureComponent {
     render() {
+        let {t} = this.props;
         // console.log("day list render");
         return (
             this.props.notes.length ? 
@@ -20,7 +22,9 @@ export default class DayNotesList extends PureComponent {
                 /> 
             ))
             :
-            <div className="no-content">Нет записей</div> 
+            <div className="no-content">{t("no-content")}</div> 
         )
     }
 }
+
+export default translate("translations")(DayNotesList)

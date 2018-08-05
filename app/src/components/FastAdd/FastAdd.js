@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Textarea from "react-textarea-autosize";
+import {translate, Trans} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
@@ -36,11 +37,13 @@ class FastAdd extends Component {
     }
 
     render() {
+        let {t} = this.props;
+
         return (
             <div className="fast-add-wrapper">                
                 <Textarea
                     type="text"
-                    placeholder="Описание"
+                    placeholder={t("description")}
                     onChange={(e) => this.setState({fastAddInputValue: e.target.value})}
                     value={this.state.fastAddInputValue}
                 />
@@ -63,4 +66,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FastAdd);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(FastAdd));

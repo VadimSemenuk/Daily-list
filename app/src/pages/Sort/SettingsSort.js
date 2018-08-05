@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from "moment";
+import {translate, Trans} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
 import Radio from '../../components/Radio/Radio';
 import Header from '../../components/Header/Header';
-import { InsetListItem, SwitchListItem } from "../../components/ListItem/ListItem";
+import {InsetListItem, SwitchListItem} from "../../components/ListItem/ListItem";
 import Modal from "../../components/Modal/Modal";
 
 import './SettingsSort.scss';
@@ -18,8 +19,11 @@ class SettingsSort extends Component {
 
         this.state = {
             sortModal: false,
-            orderModal: false,
-            finsModal: false
+            directionModal: false,
+            finsModal: false,
+
+            sortVal: this.props.settings.sort.type,
+            directionVal: this.props.settings.sort.direction,
         }
     }
 
@@ -34,12 +38,14 @@ class SettingsSort extends Component {
     }
 
     render() {
+        let {t} = this.props;
+
         return (
             <div className="page-wrapper">
-                <Header title="Отображение" />
+                <Header title={t("view")} />
                 <div className="scroll page-content padding">
                     <InsetListItem 
-                        text="Сортировка"
+                        text={t("sort")}
                         onClick={() => this.setState({sortModal: true})}
                     />
                     <Modal 
@@ -48,52 +54,52 @@ class SettingsSort extends Component {
                     >
                         <div className="radio-group">
                             <Radio 
-                                name="sort"
+                                name="sort-type"
                                 checked={this.props.settings.sort.type === 0}
-                                value={1}
-                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {type: +e.target.value}))}
-                                text="По указанному времени"
+                                value={0}
+                                onChange={(e, text) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}))}
+                                text={t("time-sort")}
                             />
                             <Radio
-                                name="sort"
+                                name="sort-type"
                                 checked={this.props.settings.sort.type === 1}
-                                value={2}                
-                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {type: +e.target.value}))}
-                                text="По времени добавления"
+                                value={1}                
+                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}))}
+                                text={t("time-add-sort")}
                             />
                         </div>
                     </Modal>
 
                     <InsetListItem 
-                        text="Порядок отображения"
-                        onClick={() => this.setState({orderModal: true})}
+                        text={t("view-direction")}
+                        onClick={() => this.setState({directionModal: true})}
                     />
                     <Modal 
-                        isOpen={this.state.orderModal}
-                        onRequestClose={() => this.setState({orderModal: false})}
+                        isOpen={this.state.directionModal}
+                        onRequestClose={() => this.setState({directionModal: false})}
                     >
                         <div className="radio-group">
                             <Radio 
-                                name="sort"
-                                checked={this.props.settings.sort.order === 0}
+                                name="sort-direction"
+                                checked={this.props.settings.sort.direction === 0}
                                 value={0}
-                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {order: +e.target.value}))}
-                                text="В прямом порядке"
+                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}))}
+                                text={t("view-direction-asc")}
                             />
                             <Radio
-                                name="sort"
-                                checked={this.props.settings.sort.order === 1}
+                                name="sort-direction"
+                                checked={this.props.settings.sort.direction === 1}
                                 value={1}                
-                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {order: +e.target.value}))}
-                                text="В обратном порядке"
+                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}))}
+                                text={t("view-direction-desc")}
                             />
                         </div>
                     </Modal>
 
                     <SwitchListItem 
-                        text="Перемещать завершенные вниз"  
-                        checked={this.props.settings.finishedSort}
-                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {finSort: +e.target.value}))}     
+                        text={t("fin-sort")}  
+                        checked={this.props.settings.sort.finSort}
+                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {finSort: e}))}     
                     />            
                 </div>
             </div>
@@ -113,4 +119,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsSort);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(SettingsSort));

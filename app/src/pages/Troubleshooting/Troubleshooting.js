@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
+import {translate, Trans} from "react-i18next";
 
 import './Troubleshooting.scss';
 
 import Header from '../../components/Header/Header';
-import { InsetListItem, TriggerListItem } from "../../components/ListItem/ListItem";
+import {InsetListItem, TriggerListItem} from "../../components/ListItem/ListItem";
 
-export default class Troubleshooting extends Component {
+class Troubleshooting extends Component {
 	constructor(props) {
         super(props);
 
@@ -32,37 +33,39 @@ export default class Troubleshooting extends Component {
     }
 
     render () {
+        let {t} = this.props;
+
         return (
             <div className="page-wrapper troubleshooting-page-wrapper">
-                <Header title="Помощь" />
+                <Header title={t("help")} />
                 <div className="page-content scroll padding">
                     <InsetListItem 
-                        text="Предыдущая версия"
-                        onClick={this.getPreviousVersion}  
+                        text={t("previous-version")}
+                        onClick={this.getPreviousVersion}
                     />
                     <TriggerListItem 
-                        text="Не приходят уведомления"
+                        text={t("no-notification")}
                         onClick={() => this.setIssueVisible(1)}  
                         triggerValue={this.state.issueVisible === 1}
                     />
                     {
                         this.state.issueVisible === 1 &&
                         <div className="issue-wrapper">
-                            Перейдите в настройки приложения
+                            {t("no-notification-a")}
                             <button 
                                 onClick={this.openSettings}
                                 className="text block"
-                            >Перейти</button>
+                            >{t("move")}</button>
                             <img 
                                 src={require("../../media/img/issues/issue1.0.jpg")}
                                 alt="issue"
                             />
-                            Затем перейдите к настройкам разрешений<br/>
+                            {t("no-notification-b")}
                             <img 
                                 src={require("../../media/img/issues/issue1.1.jpg")}
                                 alt="issue"                            
                             />
-                            Для разрешения "Запуск в фоне" (название может отличаться) установите значение "Разрешить"
+                            {t("no-notification-c")}                            
                             <img 
                                 src={require("../../media/img/issues/issue1.2.jpg")}
                                 alt="issue"                            
@@ -74,3 +77,5 @@ export default class Troubleshooting extends Component {
         );
     }
 }
+
+export default translate("translations")(Troubleshooting)

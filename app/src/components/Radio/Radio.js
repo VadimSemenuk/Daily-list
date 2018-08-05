@@ -6,7 +6,8 @@ export default (props) => (
     <label className={`radio ${props.checked ? "active" : ""}`}>
       <input 
           {...props}
-          type="radio"         
+          type="radio"    
+          onChange={(e) => props.onChange(e.target.value, props.text)}     
       />
       <div className="radio-inner"></div>
     </label>

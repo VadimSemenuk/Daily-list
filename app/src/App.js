@@ -2,7 +2,10 @@ import React, {Component} from "react";
 import {Provider} from "react-redux";
 import initStore from "./store";
 import 'moment/locale/ru';
-import { BeatLoader } from 'react-spinners';
+import {BeatLoader} from 'react-spinners';
+import {I18nextProvider} from "react-i18next";
+
+import i18n from "./i18n";
 
 import Root from "./Root";
 
@@ -14,8 +17,8 @@ import settingsService from "./services/settings.service";
 let store;
 
 export default class App extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             appReady: false,
@@ -62,7 +65,9 @@ export default class App extends Component {
         return (
             this.state.appReady ?
             <Provider store={store}>
-                <Root />
+                <I18nextProvider i18n={i18n}>
+                    <Root />
+                </I18nextProvider>
             </Provider>
             :
             this.state.settings ?

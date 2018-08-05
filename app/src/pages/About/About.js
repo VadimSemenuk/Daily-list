@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
+import {translate, Trans} from "react-i18next";
 
 import Logo from '../../media/img/logo.png';
 
 import Header from '../../components/Header/Header';
-import { InsetListItem, TriggerListItem } from "../../components/ListItem/ListItem";
+import {InsetListItem, TriggerListItem} from "../../components/ListItem/ListItem";
 
 import './About.scss';
 
-export default class About extends Component {
+class About extends Component {
 	constructor(props) {
         super(props);
   
@@ -27,7 +28,7 @@ export default class About extends Component {
 
     launthMarket = () => {
         if (navigator.connection.type === window.Connection.NONE) {
-            alert("Подключитесь к интернету для выполнения действия");
+            window.plugins.toast.showLongBottom(this.props.t("internet-required"));       
             return 
         }
 
@@ -36,22 +37,24 @@ export default class About extends Component {
 
     share = () => {
         if (navigator.connection.type === window.Connection.NONE) {
-            alert("Подключитесь к интернету для выподнения действия");
+            window.plugins.toast.showLongBottom(this.props.t("internet-required"));       
             return 
         }
 
         window.plugins.socialsharing.share(
-            'Ежедневник - заметки и напоминания в удобном виде', 
-            'Ежедневник', 
+            this.props.t("share-content"), 
+            this.props.t("share-theme"), 
             Logo, 
             'https://ce22s.app.goo.gl/u9DC'
         )
     }
 
     render () {
+        let {t} = this.props;
+
         return (
             <div className="page-wrapper">
-                <Header />
+                <Header title={t("about")}/>
                 <div className="scroll page-content padding">
                     <img 
                         className="app-logo"
@@ -59,29 +62,29 @@ export default class About extends Component {
                         alt="app-logo"
                     />
                     <div className="text-center">
-                        <strong>Ежедневник</strong>
+                        <strong>{t("app-name")}</strong>
                         <p>&#9400; Mamindeveloper, 2017</p>
                         <p>mamindeveloper@gmail.com</p>                        
                     </div> 
                     <div className="list-items-block">
                         <InsetListItem 
-                            text="Оценить приложение"
+                            text={t("star-app")}
                             onClick={this.launthMarket}  
                         />
                         <InsetListItem 
-                            text="Поделиться приложением"
+                            text={t("share-app")}
                             onClick={this.share}  
                         /> 
                     </div> 
                     <TriggerListItem 
-                        text="Использованные ресурсы"
+                        text={t("resources")}
                         onClick={() => this.setDropdownVisible(1)}  
                         triggerValue={this.state.dropdownVisible === 1}
                     />   
                     {  
                         this.state.dropdownVisible &&                   
                         <div>
-                            <strong>Графика:</strong>
+                            <strong>{t("graphics")}</strong>
                             <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC 3.0 BY</a></div>           
                             <div>Icons made by <a href="http://www.flaticon.com/authors/madebyoliver" title="Madebyoliver">Madebyoliver</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" >CC 3.0 BY</a></div>
                             <div>Icons made by <a href="http://www.flaticon.com/authors/chris-veigt" title="Chris Veigt">Chris Veigt</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" >CC 3.0 BY</a></div>
@@ -97,3 +100,5 @@ export default class About extends Component {
         );
     }
 }
+
+export default translate("translations")(About)
