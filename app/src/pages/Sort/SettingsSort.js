@@ -23,18 +23,13 @@ class SettingsSort extends Component {
         }
     }
 
-    onValueSet = async (setting, v) => {
-        await this.props.setSetting(setting, v);
-    }
-
     componentWillUnmount() {
         this.props.getNotesByDates(
             [
                 moment(this.props.currentDate).add(-1, "day"),
                 moment(this.props.currentDate).startOf("day"),
                 moment(this.props.currentDate).add(1, "day")
-            ],
-            this.props.settings
+            ]
         ); 
     }
 
@@ -54,16 +49,16 @@ class SettingsSort extends Component {
                         <div className="radio-group">
                             <Radio 
                                 name="sort"
-                                checked={this.props.settings.sort === 1}
+                                checked={this.props.settings.sort.type === 0}
                                 value={1}
-                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {type: +e.target.value}))}
                                 text="По указанному времени"
                             />
                             <Radio
                                 name="sort"
-                                checked={this.props.settings.sort === 2}
+                                checked={this.props.settings.sort.type === 1}
                                 value={2}                
-                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {type: +e.target.value}))}
                                 text="По времени добавления"
                             />
                         </div>
@@ -80,16 +75,16 @@ class SettingsSort extends Component {
                         <div className="radio-group">
                             <Radio 
                                 name="sort"
-                                checked={this.props.settings.sort === 1}
-                                value={1}
-                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                checked={this.props.settings.sort.order === 0}
+                                value={0}
+                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {order: +e.target.value}))}
                                 text="В прямом порядке"
                             />
                             <Radio
                                 name="sort"
-                                checked={this.props.settings.sort === 2}
-                                value={2}                
-                                onChange={(e) => this.onValueSet("sort", +e.target.value)}
+                                checked={this.props.settings.sort.order === 1}
+                                value={1}                
+                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {order: +e.target.value}))}
                                 text="В обратном порядке"
                             />
                         </div>
@@ -98,7 +93,7 @@ class SettingsSort extends Component {
                     <SwitchListItem 
                         text="Перемещать завершенные вниз"  
                         checked={this.props.settings.finishedSort}
-                        onChange={(e) => this.props.setSetting('finishedSort', +e)}     
+                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.state.settings, {finSort: +e.target.value}))}     
                     />            
                 </div>
             </div>

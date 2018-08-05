@@ -3,15 +3,18 @@ let init = {
         id: 0,
         statusBar: null,
         header: null,
-        body: null
+        body: null,
+        realId: 0
     },
     defaultNotification: true,
     fastAdd: false,
-    sort: 0,
-    password: null,
-    fontSize: 14,
-    finishedSort: 1,
-    autoBackup: 0
+    sort: {
+        type: 0,
+        direction: 0,
+        finSort: 0,
+    },
+    passwordHash: null,
+    fontSize: 14
 };
 
 function settings (state = init, action) {

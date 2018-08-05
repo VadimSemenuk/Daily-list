@@ -1,88 +1,11 @@
 import execureSQL from "../utils/executeSQL";
 import moment from 'moment';
 
-import migrateService from "./migrate.service";
 import notesService from "./notes.service";
 
 import config from "../config/config";
 
 class AppService {
-    async createDB () {
-        try {
-            let isTaskTablePresent = (await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks';`)).rows.length;
-            let isSucseedFirstLoadMarkPresent = localStorage.getItem(config.appId) && JSON.stringify(localStorage.getItem(config.appId)).firstLoadSucseed;
-
-            if (isTaskTablePresent || isSucseedFirstLoadMarkPresent) {
-                console.log('Using existing DB')
-                return
-            }
-    
-            console.log('Filling DB'); 
-    
-            await execureSQL(
-                `CREATE TABLE IF NOT EXISTS Tasks
-                (
-                    id INTEGER PRIMARY KEY,
-                    uuid TEXT,
-                    title TEXT,
-                    startTime INTEGER,
-                    endTime INTEGER,
-                    notificate INTEGER,
-                    tag TEXT,
-                    dynamicFields TEXT,
-                    added INTEGER,
-                    finished INTEGER DEFAULT 0,
-                    isSynced INTEGER DEFAULT 0,
-                    isLastActionSynced INTEGER DEFAULT 0,
-                    lastAction TEXT,
-                    lastActionTime INTEGER,
-                    userId INTEGER,
-                    UNIQUE (uuid) ON CONFLICT REPLACE                    
-                );`
-            )
-            console.log('Tasks table created');
-    
-            await execureSQL(
-                `CREATE TABLE IF NOT EXISTS Settings
-                (
-                    defaultNotification INTEGER DEFAULT 1,
-                    sort INTEGER DEFAULT 4,
-                    fastAdd INTEGER DEFAULT 1,
-                    colorTheme INTEGER DEFAULT 0,
-                    password TEXT,    
-                    fontSize INTEGER DEFAULT 14,
-                    finishedSort INTEGER DEFAULT 1,
-                    autoBackup INTEGER DEFAULT 0
-                );`
-            )
-            console.log('Settings table created');
-    
-            await execureSQL(
-                `INSERT INTO Settings
-                (defaultNotification, sort, fastAdd, colorTheme, fontSize, finishedSort, autoBackup)
-                VALUES (1, 3, 0, 0, 14, 1, 0);`
-            )
-            console.log('Settings table filled');
-            console.log('Tasks table created');
-
-            let legacyData = migrateService.checkToLegacyData();
-            if (legacyData) {
-                try {
-                    await migrateService.migrateLegacyData(legacyData);
-                    localStorage.removeItem("DLData");
-                } catch (err) {
-                    console.log(err);
-                }
-            } else {
-                // this.addInitNote();            
-            }
-
-            localStorage.setItem(config.appId, JSON.stringify({ firstLoadSucseed: true }))
-        } catch (error) {
-            console.log('Transaction error: ', error.message);
-        }
-    }
-
     addInitNote() {
         notesService.addNote({
             endTime: false,
@@ -91,7 +14,7 @@ class AppService {
             pictureSourceModal: false,
             startTime: false,
             tag: "#c5282f",
-            title: "Приветствую",
+            title: "Привет",
             added: moment().startOf("day"),
             dynamicFields: [
                 {

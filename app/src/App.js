@@ -8,6 +8,7 @@ import Root from "./Root";
 
 import DB from './db/db';
 import appService from './services/app.service';
+import migrationService from './services/migration/migration.service';
 import settingsService from "./services/settings.service";
 
 let store;
@@ -31,7 +32,7 @@ export default class App extends Component {
             await new Promise((resolve) => document.addEventListener("deviceready", resolve, false));
         }
 
-        await this.initDB();
+        await this.initDb();       
         await this.initSettings();
         window.DEVICE_IMEI = await appService.getDeviceIMEI();
         store = await initStore();
@@ -40,9 +41,9 @@ export default class App extends Component {
 		});
     }
 
-    async initDB() {
+    async initDb() {
         window.db = await DB();
-        await appService.createDB();
+        await migrationService.run();       
     }
 
     async initSettings() {

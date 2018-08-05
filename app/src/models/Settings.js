@@ -3,7 +3,7 @@ export default class Settings {
     defaultNotification: boolean;
     fastAdd: boolean;
     sort: Sort;
-    password: Password;
+    password: string;
     fontSize: number;
 }
 
@@ -19,9 +19,4 @@ export class Sort {
     type: number;
     direction: number;
     finSort: boolean;
-}
-
-export class Password {
-    type: number;
-    direction: number;
 }

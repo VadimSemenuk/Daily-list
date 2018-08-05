@@ -5,17 +5,18 @@ class SetitngsService {
     async getSettings () {
         try {
             let select = await executeSQL(
-                `SELECT defaultNotification, sort, fastAdd, colorTheme, password, fontSize, finishedSort, autoBackup
+                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize
                 FROM Settings;`
             );
-    
+
             let result = select.rows.item(0);
 
             return {
                 ...result, 
                 defaultNotification: !!result.defaultNotification,
                 fastAdd: !!result.fastAdd,
-                theme: themesService.getThemeById(result.colorTheme)
+                theme: themesService.getThemeById(result.theme),
+                sort: JSON.parse(result.sort)
             }
         } catch (err) {
             console.log('Error: ', err);
