@@ -1,5 +1,5 @@
 import React from 'react';
-import pasteImg from "../../media/img/insert.svg";
+import pasteImg from "../../assets/img/insert.svg";
 
 import './Fab.scss';
 

@@ -8,11 +8,11 @@ import * as AppActions from '../../actions';
 
 import './Header.scss';
 
-import AddImg from "../../media/img/add.svg";
-import CalendarImg from "../../media/img/calendar.svg";
-import LeftArrowImg from "../../media/img/left-arrow.svg";
-import CheckedImg from "../../media/img/checked.svg";
-import SettimgsImg from "../../media/img/settings.svg";
+import AddImg from "../../assets/img/add.svg";
+import CalendarImg from "../../assets/img/calendar.svg";
+import LeftArrowImg from "../../assets/img/left-arrow.svg";
+import CheckedImg from "../../assets/img/checked.svg";
+import SettimgsImg from "../../assets/img/settings.svg";
 
 function getDayNameFormatted (date) {
     let day = date.locale("ru").format('dddd');

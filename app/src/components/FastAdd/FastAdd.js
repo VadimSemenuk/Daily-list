@@ -8,7 +8,7 @@ import * as AppActions from '../../actions';
 
 import './FastAdd.scss';
 
-import addImg from '../../media/img/add-grey.svg';
+import addImg from '../../assets/img/add-grey.svg';
 
 class FastAdd extends Component {
     constructor(props) {

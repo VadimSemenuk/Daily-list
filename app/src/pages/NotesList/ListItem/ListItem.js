@@ -4,7 +4,7 @@ import moment from "moment";
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 
-import AlarmImg from '../../../media/img/alarm.svg';
+import AlarmImg from '../../../assets/img/alarm.svg';
 
 import './ListItem.scss';
 
@@ -123,7 +123,7 @@ export default class Note extends PureComponent {
                 <div className="more-button">
                     <button onClick={this.onItemActionsWindowRequest}>                             
                         <img
-                            src={require("../../../media/img/more.svg")}
+                            src={require("../../../assets/img/more.svg")}
                             alt="more"
                         />
                     </button>

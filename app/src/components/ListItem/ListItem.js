@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {PureComponent} from 'react';
 
 import Switch from '../../components/Switch/Switch';
+import Modal from "../../components/Modal/Modal";
 
 import './ListItem.scss';
 
-import arrowRight from '../../media/img/right-grey.svg';
+import arrowRight from '../../assets/img/right-grey.svg';
 
 export let SwitchListItem = (props) => (
     <div className="list-item">
@@ -82,6 +83,38 @@ export let ValueListItem = (props) => (
         onClick={props.onClick}                                
     >
         <span className="list-item-text">{props.text}</span>
-        <span className="list-item-text">{props.text}</span>        
+        <span className="list-item-value">{props.value}</span>        
     </button>
 )
+
+export class ModalListItem extends PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isModalActive: false
+        }
+    }
+
+    triggerModal = () => {
+        this.setState({
+            isModalActive: !this.state.isModalActive
+        })
+    }
+
+    render () {
+        return ([
+            <this.props.listItem
+                {...this.props}
+                onClick={this.triggerModal} 
+            />, 
+
+            <Modal 
+                isOpen={this.state.isModalActive}
+                onRequestClose={this.triggerModal}
+            >
+                {this.props.children}
+            </Modal>
+        ])
+    }
+}

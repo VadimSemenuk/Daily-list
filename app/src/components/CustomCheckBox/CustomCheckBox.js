@@ -2,8 +2,8 @@ import React, {PureComponent} from 'react';
 
 import './CustomCheckBox.scss';
 
-import CheckedImage from '../../media/img/checkbox/checked.png';
-import UncheckedImage from '../../media/img/checkbox/unchecked.png';
+import CheckedImage from '../../assets/img/checkbox/checked.png';
+import UncheckedImage from '../../assets/img/checkbox/unchecked.png';
 
 export default class CustomCheckBox extends PureComponent {
     handleToggleChecked = (e) => {

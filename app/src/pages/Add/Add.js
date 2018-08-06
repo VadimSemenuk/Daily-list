@@ -189,7 +189,7 @@ class Add extends Component {
                                                 alt="attachment" />
                                             <button onClick={() => this.onDynamicItemRemove(i)}>
                                                 <img
-                                                    src={require('../../media/img/remove.png')} 
+                                                    src={require('../../assets/img/remove.png')} 
                                                     alt="rm"
                                                 />        
                                             </button>
@@ -202,14 +202,14 @@ class Add extends Component {
                         <div className="add-actions-wrapper">
                             <button onClick={this.addListItem}>
                                 <img
-                                    src={require('../../media/img/add-grey.svg')} 
+                                    src={require('../../assets/img/add-grey.svg')} 
                                     alt="tf"                                                                
                                 />   
                                 <span>Пункт списка</span>     
                             </button>  
                             <button onClick={this.addInput}>
                                 <img 
-                                    src={require('../../media/img/add-grey.svg')} 
+                                    src={require('../../assets/img/add-grey.svg')} 
                                     alt="lf"                                
                                 />   
                                 <span>Поле</span>     
@@ -219,7 +219,7 @@ class Add extends Component {
                                 onClick={() => this.setState({pictureSourceModal: true})}
                             >
                                 <img 
-                                    src={require('../../media/img/photo-camera.svg')} 
+                                    src={require('../../assets/img/photo-camera.svg')} 
                                     alt="cam"
                                 />      
                             </button> 

@@ -57,17 +57,17 @@ class Troubleshooting extends Component {
                                 className="text block"
                             >{t("move")}</button>
                             <img 
-                                src={require("../../media/img/issues/issue1.0.jpg")}
+                                src={require("../../assets/img/issues/issue1.0.jpg")}
                                 alt="issue"
                             />
                             {t("no-notification-b")}
                             <img 
-                                src={require("../../media/img/issues/issue1.1.jpg")}
+                                src={require("../../assets/img/issues/issue1.1.jpg")}
                                 alt="issue"                            
                             />
                             {t("no-notification-c")}                            
                             <img 
-                                src={require("../../media/img/issues/issue1.2.jpg")}
+                                src={require("../../assets/img/issues/issue1.2.jpg")}
                                 alt="issue"                            
                             />
                         </div>

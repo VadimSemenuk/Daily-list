@@ -5,7 +5,7 @@ import * as AppActions from '../../actions';
 import {getGreeting} from "../../utils/dayPart"
 import {translate, Trans} from "react-i18next";
 
-import arrowRight from '../../media/img/right-grey.svg';
+import arrowRight from '../../assets/img/right-grey.svg';
 
 import './Password.scss';
 

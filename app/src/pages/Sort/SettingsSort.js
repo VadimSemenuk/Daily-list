@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from "moment";
@@ -8,25 +8,12 @@ import * as AppActions from '../../actions';
 
 import Radio from '../../components/Radio/Radio';
 import Header from '../../components/Header/Header';
-import {InsetListItem, SwitchListItem} from "../../components/ListItem/ListItem";
+import {InsetListItem, SwitchListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";
 import Modal from "../../components/Modal/Modal";
 
 import './SettingsSort.scss';
 
 class SettingsSort extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            sortModal: false,
-            directionModal: false,
-            finsModal: false,
-
-            sortVal: this.props.settings.sort.type,
-            directionVal: this.props.settings.sort.direction,
-        }
-    }
-
     componentWillUnmount() {
         this.props.getNotesByDates(
             [
@@ -44,13 +31,10 @@ class SettingsSort extends Component {
             <div className="page-wrapper">
                 <Header title={t("view")} />
                 <div className="scroll page-content padding">
-                    <InsetListItem 
-                        text={t("sort")}
-                        onClick={() => this.setState({sortModal: true})}
-                    />
-                    <Modal 
-                        isOpen={this.state.sortModal}
-                        onRequestClose={() => this.setState({sortModal: false})}
+                    <ModalListItem
+                        text={t("sort")} 
+                        value={"value"}
+                        listItem={ValueListItem}
                     >
                         <div className="radio-group">
                             <Radio 
@@ -68,15 +52,12 @@ class SettingsSort extends Component {
                                 text={t("time-add-sort")}
                             />
                         </div>
-                    </Modal>
+                    </ModalListItem>
 
-                    <InsetListItem 
-                        text={t("view-direction")}
-                        onClick={() => this.setState({directionModal: true})}
-                    />
-                    <Modal 
-                        isOpen={this.state.directionModal}
-                        onRequestClose={() => this.setState({directionModal: false})}
+                    <ModalListItem
+                        text={t("view-direction")} 
+                        value={"value"}
+                        listItem={ValueListItem}
                     >
                         <div className="radio-group">
                             <Radio 
@@ -94,7 +75,7 @@ class SettingsSort extends Component {
                                 text={t("view-direction-desc")}
                             />
                         </div>
-                    </Modal>
+                    </ModalListItem>
 
                     <SwitchListItem 
                         text={t("fin-sort")}  

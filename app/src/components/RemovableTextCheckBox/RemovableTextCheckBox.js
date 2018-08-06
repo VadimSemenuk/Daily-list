@@ -24,7 +24,7 @@ export default class RemovableTextCheckBox extends PureComponent {
                 />
                 <button onClick={this.props.onListItemRemove}>
                     <img
-                        src={require('../../media/img/remove.png')} 
+                        src={require('../../assets/img/remove.png')} 
                         alt="rm"
                     />        
                 </button>

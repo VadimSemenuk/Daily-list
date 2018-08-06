@@ -80,7 +80,7 @@ export default class TimeSet extends Component {
                                     onClick={() => this.reset("startTime")}
                                 >
                                     <img
-                                        src={require('../../../media/img/remove.png')} 
+                                        src={require('../../../assets/img/remove.png')} 
                                         alt="rm"
                                     />        
                                 </button>
@@ -101,7 +101,7 @@ export default class TimeSet extends Component {
                                     onClick={() => this.reset("endTime")}
                                 >
                                     <img
-                                        src={require('../../../media/img/remove.png')} 
+                                        src={require('../../../assets/img/remove.png')} 
                                         alt="rm"
                                     />        
                                 </button>

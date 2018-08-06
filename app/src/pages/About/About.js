@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {translate, Trans} from "react-i18next";
 
-import Logo from '../../media/img/logo.png';
+import Logo from '../../assets/img/logo.png';
 
 import Header from '../../components/Header/Header';
 import {InsetListItem, TriggerListItem} from "../../components/ListItem/ListItem";
