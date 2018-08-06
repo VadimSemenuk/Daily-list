@@ -1,7 +1,32 @@
 import executeSQL from '../utils/executeSQL';
 import themesService from './themes.service';
 
+let sortTypeSettings = [{
+    translateId: "time-sort",
+    val: 0
+}, {
+    translateId: "time-add-sort",
+    val: 1
+}];
+
+let sortDirectionSettings = [{
+    translateId: "view-direction-asc",
+    val: 0
+}, {
+    translateId: "view-direction-desc",
+    val: 1
+}];
+
 class SetitngsService {
+
+    getSortTypeSettings() {
+        return [...sortTypeSettings]
+    }
+
+    getSortDirectionSettings() {
+        return [...sortDirectionSettings]
+    }
+
     async getSettings () {
         try {
             let select = await executeSQL(
@@ -37,6 +62,8 @@ class SetitngsService {
             console.log('Error: ', err);
         }
     }
+
+    getSortTypeSettings
 }
 
 let setitngsService = new SetitngsService();

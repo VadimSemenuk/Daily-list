@@ -106,10 +106,12 @@ export class ModalListItem extends PureComponent {
         return ([
             <this.props.listItem
                 {...this.props}
+                key={0}
                 onClick={this.triggerModal} 
-            />, 
+            />,
 
             <Modal 
+                key={1}            
                 isOpen={this.state.isModalActive}
                 onRequestClose={this.triggerModal}
             >

@@ -66,21 +66,22 @@ class About extends Component {
                         <p>&#9400; Mamindeveloper, 2017</p>
                         <p>mamindeveloper@gmail.com</p>                        
                     </div> 
-                    <div className="list-items-block">
-                        <InsetListItem 
-                            text={t("star-app")}
-                            onClick={this.launthMarket}  
-                        />
-                        <InsetListItem 
-                            text={t("share-app")}
-                            onClick={this.share}  
-                        /> 
-                    </div> 
+                    <InsetListItem 
+                        text={t("star-app")}
+                        onClick={this.launthMarket}  
+                    />
+                    <InsetListItem 
+                        text={t("share-app")}
+                        onClick={this.share}  
+                    /> 
                     <TriggerListItem 
                         text={t("resources")}
                         onClick={() => this.setDropdownVisible(1)}  
                         triggerValue={this.state.dropdownVisible === 1}
                     />   
+
+                    {/* <span className="list-items-block-header">{t("issues")}</span> */}
+
                     {  
                         this.state.dropdownVisible &&                   
                         <div>

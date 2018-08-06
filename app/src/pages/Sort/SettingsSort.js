@@ -6,12 +6,17 @@ import {translate, Trans} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
+import settingsService from '../../services/settings.service'; 
+
 import Radio from '../../components/Radio/Radio';
 import Header from '../../components/Header/Header';
 import {InsetListItem, SwitchListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";
 import Modal from "../../components/Modal/Modal";
 
 import './SettingsSort.scss';
+
+let sortTypeSettings = settingsService.getSortTypeSettings();
+let sortDirectionSettings = settingsService.getSortDirectionSettings();
 
 class SettingsSort extends Component {
     componentWillUnmount() {
@@ -26,6 +31,8 @@ class SettingsSort extends Component {
 
     render() {
         let {t} = this.props;
+        let activeSortType = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type);
+        let activeSortDirection = sortDirectionSettings.find((a) => a.val === this.props.settings.sort.direction);        
 
         return (
             <div className="page-wrapper">
@@ -33,47 +40,43 @@ class SettingsSort extends Component {
                 <div className="scroll page-content padding">
                     <ModalListItem
                         text={t("sort")} 
-                        value={"value"}
+                        value={t(activeSortType.translateId)}
                         listItem={ValueListItem}
                     >
                         <div className="radio-group">
-                            <Radio 
-                                name="sort-type"
-                                checked={this.props.settings.sort.type === 0}
-                                value={0}
-                                onChange={(e, text) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}))}
-                                text={t("time-sort")}
-                            />
-                            <Radio
-                                name="sort-type"
-                                checked={this.props.settings.sort.type === 1}
-                                value={1}                
-                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}))}
-                                text={t("time-add-sort")}
-                            />
+                            {
+                                sortTypeSettings.map((setting, i) => (
+                                    <Radio 
+                                        key={i}
+                                        name="sort-type"
+                                        checked={this.props.settings.sort.type === setting.val}
+                                        value={setting.val}
+                                        onChange={(e, text) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}))}
+                                        text={t(setting.translateId)}
+                                    />
+                                ))
+                            }
                         </div>
                     </ModalListItem>
 
                     <ModalListItem
                         text={t("view-direction")} 
-                        value={"value"}
+                        value={t(activeSortDirection.translateId)}
                         listItem={ValueListItem}
                     >
                         <div className="radio-group">
-                            <Radio 
-                                name="sort-direction"
-                                checked={this.props.settings.sort.direction === 0}
-                                value={0}
-                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}))}
-                                text={t("view-direction-asc")}
-                            />
-                            <Radio
-                                name="sort-direction"
-                                checked={this.props.settings.sort.direction === 1}
-                                value={1}                
-                                onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}))}
-                                text={t("view-direction-desc")}
-                            />
+                            {
+                                sortDirectionSettings.map((setting, i) => (
+                                    <Radio
+                                        key={i}
+                                        name="sort-direction"
+                                        checked={this.props.settings.sort.direction === setting.val}
+                                        value={setting.val}
+                                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}))}
+                                        text={t(setting.translateId)}
+                                    />
+                                ))
+                            }
                         </div>
                     </ModalListItem>
 

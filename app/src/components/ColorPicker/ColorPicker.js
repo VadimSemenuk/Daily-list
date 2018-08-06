@@ -15,12 +15,12 @@ export default (props) => (
 
                 return (
                     <button 
-                        className={`color-item-wrapper ${value === color ? "active" : ""}`}
+                        className={`color-item-wrapper${value === color ? " active" : ""}`}
                         key={i}
                         onClick={() => props.onSelect({color: colorsItem, index: i})}
                     >
                         <div 
-                            className="color-item"
+                            className={`color-item${color === "transparent" ? " black-tick" : ""}`}
                             style={{backgroundColor: color}}
                         ></div>
                     </button>

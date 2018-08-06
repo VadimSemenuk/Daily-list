@@ -21,6 +21,10 @@
             background-size: 14px;
             background-repeat: no-repeat;
             background-position: center;
+        
+            &.black-tick {
+                background-image: url("../../assets/img/tick-black.svg");
+            }
         }
     }
     &:first-child {
