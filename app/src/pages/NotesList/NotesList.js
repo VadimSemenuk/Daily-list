@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from "moment";
 import ReactSwipe from 'react-swipe';
+import {translate, Trans} from "react-i18next";
 
 import synchronizationService from '../../services/synchronization.service';
 import appService from "../../services/app.service";
@@ -162,6 +163,8 @@ class NotesList extends PureComponent {
     }
 
     render() {
+        let {t} = this.props;
+
         return (
             <div className="page-wrapper">
                 <Header
@@ -221,9 +224,9 @@ class NotesList extends PureComponent {
                         onRequestClose={this.closeDialog}
                         innerClassName="actions-modal-inner"
                     >
-                        <button onClick={this.onEditRequest}>Редактировать</button>
-                        <button onClick={this.onListItemRemove}>Удалить</button>
-                        <button onClick={this.onCopyRequest}>Копировать</button>
+                        <button onClick={this.onEditRequest}>{t("edit")}</button>
+                        <button onClick={this.onListItemRemove}>{t("delete")}</button>
+                        <button onClick={this.onCopyRequest}>{t("copy")}</button>
                         
                     </Modal>
 
@@ -284,7 +287,7 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(NotesList);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(NotesList));
 
 function sort (data, settings) {
     let notesCompareFn = getNotesCompareFn();

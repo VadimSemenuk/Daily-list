@@ -63,5 +63,8 @@ export default {
     "description": "Описание",
  
     // notes list page
-    "no-content": "Нет записей"
+    "no-content": "Нет записей",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "copy": "Копировать"
 }
