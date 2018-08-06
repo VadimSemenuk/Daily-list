@@ -1,46 +1,25 @@
-.set-time-wrapper {
-    color: #333;
-    font-size: 1em;
+.set-time-actions-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 10px;
 
-    .set-time-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        .set-time-actions-wrapper {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-left: 10px;
-
-            .divider {
-                padding: 0 8px;
-            }
-
-
-            .set-time-action-wrapper {
-                display: flex;
-                align-items: center;
-
-                .set-time-reset {
-                    width: 30px;
-                    height: 30px;
-
-                    img {
-                        height: 10px;
-                    }
-                }
-            }
-        }
+    .divider {
+        padding: 0 8px;
     }
 
-    .set-notificate-container {
+
+    .set-time-action-wrapper {
         display: flex;
-        flex-direction: row;
         align-items: center;
 
-        & > span {
-            padding-right: 10px;
+        .set-time-reset {
+            width: 30px;
+            height: 30px;
+
+            img {
+                height: 10px;
+            }
         }
     }
 }

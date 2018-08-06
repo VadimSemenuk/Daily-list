@@ -120,9 +120,8 @@ button,
         position: relative;
     
         & > span {
-            padding: 5px 0;
+            padding: 4px 0;
             padding-right: 14px;
-            border-bottom: 1px solid #e0d9d9;
         }
         &:after {
             content: "";
@@ -133,8 +132,8 @@ button,
             display: block;
             position: absolute;
             right: 0;
-            top: 15px;
-            transform: rotate(90deg);
+            top: 50%;
+            transform: rotate(90deg) translate(-50%, 0);
         }
     }
 

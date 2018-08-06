@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
 import moment from 'moment';
+import {translate, Trans} from "react-i18next";
 
-import Switch from "../../../components/Switch/Switch"
+import {SwitchListItem, ListItem} from "../../../components/ListItem/ListItem";
+
+import RemoveImg from '../../../assets/img/remove.png';
 
 import './TimeSet.scss';
 
-export default class TimeSet extends Component {
+class TimeSet extends Component {
     constructor(props) {
         super(props);
 
@@ -37,7 +40,11 @@ export default class TimeSet extends Component {
         }, (date) => this.onTimeSet(moment(date).startOf("minute").valueOf(), state));
     }
 
-    onNotificateChange = (notificate) => { 
+    onNotificateChange = (notificate) => {
+        if (!this.props.startTime) {
+            window.plugins.toast.showLongBottom(this.props.t("set-time-first"));                   
+        }
+        
         if (this.props.settings.defaultNotification && !notificate) {
             this.removeNotificationFromDefault = true;
         }
@@ -60,66 +67,71 @@ export default class TimeSet extends Component {
         })
     }
 
-    render() {   
+    render() {  
+        let {t} = this.props;
+        
         return (
             <div className="set-time-wrapper">
-                <div className="set-time-container">
-                    <span>Время:</span>
-                    <div className="set-time-actions-wrapper">
-                        <div className="set-time-action-wrapper">
-                            <button
-                                className="pick"
-                                onClick={() => this.pickTime('startTime')}
-                            >
-                                <span>{this.props.startTime ? this.props.startTime.format('HH:mm') : 'Указать'}</span>     
-                            </button>
-                            {
-                                this.props.startTime &&
-                                <button 
-                                    className="set-time-reset"
-                                    onClick={() => this.reset("startTime")}
+                <ListItem 
+                    className="tiny no-touchable"
+                    text={t("theme")}
+                    ValElement={() => (
+                        <div className="set-time-actions-wrapper">
+                            <div className="set-time-action-wrapper">
+                                <button
+                                    className="pick"
+                                    onClick={() => this.pickTime('startTime')}
                                 >
-                                    <img
-                                        src={require('../../../assets/img/remove.png')} 
-                                        alt="rm"
-                                    />        
+                                    <span>{this.props.startTime ? this.props.startTime.format('HH:mm') : 'Указать'}</span>     
                                 </button>
-                            }
-                        </div>
-                        <span className="divider">-</span>
-                        <div className="set-time-action-wrapper">
-                            <button 
-                                className="pick"
-                                onClick={() => this.pickTime('endTime')}
-                            >
-                                <span>{this.props.endTime ? this.props.endTime.format('HH:mm') : 'Указать'}</span>   
-                            </button>
-                            {
-                                this.props.endTime &&
+                                {
+                                    this.props.startTime &&
+                                    <button 
+                                        className="set-time-reset"
+                                        onClick={() => this.reset("startTime")}
+                                    >
+                                        <img
+                                            src={RemoveImg} 
+                                            alt="rm"
+                                        />        
+                                    </button>
+                                }
+                            </div>
+                            <span className="divider">-</span>
+                            <div className="set-time-action-wrapper">
                                 <button 
-                                    className="set-time-reset"
-                                    onClick={() => this.reset("endTime")}
+                                    className="pick"
+                                    onClick={() => this.pickTime('endTime')}
                                 >
-                                    <img
-                                        src={require('../../../assets/img/remove.png')} 
-                                        alt="rm"
-                                    />        
+                                    <span>{this.props.endTime ? this.props.endTime.format('HH:mm') : 'Указать'}</span>   
                                 </button>
-                            }
-                        </div>
-                    </div>
-                </div>
+                                {
+                                    this.props.endTime &&
+                                    <button 
+                                        className="set-time-reset"
+                                        onClick={() => this.reset("endTime")}
+                                    >
+                                        <img
+                                            src={RemoveImg} 
+                                            alt="rm"
+                                        />        
+                                    </button>
+                                }
+                            </div>
+                        </div>      
+                    )}
+                />
 
-                <div className="set-notificate-container">
-                    <span>Напомнить:</span>
-
-                    <Switch 
-                        onChange={this.onNotificateChange}
-                        checked={this.props.notificate}
-                        disabled={!this.props.startTime}
-                    />
-                </div>
+                <SwitchListItem 
+                    className="tiny"
+                    text={t("notify")}  
+                    checked={this.props.notificate}
+                    onChange={this.onNotificateChange} 
+                    disabled={!this.props.startTime}  
+                />
             </div>
         )
     }
 }
+
+export default translate("translations")(TimeSet)

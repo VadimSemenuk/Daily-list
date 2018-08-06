@@ -8,7 +8,7 @@ import './ListItem.scss';
 import arrowRight from '../../assets/img/right-grey.svg';
 
 export let SwitchListItem = (props) => (
-    <div className="list-item">
+    <div className={`list-item switch-list-item ${props.className} ${props.disabled ? "disabled" : ""}`}>
         <span className="list-item-text">{props.text}</span>
         <Switch 
             checked={props.checked}
@@ -31,15 +31,25 @@ export let InsetListItem = (props) => (
     </button>
 )
 
-export let ListItem = (props) => (
+export let ButtonListItem = (props) => (
     <button 
-        className="list-item"
+        className={`list-item ${props.className}`}
         style={props.style}
         onClick={props.onClick}                                
     >
         <span className="list-item-text">{props.text}</span>
         <props.ValElement />
     </button>
+)
+
+export let ListItem = (props) => (
+    <div 
+        className={`list-item ${props.className}`}
+        style={props.style}                              
+    >
+        <span className="list-item-text">{props.text}</span>
+        <props.ValElement />
+    </div>
 )
 
 export let SelectListItem = (props) => (

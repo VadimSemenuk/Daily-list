@@ -1,5 +1,6 @@
 .list-item {
     padding: 16px 0;
+    min-height: 50px;
     flex: 1;
     align-items: center;
     border-bottom: 1px solid #eceaea;
@@ -7,9 +8,14 @@
     width: 100%;
     font-size: 1em;
     height: unset;
+    box-sizing: border-box;
 
     &:last-child {
         border-bottom: none;
+    }
+
+    button {
+        height: auto;
     }
 
     .list-item-text {
@@ -45,6 +51,21 @@
             .list-item-img {            
                 transform: rotate(90deg);
             }
+        }
+    }
+
+    &.tiny {
+        padding: 8px 0;
+        min-height: 42px;
+    }
+
+    &.no-touchable {
+        opacity: 1 !important;      
+    }
+
+    &.switch-list-item {
+        &.disabled {
+            opacity: 0.6;   
         }
     }
 }

@@ -6,7 +6,7 @@ import {translate, Trans} from "react-i18next";
 import * as AppActions from '../../actions'; 
 
 import Header from '../../components/Header/Header';
-import {SwitchListItem, ListItem, SelectListItem} from "../../components/ListItem/ListItem";
+import {SwitchListItem, ButtonListItem, SelectListItem} from "../../components/ListItem/ListItem";
 import Modal from "../../components/Modal/Modal";
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 
@@ -54,7 +54,7 @@ class SettingsTheme extends Component {
             <div className="page-wrapper theme-page-wrapper">
                 <Header title={t("interface")} />
                 <div className="scroll page-content padding">
-                    <ListItem 
+                    <ButtonListItem 
                         onClick={() => this.setState({themeModal: true})}
                         text={t("theme")}
                         style={{padding: "10px 0"}}
