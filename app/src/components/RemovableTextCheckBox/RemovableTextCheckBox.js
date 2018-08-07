@@ -2,29 +2,36 @@ import React, { PureComponent } from 'react';
 
 import CheckBox from '../CheckBox/CheckBox';
 
+import RemoveImg from '../../assets/img/remove.png';
+
 import './RemovableTextCheckBox.scss';
 
 export default class RemovableTextCheckBox extends PureComponent {
-    onValueChange = (e) => this.props.onValueChange(e);   
+    ref;
 
     onTextChange = (e) => this.props.onTextChange(e.target.value);
 
+    onListItemRemove = (e) => this.props.onListItemRemove(this.ref);
+
     render () {
         return (
-            <div className="removable-text-checkbox-wrapper">
+            <div 
+                className="removable-text-checkbox-wrapper"
+                ref={(a) => this.ref = a}
+            >
                 <CheckBox 
                     checked={this.props.value}
-                    onChange={this.onValueChange}
+                    onChange={this.props.onValueChange}
                 />
                 <input 
                     type="text"
                     onChange={this.onTextChange}
                     value={this.props.textValue}
-                    className={`content-input ${this.props.value ? "crossed" : ""}`}
+                    className={`content-input${this.props.value ? " crossed" : ""}`}
                 />
-                <button onClick={this.props.onListItemRemove}>
+                <button onClick={this.onListItemRemove}>
                     <img
-                        src={require('../../assets/img/remove.png')} 
+                        src={RemoveImg} 
                         alt="rm"
                     />        
                 </button>

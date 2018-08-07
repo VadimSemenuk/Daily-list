@@ -69,11 +69,19 @@ class Add extends Component {
         })
     }
 
-    onDynamicItemRemove = (i) => {
-        let e = this.state.dynamicFields.slice();
-        e[i] = null;
+    onDynamicItemRemove = (i, ref) => {
+        let nextSibling = ref.nextSibling;
+        if (nextSibling.classList.contains("removable-text-checkbox-wrapper")) {
+            nextSibling.querySelector("input").focus();
+        } else {
+            let prevSibling = ref.previousSibling;
+            if (prevSibling.classList.contains("removable-text-checkbox-wrapper")) {
+                prevSibling.querySelector("input").focus();
+            } 
+        }
+
         this.setState({
-            dynamicFields: e
+            dynamicFields: [...this.state.dynamicFields.slice(0, i), null, ...this.state.dynamicFields.slice(i + 1)] 
         })
     }
 
@@ -102,7 +110,7 @@ class Add extends Component {
     }
 
     getInputsValues = () => {
-        return this.state
+        return [...this.state]
     }
 
     onSubmit = async () => {
@@ -119,7 +127,11 @@ class Add extends Component {
 
     scrollToBottom() {
         let el = document.querySelector(".add-content-wrapper");
-        el.scrollTop = el.scrollHeight;     
+        el.scrollTop = el.scrollHeight;
+        setTimeout(() => {
+            let el = document.querySelector(".add-content-wrapper");
+            el.scrollTop = el.scrollHeight; 
+        });    
     }
 
     showImage = (i) => {
@@ -163,7 +175,7 @@ class Add extends Component {
                                     return (
                                         <RemovableTextCheckBox 
                                             key={i} 
-                                            onListItemRemove={() => this.onDynamicItemRemove(i)}
+                                            onListItemRemove={(inputRef) => this.onDynamicItemRemove(i, inputRef)}
                                             onTextChange={(text) => {
                                                 let dynamicFields = this.state.dynamicFields.slice();
                                                 dynamicFields[i] = {...dynamicFields[i], value: text}                                          
@@ -186,7 +198,8 @@ class Add extends Component {
                                                 key={i}
                                                 className="attached-image" 
                                                 src={a.uri} 
-                                                alt="attachment" />
+                                                alt="attachment" 
+                                            />
                                             <button onClick={() => this.onDynamicItemRemove(i)}>
                                                 <img
                                                     src={require('../../assets/img/remove.png')} 
