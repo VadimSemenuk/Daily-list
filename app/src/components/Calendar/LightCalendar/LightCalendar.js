@@ -86,24 +86,17 @@ export default class LightCalendar extends Component {
             });
         } else {
             let weeks;
+
+            let currentWeekStartDate = moment(msSelectedWeekStartDate);
+            let prevWeekStartDate = moment(msSelectedWeekStartDate).subtract(1, 'week');
+            let nextWeekStartDate = moment(msSelectedWeekStartDate).add(1, 'week');
+
             if (this.activePageIndex === 2) {
-                weeks = [
-                    this.generateWeekDates(moment(msSelectedWeekStartDate)),
-                    this.generateWeekDates(moment(msSelectedWeekStartDate).add(1, 'week')),   
-                    this.generateWeekDates(moment(msSelectedWeekStartDate).subtract(1, 'week')) 
-                ]
+                weeks = [this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate)];
             } else if (this.activePageIndex === 0) {
-                weeks = [
-                    this.generateWeekDates(moment(msSelectedWeekStartDate).subtract(1, 'week')), 
-                    this.generateWeekDates(moment(msSelectedWeekStartDate)),
-                    this.generateWeekDates(moment(msSelectedWeekStartDate).add(1, 'week'))
-                ]
+                weeks = [this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate)];
             } else {
-                weeks = [
-                    this.generateWeekDates(moment(msSelectedWeekStartDate).add(1, 'week')), 
-                    this.generateWeekDates(moment(msSelectedWeekStartDate).subtract(1, 'week')), 
-                    this.generateWeekDates(moment(msSelectedWeekStartDate))
-                ]
+                weeks = [this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate)];
             }
 
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
@@ -114,8 +107,10 @@ export default class LightCalendar extends Component {
                 monthName
             }, () => {
                 if (msSelectedWeekStartDate > weeks[this.activePageIndex][0].valueOf()) {
+                    console.log("next");                    
                     this.sliderRef.next();
                 } else {
+                    console.log("rev");
                     this.sliderRef.prev();            
                 }
             })

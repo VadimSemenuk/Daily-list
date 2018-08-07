@@ -24,6 +24,8 @@ export default class Calendar extends Component {
 
         this.activePageIndex = 1;  
         this.prevPageIndex = 1;
+
+        this.noSlideEventHandle = false;
     }
 
     componentDidMount() {
@@ -103,7 +105,54 @@ export default class Calendar extends Component {
         this.prevPageIndex = action.prevPageIndex;
         this.activePageIndex = action.activePageIndex;
 
+        if (this.noSlideEventHandle) {
+            this.noSlideEventHandle = false
+            return
+        }
         this.onSlideChange(action);
+    }
+
+    componentWillReceiveProps(nextProps) {        
+        let msSelectedDate = moment(nextProps.currentDate).startOf("day").valueOf();
+        let currentMonthStartDate = moment(msSelectedDate).startOf("month");       
+
+        if (currentMonthStartDate.valueOf() === this.state.currentMonthStartDate.valueOf()) {
+            this.setState({
+                msSelectedDate
+            });
+        } else {
+            let monthes;
+
+            let prevMonthStartDate = moment(currentMonthStartDate).subtract(1, 'week');
+            let nextMonthStartDate = moment(currentMonthStartDate).add(1, 'week');
+
+            if (this.activePageIndex === 2) {
+                monthes = [this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate)];
+            } else if (this.activePageIndex === 0) {
+                monthes = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
+            } else {
+                monthes = [this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate)];
+            }          
+
+            let msPrevStateMonthStartDate = this.state.currentMonthStartDate.valueOf();
+
+            this.setState({
+                monthes,
+                currentMonthStartDate,
+                msSelectedDate
+            }, () => {
+                this.noSlideEventHandle = true;
+                if (currentMonthStartDate.valueOf() > msPrevStateMonthStartDate) {
+                    this.sliderRef.next();
+                } else {
+                    this.sliderRef.prev();            
+                }
+            })
+        }
+    }
+
+    setSliderRef = (a) => {
+        this.sliderRef = a;
     }
 
     render() {
