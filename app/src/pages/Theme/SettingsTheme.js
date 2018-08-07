@@ -6,16 +6,18 @@ import {translate, Trans} from "react-i18next";
 import * as AppActions from '../../actions'; 
 
 import Header from '../../components/Header/Header';
-import {SwitchListItem, ButtonListItem, SelectListItem} from "../../components/ListItem/ListItem";
-import Modal from "../../components/Modal/Modal";
+import {SwitchListItem, ButtonListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
+import Radio from '../../components/Radio/Radio';
 
 import themesService from '../../services/themes.service';
+import settingsService from '../../services/settings.service'; 
 
 import './SettingsTheme.scss';
 import '../../components/ColorPicker/ColorPicker.scss';
 
 let themes = themesService.getThemesList();
+let fontSizeSettings = settingsService.getFontSizeSettings();
 
 class SettingsTheme extends Component {
     constructor(props) {
@@ -54,9 +56,8 @@ class SettingsTheme extends Component {
             <div className="page-wrapper theme-page-wrapper">
                 <Header title={t("interface")} />
                 <div className="scroll page-content padding">
-                    <ButtonListItem 
-                        onClick={() => this.setState({themeModal: true})}
-                        text={t("theme")}
+                    <ModalListItem
+                        text={t("theme")} 
                         style={{padding: "10px 0"}}
                         ValElement={() => (
                             <div className="color-item-wrapper">
@@ -66,11 +67,7 @@ class SettingsTheme extends Component {
                                 ></div>
                             </div>
                         )}
-                    />
-
-                    <Modal 
-                        isOpen={this.state.themeModal}
-                        onRequestClose={() => this.setState({themeModal: false})}
+                        listItem={ButtonListItem}
                     >
                         <SwitchListItem 
                             text={t("random-theme")}  
@@ -84,16 +81,32 @@ class SettingsTheme extends Component {
                             onSelect={(event) => this.onThemeSelect(event.color.id)}
                             disabled={this.props.settings.theme.id === -1}
                         />
-                    </Modal>
+                    </ModalListItem>
 
-                    <SelectListItem
-                        text={t("font-size")}
+                    <ModalListItem
+                        text={t("font-size")} 
                         value={this.props.settings.fontSize}
-                        onSelect={(value) => {
-                            this.props.setSetting('fontSize', +value)
-                            document.querySelector("body").style.fontSize = +value + "px";    
-                        }}
-                    />
+                        listItem={ValueListItem}
+                    >
+                        <div className="radio-group">
+                            {
+                                fontSizeSettings.map((setting, i) => (
+                                    <Radio 
+                                        key={i}
+                                        name="font-size"
+                                        checked={this.props.settings.fontSize === setting}
+                                        value={setting}
+                                        onChange={(value) => {
+                                            this.props.setSetting('fontSize', +value)
+                                            document.querySelector("body").style.fontSize = +value + "px";    
+                                        }}
+                                        text={setting}
+                                    />
+                                ))
+                            }
+                        </div>
+                    </ModalListItem>
+                    
                     <SwitchListItem 
                         text={t("fast-add")}  
                         checked={this.props.settings.fastAdd}

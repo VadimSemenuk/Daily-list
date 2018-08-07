@@ -10,8 +10,7 @@ import settingsService from '../../services/settings.service';
 
 import Radio from '../../components/Radio/Radio';
 import Header from '../../components/Header/Header';
-import {InsetListItem, SwitchListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";
-import Modal from "../../components/Modal/Modal";
+import {SwitchListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";
 
 import './SettingsSort.scss';
 

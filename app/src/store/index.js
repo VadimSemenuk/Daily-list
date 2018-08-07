@@ -7,10 +7,7 @@ import settingsService from "../services/settings.service";
 
 import reducers from '../reducers';
 
-async function initStore (settings) {
-    if (!settings) {
-        settings = await settingsService.getSettings();
-    }
+async function initStore (settings) {   
     let date = moment().startOf('day');
     let notes = await notesService.getNotesByDates(
         [

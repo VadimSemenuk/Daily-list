@@ -38,7 +38,7 @@ export default class App extends Component {
         await this.initDb();       
         await this.initSettings();
         window.DEVICE_IMEI = await appService.getDeviceIMEI();
-        store = await initStore();
+        store = await initStore(this.state.settings);
         this.setState({
             appReady: true
 		});
@@ -51,7 +51,8 @@ export default class App extends Component {
 
     async initSettings() {
         let settings = await settingsService.getSettings();
-        this.setState({settings});
+        this.applyInitSettings(settings);
+        await this.setState({settings});
     }
 
     applyInitSettings(settings) {

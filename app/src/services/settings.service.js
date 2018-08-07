@@ -17,6 +17,8 @@ let sortDirectionSettings = [{
     val: 1
 }];
 
+let fontSizeSettings = [12, 13, 14, 15, 16, 17, 18];
+
 class SetitngsService {
 
     getSortTypeSettings() {
@@ -25,6 +27,10 @@ class SetitngsService {
 
     getSortDirectionSettings() {
         return [...sortDirectionSettings]
+    }
+
+    getFontSizeSettings() {
+        return [...fontSizeSettings]
     }
 
     async getSettings () {

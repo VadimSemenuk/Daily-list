@@ -133,7 +133,7 @@ class Add extends Component {
                 <Header
                     page="add"
                     onSubmit={this.onSubmit}
-                    title={this.props.match.path === "/edit" ? "Редактировать" : "Добавить"}
+                    showCurrentDate={true}
                 />
                 <div className="add-wrapper page-content">
                     <div className="add-content-wrapper">

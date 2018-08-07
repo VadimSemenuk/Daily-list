@@ -73,4 +73,5 @@ export default {
     // add
     "notify": "Напомнить",
     "set-time-first": "Установите время начала",
+    "time": "Время",
 }

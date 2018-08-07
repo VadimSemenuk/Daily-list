@@ -42,7 +42,8 @@ class TimeSet extends Component {
 
     onNotificateChange = (notificate) => {
         if (!this.props.startTime) {
-            window.plugins.toast.showLongBottom(this.props.t("set-time-first"));                   
+            window.plugins.toast.showLongBottom(this.props.t("set-time-first"));           
+            return        
         }
         
         if (this.props.settings.defaultNotification && !notificate) {
@@ -73,8 +74,8 @@ class TimeSet extends Component {
         return (
             <div className="set-time-wrapper">
                 <ListItem 
-                    className="tiny no-touchable"
-                    text={t("theme")}
+                    className="tiny no-touchable no-padding"
+                    text={t("time")}
                     ValElement={() => (
                         <div className="set-time-actions-wrapper">
                             <div className="set-time-action-wrapper">

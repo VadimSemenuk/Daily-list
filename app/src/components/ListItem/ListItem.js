@@ -52,27 +52,6 @@ export let ListItem = (props) => (
     </div>
 )
 
-export let SelectListItem = (props) => (
-    <button 
-        className="list-item"
-        onClick={props.onClick}                                
-    >
-        <span className="list-item-text">{props.text}</span>
-        <select 
-            value={props.value}
-            onChange={(e) => props.onSelect(e.target.value)}
-        >
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16">16</option>
-            <option value="17">17</option>
-            <option value="18">18</option>                            
-        </select>
-    </button>
-)
-
 export let TriggerListItem = (props) => (
     <button 
         className={`list-item trigger-list-item ${props.triggerValue ? " active" : ""}`}
