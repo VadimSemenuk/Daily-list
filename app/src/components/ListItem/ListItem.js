@@ -103,6 +103,7 @@ export class ModalListItem extends PureComponent {
                 key={1}            
                 isOpen={this.state.isModalActive}
                 onRequestClose={this.triggerModal}
+                innerClassName={this.props.innerClassName}
             >
                 {this.props.children}
             </Modal>

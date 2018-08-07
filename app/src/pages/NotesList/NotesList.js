@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from "moment";
 import ReactSwipe from 'react-swipe';
-import {translate, Trans} from "react-i18next";
+import {translate} from "react-i18next";
 
 import synchronizationService from '../../services/synchronization.service';
 import appService from "../../services/app.service";
@@ -274,7 +274,7 @@ class NotesList extends PureComponent {
 }
 
 function mapStateToProps(state, props) {
-    // sort(state.notes, state.settings);
+    sort(state.notes, state.settings);
 
     return {
         notes: state.notes,
@@ -293,8 +293,8 @@ function sort (data, settings) {
     let notesCompareFn = getNotesCompareFn();
 
     return data.map((list) => {
-        if (settings.finishedSort === 2) {
-            list.sort((a, b) => {
+        if (settings.sort.finSort) {
+            list.items.sort((a, b) => {
                 if (a.finished === b.finished) {
                     return notesCompareFn(a, b)
                 } else {
@@ -302,7 +302,7 @@ function sort (data, settings) {
                 }
             })
         } else {
-            list.sort((a, b) => {
+            list.items.sort((a, b) => {
                 return notesCompareFn(a, b)
             })
         }
@@ -310,35 +310,38 @@ function sort (data, settings) {
     })
 
     function getNotesCompareFn() {
-        if (settings.sort === 1) {
-            return (a, b) => {
-                let aVal = 0, bVal = 0;
-                if (a.startTime) {
-                    aVal = a.startTime.valueOf();
-                }
-                if (b.startTime) {
-                    bVal = b.startTime.valueOf();
-                }               
-                return aVal - bVal; 
-            }          
+        if (settings.sort.type === 0) {
+            if (settings.sort.direction === 1) {
+                return (a, b) => {
+                    let aVal = 0, bVal = 0;
+                    if (a.startTime) {
+                        aVal = a.startTime.valueOf();
+                    }
+                    if (b.startTime) {
+                        bVal = b.startTime.valueOf();
+                    }               
+                    return aVal - bVal; 
+                }   
+            } else {
+                return (a, b) => {
+                    let aVal = 0, bVal = 0;
+                    if (a.startTime) {
+                        aVal = a.startTime.valueOf();
+                    }
+                    if (b.startTime) {
+                        bVal = b.startTime.valueOf();
+                    }
+                    return bVal - aVal; 
+                } 
+            }    
         }
-        if (settings.sort === 2) {
-            return (a, b) => {
-                let aVal = 0, bVal = 0;
-                if (a.startTime) {
-                    aVal = a.startTime.valueOf();
-                }
-                if (b.startTime) {
-                    bVal = b.startTime.valueOf();
-                }
-                return bVal - aVal; 
-            }            
-        }
-        if (settings.sort === 3) {           
-            return (a, b) => a.key - b.key            
-        }
-        if (settings.sort === 4) {
-            return (a, b) =>  b.key - a.key       
+
+        if (settings.sort.type === 1) {
+            if (settings.sort.direction === 1) {
+                return (a, b) => a.key - b.key   
+            } else {
+                return (a, b) =>  b.key - a.key
+            }                         
         }
     }
 }

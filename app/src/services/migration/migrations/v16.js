@@ -31,8 +31,8 @@ export default {
         `);
         await execureSQL(`DROP TABLE Settings_OLD;`);
         let sort = {
-            type: 0,
-            direction: 0,
+            type: 1,
+            direction: 1,
             finSort: 0
         }
         await execureSQL(`UPDATE Settings SET sort = ?;`, [JSON.stringify(sort)]);

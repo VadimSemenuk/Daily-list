@@ -74,4 +74,6 @@ export default {
     "notify": "Напомнить",
     "set-time-first": "Установите время начала",
     "time": "Время",
+    "open-galery": "Открыть галерею",
+    "make-shot": "Сделать снимок"
 }

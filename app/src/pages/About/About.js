@@ -63,7 +63,7 @@ class About extends Component {
                     />
                     <div className="text-center">
                         <strong>{t("app-name")}</strong>
-                        <p>&#9400; Mamindeveloper, 2017</p>
+                        <p>&#9400; 2017 Mamindeveloper</p>
                         <p>mamindeveloper@gmail.com</p>                        
                     </div> 
                     <InsetListItem 

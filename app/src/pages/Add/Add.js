@@ -2,9 +2,11 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Textarea from "react-textarea-autosize";
+import {translate, Trans} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
+import {ModalListItem} from "../../components/ListItem/ListItem";
 import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/RemovableTextCheckBox';
 import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
@@ -12,6 +14,8 @@ import Header from '../../components/Header/Header';
 import Modal from '../../components/Modal/Modal';
 
 import tagsService from '../../services/tags.service';
+
+import CameraImg from '../../assets/img/photo-camera.svg';
 
 import './Add.scss';
 
@@ -30,9 +34,7 @@ class Add extends Component {
             endTime: false,
             tag: 'transparent',
             added: this.props.date,
-            finished: 0,
-
-            pictureSourceModal: false
+            finished: 0
         }
 
         this.tags = tagsService.getTags();
@@ -90,8 +92,7 @@ class Add extends Component {
             dynamicFields: [...this.state.dynamicFields,  {
                 type: "snapshot",
                 uri: url
-            }],
-            pictureSourceModal: false
+            }]
         }, () => this.scrollToBottom())
     }
 
@@ -110,7 +111,7 @@ class Add extends Component {
     }
 
     getInputsValues = () => {
-        return [...this.state]
+        return {...this.state}
     }
 
     onSubmit = async () => {
@@ -140,6 +141,8 @@ class Add extends Component {
     }
 
     render() {
+        let {t} = this.props;
+
         return (
             <div className="page-wrapper">
                 <Header
@@ -227,15 +230,24 @@ class Add extends Component {
                                 />   
                                 <span>Поле</span>     
                             </button>  
-                            <button 
-                                className="camera-button"
-                                onClick={() => this.setState({pictureSourceModal: true})}
+
+                            <ModalListItem
+                                innerClassName="actions-modal-inner"
+                                listItem={(props) => (
+                                    <button 
+                                        onClick={props.onClick}
+                                        className="camera-button"
+                                    >
+                                        <img 
+                                            src={CameraImg} 
+                                            alt="cam"
+                                        />      
+                                    </button> 
+                                )}
                             >
-                                <img 
-                                    src={require('../../assets/img/photo-camera.svg')} 
-                                    alt="cam"
-                                />      
-                            </button> 
+                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}>{t("open-galery")}</button>
+                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}>{t("make-shot")}</button>  
+                            </ModalListItem>
                         </div>
                     </div>
                     <div className="add-additionals-wrapper hide-with-active-keyboard">
@@ -252,15 +264,6 @@ class Add extends Component {
                             colors={this.tags}
                         />
                     </div>
-
-                    <Modal 
-                        isOpen={this.state.pictureSourceModal}
-                        onRequestClose={() => this.setState({pictureSourceModal: false})}
-                        innerClassName="actions-modal-inner"
-                    >
-                        <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}>Открыть галерею</button>
-                        <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}>Сделать снимок</button>                       
-                    </Modal>
                 </div>
             </div>
         );
@@ -278,4 +281,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Add);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(Add));
