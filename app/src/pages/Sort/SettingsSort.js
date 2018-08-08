@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from "moment";
-import {translate, Trans} from "react-i18next";
+import {translate} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 

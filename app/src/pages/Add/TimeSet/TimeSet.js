@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import moment from 'moment';
-import {translate, Trans} from "react-i18next";
+import {translate} from "react-i18next";
 
 import {SwitchListItem, ListItem} from "../../../components/ListItem/ListItem";
 

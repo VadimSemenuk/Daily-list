@@ -1,9 +1,6 @@
-import execureSQL from "../utils/executeSQL";
 import moment from 'moment';
 
 import notesService from "./notes.service";
-
-import config from "../config/config";
 
 class AppService {
     addInitNote() {

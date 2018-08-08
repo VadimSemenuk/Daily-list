@@ -76,7 +76,7 @@ export default class Note extends PureComponent {
                         <img 
                             className="notification-identifier"
                             src={AlarmImg}
-                            alr="notify"
+                            alt="notify"
                         />
                     }                                     
                 </div>

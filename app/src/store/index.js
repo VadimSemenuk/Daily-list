@@ -3,7 +3,6 @@ import thunkMiddleware from 'redux-thunk';
 import moment from 'moment';
 
 import notesService from "../services/notes.service";
-import settingsService from "../services/settings.service";
 
 import reducers from '../reducers';
 

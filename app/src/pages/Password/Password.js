@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as AppActions from '../../actions'; 
 import {getGreeting} from "../../utils/dayPart"
-import {translate, Trans} from "react-i18next";
+import {translate} from "react-i18next";
 
 import arrowRight from '../../assets/img/right-grey.svg';
 

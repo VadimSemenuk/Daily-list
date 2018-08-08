@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {translate, Trans} from "react-i18next";
+import {translate} from "react-i18next";
 
 import ListItem from '../ListItem/ListItem';
 

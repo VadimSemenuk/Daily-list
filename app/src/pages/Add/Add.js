@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Textarea from "react-textarea-autosize";
-import {translate, Trans} from "react-i18next";
+import {translate} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
@@ -11,7 +11,6 @@ import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/Remova
 import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
-import Modal from '../../components/Modal/Modal';
 
 import tagsService from '../../services/tags.service';
 
