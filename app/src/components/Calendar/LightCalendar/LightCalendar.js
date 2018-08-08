@@ -23,6 +23,8 @@ export default class LightCalendar extends Component {
 
         this.activePageIndex = 1;  
         this.prevPageIndex = 1;
+
+        this.noSlideEventHandle = false;
     }
 
     generateWeekDates(weekStartDate) {
@@ -91,12 +93,26 @@ export default class LightCalendar extends Component {
             let prevWeekStartDate = moment(msSelectedWeekStartDate).subtract(1, 'week');
             let nextWeekStartDate = moment(msSelectedWeekStartDate).add(1, 'week');
 
-            if (this.activePageIndex === 2) {
-                weeks = [this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate)];
-            } else if (this.activePageIndex === 0) {
-                weeks = [this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate)];
+            if (msSelectedWeekStartDate > this.state.weeks[this.activePageIndex][0].valueOf()) {
+                if (this.activePageIndex === 2) {
+                    weeks = [this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate)];
+                } else if (this.activePageIndex === 0) {
+                    weeks = [this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate)];
+                } else {
+                    weeks = [this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate)];
+                }
+                this.noSlideEventHandle = true;
+                this.sliderRef.next();
             } else {
-                weeks = [this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate)];
+                if (this.activePageIndex === 2) {
+                    weeks = [this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate)];
+                } else if (this.activePageIndex === 0) {
+                    weeks = [this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate)];
+                } else {
+                    weeks = [this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate)];
+                }
+                this.noSlideEventHandle = true;
+                this.sliderRef.prev();
             }
 
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
@@ -105,14 +121,6 @@ export default class LightCalendar extends Component {
                 weeks,
                 msSelectedDate: nextProps.currentDate.valueOf(),
                 monthName
-            }, () => {
-                if (msSelectedWeekStartDate > weeks[this.activePageIndex][0].valueOf()) {
-                    console.log("next");                    
-                    this.sliderRef.next();
-                } else {
-                    console.log("rev");
-                    this.sliderRef.prev();            
-                }
             })
         }
     }
@@ -126,6 +134,10 @@ export default class LightCalendar extends Component {
         this.prevPageIndex = action.prevPageIndex;
         this.activePageIndex = action.activePageIndex;
 
+        if (this.noSlideEventHandle) {
+            this.noSlideEventHandle = false
+            return
+        }
         this.onSlideChange(action);
     }
 
