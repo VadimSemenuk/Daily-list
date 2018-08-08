@@ -14,7 +14,7 @@ i18n.init({
     }
   },
   fallbackLng: "en",
-  debug: true,
+  debug: false,
 
   ns: ["translations"],
   defaultNS: "translations",

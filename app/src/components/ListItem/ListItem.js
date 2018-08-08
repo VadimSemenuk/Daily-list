@@ -52,20 +52,6 @@ export let ListItem = (props) => (
     </div>
 )
 
-export let TriggerListItem = (props) => (
-    <button 
-        className={`list-item trigger-list-item ${props.triggerValue ? " active" : ""}`}
-        onClick={props.onClick}                                
-    >
-        <span className="list-item-text">{props.text}</span>
-        <img 
-            className="list-item-img"
-            src={arrowRight} 
-            alt="in"
-        /> 
-    </button>
-)
-
 export let ValueListItem = (props) => (
     <button 
         className={`list-item trigger-list-item ${props.triggerValue ? " active" : ""}`}
@@ -107,6 +93,42 @@ export class ModalListItem extends PureComponent {
             >
                 {this.props.children}
             </Modal>
+        ])
+    }
+}
+
+export class TriggerListItem extends PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isActive: false
+        }
+    }
+
+    trigger = () => {
+        this.setState({
+            isActive: !this.state.isActive
+        })
+    }
+
+    render () {
+        return ([
+            <button 
+                key={0}
+                className={`list-item trigger-list-item ${this.state.isActive ? " active" : ""}`}
+                onClick={this.trigger}                                
+            >
+                <span className="list-item-text">{this.props.text}</span>
+                <img 
+                    className="list-item-img"
+                    src={arrowRight} 
+                    alt="in"
+                /> 
+            </button>,
+
+            this.state.isActive && 
+            <div key={1}>{this.props.children}</div>
         ])
     }
 }

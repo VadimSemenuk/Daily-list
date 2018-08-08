@@ -46,10 +46,6 @@ class Settings extends Component {
                         }}
                     />
                     <InsetListItem 
-                        text={t("issues")}
-                        onClick={() => this.props.history.push(`${this.props.match.url}/troubleshooting`)}
-                    />
-                    <InsetListItem 
                         text={t("about")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/about`)}
                     />
