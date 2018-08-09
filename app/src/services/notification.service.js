@@ -1,5 +1,5 @@
 class NotificationService {
-    set = (id, data) => {
+    set = (id, data) => {       
         if (!window.cordova) return
 
         window.cordova.plugins.notification.local.hasPermission((granted) => { 

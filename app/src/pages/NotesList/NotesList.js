@@ -244,7 +244,7 @@ class NotesList extends PureComponent {
                     }
 
                     {
-                        !!this.props.settings.fastAdd && 
+                        this.props.settings.fastAdd && 
                         <FastAdd 
                             currentDate={this.props.currentDate}
                         />   
