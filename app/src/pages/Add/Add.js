@@ -130,11 +130,7 @@ class Add extends Component {
 
     scrollToBottom() {
         let el = document.querySelector(".add-content-wrapper");
-        el.scrollTop = el.scrollHeight;
-        setTimeout(() => {
-            let el = document.querySelector(".add-content-wrapper");
-            el.scrollTop = el.scrollHeight; 
-        });    
+        el.scrollTop = el.scrollHeight; 
     }
 
     showImage = (i) => {
