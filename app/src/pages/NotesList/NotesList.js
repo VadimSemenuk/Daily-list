@@ -169,7 +169,6 @@ class NotesList extends PureComponent {
             <div className="page-wrapper">
                 <Header
                     page="notes"
-                    showCurrentDate={true}
                     onCalendarRequest={this.triggerCalendar}
                     onSelectToday={this.onTodaySelect}
                 />

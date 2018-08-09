@@ -18,9 +18,6 @@ function getDayNameFormatted (date) {
     let day = date.locale("ru").format('dddd');
     return day[0].toUpperCase() + day.slice(1);
 }
-function getMonthFormatted (date) {
-    return date.locale("ru").format('D MMMM');
-}
 
 let buttons = {
     "notes": [4, 0, 1],
@@ -31,18 +28,39 @@ let buttons = {
 
 let Header = (props) => (
     <header style={{backgroundColor: props.settings.theme.header}}>
-        {
-            props.showCurrentDate ?
-            <div 
-                onClick={props.onSelectToday}
-                className="current-date"
-            >
-                <span className="day">{getDayNameFormatted(moment())}</span>
-                <span className="date">{getMonthFormatted(moment())}</span> 
-            </div> 
-            :
-            <div className="page-title">{props.title}</div>
-        }
+        <div>
+            {
+                props.page === "notes" &&
+                <div 
+                    onClick={props.onSelectToday}
+                    className="current-date"
+                >
+                    <span className="day">{getDayNameFormatted(moment())}</span>
+                    <span className="date">{moment().locale("ru").format('D MMMM')}</span> 
+                </div>
+            }
+            {
+                props.title && <div className="page-title">{props.title}</div>
+            }
+            {
+                props.page === "add" && 
+                <div 
+                    className="date-pick-view-wrapper" 
+                    onClick={props.onCalendarRequest}
+                >
+                    <button>
+                        <img 
+                            src={CalendarImg}
+                            alt="date"    
+                        />
+                    </button>
+                    <div className="current-date">
+                        <span className="day">{getDayNameFormatted(moment(props.currentDate))}</span>
+                        <span className="date">{moment(props.currentDate).locale("ru").format('D MMMM')}</span> 
+                    </div>
+                </div>
+            }
+        </div>
         <div className="buttons">
             {   
                 (
@@ -122,6 +140,7 @@ let Header = (props) => (
 
 function mapStateToProps(state, props) {
     return {
+        currentDate: state.date,        
         settings: state.settings
     }
 }

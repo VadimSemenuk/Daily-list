@@ -34,6 +34,17 @@ header {
             padding: 0px;
         }
     }
+
+    .date-pick-view-wrapper {
+        position: relative;
+        right: 5px;
+        display: flex;
+        align-items: center;
+
+        .current-date {
+            margin-left: 10px;
+        }
+    }
 }
 
 .page-title {

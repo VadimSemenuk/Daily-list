@@ -11,6 +11,7 @@ import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/Remova
 import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
+import Calendar from '../../components/Calendar/Calendar/Calendar';
 
 import tagsService from '../../services/tags.service';
 
@@ -33,7 +34,9 @@ class Add extends Component {
             endTime: false,
             tag: 'transparent',
             added: this.props.date,
-            finished: 0
+            finished: 0,
+
+            calendar: false,
         }
 
         this.tags = tagsService.getTags();
@@ -139,6 +142,16 @@ class Add extends Component {
         window.PhotoViewer.show(field.uri, this.state.title, {share: false});         
     }
 
+    triggerCalendar = () => {
+        this.setState({calendar: !this.state.calendar})
+    }
+
+    onDateSelect = (date) => {
+        this.setState({
+            added: date
+        })
+    }
+
     render() {
         let {t} = this.props;
 
@@ -147,8 +160,17 @@ class Add extends Component {
                 <Header
                     page="add"
                     onSubmit={this.onSubmit}
-                    showCurrentDate={true}
+                    onCalendarRequest={this.triggerCalendar}
                 />
+                {
+                    this.state.calendar &&
+                    <Calendar 
+                        currentDate={this.state.added}
+                        settings={this.props.settings}
+                        onDateSet={this.onDateSelect}
+                        onCloseRequest={this.triggerCalendar}
+                    />
+                }
                 <div className="add-wrapper page-content">
                     <div className="add-content-wrapper">
                         <input 
@@ -272,7 +294,7 @@ class Add extends Component {
 function mapStateToProps(state, props) {
     return {
         date: state.date,
-        settings: state.settings
+        settings: state.settings      
     }
 }
 
