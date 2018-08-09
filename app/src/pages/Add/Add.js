@@ -161,6 +161,7 @@ class Add extends Component {
                     page="add"
                     onSubmit={this.onSubmit}
                     onCalendarRequest={this.triggerCalendar}
+                    currentDate={this.state.added}
                 />
                 {
                     this.state.calendar &&

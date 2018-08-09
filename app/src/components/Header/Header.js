@@ -139,8 +139,7 @@ let Header = (props) => (
 )
 
 function mapStateToProps(state, props) {
-    return {
-        currentDate: state.date,        
+    return {      
         settings: state.settings
     }
 }
