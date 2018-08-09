@@ -13,7 +13,6 @@ import SettingsTheme from './pages/Theme/SettingsTheme';
 import SettingsSort from './pages/Sort/SettingsSort';
 import SettingsPassword from './pages/Password/SettingsPassword';
 import SettingsBackup from './pages/Backup/SettingsBackup';
-import Troubleshooting from './pages/Troubleshooting/Troubleshooting';
 import About from './pages/About/About';
 import SynchronizationLoader from "./components/SynchronizationLoader/SynchronizationLoader";
 import Modal from "./components/Modal/Modal";
@@ -90,12 +89,7 @@ class Root extends Component {
                         exact 
                         path="/settings/backup" 
                         component={SettingsBackup} 
-                    />    
-                    <Route 
-                        exact 
-                        path="/settings/troubleshooting" 
-                        component={Troubleshooting} 
-                    />    
+                    />
                     <Route 
                         exact 
                         path="/settings/about" 

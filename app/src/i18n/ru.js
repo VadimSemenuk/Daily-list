@@ -75,5 +75,9 @@ export default {
     "set-time-first": "Установите время начала",
     "time": "Время",
     "open-galery": "Открыть галерею",
-    "make-shot": "Сделать снимок"
+    "make-shot": "Сделать снимок",
+
+
+    // view settings page
+    "show-mini-calendar": "Показывать мини-календарь"
 }

@@ -175,12 +175,21 @@ class NotesList extends PureComponent {
                 />
                 <div className="notes-list-wrapper page-content">
                     {   
-                        !this.state.calendar && 
-                        <LightCalendar 
+                        (!this.state.calendar && this.props.settings.showMiniCalendar) && 
+                        <LightCalendar
                             settings={this.props.settings}
                             onDateSet={this.setDate}
                             currentDate={this.props.currentDate}
                         />
+                    }
+                    {
+                        (!this.state.calendar && !this.props.settings.showMiniCalendar) && 
+                        <div
+                            className="current-date-shower"
+                            style={{backgroundColor: this.props.settings.theme.header}}
+                        >
+                            {this.props.currentDate.locale("ru").format("dddd, D MMMM")}
+                        </div>
                     }
                     {
                         this.state.calendar &&

@@ -21,7 +21,8 @@ export default {
                 fastAdd INTEGER,
                 theme INTEGER,
                 password TEXT,    
-                fontSize INTEGER 
+                fontSize INTEGER,
+                showMiniCalendar INTEGER
             );
         `);
         await execureSQL(`
@@ -35,6 +36,12 @@ export default {
             direction: 1,
             finSort: 0
         }
-        await execureSQL(`UPDATE Settings SET sort = ?;`, [JSON.stringify(sort)]);
+        await execureSQL(`
+            UPDATE Settings 
+            SET 
+                sort = ?, 
+                showMiniCalendar = ?;`, 
+            [JSON.stringify(sort), 1]
+        );
     }
 }

@@ -112,6 +112,12 @@ class SettingsTheme extends Component {
                         checked={this.props.settings.fastAdd}
                         onChange={(e) => this.props.setSetting('fastAdd', +e)}     
                     />
+
+                    <SwitchListItem 
+                        text={t("show-mini-calendar")}  
+                        checked={this.props.settings.showMiniCalendar}
+                        onChange={(e) => this.props.setSetting('showMiniCalendar', +e)}     
+                    />
                 </div>
             </div>
         );

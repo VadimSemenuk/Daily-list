@@ -36,7 +36,7 @@ class SetitngsService {
     async getSettings () {
         try {
             let select = await executeSQL(
-                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize
+                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar
                 FROM Settings;`
             );
 
@@ -44,10 +44,11 @@ class SetitngsService {
 
             return {
                 ...result, 
-                defaultNotification: !!result.defaultNotification,
-                fastAdd: !!result.fastAdd,
+                defaultNotification: Boolean(result.defaultNotification),
+                fastAdd: Boolean(result.fastAdd),
                 theme: themesService.getThemeById(result.theme),
-                sort: JSON.parse(result.sort)
+                sort: JSON.parse(result.sort),
+                showMiniCalendar: Boolean(result.showMiniCalendar)
             }
         } catch (err) {
             console.log('Error: ', err);
