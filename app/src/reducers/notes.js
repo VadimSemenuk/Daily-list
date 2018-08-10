@@ -8,13 +8,6 @@ function notes (state = init, action) {
         }
         case 'SET_LIST_DATE': {
             return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
-
-            // return state.map((list, i) => {
-            //     if (i === action) {
-            //         return Object.assign({}, list, { items: [...list.items, action.note] })
-            //     }
-            //     return list
-            // })
         }
         case 'RECIVE_NOTE': {
             return state.map((list, i) => {

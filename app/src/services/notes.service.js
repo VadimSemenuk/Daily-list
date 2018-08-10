@@ -23,8 +23,8 @@ class NotesService {
                 ~item.startTime ? item.startTime = moment(item.startTime) : item.startTime = false;
                 ~item.endTime ? item.endTime = moment(item.endTime) : item.endTime = false;
                 ~item.added ? item.added = moment(item.added) : item.added = false;
-                item.finished = !!item.finished;
-                item.notificate = !!item.notificate;                
+                item.finished = Boolean(item.finished);
+                item.notificate = Boolean(item.notificate);                
                 
                 notes.push(item);
             }

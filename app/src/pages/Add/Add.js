@@ -34,7 +34,7 @@ class Add extends Component {
             endTime: false,
             tag: 'transparent',
             added: this.props.date,
-            finished: 0,
+            finished: false,
 
             calendar: false,
         }
@@ -130,7 +130,7 @@ class Add extends Component {
 
     scrollToBottom() {
         let el = document.querySelector(".add-content-wrapper");
-        el.scrollTop = el.scrollHeight; 
+        el.scrollTop = el.scrollHeight;
     }
 
     showImage = (i) => {
@@ -178,7 +178,9 @@ class Add extends Component {
                         />
                         {
                             this.state.dynamicFields.map((a, i) => {
-                                if (a && a.type === "text") {
+                                if (!a) {
+                                    return null
+                                } else if (a.type === "text") {
                                     return (
                                         <Textarea
                                             type="text"
@@ -192,7 +194,7 @@ class Add extends Component {
                                             value={a.value}
                                         />
                                     )
-                                } else if (a && a.type === "listItem") {
+                                } else if (a.type === "listItem") {
                                     return (
                                         <RemovableTextCheckBox 
                                             key={i} 
@@ -211,7 +213,7 @@ class Add extends Component {
                                             value={a.checked}                                                                                                                       
                                         />
                                     )
-                                } else if (a && a.type === "snapshot") {
+                                } else if (a.type === "snapshot") {
                                     return (
                                         <div className="attached-image-wrapper">
                                             <img 
