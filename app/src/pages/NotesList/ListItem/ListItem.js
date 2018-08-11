@@ -113,7 +113,7 @@ export default class Note extends PureComponent {
                                 )
                             } else {
                                 return (
-                                    <span className="attached-image-label">Прикрепленное изображение</span>
+                                    <span key={i} className="attached-image-label">Прикрепленное изображение</span>
                                 )
                             }
                         }

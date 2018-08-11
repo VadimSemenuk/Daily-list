@@ -13,6 +13,7 @@ import DB from './db/db';
 import appService from './services/app.service';
 import migrationService from './services/migration/migration.service';
 import settingsService from "./services/settings.service";
+import fakeService from "./services/fake.service";
 
 let store;
 
@@ -41,7 +42,8 @@ export default class App extends Component {
         store = await initStore(this.state.settings);
         this.setState({
             appReady: true
-		});
+        });
+        // fakeService.addFakeListItemsData();
     }
 
     async initDb() {

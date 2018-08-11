@@ -10,7 +10,8 @@ import appService from "../../services/app.service";
 import authService from "../../services/auth.service";
 
 import FastAdd from '../../components/FastAdd/FastAdd';
-import DayNotesList from './DayNotesList/DayNotesList';
+import DayNotesList from './DayNotesList';
+import WeekNotesList from './WeekNotesList';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
@@ -210,20 +211,39 @@ class NotesList extends PureComponent {
                         key={this.props.notes.length}
                     >
                         {
-                            this.props.notes.map((dayNotes, i) => (
-                                <div 
-                                    className="notes-list-item-wrapper" 
-                                    key={i}
-                                >
-                                    <DayNotesList 
-                                        notes={dayNotes.items} 
-                                        index={i}
-                                        onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                        onItemFinishChange={this.props.setNoteCheckedState}
-                                        onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                    />
-                                </div>
-                            ))
+                            this.props.notes.map((notes, i) => {
+                                if (false) {
+                                    return (
+                                        <div 
+                                            className="notes-list-item-wrapper" 
+                                            key={i}
+                                        >
+                                            <DayNotesList 
+                                                notes={notes.items} 
+                                                index={i}
+                                                onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                                onItemFinishChange={this.props.setNoteCheckedState}
+                                                onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                            />
+                                        </div>
+                                    )
+                                } else {
+                                    return (
+                                        <div 
+                                            className="notes-list-item-wrapper" 
+                                            key={i}
+                                        >
+                                            <WeekNotesList 
+                                                notes={notes} 
+                                                index={i}
+                                                onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                                onItemFinishChange={this.props.setNoteCheckedState}
+                                                onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                            />
+                                        </div>
+                                    )
+                                }
+                            })
                         }
                     </ReactSwipe>
 
@@ -282,7 +302,7 @@ class NotesList extends PureComponent {
 }
 
 function mapStateToProps(state, props) {
-    sort(state.notes, state.settings);
+    // sort(state.notes, state.settings);
 
     return {
         notes: state.notes,

@@ -10,27 +10,6 @@
         padding: 0 10px;
         flex-grow: 1;
         overflow-y: auto;  
-        
-        .attached-image-wrapper {
-            position: relative;
-
-            .attached-image {
-                width: 100%;
-                height: auto;
-            }
-
-            button {
-                position: absolute;
-                top: 0;
-                right: 0;
-                background: rgba(0, 0, 0, .4);
-
-                img {
-                    width: 18px;
-                    height: 18px;
-                }
-            }
-        }
 
         .add-actions-wrapper {
             display: flex;

@@ -1,14 +1,14 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
 
-import ListItem from '../ListItem/ListItem';
+import ListItem from './ListItem/ListItem';
 
 class DayNotesList extends PureComponent {
     render() {
         let {t} = this.props;
         // console.log("day list render");
         return (
-            this.props.notes.length ? 
+            this.props.notes.length ?
             this.props.notes.map((a, i) => (
                 <ListItem 
                     key={a.key}
