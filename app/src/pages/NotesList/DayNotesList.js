@@ -12,8 +12,6 @@ class DayNotesList extends PureComponent {
             this.props.notes.map((a, i) => (
                 <ListItem 
                     key={a.key}
-                    index={i}
-                    dayIndex={this.props.index}
                     itemData={a} 
                     onShowImage={this.props.onImageShowRequest}
                     onItemFinishChange={this.props.onItemFinishChange}

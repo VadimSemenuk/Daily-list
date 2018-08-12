@@ -13,31 +13,30 @@ class DayNotesList extends PureComponent {
         return (
             this.props.notes.map((dayNotes, dayNotesIndex) => (
                 <div key={dayNotesIndex}>
-                    <div className="week-header">
+                    <div className="week-header" data-date={dayNotes.date.valueOf()}>
                         <img 
                             src={AddGeryImg}
                             alt="remove"
                         />
                         <span>{dayNotes.date.locale("ru").format("dddd")}</span>
-                    </div>                    
-
-                    {
-                        dayNotes.items.length ?
-                        dayNotes.items.map((a, i) => (
-                            <ListItem
-                                key={a.key}
-                                index={i}
-                                dayIndex={this.props.index}
-                                itemData={a} 
-                                onShowImage={this.props.onImageShowRequest}
-                                onItemFinishChange={this.props.onItemFinishChange}
-                                onDynaicFieldChange={this.props.onItemDynaicFieldChange}
-                                onItemActionsWindowRequest={this.props.onItemActionsWindowRequest}
-                            /> 
-                        ))
-                        :
-                        <div className="no-content">{t("no-content")}</div> 
-                    }
+                    </div>  
+                    <div>                  
+                        {
+                            dayNotes.items.length ?
+                            dayNotes.items.map((a, i) => (
+                                <ListItem
+                                    key={a.key}
+                                    itemData={a} 
+                                    onShowImage={this.props.onImageShowRequest}
+                                    onItemFinishChange={this.props.onItemFinishChange}
+                                    onDynaicFieldChange={this.props.onItemDynaicFieldChange}
+                                    onItemActionsWindowRequest={this.props.onItemActionsWindowRequest}
+                                /> 
+                            ))
+                            :
+                            <div className="no-content">{t("no-content")}</div> 
+                        }
+                    </div>
                 </div>
             ))
         )

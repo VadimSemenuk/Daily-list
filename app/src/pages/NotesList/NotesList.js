@@ -4,6 +4,8 @@ import {connect} from 'react-redux';
 import moment from "moment";
 import ReactSwipe from 'react-swipe';
 import {translate} from "react-i18next";
+import scroll from "scroll";
+import debounce from "debounce";
 
 import synchronizationService from '../../services/synchronization.service';
 import appService from "../../services/app.service";
@@ -45,36 +47,90 @@ class NotesList extends PureComponent {
 
     async componentDidMount() {
         // this.props.triggerSynchronizationLoader(true);
-        let deviceIMEI = await appService.getDeviceIMEI();
-        let userId = authService.getUserId();
+        // let deviceIMEI = await appService.getDeviceIMEI();
+        // let userId = authService.getUserId();
 
-        let newNotes = await synchronizationService.getNewNotes(deviceIMEI, userId);
-        if (newNotes && newNotes.length) {
-            await synchronizationService.setNewNotes(newNotes, deviceIMEI);
-        }
+        // let newNotes = await synchronizationService.getNewNotes(deviceIMEI, userId);
+        // if (newNotes && newNotes.length) {
+        //     await synchronizationService.setNewNotes(newNotes, deviceIMEI);
+        // }
 
-        let notSynkedLocalNotes = await synchronizationService.getNotSyncedLocalNotesFull(userId);
-        if (notSynkedLocalNotes && notSynkedLocalNotes.length) {
-            await synchronizationService.sendNewLocalNotes(notSynkedLocalNotes, deviceIMEI, userId);
-        }
-        // this.props.triggerSynchronizationLoader(false);        
+        // let notSynkedLocalNotes = await synchronizationService.getNotSyncedLocalNotesFull(userId);
+        // if (notSynkedLocalNotes && notSynkedLocalNotes.length) {
+        //     await synchronizationService.sendNewLocalNotes(notSynkedLocalNotes, deviceIMEI, userId);
+        // }
+        // this.props.triggerSynchronizationLoader(false);    
+        
+        this.setScrollEvent();
+    }
+
+    setScrollEvent() {
+        document.querySelectorAll(".notes-list-item-wrapper")[1].addEventListener("scroll", (e) => {
+            // let containerScrollTop = e.target.scrollTop;
+
+            // let headers = e.target.querySelectorAll(".week-header");
+            // let minOffsetDiffHeader = 99999;
+            // let minOffsetDiffHeaderIndex;            
+            // for (let i = 0; i < headers.length; i++) {
+            //     let header = headers[i];
+         
+            //     if (header.offsetTop > containerScrollTop) {
+            //         continue
+            //     }
+
+            //     if (Math.abs(header.offsetTop - containerScrollTop) < minOffsetDiffHeader) {
+            //         minOffsetDiffHeader = Math.abs(header.offsetTop - containerScrollTop);
+            //         minOffsetDiffHeaderIndex = i;
+            //     }
+            // }  
+        })
+
+        let onScroll = debounce((e) => {
+            let activeIndex;
+            let headers = e.target.querySelectorAll(".week-header");          
+            for (let i = 0; i < headers.length; i++) {
+                if (headers[i].offsetTop === e.target.scrollTop) {
+                    activeIndex = i;
+                    break;
+                }
+            }
+            console.log(activeIndex)
+        }, 100)
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
-        if (side === "left") {    
-            let nextDate = moment(this.props.currentDate).add(-1, "day");
+        if (true) {
+            if (side === "left") {    
+                let nextDate = moment(this.props.currentDate).add(-1, "day");
+                this.props.setWeekListDate(
+                    nextDate,
+                    moment(nextDate).add(-1, "day"),
+                    nextIndex
+                )
+            } else {   
+                let nextDate = moment(this.props.currentDate).add(1, "day");
+                this.props.setWeekListDate(
+                    nextDate,
+                    moment(nextDate).add(1, "day"),
+                    nextIndex            
+                )     
+            }
+        } else {
+            if (side === "left") {    
+                let nextDate = moment(this.props.currentDate).add(-1, "day");
             this.props.updateDatesAndNotes(
-                nextDate,
-                moment(nextDate).add(-1, "day"),
-                nextIndex
-            )
-        } else {   
-            let nextDate = moment(this.props.currentDate).add(1, "day");
+                    nextDate,
+                    moment(nextDate).add(-1, "day"),
+                    nextIndex
+                )
+            } else {   
+                let nextDate = moment(this.props.currentDate).add(1, "day");
             this.props.updateDatesAndNotes(
-                nextDate,
-                moment(nextDate).add(1, "day"),
-                nextIndex            
-            )     
+                    nextDate,
+                    moment(nextDate).add(1, "day"),
+                    nextIndex            
+                )     
+            }
         }
     }
 
@@ -134,24 +190,41 @@ class NotesList extends PureComponent {
     }
 
     setDate = (date) => {
-        if (this.activePageIndex === 2) {
-            this.props.setDatesAndUpdateNotes([
-                moment(date).add(1, "day"),
-                moment(date).add(-1, "day"),
-                moment(date).startOf("day"),
-            ], 2, this.props.settings);
-        } else if (this.activePageIndex === 0) {
-            this.props.setDatesAndUpdateNotes([
-                moment(date).startOf("day"),
-                moment(date).add(1, "day"),
-                moment(date).add(-1, "day"),
-            ], 0, this.props.settings);
+        if (true) {
+            let el = document.querySelectorAll(`[data-date='${date.valueOf()}']`)[1].parentElement.previousElementSibling;
+            let scrollEl = document.querySelectorAll(".notes-list-item-wrapper")[1];
+            console.log(el)
+            scroll.top(scrollEl, el.offsetTop)
+
+
+            // this.props.setDate(
+            //     [
+            //         moment(date).add(-1, "day"),
+            //         moment(date).startOf("day"),
+            //         moment(date).add(1, "day")
+            //     ],
+            //     1
+            // );
         } else {
+            if (this.activePageIndex === 2) {
             this.props.setDatesAndUpdateNotes([
-                moment(date).add(-1, "day"),
-                moment(date).startOf("day"),
-                moment(date).add(1, "day"),
-            ], 1, this.props.settings);
+                    moment(date).add(1, "day"),
+                    moment(date).add(-1, "day"),
+                    moment(date).startOf("day"),
+                ], 2, this.props.settings);
+            } else if (this.activePageIndex === 0) {
+            this.props.setDatesAndUpdateNotes([
+                    moment(date).startOf("day"),
+                    moment(date).add(1, "day"),
+                    moment(date).add(-1, "day"),
+                ], 0, this.props.settings);
+            } else {
+            this.props.setDatesAndUpdateNotes([
+                    moment(date).add(-1, "day"),
+                    moment(date).startOf("day"),
+                    moment(date).add(1, "day"),
+                ], 1, this.props.settings);
+            }
         }
     }
 
@@ -217,7 +290,6 @@ class NotesList extends PureComponent {
                                         >
                                             <DayNotesList 
                                                 notes={notes.items} 
-                                                index={i}
                                                 onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                                 onItemFinishChange={this.props.setNoteCheckedState}
                                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}
@@ -232,7 +304,6 @@ class NotesList extends PureComponent {
                                         >
                                             <WeekNotesList 
                                                 notes={notes} 
-                                                index={i}
                                                 onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                                 onItemFinishChange={this.props.setNoteCheckedState}
                                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}
