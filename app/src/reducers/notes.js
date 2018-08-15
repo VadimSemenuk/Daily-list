@@ -2,11 +2,11 @@ let init = [];
 
 function notes (state = init, action) {
     switch(action.type) {
-        case 'SET_DATE':
+        case 'SET_DATES_AND_UPDATE_NOTES':
         case 'RECIVE_NOTES': {
             return action.notes.slice();
         }
-        case 'SET_LIST_DATE': {
+        case 'UPDATE_DATES_AND_NOTES': {
             return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
         }
         case 'RECIVE_NOTE': {

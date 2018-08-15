@@ -78,20 +78,27 @@ export function getNotesByDates (dates, settings) {
 }
 
 // date
-export function setDate (dates, dateIndex, settings) {
+export function setCurrentDate (date) {
+    return {
+        type: "SET_CURRENT_DATE",
+        date
+    }
+}
+
+export function setDatesAndUpdateNotes (dates, dateIndex, settings) {
     return function(dispatch) {
         return notesService.getNotesByDates(dates, settings).then((notes) => dispatch({
-            type: "SET_DATE",
+            type: "SET_DATES_AND_UPDATE_NOTES",
             date: dates[dateIndex],
             notes
         }));
     }
 }
 
-export function setListDate (date, preRenderDate, nextIndex) {
+export function updateDatesAndNotes (date, preRenderDate, nextIndex) {
     return function(dispatch) {
         return notesService.getDayNotes(preRenderDate).then((notes) => dispatch({
-            type: "SET_LIST_DATE",
+            type: "UPDATE_DATES_AND_NOTES",
             notes,
             nextIndex,
             date

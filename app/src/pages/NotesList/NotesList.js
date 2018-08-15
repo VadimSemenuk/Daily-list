@@ -63,14 +63,14 @@ class NotesList extends PureComponent {
     onSlideChange = async ({index, nextIndex, side}) => {
         if (side === "left") {    
             let nextDate = moment(this.props.currentDate).add(-1, "day");
-            this.props.setListDate(
+            this.props.updateDatesAndNotes(
                 nextDate,
                 moment(nextDate).add(-1, "day"),
                 nextIndex
             )
         } else {   
             let nextDate = moment(this.props.currentDate).add(1, "day");
-            this.props.setListDate(
+            this.props.updateDatesAndNotes(
                 nextDate,
                 moment(nextDate).add(1, "day"),
                 nextIndex            
@@ -135,19 +135,19 @@ class NotesList extends PureComponent {
 
     setDate = (date) => {
         if (this.activePageIndex === 2) {
-            this.props.setDate([
+            this.props.setDatesAndUpdateNotes([
                 moment(date).add(1, "day"),
                 moment(date).add(-1, "day"),
                 moment(date).startOf("day"),
             ], 2, this.props.settings);
         } else if (this.activePageIndex === 0) {
-            this.props.setDate([
+            this.props.setDatesAndUpdateNotes([
                 moment(date).startOf("day"),
                 moment(date).add(1, "day"),
                 moment(date).add(-1, "day"),
             ], 0, this.props.settings);
         } else {
-            this.props.setDate([
+            this.props.setDatesAndUpdateNotes([
                 moment(date).add(-1, "day"),
                 moment(date).startOf("day"),
                 moment(date).add(1, "day"),
