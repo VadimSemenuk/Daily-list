@@ -65,67 +65,57 @@ class NotesList extends PureComponent {
     }
 
     setScrollEvent() {
-        document.querySelectorAll(".notes-list-item-wrapper")[1].addEventListener("scroll", (e) => {
-            // let containerScrollTop = e.target.scrollTop;
+        let activeIndex = 0;
+        let headers = document.querySelectorAll(".notes-list-item-wrapper")[1].querySelectorAll(".week-header");  
 
-            // let headers = e.target.querySelectorAll(".week-header");
-            // let minOffsetDiffHeader = 99999;
-            // let minOffsetDiffHeaderIndex;            
-            // for (let i = 0; i < headers.length; i++) {
-            //     let header = headers[i];
-         
-            //     if (header.offsetTop > containerScrollTop) {
-            //         continue
-            //     }
-
-            //     if (Math.abs(header.offsetTop - containerScrollTop) < minOffsetDiffHeader) {
-            //         minOffsetDiffHeader = Math.abs(header.offsetTop - containerScrollTop);
-            //         minOffsetDiffHeaderIndex = i;
-            //     }
-            // }  
-        })
-
-        let onScroll = debounce((e) => {
-            let activeIndex;
-            let headers = e.target.querySelectorAll(".week-header");          
+        let onScroll = debounce((e) => {        
             for (let i = 0; i < headers.length; i++) {
                 if (headers[i].offsetTop === e.target.scrollTop) {
-                    activeIndex = i;
+                    if (activeIndex !== i) {
+                        onIndexChange(i);
+                    }
                     break;
                 }
             }
-            console.log(activeIndex)
         }, 100)
+
+        let onIndexChange = (i) => {
+            activeIndex = i;
+            // console.log(moment(+headers[i].dataset.date));
+            this.props.setCurrentDate(moment(+headers[i].dataset.date));
+        }
+        
+        document.querySelectorAll(".notes-list-item-wrapper")[1].addEventListener("scroll", onScroll);
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
         if (true) {
             if (side === "left") {    
-                let nextDate = moment(this.props.currentDate).add(-1, "day");
-                this.props.setWeekListDate(
+                let nextDate = moment(this.props.currentDate).add(-1, "week");
+                this.props.updateWeekDatesAndNotes(
                     nextDate,
-                    moment(nextDate).add(-1, "day"),
+                    moment(nextDate).add(-1, "week"),
                     nextIndex
                 )
             } else {   
-                let nextDate = moment(this.props.currentDate).add(1, "day");
-                this.props.setWeekListDate(
+                let nextDate = moment(this.props.currentDate).add(1, "week");
+                this.props.updateWeekDatesAndNotes(
                     nextDate,
-                    moment(nextDate).add(1, "day"),
+                    moment(nextDate).add(1, "week"),
                     nextIndex            
                 )     
             }
         } else {
             if (side === "left") {    
                 let nextDate = moment(this.props.currentDate).add(-1, "day");
-            this.props.updateDatesAndNotes(
+                this.props.updateDatesAndNotes(
                     nextDate,
                     moment(nextDate).add(-1, "day"),
                     nextIndex
                 )
             } else {   
                 let nextDate = moment(this.props.currentDate).add(1, "day");
-            this.props.updateDatesAndNotes(
+                this.props.updateDatesAndNotes(
                     nextDate,
                     moment(nextDate).add(1, "day"),
                     nextIndex            
@@ -195,16 +185,6 @@ class NotesList extends PureComponent {
             let scrollEl = document.querySelectorAll(".notes-list-item-wrapper")[1];
             console.log(el)
             scroll.top(scrollEl, el.offsetTop)
-
-
-            // this.props.setDate(
-            //     [
-            //         moment(date).add(-1, "day"),
-            //         moment(date).startOf("day"),
-            //         moment(date).add(1, "day")
-            //     ],
-            //     1
-            // );
         } else {
             if (this.activePageIndex === 2) {
             this.props.setDatesAndUpdateNotes([
@@ -323,7 +303,6 @@ class NotesList extends PureComponent {
                         <button onClick={this.onEditRequest}>{t("edit")}</button>
                         <button onClick={this.onListItemRemove}>{t("delete")}</button>
                         <button onClick={this.onCopyRequest}>{t("copy")}</button>
-                        
                     </Modal>
 
                     {

@@ -107,10 +107,10 @@ export function updateDatesAndNotes (date, preRenderDate, nextIndex) {
 }
 
 
-export function setWeekListDate (date, preRenderDate, nextIndex) {
+export function updateWeekDatesAndNotes (date, preRenderDate, nextIndex) {
     return function(dispatch) {
         return notesService.getWeekNotes(preRenderDate).then((notes) => dispatch({
-            type: "SET_LIST_DATE",
+            type: "UPDATE_WEEK_DATES_AND_NOTES",
             notes,
             nextIndex,
             date

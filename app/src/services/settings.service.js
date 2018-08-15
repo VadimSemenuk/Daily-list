@@ -19,6 +19,14 @@ let sortDirectionSettings = [{
 
 let fontSizeSettings = [12, 13, 14, 15, 16, 17, 18];
 
+let notesShowIntervalSettings = [{
+    translateId: "notes-show-interval-week",
+    val: 0
+}, {
+    translateId: "notes-show-interval-day",
+    val: 1
+}];
+
 class SetitngsService {
 
     getSortTypeSettings() {
@@ -33,10 +41,14 @@ class SetitngsService {
         return [...fontSizeSettings]
     }
 
+    getNotesShowIntervalSettings() {
+        return [...notesShowIntervalSettings]
+    }
+
     async getSettings () {
         try {
             let select = await executeSQL(
-                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar
+                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar, notesShowInterval
                 FROM Settings;`
             );
 
@@ -70,8 +82,6 @@ class SetitngsService {
             console.log('Error: ', err);
         }
     }
-
-    getSortTypeSettings
 }
 
 let setitngsService = new SetitngsService();

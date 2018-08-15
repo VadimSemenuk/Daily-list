@@ -22,7 +22,8 @@ export default {
                 theme INTEGER,
                 password TEXT,    
                 fontSize INTEGER,
-                showMiniCalendar INTEGER
+                showMiniCalendar INTEGER,
+                notesShowInterval INTEGER
             );
         `);
         await execureSQL(`
@@ -40,8 +41,9 @@ export default {
             UPDATE Settings 
             SET 
                 sort = ?, 
-                showMiniCalendar = ?;`, 
-            [JSON.stringify(sort), 1]
+                showMiniCalendar = ?,
+                notesShowInterval = ?;`, 
+            [JSON.stringify(sort), 1, 0]
         );
     }
 }

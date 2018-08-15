@@ -7,7 +7,7 @@ import AddGeryImg from '../../assets/img/add-grey.svg';
 
 class DayNotesList extends PureComponent {
     render() {
-        console.log(this.props.notes);
+        // console.log(this.props.notes);
         let {t} = this.props;
 
         return (
