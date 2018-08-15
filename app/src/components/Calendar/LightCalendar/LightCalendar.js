@@ -143,10 +143,7 @@ export default class LightCalendar extends Component {
 
     render() {
         return (
-            <div  
-                className="light-calendar-wrapper"
-                style={{background: this.props.settings.theme.header, borderColor: this.props.settings.theme.header}}
-            >
+            <div className="light-calendar-wrapper theme-header-background theme-header-border">
                 <div className="light-calendar-month">{this.state.monthName}</div>
                 <ReactSwipe
                     ref={this.setSliderRef}

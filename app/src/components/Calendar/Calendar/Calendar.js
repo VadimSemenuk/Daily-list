@@ -164,10 +164,7 @@ export default class Calendar extends Component {
 
     render() {
         return (
-            <div  
-                className="calendar-wrapper"
-                style={{background: this.props.settings.theme.header, borderColor: this.props.settings.theme.header}}
-            >
+            <div className="calendar-wrapper theme-header-background theme-header-border">
                 <div className="calendar-month-name">{this.state.currentMonthStartDate.locale("ru").format("MMMM")}</div>
                 <WeekDays />
                 <ReactSwipe

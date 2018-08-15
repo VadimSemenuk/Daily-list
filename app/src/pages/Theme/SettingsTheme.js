@@ -39,6 +39,8 @@ class SettingsTheme extends Component {
         } else {
             this.props.setSetting('theme', theme)
         }
+
+        themesService.applyTheme(theme);
     }
 
     onRandomThemeModeTrigger = (e) => {
@@ -61,10 +63,7 @@ class SettingsTheme extends Component {
                         style={{padding: "10px 0"}}
                         ValElement={() => (
                             <div className="color-item-wrapper">
-                                <div 
-                                    className="color-item"
-                                    style={{backgroundColor: this.props.settings.theme.header}}
-                                ></div>
+                                <div className="color-item theme-header-background"></div>
                             </div>
                         )}
                         listItem={ButtonListItem}

@@ -13,6 +13,7 @@ import DB from './db/db';
 import appService from './services/app.service';
 import migrationService from './services/migration/migration.service';
 import settingsService from "./services/settings.service";
+import themesService from "./services/themes.service";
 import fakeService from "./services/fake.service";
 
 let store;
@@ -62,6 +63,7 @@ export default class App extends Component {
         if (window.cordova && window.cordova.platformId === 'android') {
             window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
         }
+        themesService.applyTheme(settings.theme);
     }
 
     render() {

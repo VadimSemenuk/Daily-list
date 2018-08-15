@@ -22,7 +22,7 @@ let buttons = {
 }
 
 let Header = (props) => (
-    <header style={{backgroundColor: props.settings.theme.header}}>
+    <header className="theme-header-background">
         <div>
             {
                 props.page === "notes" &&
@@ -136,7 +136,7 @@ let Header = (props) => (
     </header>
 )
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {      
         settings: state.settings
     }

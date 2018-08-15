@@ -109,6 +109,24 @@ class ThemesService {
     getThemesList = () => [...this.themes];
 
     getThemesCount = () => this.themes.length
+
+    applyTheme = (theme) => {
+        let styleEl = document.querySelector("style.theme-styles");
+        if (!styleEl) {
+            styleEl = document.createElement("style");
+            styleEl.classList.add("theme-styles");
+            document.querySelector("body").appendChild(styleEl);
+        }
+
+        styleEl.innerHTML = `
+            .theme-header-background {
+                background: ${theme.header};
+            }
+            .theme-header-border {
+                border-color: ${theme.header};
+            }
+        `
+    }
 }
 
 let themesService = new ThemesService();
