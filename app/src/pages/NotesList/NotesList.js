@@ -61,7 +61,9 @@ class NotesList extends PureComponent {
         // }
         // this.props.triggerSynchronizationLoader(false);    
         
-        this.setScrollEvent();
+        if (this.props.settings.notesShowInterval === 0) {
+            this.setScrollEvent();
+        }
     }
 
     setScrollEvent() {
@@ -81,7 +83,6 @@ class NotesList extends PureComponent {
 
         let onIndexChange = (i) => {
             activeIndex = i;
-            // console.log(moment(+headers[i].dataset.date));
             this.props.setCurrentDate(moment(+headers[i].dataset.date));
         }
         
@@ -89,38 +90,29 @@ class NotesList extends PureComponent {
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
-        if (true) {
-            if (side === "left") {    
-                let nextDate = moment(this.props.currentDate).add(-1, "week");
-                this.props.updateWeekDatesAndNotes(
-                    nextDate,
-                    moment(nextDate).add(-1, "week"),
-                    nextIndex
-                )
-            } else {   
-                let nextDate = moment(this.props.currentDate).add(1, "week");
-                this.props.updateWeekDatesAndNotes(
-                    nextDate,
-                    moment(nextDate).add(1, "week"),
-                    nextIndex            
-                )     
-            }
+        let updateFn, diff;
+        if (this.props.settings.notesShowInterval === 0) {
+            updateFn = this.props.updateWeekDatesAndNotes;
+            diff = "week";
         } else {
-            if (side === "left") {    
-                let nextDate = moment(this.props.currentDate).add(-1, "day");
-                this.props.updateDatesAndNotes(
-                    nextDate,
-                    moment(nextDate).add(-1, "day"),
-                    nextIndex
-                )
-            } else {   
-                let nextDate = moment(this.props.currentDate).add(1, "day");
-                this.props.updateDatesAndNotes(
-                    nextDate,
-                    moment(nextDate).add(1, "day"),
-                    nextIndex            
-                )     
-            }
+            updateFn = this.props.updateDatesAndNotes;
+            diff = "day";
+        }
+
+        if (side === "left") {    
+            let nextDate = moment(this.props.currentDate).add(-1, diff);
+            updateFn(
+                nextDate,
+                moment(nextDate).add(-1, diff),
+                nextIndex
+            )
+        } else {   
+            let nextDate = moment(this.props.currentDate).add(1, diff);
+            updateFn(
+                nextDate,
+                moment(nextDate).add(1, diff),
+                nextIndex            
+            )     
         }
     }
 
@@ -180,30 +172,29 @@ class NotesList extends PureComponent {
     }
 
     setDate = (date) => {
-        if (true) {
+        if (this.props.settings.notesShowInterval === 0) {
             let el = document.querySelectorAll(`[data-date='${date.valueOf()}']`)[1].parentElement.previousElementSibling;
             let scrollEl = document.querySelectorAll(".notes-list-item-wrapper")[1];
-            console.log(el)
             scroll.top(scrollEl, el.offsetTop)
         } else {
             if (this.activePageIndex === 2) {
-            this.props.setDatesAndUpdateNotes([
+                this.props.setDatesAndUpdateNotes([
                     moment(date).add(1, "day"),
                     moment(date).add(-1, "day"),
                     moment(date).startOf("day"),
-                ], 2, this.props.settings);
+                ], 2, this.props.settings.notesShowInterval);
             } else if (this.activePageIndex === 0) {
-            this.props.setDatesAndUpdateNotes([
+                this.props.setDatesAndUpdateNotes([
                     moment(date).startOf("day"),
                     moment(date).add(1, "day"),
                     moment(date).add(-1, "day"),
-                ], 0, this.props.settings);
+                ], 0, this.props.settings.notesShowInterval);
             } else {
-            this.props.setDatesAndUpdateNotes([
+                this.props.setDatesAndUpdateNotes([
                     moment(date).add(-1, "day"),
                     moment(date).startOf("day"),
                     moment(date).add(1, "day"),
-                ], 1, this.props.settings);
+                ], 1, this.props.settings.notesShowInterval);
             }
         }
     }
@@ -262,14 +253,14 @@ class NotesList extends PureComponent {
                     >
                         {
                             this.props.notes.map((notes, i) => {
-                                if (false) {
+                                if (this.props.settings.notesShowInterval === 0) {
                                     return (
                                         <div 
                                             className="notes-list-item-wrapper" 
                                             key={i}
                                         >
-                                            <DayNotesList 
-                                                notes={notes.items} 
+                                            <WeekNotesList 
+                                                notes={notes} 
                                                 onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                                 onItemFinishChange={this.props.setNoteCheckedState}
                                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}
@@ -282,8 +273,8 @@ class NotesList extends PureComponent {
                                             className="notes-list-item-wrapper" 
                                             key={i}
                                         >
-                                            <WeekNotesList 
-                                                notes={notes} 
+                                            <DayNotesList 
+                                                notes={notes.items} 
                                                 onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                                 onItemFinishChange={this.props.setNoteCheckedState}
                                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}

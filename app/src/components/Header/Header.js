@@ -75,7 +75,7 @@ let Header = (props) => (
                             </button>
                         )
                     case 1: 
-                        if (true) {
+                        if (props.settings.notesShowInterval === 0) {
                             return null
                         } 
                         return (

@@ -6,22 +6,7 @@ import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
 
 class NotesService {
-    async getDayNotesq(date) {
-        let s = performance.now();
-        await this.getDayNotess(date)
-        await this.getDayNotess(date)
-        await this.getDayNotess(date)
-        await this.getDayNotess(date)
-        await this.getDayNotess(date)
-        let res = await this.getDayNotess(date)
-        let e = performance.now(); 
-        console.log(e - s) 
-       
-        return res;
-    }
-
     async getWeekNotes(date) {
-        let s = performance.now();
         let finDate = moment(date).startOf("isoWeek").valueOf() + 604800000;
 
         let select = await executeSQL(
@@ -60,9 +45,6 @@ class NotesService {
             }
         });
 
-        let e = performance.now(); 
-        console.log(e - s) 
-
         return res;
     }
 
@@ -100,7 +82,7 @@ class NotesService {
         // return await Promise.all(tasks);
 
         let buf = [];
-        if (period === "week") {
+        if (period === 0) {
             for (let i of dates) {
                 buf.push(await this.getWeekNotes(i))
             }      

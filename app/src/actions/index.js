@@ -65,9 +65,9 @@ export function updateNote (note) {
     }
 }
 
-export function getNotesByDates (dates, settings) {
+export function getNotesByDates (dates, period) {
     return function(dispatch) {
-        return notesService.getNotesByDates(dates, settings).then((notes) => {
+        return notesService.getNotesByDates(dates, period).then((notes) => {
             dispatch({
                 type: "RECIVE_NOTES",
                 dates,
@@ -85,9 +85,9 @@ export function setCurrentDate (date) {
     }
 }
 
-export function setDatesAndUpdateNotes (dates, dateIndex, settings) {
+export function setDatesAndUpdateNotes (dates, dateIndex, period) {
     return function(dispatch) {
-        return notesService.getNotesByDates(dates, settings).then((notes) => dispatch({
+        return notesService.getNotesByDates(dates, period).then((notes) => dispatch({
             type: "SET_DATES_AND_UPDATE_NOTES",
             date: dates[dateIndex],
             notes

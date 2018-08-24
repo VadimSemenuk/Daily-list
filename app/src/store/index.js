@@ -13,7 +13,7 @@ async function initStore (settings) {
             moment().startOf("day"),
             moment().add(1, "day")
         ],
-        "week"
+        settings.notesShowInterval
     );
     let password = !settings.password;
 
