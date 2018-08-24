@@ -48,35 +48,30 @@ class SetitngsService {
     async getSettings () {
         try {
             let select = await executeSQL(
-                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar, notesShowInterval
+                `SELECT settings
                 FROM Settings;`
             );
+            console.log(select);
 
-            let result = select.rows.item(0);
+            let result = JSON.parse(select.rows.item(0).settings);
 
             return {
-                ...result, 
-                defaultNotification: Boolean(result.defaultNotification),
-                fastAdd: Boolean(result.fastAdd),
+                ...result,
                 theme: themesService.getThemeById(result.theme),
-                sort: JSON.parse(result.sort),
-                showMiniCalendar: Boolean(result.showMiniCalendar)
             }
         } catch (err) {
             console.log('Error: ', err);
         }
     }
 
-    async setSetting (item, value) {  
-        switch(item) {
-            case("theme"): value = value.id; break;
-            case("sort"): value = JSON.stringify(value); break;
-            default: break;
-        }
+    async setSettings (settingName, value, settings) {  
+        settings[settingName] = value;
+        settings.theme = settings.theme.id;
+
         try {
             await executeSQL(
                 `UPDATE Settings 
-                SET ${item} = ?;`, [value]
+                SET settings = ?;`, [JSON.stringify(settings)]
             );
         } catch (err) {
             console.log('Error: ', err);

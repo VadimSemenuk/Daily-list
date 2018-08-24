@@ -87,26 +87,29 @@ class SettingsSort extends Component {
                         onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {finSort: e}))}     
                     />   
 
-                    <ModalListItem
-                        text={t("notes-show-interval")} 
-                        value={t(activeNotesShowInterval.translateId)}
-                        listItem={ValueListItem}
-                    >
-                        <div className="radio-group">
-                            {
-                                notesShowIntervalSettings.map((setting, i) => (
-                                    <Radio
-                                        key={i}
-                                        name="sort-direction"
-                                        checked={this.props.settings.notesShowInterval === setting.val}
-                                        value={setting.val}
-                                        onChange={(e) => this.props.setSetting("notesShowInterval", +e)}
-                                        text={t(setting.translateId)}
-                                    />
-                                ))
-                            }
-                        </div>
-                    </ModalListItem>         
+                    {
+                        false &&
+                        <ModalListItem
+                            text={t("notes-show-interval")} 
+                            value={t(activeNotesShowInterval.translateId)}
+                            listItem={ValueListItem}
+                        >
+                            <div className="radio-group">
+                                {
+                                    notesShowIntervalSettings.map((setting, i) => (
+                                        <Radio
+                                            key={i}
+                                            name="sort-direction"
+                                            checked={this.props.settings.notesShowInterval === setting.val}
+                                            value={setting.val}
+                                            onChange={(e) => this.props.setSetting("notesShowInterval", +e)}
+                                            text={t(setting.translateId)}
+                                        />
+                                    ))
+                                }
+                            </div>
+                        </ModalListItem>   
+                    }      
                 </div>
             </div>
         );
