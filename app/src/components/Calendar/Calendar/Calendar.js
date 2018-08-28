@@ -19,7 +19,9 @@ export default class Calendar extends Component {
         this.state = {
             monthes: this.getMonthes(currentMonthStartDate),
             currentMonthStartDate,
-            msSelectedDate
+            msSelectedDate,
+            msSelectedDates: [msSelectedDate],
+            mode: this.props.mode || "default"
         }
 
         this.activePageIndex = 1;  
@@ -93,11 +95,30 @@ export default class Calendar extends Component {
         return monthData;
     }
 
-    onDateSet = (date) => {
-        this.setState({
-            msSelectedDate: date.valueOf()
-        })
-        this.props.onDateSet(moment(date))
+    onDateSet = (date, active) => {
+        if (this.props.mode === "multiselect") {
+            let msSelectedDates;
+            let msDate = date.valueOf()
+
+            if (active) {
+                let index = this.state.msSelectedDates.findIndex((a) => a === msDate);
+                msSelectedDates = [...this.state.msSelectedDates.slice(0, index), ...this.state.msSelectedDates.slice(index + 1)];
+            } else {
+                msSelectedDates = [...this.state.msSelectedDates, msDate];
+            }
+
+            this.setState({
+                msSelectedDates
+            })
+            // this.props.onDatesSet(msSelectedDates);
+        } else {
+            if (!active) {
+                this.setState({
+                    msSelectedDate: date.valueOf()
+                })
+                this.props.onDateSet(moment(date))
+            }
+        }
     }
     
     onSliderChange = (e) => {
@@ -190,6 +211,7 @@ export default class Calendar extends Component {
                                     <MonthDates
                                         monthWeeks={monthWeeks}
                                         msSelectedDate={this.state.msSelectedDate}
+                                        msSelectedDates={this.state.msSelectedDates}
                                         onSelect={this.onDateSet}
                                     /> 
                                 </div>  

@@ -45,4 +45,16 @@
 .light-calendar-month {
     text-align: center;
     color: #fff;
+    padding-bottom: 7px;
+}
+
+.week-days {
+    display: flex;
+
+    span {
+        font-size: 0.84em;
+        flex: 1;
+        color: #fff;
+        text-align: center;
+    }
 }

@@ -17,12 +17,19 @@ export default class MonthDates extends PureComponent {
                                             return <div key={i} className="calendar-date"></div>
                                         }
 
-                                        let active = weekDay.valueOf() === this.props.msSelectedDate;
+                                        let active
+                                        if (this.props.mode === "multiselect") {
+                                            let msCurrentDay = weekDay.valueOf();
+                                            active = ~this.props.msSelectedDates.findIndex((a) => a === msCurrentDay);
+                                        } else {
+                                            active = weekDay.valueOf() === this.props.msSelectedDate;
+                                        }
+
                                         return (
                                             <button 
                                                 className={`calendar-date ${active ? 'active' : ''}`}
                                                 key={i} 
-                                                onClick={() => this.props.onSelect(weekDay)}
+                                                onClick={() => this.props.onSelect(weekDay, active)}
                                             >{weekDay.format('DD')}</button> 
                                         )
                                     })

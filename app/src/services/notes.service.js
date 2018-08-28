@@ -10,9 +10,21 @@ class NotesService {
         let select = await executeSQL(
             `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
             FROM Tasks
-            WHERE added = ? AND userId = ? AND lastAction != 'DELETE';`, 
+            WHERE added = ? AND userId = ? AND lastAction != 'DELETE' AND repeatType = "no-repeat";`, 
             [date.valueOf(), authService.getUserId()]
         );              
+
+        let select1 = await executeSQL(
+            `SELECT t.id
+            FROM Tasks t
+            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+            WHERE 
+                t.userId = ? AND 
+                t.lastAction != 'DELETE' AND 
+                (t.repeatType = "no-repeat" OR (t.repeatType = "week" AND rep.value = 2) OR (t.repeatType = "any" AND rep.value = ?));`, 
+            [authService.getUserId(), date.valueOf()]
+        );   
+        console.log(select1.rows);
 
         let notes = [];
 
@@ -70,7 +82,7 @@ class NotesService {
             return
         }
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(inserted.insertId));
         }
 
@@ -84,8 +96,8 @@ class NotesService {
     async insertNote(note) {
         let insert = await executeSQL(
             `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, lastAction, lastActionTime, userId, isSynced, isLastActionSynced)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title, 
@@ -100,7 +112,18 @@ class NotesService {
                 note.lastActionTime,
                 note.userId,
                 note.isSynced,
-                note.isLastActionSynced
+                note.isLastActionSynced,
+                "any"
+            ]
+        ).catch((err) => console.warn(err));
+
+        await executeSQL(
+            `INSERT INTO TasksRepeatValues
+            (taskId, value)
+            VALUES(?, ?);`,
+            [
+                insert.insertId,
+                note.added
             ]
         ).catch((err) => console.warn(err));
         
@@ -140,7 +163,7 @@ class NotesService {
             return
         }
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             fetch(`${config.apiURL}/notes/finish-state`, {
                 method: "POST",
                 credentials: "same-origin",
@@ -180,7 +203,7 @@ class NotesService {
             return
         }
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             fetch(`${config.apiURL}/notes/dynamic-fields`, {
                 method: "POST",
                 credentials: "same-origin",
@@ -218,7 +241,7 @@ class NotesService {
             return
         }         
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             fetch(`${config.apiURL}/notes`, {
                 method: "DELETE",
                 credentials: "same-origin",
@@ -285,7 +308,7 @@ class NotesService {
             return
         }
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             fetch(`${config.apiURL}/notes`, {
                 method: "PUT",
                 credentials: "same-origin",

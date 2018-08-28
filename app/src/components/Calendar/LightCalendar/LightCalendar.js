@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import './LightCalendar.scss';
 
+import WeekDays from "./WeekDays";
 import WeekDatesRow from "./WeekDatesRow";
 
 import sliderChangeSide from "../../../utils/sliderChangeSide";
@@ -148,6 +149,7 @@ export default class LightCalendar extends Component {
                 style={{background: this.props.settings.theme.header, borderColor: this.props.settings.theme.header}}
             >
                 <div className="light-calendar-month">{this.state.monthName}</div>
+                <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}
                     className="light-calendar-swiper"

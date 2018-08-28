@@ -1,7 +1,7 @@
 export default {
     // settings page
     "settings": "Настройки",
-    "default-notification": "Включить уведомление по умолчанию",
+    "default-notification": "Автоматически добавлять уведомление",
     "view": "Отображение",
     "interface": "Интерфейс",
     "data-sync": "Синхронизация данных",

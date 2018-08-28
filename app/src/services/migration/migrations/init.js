@@ -28,7 +28,17 @@ async function createTables () {
             lastAction TEXT,
             lastActionTime INTEGER,
             userId INTEGER,
+            repeatType INTEGER DEFAULT "no-repeat",
             UNIQUE (uuid) ON CONFLICT REPLACE                    
+        );`
+    )
+
+    await execureSQL(
+        `CREATE TABLE IF NOT EXISTS TasksRepeatValues
+        (
+            taskId INTEGER,
+            value INTEGER,
+            FOREIGN KEY(taskId) REFERENCES Tasks(id)
         );`
     )
     
