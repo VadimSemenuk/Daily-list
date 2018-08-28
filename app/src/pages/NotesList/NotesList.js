@@ -4,13 +4,16 @@ import {connect} from 'react-redux';
 import moment from "moment";
 import ReactSwipe from 'react-swipe';
 import {translate} from "react-i18next";
+import scroll from "scroll";
+import debounce from "debounce";
 
 import synchronizationService from '../../services/synchronization.service';
 import appService from "../../services/app.service";
 import authService from "../../services/auth.service";
 
 import FastAdd from '../../components/FastAdd/FastAdd';
-import DayNotesList from './DayNotesList/DayNotesList';
+import DayNotesList from './DayNotesList';
+import WeekNotesList from './WeekNotesList';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
@@ -44,34 +47,70 @@ class NotesList extends PureComponent {
 
     async componentDidMount() {
         // this.props.triggerSynchronizationLoader(true);
-        let deviceIMEI = await appService.getDeviceIMEI();
-        let userId = authService.getUserId();
+        // let deviceIMEI = await appService.getDeviceIMEI();
+        // let userId = authService.getUserId();
 
-        let newNotes = await synchronizationService.getNewNotes(deviceIMEI, userId);
-        if (newNotes && newNotes.length) {
-            await synchronizationService.setNewNotes(newNotes, deviceIMEI);
-        }
+        // let newNotes = await synchronizationService.getNewNotes(deviceIMEI, userId);
+        // if (newNotes && newNotes.length) {
+        //     await synchronizationService.setNewNotes(newNotes, deviceIMEI);
+        // }
 
-        let notSynkedLocalNotes = await synchronizationService.getNotSyncedLocalNotesFull(userId);
-        if (notSynkedLocalNotes && notSynkedLocalNotes.length) {
-            await synchronizationService.sendNewLocalNotes(notSynkedLocalNotes, deviceIMEI, userId);
+        // let notSynkedLocalNotes = await synchronizationService.getNotSyncedLocalNotesFull(userId);
+        // if (notSynkedLocalNotes && notSynkedLocalNotes.length) {
+        //     await synchronizationService.sendNewLocalNotes(notSynkedLocalNotes, deviceIMEI, userId);
+        // }
+        // this.props.triggerSynchronizationLoader(false);    
+        
+        if (this.props.settings.notesShowInterval === 0) {
+            this.setScrollEvent();
         }
-        // this.props.triggerSynchronizationLoader(false);        
+    }
+
+    setScrollEvent() {
+        let activeIndex = 0;
+        let headers = document.querySelectorAll(".notes-list-item-wrapper")[1].querySelectorAll(".week-header");  
+
+        let onScroll = debounce((e) => {        
+            for (let i = 0; i < headers.length; i++) {
+                if (headers[i].offsetTop === e.target.scrollTop) {
+                    if (activeIndex !== i) {
+                        onIndexChange(i);
+                    }
+                    break;
+                }
+            }
+        }, 100)
+
+        let onIndexChange = (i) => {
+            activeIndex = i;
+            this.props.setCurrentDate(moment(+headers[i].dataset.date));
+        }
+        
+        document.querySelectorAll(".notes-list-item-wrapper")[1].addEventListener("scroll", onScroll);
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
+        let updateFn, diff;
+        if (this.props.settings.notesShowInterval === 0) {
+            updateFn = this.props.updateWeekDatesAndNotes;
+            diff = "week";
+        } else {
+            updateFn = this.props.updateDatesAndNotes;
+            diff = "day";
+        }
+
         if (side === "left") {    
-            let nextDate = moment(this.props.currentDate).add(-1, "day");
-            this.props.setListDate(
+            let nextDate = moment(this.props.currentDate).add(-1, diff);
+            updateFn(
                 nextDate,
-                moment(nextDate).add(-1, "day"),
+                moment(nextDate).add(-1, diff),
                 nextIndex
             )
         } else {   
-            let nextDate = moment(this.props.currentDate).add(1, "day");
-            this.props.setListDate(
+            let nextDate = moment(this.props.currentDate).add(1, diff);
+            updateFn(
                 nextDate,
-                moment(nextDate).add(1, "day"),
+                moment(nextDate).add(1, diff),
                 nextIndex            
             )     
         }
@@ -133,24 +172,30 @@ class NotesList extends PureComponent {
     }
 
     setDate = (date) => {
-        if (this.activePageIndex === 2) {
-            this.props.setDate([
-                moment(date).add(1, "day"),
-                moment(date).add(-1, "day"),
-                moment(date).startOf("day"),
-            ], 2, this.props.settings);
-        } else if (this.activePageIndex === 0) {
-            this.props.setDate([
-                moment(date).startOf("day"),
-                moment(date).add(1, "day"),
-                moment(date).add(-1, "day"),
-            ], 0, this.props.settings);
+        if (this.props.settings.notesShowInterval === 0) {
+            let el = document.querySelectorAll(`[data-date='${date.valueOf()}']`)[1].parentElement.previousElementSibling;
+            let scrollEl = document.querySelectorAll(".notes-list-item-wrapper")[1];
+            scroll.top(scrollEl, el.offsetTop)
         } else {
-            this.props.setDate([
-                moment(date).add(-1, "day"),
-                moment(date).startOf("day"),
-                moment(date).add(1, "day"),
-            ], 1, this.props.settings);
+            if (this.activePageIndex === 2) {
+                this.props.setDatesAndUpdateNotes([
+                    moment(date).add(1, "day"),
+                    moment(date).add(-1, "day"),
+                    moment(date).startOf("day"),
+                ], 2, this.props.settings.notesShowInterval);
+            } else if (this.activePageIndex === 0) {
+                this.props.setDatesAndUpdateNotes([
+                    moment(date).startOf("day"),
+                    moment(date).add(1, "day"),
+                    moment(date).add(-1, "day"),
+                ], 0, this.props.settings.notesShowInterval);
+            } else {
+                this.props.setDatesAndUpdateNotes([
+                    moment(date).add(-1, "day"),
+                    moment(date).startOf("day"),
+                    moment(date).add(1, "day"),
+                ], 1, this.props.settings.notesShowInterval);
+            }
         }
     }
 
@@ -183,10 +228,7 @@ class NotesList extends PureComponent {
                     }
                     {
                         (!this.state.calendar && !this.props.settings.showMiniCalendar) && 
-                        <div
-                            className="current-date-shower"
-                            style={{backgroundColor: this.props.settings.theme.header}}
-                        >
+                        <div className="current-date-shower theme-header-background">
                             {this.props.currentDate.locale("ru").format("dddd, D MMMM")}
                         </div>
                     }
@@ -210,20 +252,37 @@ class NotesList extends PureComponent {
                         key={this.props.notes.length}
                     >
                         {
-                            this.props.notes.map((dayNotes, i) => (
-                                <div 
-                                    className="notes-list-item-wrapper" 
-                                    key={i}
-                                >
-                                    <DayNotesList 
-                                        notes={dayNotes.items} 
-                                        index={i}
-                                        onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                        onItemFinishChange={this.props.setNoteCheckedState}
-                                        onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                    />
-                                </div>
-                            ))
+                            this.props.notes.map((notes, i) => {
+                                if (this.props.settings.notesShowInterval === 0) {
+                                    return (
+                                        <div 
+                                            className="notes-list-item-wrapper" 
+                                            key={i}
+                                        >
+                                            <WeekNotesList 
+                                                notes={notes} 
+                                                onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                                onItemFinishChange={this.props.setNoteCheckedState}
+                                                onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                            />
+                                        </div>
+                                    )
+                                } else {
+                                    return (
+                                        <div 
+                                            className="notes-list-item-wrapper" 
+                                            key={i}
+                                        >
+                                            <DayNotesList 
+                                                notes={notes.items} 
+                                                onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                                onItemFinishChange={this.props.setNoteCheckedState}
+                                                onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                            />
+                                        </div>
+                                    )
+                                }
+                            })
                         }
                     </ReactSwipe>
 
@@ -235,7 +294,6 @@ class NotesList extends PureComponent {
                         <button onClick={this.onEditRequest}>{t("edit")}</button>
                         <button onClick={this.onListItemRemove}>{t("delete")}</button>
                         <button onClick={this.onCopyRequest}>{t("copy")}</button>
-                        
                     </Modal>
 
                     {
@@ -282,7 +340,7 @@ class NotesList extends PureComponent {
 }
 
 function mapStateToProps(state, props) {
-    sort(state.notes, state.settings);
+    // sort(state.notes, state.settings);
 
     return {
         notes: state.notes,

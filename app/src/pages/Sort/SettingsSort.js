@@ -10,28 +10,30 @@ import settingsService from '../../services/settings.service';
 
 import Radio from '../../components/Radio/Radio';
 import Header from '../../components/Header/Header';
-import {SwitchListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";
+import {SwitchListItem, ModalListItem, ValueListItem, ListItem} from "../../components/ListItem/ListItem";
 
 import './SettingsSort.scss';
 
 let sortTypeSettings = settingsService.getSortTypeSettings();
 let sortDirectionSettings = settingsService.getSortDirectionSettings();
+let notesShowIntervalSettings = settingsService.getNotesShowIntervalSettings();
 
 class SettingsSort extends Component {
     componentWillUnmount() {
-        this.props.getNotesByDates(
-            [
-                moment(this.props.currentDate).add(-1, "day"),
-                moment(this.props.currentDate).startOf("day"),
-                moment(this.props.currentDate).add(1, "day")
-            ]
-        ); 
+        // this.props.getNotesByDates(
+        //     [
+        //         moment(this.props.currentDate).add(-1, "day"),
+        //         moment(this.props.currentDate).startOf("day"),
+        //         moment(this.props.currentDate).add(1, "day")
+        //     ]
+        // ); 
     }
 
     render() {
         let {t} = this.props;
         let activeSortType = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type);
-        let activeSortDirection = sortDirectionSettings.find((a) => a.val === this.props.settings.sort.direction);        
+        let activeSortDirection = sortDirectionSettings.find((a) => a.val === this.props.settings.sort.direction);    
+        let activeNotesShowInterval = notesShowIntervalSettings.find((a) => a.val === this.props.settings.notesShowInterval);                
 
         return (
             <div className="page-wrapper">
@@ -83,7 +85,31 @@ class SettingsSort extends Component {
                         text={t("fin-sort")}  
                         checked={this.props.settings.sort.finSort}
                         onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {finSort: e}))}     
-                    />            
+                    />   
+
+                    {
+                        false &&
+                        <ModalListItem
+                            text={t("notes-show-interval")} 
+                            value={t(activeNotesShowInterval.translateId)}
+                            listItem={ValueListItem}
+                        >
+                            <div className="radio-group">
+                                {
+                                    notesShowIntervalSettings.map((setting, i) => (
+                                        <Radio
+                                            key={i}
+                                            name="sort-direction"
+                                            checked={this.props.settings.notesShowInterval === setting.val}
+                                            value={setting.val}
+                                            onChange={(e) => this.props.setSetting("notesShowInterval", +e)}
+                                            text={t(setting.translateId)}
+                                        />
+                                    ))
+                                }
+                            </div>
+                        </ModalListItem>   
+                    }      
                 </div>
             </div>
         );

@@ -12,9 +12,9 @@ class FakeService {
             for (let i of sequence) {     
                 await execureSQL(
                     `INSERT INTO Tasks
-                    (title, startTime, endTime, notificate, tag, dynamicFields, added)
-                    VALUES(?, ?, ?, ?, ?, ?, ?);`,
-                    [new Date(date).toDateString(), +new Date(date + (i * 10000)), +new Date(date + (i * 100000)), 0, "transparent", dynamicDataJson, date]
+                    (title, startTime, endTime, notificate, tag, dynamicFields, added, userId, lastAction)
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                    [new Date(date).toDateString(), +new Date(date + (i * 10000)), +new Date(date + (i * 100000)), 0, "transparent", dynamicDataJson, date, 3, "ADD"]
                 );  
             }
         };

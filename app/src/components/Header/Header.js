@@ -14,11 +14,6 @@ import LeftArrowImg from "../../assets/img/left-arrow.svg";
 import CheckedImg from "../../assets/img/checked.svg";
 import SettimgsImg from "../../assets/img/settings.svg";
 
-function getDayNameFormatted (date) {
-    let day = date.locale("ru").format('dddd');
-    return day[0].toUpperCase() + day.slice(1);
-}
-
 let buttons = {
     "notes": [4, 0, 1],
     "add": [2, 3],  
@@ -27,7 +22,7 @@ let buttons = {
 }
 
 let Header = (props) => (
-    <header style={{backgroundColor: props.settings.theme.header}}>
+    <header className="theme-header-background">
         <div>
             {
                 props.page === "notes" &&
@@ -35,7 +30,7 @@ let Header = (props) => (
                     onClick={props.onSelectToday}
                     className="current-date"
                 >
-                    <span className="day">{getDayNameFormatted(moment())}</span>
+                    <span className="day">{moment(props.currentDate).locale("ru").format('dddd')}</span>
                     <span className="date">{moment().locale("ru").format('D MMMM')}</span> 
                 </div>
             }
@@ -55,7 +50,7 @@ let Header = (props) => (
                         />
                     </button>
                     <div className="current-date">
-                        <span className="day">{getDayNameFormatted(moment(props.currentDate))}</span>
+                        <span className="day">{moment(props.currentDate).locale("ru").format('dddd')}</span>
                         <span className="date">{moment(props.currentDate).locale("ru").format('D MMMM')}</span> 
                     </div>
                 </div>
@@ -80,6 +75,9 @@ let Header = (props) => (
                             </button>
                         )
                     case 1: 
+                        if (props.settings.notesShowInterval === 0) {
+                            return null
+                        } 
                         return (
                             <Link
                                 key={a}                                
@@ -138,7 +136,7 @@ let Header = (props) => (
     </header>
 )
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {      
         settings: state.settings
     }

@@ -6,6 +6,48 @@ import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
 
 class NotesService {
+    async getWeekNotes(date) {
+        let finDate = moment(date).startOf("isoWeek").valueOf() + 604800000;
+
+        let select = await executeSQL(
+            `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
+            FROM Tasks
+            WHERE added >= ? AND added <= ? AND userId = ? AND lastAction != 'DELETE';`, 
+            [date.startOf("isoWeek").valueOf(), finDate, authService.getUserId()]
+        );  
+
+        let notes = [];
+        if (select.rows) {    
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+                item.dynamicFields = JSON.parse(item.dynamicFields);
+                ~item.startTime ? item.startTime = moment(item.startTime) : item.startTime = false;
+                ~item.endTime ? item.endTime = moment(item.endTime) : item.endTime = false;
+                ~item.added ? item.added = moment(item.added) : item.added = false;
+                item.finished = Boolean(item.finished);
+                item.notificate = Boolean(item.notificate);                
+                
+                notes.push(item);
+            }
+        }
+
+        let weekDates = [];
+        for (let i = 1; i < 8; i++) {
+            weekDates.push(moment(date).day(i));
+        }
+
+        let res = weekDates.map((a) => {
+            let msDate = a.valueOf();        
+
+            return {
+                date: a,
+                items: notes.filter((a) => a.added.valueOf() === msDate)
+            }
+        });
+
+        return res;
+    }
+
     async getDayNotes(date) {
         let select = await executeSQL(
             `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
@@ -27,7 +69,6 @@ class NotesService {
         console.log(select1.rows);
 
         let notes = [];
-
         if (select.rows) {    
             for(let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
@@ -48,9 +89,21 @@ class NotesService {
         }
     }
 
-    async getNotesByDates (dates) {
-        let tasks = dates.map((a) => this.getDayNotes(a));
-        return await Promise.all(tasks);
+    async getNotesByDates (dates, period) {
+        // let tasks = dates.map((a) => this.getDayNotes(a));
+        // return await Promise.all(tasks);
+
+        let buf = [];
+        if (period === 0) {
+            for (let i of dates) {
+                buf.push(await this.getWeekNotes(i))
+            }      
+        } else {
+            for (let i of dates) {
+                buf.push(await this.getDayNotes(i))
+            }      
+        }
+        return buf;
     }
 
     async addNote(addedNote) {

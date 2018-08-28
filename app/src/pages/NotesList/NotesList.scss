@@ -22,8 +22,11 @@
         .no-content {
             text-align: center;
             font-size: 1.1em;
-            margin-top: 16px;
+            margin: 16px;
             color: #827777;
+        }
+        .week-header ~ .no-content {
+            margin: 5px;
         }
     }
 
@@ -31,5 +34,27 @@
         padding-bottom: 10px;
         color: #fff;
         text-align: center;
+    }
+
+    .week-header {
+        background: #f3f3f3;
+        display: flex;
+        align-items: center;
+        padding: 7px 10px;
+        position: sticky;
+        top: 0;
+        z-index: 99999;
+
+        img {
+            height: 20px;
+            display: block;
+        }
+
+        span {
+            display: block;
+            line-height: 1;
+            padding-left: 10px;
+            text-transform: capitalize;            
+        }
     }
 }

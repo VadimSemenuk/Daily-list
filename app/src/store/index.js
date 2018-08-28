@@ -7,14 +7,13 @@ import notesService from "../services/notes.service";
 import reducers from '../reducers';
 
 async function initStore (settings) {   
-    let date = moment().startOf('day');
     let notes = await notesService.getNotesByDates(
         [
-            moment(date).add(-1, "day"),
-            moment(date).startOf("day"),
-            moment(date).add(1, "day"),
+            moment().add(-1, "day"),
+            moment().startOf("day"),
+            moment().add(1, "day")
         ],
-        settings
+        settings.notesShowInterval
     );
     let password = !settings.password;
 

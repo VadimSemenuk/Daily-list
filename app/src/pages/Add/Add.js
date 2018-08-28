@@ -12,10 +12,12 @@ import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
+import RemovableImage from "../../components/RemovableImage/RemovableImage";
 
 import tagsService from '../../services/tags.service';
 
 import CameraImg from '../../assets/img/photo-camera.svg';
+import AddGeryImg from '../../assets/img/add-grey.svg';
 
 import './Add.scss';
 
@@ -215,21 +217,12 @@ class Add extends Component {
                                     )
                                 } else if (a.type === "snapshot") {
                                     return (
-                                        <div className="attached-image-wrapper">
-                                            <img 
-                                                onClick={() => this.showImage(i)}
-                                                key={i}
-                                                className="attached-image" 
-                                                src={a.uri} 
-                                                alt="attachment" 
-                                            />
-                                            <button onClick={() => this.onDynamicItemRemove(i)}>
-                                                <img
-                                                    src={require('../../assets/img/remove.png')} 
-                                                    alt="rm"
-                                                />        
-                                            </button>
-                                        </div>
+                                        <RemovableImage 
+                                            key={i}
+                                            src={a.uri}
+                                            onClick={() => this.showImage(i)}
+                                            onRemove={() => this.onDynamicItemRemove(i)}
+                                        />
                                     )
                                 }
                                 return null
@@ -238,14 +231,14 @@ class Add extends Component {
                         <div className="add-actions-wrapper">
                             <button onClick={this.addListItem}>
                                 <img
-                                    src={require('../../assets/img/add-grey.svg')} 
+                                    src={AddGeryImg} 
                                     alt="tf"                                                                
                                 />   
                                 <span>Пункт списка</span>     
                             </button>  
                             <button onClick={this.addInput}>
                                 <img 
-                                    src={require('../../assets/img/add-grey.svg')} 
+                                    src={AddGeryImg} 
                                     alt="lf"                                
                                 />   
                                 <span>Поле</span>     

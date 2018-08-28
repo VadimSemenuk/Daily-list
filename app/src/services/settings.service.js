@@ -19,6 +19,14 @@ let sortDirectionSettings = [{
 
 let fontSizeSettings = [12, 13, 14, 15, 16, 17, 18];
 
+let notesShowIntervalSettings = [{
+    translateId: "notes-show-interval-week",
+    val: 0
+}, {
+    translateId: "notes-show-interval-day",
+    val: 1
+}];
+
 class SetitngsService {
 
     getSortTypeSettings() {
@@ -33,45 +41,42 @@ class SetitngsService {
         return [...fontSizeSettings]
     }
 
+    getNotesShowIntervalSettings() {
+        return [...notesShowIntervalSettings]
+    }
+
     async getSettings () {
         try {
             let select = await executeSQL(
-                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar
+                `SELECT settings
                 FROM Settings;`
             );
+            console.log(select);
 
-            let result = select.rows.item(0);
+            let result = JSON.parse(select.rows.item(0).settings);
 
             return {
-                ...result, 
-                defaultNotification: Boolean(result.defaultNotification),
-                fastAdd: Boolean(result.fastAdd),
+                ...result,
                 theme: themesService.getThemeById(result.theme),
-                sort: JSON.parse(result.sort),
-                showMiniCalendar: Boolean(result.showMiniCalendar)
             }
         } catch (err) {
             console.log('Error: ', err);
         }
     }
 
-    async setSetting (item, value) {  
-        switch(item) {
-            case("theme"): value = value.id; break;
-            case("sort"): value = JSON.stringify(value); break;
-            default: break;
-        }
+    async setSettings (settingName, value, settings) {  
+        settings[settingName] = value;
+        settings.theme = settings.theme.id;
+
         try {
             await executeSQL(
                 `UPDATE Settings 
-                SET ${item} = ?;`, [value]
+                SET settings = ?;`, [JSON.stringify(settings)]
             );
         } catch (err) {
             console.log('Error: ', err);
         }
     }
-
-    getSortTypeSettings
 }
 
 let setitngsService = new SetitngsService();

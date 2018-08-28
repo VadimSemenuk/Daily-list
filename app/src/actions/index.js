@@ -65,9 +65,9 @@ export function updateNote (note) {
     }
 }
 
-export function getNotesByDates (dates, settings) {
+export function getNotesByDates (dates, period) {
     return function(dispatch) {
-        return notesService.getNotesByDates(dates, settings).then((notes) => {
+        return notesService.getNotesByDates(dates, period).then((notes) => {
             dispatch({
                 type: "RECIVE_NOTES",
                 dates,
@@ -78,20 +78,39 @@ export function getNotesByDates (dates, settings) {
 }
 
 // date
-export function setDate (dates, dateIndex, settings) {
+export function setCurrentDate (date) {
+    return {
+        type: "SET_CURRENT_DATE",
+        date
+    }
+}
+
+export function setDatesAndUpdateNotes (dates, dateIndex, period) {
     return function(dispatch) {
-        return notesService.getNotesByDates(dates, settings).then((notes) => dispatch({
-            type: "SET_DATE",
+        return notesService.getNotesByDates(dates, period).then((notes) => dispatch({
+            type: "SET_DATES_AND_UPDATE_NOTES",
             date: dates[dateIndex],
             notes
         }));
     }
 }
 
-export function setListDate (date, preRenderDate, nextIndex) {
+export function updateDatesAndNotes (date, preRenderDate, nextIndex) {
     return function(dispatch) {
         return notesService.getDayNotes(preRenderDate).then((notes) => dispatch({
-            type: "SET_LIST_DATE",
+            type: "UPDATE_DATES_AND_NOTES",
+            notes,
+            nextIndex,
+            date
+        }));
+    }
+}
+
+
+export function updateWeekDatesAndNotes (date, preRenderDate, nextIndex) {
+    return function(dispatch) {
+        return notesService.getWeekNotes(preRenderDate).then((notes) => dispatch({
+            type: "UPDATE_WEEK_DATES_AND_NOTES",
             notes,
             nextIndex,
             date
@@ -101,8 +120,8 @@ export function setListDate (date, preRenderDate, nextIndex) {
 
 // settings
 export function setSetting (settingName, value) {     
-    return function(dispatch) {
-        return settingsService.setSetting(settingName, value).then(() => dispatch({
+    return function(dispatch, getState) {
+        return settingsService.setSettings(settingName, value, getState().settings).then(() => dispatch({
             type: "SET_SETTING",
             settingName,
             value

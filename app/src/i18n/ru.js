@@ -78,6 +78,11 @@ export default {
     "make-shot": "Сделать снимок",
 
 
+    // interface settings page
+    "show-mini-calendar": "Показывать мини-календарь",
+
     // view settings page
-    "show-mini-calendar": "Показывать мини-календарь"
+    "notes-show-interval": "Отображать за период",
+    "notes-show-interval-week": "Неделя",
+    "notes-show-interval-day": "День",    
 }
