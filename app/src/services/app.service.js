@@ -63,7 +63,8 @@ class AppService {
     getDeviceIMEI() {
         return new Promise((resolve, reject) => {
             if (window.cordova) {
-                window.cordova.plugins.IMEI((err, imei) => err ? reject(err) : resolve(imei)) 
+                // window.cordova.plugins.IMEI((err, imei) => err ? reject(err) : resolve(imei)) 
+                resolve("2");
             } else {
                 resolve("2")
             }
