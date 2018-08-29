@@ -14,7 +14,7 @@ import Header from '../../components/Header/Header';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
 
-import tagsService from '../../services/tags.service';
+import notesService from '../../services/notes.service';
 
 import CameraImg from '../../assets/img/photo-camera.svg';
 import AddGeryImg from '../../assets/img/add-grey.svg';
@@ -41,7 +41,7 @@ class Add extends Component {
             calendar: false,
         }
 
-        this.tags = tagsService.getTags();
+        this.tags = notesService.getTags();
     }
 
     componentDidMount() {
@@ -272,7 +272,7 @@ class Add extends Component {
                             settings={this.props.settings}
                         />
                         <ColorPicker 
-                            onSelect={(e) => this.setState({tag: tagsService.getTagByIndex(e.index)})}
+                            onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}
                             value={this.state.tag}
                             colors={this.tags}
                         />

@@ -9,6 +9,8 @@ import WeekDatesRow from "./WeekDatesRow";
 
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
+import calendarService from "../../../services/calendar.service";
+
 export default class LightCalendar extends Component {
     constructor(props) {
         super(props);
@@ -19,13 +21,22 @@ export default class LightCalendar extends Component {
         this.state = {
             weeks,
             msSelectedDate,
-            monthName: this.getMonthName(weeks[1][0], weeks[1][6])
+            monthName: this.getMonthName(weeks[1][0], weeks[1][6]),
+            count: {}
         }
 
         this.activePageIndex = 1;  
         this.prevPageIndex = 1;
 
         this.noSlideEventHandle = false;
+    }
+
+    async componentDidMount() {
+        calendarService.setNotesCountInterval(6);
+        let count = await calendarService.getNotesCount(this.state.msSelectedDate);
+        this.setState({
+            count
+        })
     }
 
     generateWeekDates(weekStartDate) {
@@ -44,7 +55,7 @@ export default class LightCalendar extends Component {
         ]
     }
 
-    onSlideChange = ({index, nextIndex, side}) => {   
+    onSlideChange = async ({index, nextIndex, side}) => {   
         let weeks = this.state.weeks.slice();
 
         if (side === "left") {        
@@ -53,11 +64,14 @@ export default class LightCalendar extends Component {
             weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(1, 'week'));
         }
 
+        let count = await calendarService.updateNotesCountData(weeks[nextIndex][0]);
+
         let monthName = this.getMonthName(weeks[index][0], weeks[index][6]);
         
         this.setState({
             weeks,
-            monthName
+            monthName,
+            count
         })
     }
 
@@ -80,7 +94,7 @@ export default class LightCalendar extends Component {
         this.props.onDateSet(moment(date));
     }
 
-    componentWillReceiveProps(nextProps) {
+    async componentWillReceiveProps(nextProps) {
         let msSelectedWeekStartDate = moment(nextProps.currentDate).startOf('isoWeek').valueOf();
 
         if (msSelectedWeekStartDate === this.state.weeks[this.activePageIndex][0].valueOf()) {
@@ -116,12 +130,15 @@ export default class LightCalendar extends Component {
                 this.sliderRef.prev();
             }
 
+            let count = await calendarService.getNotesCount(currentWeekStartDate);
+
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
 
             this.setState({
                 weeks,
                 msSelectedDate: nextProps.currentDate.valueOf(),
-                monthName
+                monthName,
+                count
             })
         }
     }
@@ -161,10 +178,11 @@ export default class LightCalendar extends Component {
                         this.state.weeks.map((week, i) => {
                             return (
                                 <div key={i}>
-                                    <WeekDatesRow 
+                                    <WeekDatesRow
                                         week={week} 
                                         msSelectedDate={this.state.msSelectedDate}
                                         onSelect={this.setDate} 
+                                        count={this.state.count}
                                     />
                                 </div>
                             )

@@ -120,8 +120,8 @@ export function updateWeekDatesAndNotes (date, preRenderDate, nextIndex) {
 
 // settings
 export function setSetting (settingName, value) {     
-    return function(dispatch, getState) {
-        return settingsService.setSettings(settingName, value, getState().settings).then(() => dispatch({
+    return function(dispatch) {
+        return settingsService.setSetting(settingName, value).then(() => dispatch({
             type: "SET_SETTING",
             settingName,
             value

@@ -5,6 +5,7 @@ import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 
 import AlarmImg from '../../../assets/img/alarm.svg';
+import MoreImg from "../../../assets/img/more.svg";
 
 import './ListItem.scss';
 
@@ -123,7 +124,7 @@ export default class Note extends PureComponent {
                 <div className="more-button">
                     <button onClick={this.onItemActionsWindowRequest}>                             
                         <img
-                            src={require("../../../assets/img/more.svg")}
+                            src={MoreImg}
                             alt="more"
                         />
                     </button>

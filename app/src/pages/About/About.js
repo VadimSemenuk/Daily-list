@@ -61,10 +61,6 @@ class About extends Component {
                         text={t("star-app")}
                         onClick={this.launthMarket}  
                     />
-                    <InsetListItem 
-                        text={t("share-app")}
-                        onClick={this.share}  
-                    /> 
                     <TriggerListItem text={t("resources")}>
                         <div>
                             <strong>{t("graphics")}</strong>
@@ -80,11 +76,6 @@ class About extends Component {
                     </TriggerListItem>
 
                     <span className="list-items-block-header">{t("issues")}</span>
-
-                    <InsetListItem 
-                        text={t("previous-version")}
-                        onClick={this.getPreviousVersion}
-                    />
 
                     <TriggerListItem text={t("no-notification")}>
                         <div className="issue-wrapper">
