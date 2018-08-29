@@ -182,7 +182,7 @@ class NotesService {
                 note.userId,
                 note.isSynced,
                 note.isLastActionSynced,
-                "any"
+                "no-repeat"
             ]
         ).catch((err) => console.warn(err));
 

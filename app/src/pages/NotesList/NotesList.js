@@ -8,7 +8,6 @@ import scroll from "scroll";
 import debounce from "debounce";
 
 import synchronizationService from '../../services/synchronization.service';
-import appService from "../../services/app.service";
 import authService from "../../services/auth.service";
 
 import FastAdd from '../../components/FastAdd/FastAdd';
@@ -47,7 +46,7 @@ class NotesList extends PureComponent {
 
     async componentDidMount() {
         // this.props.triggerSynchronizationLoader(true);
-        // let deviceIMEI = await appService.getDeviceIMEI();
+        // let deviceIMEI = window.DEVICE_IMEI;
         // let userId = authService.getUserId();
 
         // let newNotes = await synchronizationService.getNewNotes(deviceIMEI, userId);

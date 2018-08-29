@@ -10,7 +10,6 @@ import i18n from "./i18n";
 import Root from "./Root";
 
 import DB from './db/db';
-import appService from './services/app.service';
 import migrationService from './services/migration/migration.service';
 import settingsService from "./services/settings.service";
 import themesService from "./services/themes.service";
@@ -38,7 +37,7 @@ export default class App extends Component {
 
         await this.initDb();       
         await this.initSettings();
-        window.DEVICE_IMEI = await appService.getDeviceIMEI();
+        window.DEVICE_IMEI = "1";
         store = await initStore(this.state.settings);
         this.setState({
             appReady: true

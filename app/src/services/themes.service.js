@@ -125,6 +125,9 @@ class ThemesService {
             .theme-header-border {
                 border-color: ${theme.header};
             }
+            .page-content {
+                background: ${theme.body}
+            }
         `
     }
 }
