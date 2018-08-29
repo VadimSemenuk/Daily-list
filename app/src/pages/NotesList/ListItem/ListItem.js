@@ -66,74 +66,76 @@ export default class Note extends PureComponent {
                     style={{backgroundColor: this.props.itemData.tag}} 
                     className="tag"
                 ></div>
-                <div className="note-header">
-                    <div className="note-header-time-wrapper">
-                        {this.props.itemData.startTime && <span>{getTime(this.props.itemData.startTime)}</span>} 
-                        {this.props.itemData.endTime && <span className="divider">-</span>}
-                        {this.props.itemData.endTime && <span>{getTime(this.props.itemData.endTime)}</span>}                                                    
+                <div className="note-content">
+                    <div className="note-header">
+                        <div className="note-header-time-wrapper">
+                            {this.props.itemData.startTime && <span>{getTime(this.props.itemData.startTime)}</span>} 
+                            {this.props.itemData.endTime && <span className="divider">-</span>}
+                            {this.props.itemData.endTime && <span>{getTime(this.props.itemData.endTime)}</span>}                                                    
+                        </div>
+                        {
+                            this.props.itemData.notificate &&
+                            <img 
+                                className="notification-identifier"
+                                src={AlarmImg}
+                                alt="notify"
+                            />
+                        }                                     
                     </div>
+                    {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
                     {
-                        this.props.itemData.notificate &&
-                        <img 
-                            className="notification-identifier"
-                            src={AlarmImg}
-                            alt="notify"
-                        />
-                    }                                     
-                </div>
-                {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
-                {
-                    this.props.itemData.dynamicFields.map((a, i) => {
-                        if (a && a.type === "text") {
-                            return (
-                                <div 
-                                    className="item-data-text" 
-                                    key={i}
-                                >{a.value}</div>
-                            )
-                        } else if (a && a.type === "listItem") {
-                            return (
-                                <TextCheckBox 
-                                    key={i} 
-                                    id={i}
-                                    textValue={a.value}
-                                    checkBoxValue={a.checked}
-                                    onValueChange={this.onDynaicFieldChange}
-                                />
-                            )
-                        } else if (a && a.type === "snapshot") {
-                            if (this.state.expanded) {
+                        this.props.itemData.dynamicFields.map((a, i) => {
+                            if (a && a.type === "text") {
                                 return (
-                                    <img 
-                                        onClick={this.showImage}
+                                    <div 
+                                        className="item-data-text" 
                                         key={i}
-                                        className="attached-image" 
-                                        src={a.uri} 
-                                        alt="attachment" 
+                                    >{a.value}</div>
+                                )
+                            } else if (a && a.type === "listItem") {
+                                return (
+                                    <TextCheckBox 
+                                        key={i} 
+                                        id={i}
+                                        textValue={a.value}
+                                        checkBoxValue={a.checked}
+                                        onValueChange={this.onDynaicFieldChange}
                                     />
                                 )
-                            } else {
-                                return (
-                                    <span key={i} className="attached-image-label">Прикрепленное изображение</span>
-                                )
+                            } else if (a && a.type === "snapshot") {
+                                if (this.state.expanded) {
+                                    return (
+                                        <img 
+                                            onClick={this.showImage}
+                                            key={i}
+                                            className="attached-image" 
+                                            src={a.uri} 
+                                            alt="attachment" 
+                                        />
+                                    )
+                                } else {
+                                    return (
+                                        <span key={i} className="attached-image-label">Прикрепленное изображение</span>
+                                    )
+                                }
                             }
-                        }
-                        return null
-                    })
-                }
-                <div className="more-button">
-                    <button onClick={this.onItemActionsWindowRequest}>                             
-                        <img
-                            src={MoreImg}
-                            alt="more"
+                            return null
+                        })
+                    }
+                    <div className="more-button">
+                        <button onClick={this.onItemActionsWindowRequest}>                             
+                            <img
+                                src={MoreImg}
+                                alt="more"
+                            />
+                        </button>
+                    </div>
+                    <div className="note-finish-checkbox">
+                        <CustomCheckBox
+                            checked={this.props.itemData.finished}
+                            onChange={this.onItemFinishChange}
                         />
-                    </button>
-                </div>
-                <div className="note-finish-checkbox">
-                    <CustomCheckBox
-                        checked={this.props.itemData.finished}
-                        onChange={this.onItemFinishChange}
-                    />
+                    </div>
                 </div>
             </div>
         )

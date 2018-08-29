@@ -9,19 +9,20 @@
 
 .light-checkbox-wrapper .light-checkbox {
     position: relative;
-    height: 20px;
-    width: 20px;
+    height: 22px;
+    width: 22px;
 }
 .light-checkbox-wrapper .light-checkbox:before {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     background: transparent;
     border: 1px solid #c7c7cd;
-    border-radius: 20px;
+    border-radius: 22px;
     left: 0;
     top: 0;
+    box-sizing: border-box;
 }
 .light-checkbox.active:before {
     background: #414040;
@@ -30,16 +31,17 @@
 .light-checkbox:after {
     content: '';
     position: absolute;
-    top: 7px;
-    left: 5px;
-    width: 10px;
-    height: 4px;
+    top: 8px;
+    left: 6px;
+    width: 11px;
+    height: 5px;
     background: transparent;
     border: 1px solid #fff;
     border-top: none;
     border-right: none;
     transform: rotate(-45deg);
     opacity: 0;
+    box-sizing: border-box;
 }
 .light-checkbox.active:after {
     opacity: 1;

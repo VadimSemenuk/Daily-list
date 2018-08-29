@@ -38,7 +38,7 @@ export let ButtonListItem = (props) => (
         onClick={props.onClick}                                
     >
         <span className="list-item-text">{props.text}</span>
-        <props.ValElement />
+        {props.ValElement && <props.ValElement />}
     </button>
 )
 
@@ -54,7 +54,7 @@ export let ListItem = (props) => (
 
 export let ValueListItem = (props) => (
     <button 
-        className={`list-item trigger-list-item ${props.triggerValue ? " active" : ""}`}
+        className={`list-item trigger-list-item ${props.triggerValue ? " active" : ""}  ${props.className}`}
         onClick={props.onClick}                                
     >
         <span className="list-item-text">{props.text}</span>

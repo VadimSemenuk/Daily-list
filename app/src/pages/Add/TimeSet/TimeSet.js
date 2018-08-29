@@ -141,7 +141,7 @@ class TimeSet extends Component {
                 />
 
                 <ModalListItem
-                    innerClassName="actions-modal-inner"
+                    className="tiny"
                     text={t("repeat-type")} 
                     value={t(selectedRepeatTypeOption.translateId)}
                     listItem={ValueListItem}

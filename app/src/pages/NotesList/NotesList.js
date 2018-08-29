@@ -18,6 +18,7 @@ import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
 import Modal from '../../components/Modal/Modal';
 import Fab from '../../components/Fab/Fab';
+import {ButtonListItem} from "../../components/ListItem/ListItem";
 
 import * as AppActions from '../../actions'; 
 
@@ -288,11 +289,22 @@ class NotesList extends PureComponent {
                     <Modal 
                         isOpen={this.state.listItemDialogVisible ? true : false} 
                         onRequestClose={this.closeDialog}
-                        innerClassName="actions-modal-inner"
                     >
-                        <button onClick={this.onEditRequest}>{t("edit")}</button>
-                        <button onClick={this.onListItemRemove}>{t("delete")}</button>
-                        <button onClick={this.onCopyRequest}>{t("copy")}</button>
+                        <ButtonListItem
+                            className="no-border"
+                            text={t("edit")}
+                            onClick={this.onEditRequest}
+                        />
+                        <ButtonListItem
+                            className="no-border"
+                            text={t("delete")}
+                            onClick={this.onListItemRemove}
+                        />
+                        <ButtonListItem
+                            className="no-border"
+                            text={t("copy")}
+                            onClick={this.onCopyRequest}
+                        />
                     </Modal>
 
                     {
@@ -338,8 +350,8 @@ class NotesList extends PureComponent {
     }
 }
 
-function mapStateToProps(state, props) {
-    // sort(state.notes, state.settings);
+function mapStateToProps(state) {
+    sort(state.notes, state.settings);
 
     return {
         notes: state.notes,

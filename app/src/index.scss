@@ -148,7 +148,7 @@ input,
 textarea {
     border: none;
     border-bottom: 1px solid #e0d9d9;
-    padding: 10px 5px;
+    padding: 13px 5px;
     display: block;
     outline: none;
     width: 100%;
@@ -206,4 +206,8 @@ select {
     padding: 10px;
     padding-bottom: 0;
     color: #868383;
+}
+
+.ReactModal__Body--open #root {
+    filter: blur(1px);
 }

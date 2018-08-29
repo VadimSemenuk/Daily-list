@@ -23,18 +23,4 @@
     .modal-inner {
         padding: 11px 16px;
     }
-
-    .actions-modal-inner {
-        button {
-            font-size: 1em;
-            width: 100%;
-            text-align: left;
-            justify-content: flex-start;
-            height: 46px;
-            border-bottom: 1px solid #eceaea;
-        }
-        button:last-of-type {
-            border: none;
-        }
-    }
 }

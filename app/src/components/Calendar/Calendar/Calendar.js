@@ -187,7 +187,7 @@ export default class Calendar extends Component {
                 nextDate = prevMonthStartDate;
             }        
 
-            let count = await calendarService.updateNotesCountData(nextDate.valueOf());
+            let count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
 
             this.setState({
                 monthes,

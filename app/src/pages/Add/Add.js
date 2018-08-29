@@ -6,7 +6,7 @@ import {translate} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
-import {ModalListItem} from "../../components/ListItem/ListItem";
+import {ModalListItem, ButtonListItem} from "../../components/ListItem/ListItem";
 import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/RemovableTextCheckBox';
 import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
@@ -246,7 +246,6 @@ class Add extends Component {
                             </button>  
 
                             <ModalListItem
-                                innerClassName="actions-modal-inner"
                                 listItem={(props) => (
                                     <button 
                                         onClick={props.onClick}
@@ -259,12 +258,24 @@ class Add extends Component {
                                     </button> 
                                 )}
                             >
-                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}>{t("open-galery")}</button>
-                                <button onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}>{t("make-shot")}</button>  
+                                <ButtonListItem
+                                    className="no-border"
+                                    text={t("open-galery")}
+                                    onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}
+                                />
+
+                                <ButtonListItem
+                                    className="no-border"
+                                    text={t("make-shot")}
+                                    onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}
+                                />
                             </ModalListItem>
                         </div>
                     </div>
-                    <div className="add-additionals-wrapper hide-with-active-keyboard">
+                    <div 
+                        className="add-additionals-wrapper hide-with-active-keyboard" 
+                        style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
+                    >
                         <TimeSet
                             onStateChange={(time) => this.setState({...time})} 
                             notificate={this.state.notificate}

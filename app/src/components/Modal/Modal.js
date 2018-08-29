@@ -10,11 +10,11 @@ export default class CustomModal extends Component {
         }
     }
 
-    componentDidUpdate(prevState) {
+    componentDidUpdate() {
         if (this.props.isOpen) {
             this.setBackButtonEventHandler();   
         } else {
-            this.removeBackButtonEventHandler();               
+            this.removeBackButtonEventHandler();  
         }
     }
 

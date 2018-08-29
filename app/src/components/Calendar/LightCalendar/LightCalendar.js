@@ -134,7 +134,7 @@ export default class LightCalendar extends Component {
                 nextDate = prevWeekStartDate;
             }
 
-            let count = await calendarService.updateNotesCountData(nextDate.valueOf());
+            let count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
 
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
 
