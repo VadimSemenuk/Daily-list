@@ -82,7 +82,6 @@ class NotesService {
                 (t.repeatType = "no-repeat" OR (t.repeatType = "week" AND rep.value = 2) OR (t.repeatType = "any" AND rep.value = ?));`, 
             [authService.getUserId(), date.valueOf()]
         );   
-        console.log(select1.rows);
 
         let notes = [];
         if (select.rows) {    
@@ -401,6 +400,21 @@ class NotesService {
 
     getTagByIndex(index) {
         return tags[index];
+    }
+    
+    getRepeatTypeOptions() {
+        return [{ 
+            val: "no-repeat", 
+            translateId: "repeat-type-no-repeat" 
+        }, 
+        { 
+            val: "week",
+            translateId: "repeat-type-week" 
+        }, 
+        { 
+            val: "any",
+            translateId: "repeat-type-any" 
+        }]
     }
 }
 

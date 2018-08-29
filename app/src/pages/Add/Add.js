@@ -37,6 +37,7 @@ class Add extends Component {
             tag: 'transparent',
             added: this.props.date,
             finished: false,
+            repeatType: "no-repeat",
 
             calendar: false,
         }
@@ -270,6 +271,7 @@ class Add extends Component {
                             startTime={this.state.startTime}
                             endTime={this.state.endTime}
                             settings={this.props.settings}
+                            repeatType={this.state.repeatType}
                         />
                         <ColorPicker 
                             onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}

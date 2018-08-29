@@ -2,7 +2,10 @@ import React, {Component} from 'react';
 import moment from 'moment';
 import {translate} from "react-i18next";
 
-import {SwitchListItem, ListItem} from "../../../components/ListItem/ListItem";
+import {SwitchListItem, ListItem, ModalListItem, ValueListItem} from "../../../components/ListItem/ListItem";
+import Radio from '../../../components/Radio/Radio';
+
+import notesService from '../../../services/notes.service';
 
 import RemoveImg from '../../../assets/img/remove.png';
 
@@ -68,8 +71,14 @@ class TimeSet extends Component {
         })
     }
 
+    onRepeatSet = (e) => {
+        console.log(e);
+    }
+
     render() {  
         let {t} = this.props;
+        let repeatTypeOptions = notesService.getRepeatTypeOptions();
+        let selectedRepeatTypeOption = repeatTypeOptions.find((a) => a.val === this.props.repeatType);
         
         return (
             <div className="set-time-wrapper">
@@ -130,6 +139,28 @@ class TimeSet extends Component {
                     onChange={this.onNotificateChange} 
                     disabled={!this.props.startTime}  
                 />
+
+                <ModalListItem
+                    innerClassName="actions-modal-inner"
+                    text={t("repeat-type")} 
+                    value={t(selectedRepeatTypeOption.translateId)}
+                    listItem={ValueListItem}
+                >
+                    <div className="radio-group">
+                        {
+                            repeatTypeOptions.map((setting, i) => (
+                                <Radio
+                                    key={i}
+                                    name="repeat-type"
+                                    checked={this.props.repeatType === setting.val}
+                                    value={setting.val}
+                                    onChange={this.onRepeatSet}
+                                    text={t(setting.translateId)}
+                                />
+                            ))
+                        }
+                    </div>
+                </ModalListItem>
             </div>
         )
     }

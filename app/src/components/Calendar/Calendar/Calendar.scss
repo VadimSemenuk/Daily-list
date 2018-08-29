@@ -55,6 +55,19 @@
                 opacity: 1;            
             }
         }
+
+        .count {
+            position: absolute;
+            top: 0px;
+            right: 1px;
+            background: #ce4747;
+            width: 15px;
+            height: 15px;
+            padding-top: 1px;
+            font-size: 12px;
+            border-radius: 15px;
+            box-sizing: border-box;
+        }
     }
 }
 

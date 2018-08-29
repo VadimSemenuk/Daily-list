@@ -9,6 +9,8 @@ import WeekDays from "./WeekDays";
 
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
+import { monthCalendarService as calendarService } from "../../../services/calendar.service";
+
 export default class Calendar extends Component {
     constructor(props) {
         super(props);
@@ -21,7 +23,8 @@ export default class Calendar extends Component {
             currentMonthStartDate,
             msSelectedDate,
             msSelectedDates: [msSelectedDate],
-            mode: this.props.mode || "default"
+            mode: this.props.mode || "default",
+            count: {}
         }
 
         this.activePageIndex = 1;  
@@ -30,15 +33,21 @@ export default class Calendar extends Component {
         this.noSlideEventHandle = false;
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest)
+
+        calendarService.setNotesCountInterval(4);
+        let count = await calendarService.getNotesCount(this.state.msSelectedDate);
+        this.setState({
+            count
+        })
     }   
 
     componentWillUnmount() {
         document.querySelector(".notes-list-swiper").removeEventListener("click", this.props.onCloseRequest)
     }
 
-    onSlideChange = ({index, nextIndex, side}) => {   
+    onSlideChange = async ({index, nextIndex, side}) => {   
         let nextMonthes = this.state.monthes.slice();
         let nextCurrentMonthStartDate;
         
@@ -50,9 +59,12 @@ export default class Calendar extends Component {
             nextMonthes[nextIndex] = this.getMonthDays(moment(nextCurrentMonthStartDate).add(1, 'month'));  
         }
 
+        let count = (await calendarService.updateNotesCountData(nextCurrentMonthStartDate.valueOf())) || this.state.count;        
+
         this.setState({
             monthes: nextMonthes,
-            currentMonthStartDate: nextCurrentMonthStartDate
+            currentMonthStartDate: nextCurrentMonthStartDate,
+            count
         })
     }
 
@@ -133,7 +145,7 @@ export default class Calendar extends Component {
         this.onSlideChange(action);
     }
 
-    componentWillReceiveProps(nextProps) {        
+    async componentWillReceiveProps(nextProps) {        
         let msSelectedDate = moment(nextProps.currentDate).startOf("day").valueOf();
         let currentMonthStartDate = moment(msSelectedDate).startOf("month");       
 
@@ -146,6 +158,8 @@ export default class Calendar extends Component {
 
             let prevMonthStartDate = moment(currentMonthStartDate).subtract(1, 'week');
             let nextMonthStartDate = moment(currentMonthStartDate).add(1, 'week');
+            
+            let nextDate;
 
             if (currentMonthStartDate.valueOf() > this.state.currentMonthStartDate.valueOf()) {
                 if (this.activePageIndex === 2) {
@@ -158,6 +172,7 @@ export default class Calendar extends Component {
 
                 this.noSlideEventHandle = true;
                 this.sliderRef.next();
+                nextDate = nextMonthStartDate;
             } else {
                 if (this.activePageIndex === 2) {
                     monthes = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
@@ -168,13 +183,17 @@ export default class Calendar extends Component {
                 }  
 
                 this.noSlideEventHandle = true;
-                this.sliderRef.prev();            
+                this.sliderRef.prev();     
+                nextDate = prevMonthStartDate;
             }        
+
+            let count = await calendarService.updateNotesCountData(nextDate.valueOf());
 
             this.setState({
                 monthes,
                 currentMonthStartDate,
-                msSelectedDate
+                msSelectedDate,
+                count
             })
         }
     }
@@ -210,6 +229,7 @@ export default class Calendar extends Component {
                                         msSelectedDate={this.state.msSelectedDate}
                                         msSelectedDates={this.state.msSelectedDates}
                                         onSelect={this.onDateSet}
+                                        count={this.state.count}
                                     /> 
                                 </div>  
                             )

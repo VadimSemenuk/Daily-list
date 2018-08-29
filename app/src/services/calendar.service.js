@@ -3,14 +3,18 @@ import authService from "./auth.service";
 import moment from 'moment';
 
 class CalendarService {
+    constructor(period) {
+        this.period = period;
+    }
+
     interval = 10;
     halfInterval = this.interval / 2;
     intervalStartDate = null;
     intervalEndDate = null;
 
     async getNotesCount(date) {
-        let intervalStartDate = moment(date).startOf("week").subtract(this.halfInterval, "week").valueOf();
-        let intervalEndDate = moment(date).startOf("week").add(this.halfInterval, "week").valueOf();
+        let intervalStartDate = moment(date).startOf(this.period).subtract(this.halfInterval, this.period).valueOf();
+        let intervalEndDate = moment(date).startOf(this.period).add(this.halfInterval, this.period).valueOf();
 
         let select = await executeSQL(
             `SELECT COUNT(*) as count, added FROM Tasks
@@ -32,9 +36,9 @@ class CalendarService {
     }
 
     async updateNotesCountData(nextDate) {
-        if (nextDate >= this.intervalEndDate) {
-            return this.getNotesCount(nextDate, 6);
-        }
+        if (nextDate >= this.intervalEndDate || nextDate <= this.intervalStartDate) {
+            return this.getNotesCount(nextDate);
+        };
 
         return false;
     }
@@ -45,6 +49,10 @@ class CalendarService {
     }
 }
 
-let calendarService = new CalendarService();
+let weekCalendarService = new CalendarService("week");
+let monthCalendarService = new CalendarService("month");
 
-export default calendarService;
+export {
+    weekCalendarService,
+    monthCalendarService
+}

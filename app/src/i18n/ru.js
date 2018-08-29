@@ -76,6 +76,10 @@ export default {
     "time": "Время",
     "open-galery": "Открыть галерею",
     "make-shot": "Сделать снимок",
+    "repeat-type": "Повторять",
+    "repeat-type-no-repeat": "Каждый день",
+    "repeat-type-week": "Каждую неделю",
+    "repeat-type-any": "Выбрать даты",
 
 
     // interface settings page
