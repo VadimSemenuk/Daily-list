@@ -173,9 +173,10 @@ class Add extends Component {
                 }
                 <div className="add-wrapper page-content">
                     <div className="add-content-wrapper">
-                        <input 
+                        <input
+                            className="title"
                             type="text" 
-                            placeholder="Заголовок"
+                            placeholder={t("input-placeholder-title")}
                             value={this.state.title}
                             onChange={(e) => this.setState({title: e.target.value})}
                         />
@@ -187,7 +188,7 @@ class Add extends Component {
                                     return (
                                         <Textarea
                                             type="text"
-                                            placeholder="Описание"
+                                            placeholder={t("input-placeholder-text")}
                                             key={i} 
                                             onChange={(e) => {
                                                 let dynamicFields = this.state.dynamicFields.slice()

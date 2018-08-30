@@ -60,7 +60,7 @@ export default {
     "share-content": "Ежедневник - заметки и напоминания в удобном виде",
 
     // fast-add field
-    "description": "Описание",
+    "description": "Текст...",
  
     // notes list page
     "no-content": "Нет записей",
@@ -69,6 +69,9 @@ export default {
     "copy": "Копировать",
 
     // -------------------------
+
+    // settings page
+    "default-notification": "Автоматически добавлять уведомление",
 
     // add
     "notify": "Напомнить",
@@ -80,6 +83,8 @@ export default {
     "repeat-type-no-repeat": "Каждый день",
     "repeat-type-week": "Каждую неделю",
     "repeat-type-any": "Выбрать даты",
+    "input-placeholder-title": "Заголовок",
+    "input-placeholder-text": "Текст",
 
 
     // interface settings page
