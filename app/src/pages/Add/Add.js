@@ -278,12 +278,12 @@ class Add extends Component {
                         style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
                     >
                         <TimeSet
-                            onStateChange={(time) => this.setState({...time})} 
                             notificate={this.state.notificate}
                             startTime={this.state.startTime}
                             endTime={this.state.endTime}
                             settings={this.props.settings}
                             repeatType={this.state.repeatType}
+                            onStateChange={(time) => this.setState({...time})} 
                         />
                         <ColorPicker 
                             onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}

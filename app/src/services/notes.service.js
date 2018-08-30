@@ -65,23 +65,32 @@ class NotesService {
     }
 
     async getDayNotes(date) {
-        let select = await executeSQL(
+        let select1 = await executeSQL(
             `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
             FROM Tasks
             WHERE added = ? AND userId = ? AND lastAction != 'DELETE' AND repeatType = "no-repeat";`, 
             [date.valueOf(), authService.getUserId()]
         );              
 
-        let select1 = await executeSQL(
-            `SELECT t.id
+        let select = await executeSQL(
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE 
                 t.userId = ? AND 
                 t.lastAction != 'DELETE' AND 
-                (t.repeatType = "no-repeat" OR (t.repeatType = "week" AND rep.value = 2) OR (t.repeatType = "any" AND rep.value = ?));`, 
-            [authService.getUserId(), date.valueOf()]
+                (
+                    (t.repeatType = "no-repeat" AND added = ?) OR 
+                    (t.repeatType) = "day" OR 
+                    (t.repeatType = "week" AND rep.value = ?) OR 
+                    (t.repeatType = "any" AND rep.value = ?)
+                );`, 
+            [authService.getUserId(), date.valueOf(), date.isoWeekday(), date.valueOf()]
         );   
+        console.log(date)
+        console.log(date.isoWeekday());
+        console.log(date.date());
+        console.log("-------");
 
         let notes = [];
         if (select.rows) {    
@@ -105,20 +114,9 @@ class NotesService {
     }
 
     async getNotesByDates (dates, period) {
-        // let tasks = dates.map((a) => this.getDayNotes(a));
-        // return await Promise.all(tasks);
-
-        let buf = [];
-        if (period === 0) {
-            for (let i of dates) {
-                buf.push(await this.getWeekNotes(i))
-            }      
-        } else {
-            for (let i of dates) {
-                buf.push(await this.getDayNotes(i))
-            }      
-        }
-        return buf;
+        let fn = period === 0 ? this.getWeekNotes : this.getDayNotes;
+        let tasks = dates.map((a) => fn(a));
+        return await Promise.all(tasks);
     }
 
     async addNote(addedNote) {
@@ -181,19 +179,28 @@ class NotesService {
                 note.userId,
                 note.isSynced,
                 note.isLastActionSynced,
-                "no-repeat"
+                note.repeatType
             ]
         ).catch((err) => console.warn(err));
 
-        await executeSQL(
-            `INSERT INTO TasksRepeatValues
-            (taskId, value)
-            VALUES(?, ?);`,
-            [
-                insert.insertId,
-                note.added
-            ]
-        ).catch((err) => console.warn(err));
+        let tasksRepeatValue =  null;
+        if (note.repeatType === "week") {
+            tasksRepeatValue = moment(note.added).isoWeekday();
+        } else if (note.repeatType === "any") {
+            tasksRepeatValue = note.added;
+        }
+
+        if (tasksRepeatValue !== null) {
+            await executeSQL(
+                `INSERT INTO TasksRepeatValues
+                (taskId, value)
+                VALUES(?, ?);`,
+                [
+                    insert.insertId,
+                    tasksRepeatValue
+                ]
+            ).catch((err) => console.warn(err));
+        }
         
         return insert;
     }
@@ -406,6 +413,10 @@ class NotesService {
         return [{ 
             val: "no-repeat", 
             translateId: "repeat-type-no-repeat" 
+        }, 
+        { 
+            val: "day", 
+            translateId: "repeat-type-day" 
         }, 
         { 
             val: "week",

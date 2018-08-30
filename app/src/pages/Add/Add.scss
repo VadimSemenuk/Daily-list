@@ -58,6 +58,7 @@
         background: #fcfcfc;
         border-radius: 3px;
         margin: 6px;
+        transition: 200ms ease all;
 
         &.hidden {
             display: none;

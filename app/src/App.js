@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import {Provider} from "react-redux";
 import initStore from "./store";
-import 'moment/locale/ru';
 import {BeatLoader} from 'react-spinners';
 import {I18nextProvider} from "react-i18next";
 

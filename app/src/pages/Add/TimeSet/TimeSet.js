@@ -72,7 +72,9 @@ class TimeSet extends Component {
     }
 
     onRepeatSet = (e) => {
-        console.log(e);
+        this.props.onStateChange({
+            repeatType: e             
+        })
     }
 
     render() {  
