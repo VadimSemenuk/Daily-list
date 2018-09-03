@@ -18,11 +18,13 @@ export default class Calendar extends Component {
         let msSelectedDate = moment(this.props.currentDate).startOf("day").valueOf();
         let currentMonthStartDate = moment(msSelectedDate).startOf("month");        
 
+        console.log(this.props.msSelectedDates)
+
         this.state = {
             monthes: this.getMonthes(currentMonthStartDate),
             currentMonthStartDate,
             msSelectedDate,
-            msSelectedDates: [msSelectedDate],
+            msSelectedDates: this.props.msSelectedDates.length ? this.props.msSelectedDates : [msSelectedDate],
             mode: this.props.mode || "default",
             count: {}
         }
@@ -122,7 +124,8 @@ export default class Calendar extends Component {
             this.setState({
                 msSelectedDates
             })
-            // this.props.onDatesSet(msSelectedDates);
+
+            this.props.onDatesSet(msSelectedDates);
         } else {
             if (!active) {
                 this.setState({
@@ -205,7 +208,7 @@ export default class Calendar extends Component {
     render() {
         return (
             <div className="calendar-wrapper theme-header-background theme-header-border">
-                <div className="calendar-month-name">{this.state.currentMonthStartDate.locale("ru").format("MMMM")}</div>
+                <div className="calendar-month-name">{this.state.currentMonthStartDate.format("MMMM")}</div>
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}
@@ -230,6 +233,7 @@ export default class Calendar extends Component {
                                         msSelectedDates={this.state.msSelectedDates}
                                         onSelect={this.onDateSet}
                                         count={this.state.count}
+                                        mode={this.state.mode}
                                     /> 
                                 </div>  
                             )

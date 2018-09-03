@@ -65,13 +65,6 @@ class NotesService {
     }
 
     async getDayNotes(date) {
-        let select1 = await executeSQL(
-            `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
-            FROM Tasks
-            WHERE added = ? AND userId = ? AND lastAction != 'DELETE' AND repeatType = "no-repeat";`, 
-            [date.valueOf(), authService.getUserId()]
-        );              
-
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced
             FROM Tasks t
@@ -81,16 +74,12 @@ class NotesService {
                 t.lastAction != 'DELETE' AND 
                 (
                     (t.repeatType = "no-repeat" AND added = ?) OR 
-                    (t.repeatType) = "day" OR 
+                    t.repeatType = "day" OR 
                     (t.repeatType = "week" AND rep.value = ?) OR 
                     (t.repeatType = "any" AND rep.value = ?)
                 );`, 
             [authService.getUserId(), date.valueOf(), date.isoWeekday(), date.valueOf()]
         );   
-        console.log(date)
-        console.log(date.isoWeekday());
-        console.log(date.date());
-        console.log("-------");
 
         let notes = [];
         if (select.rows) {    
@@ -140,23 +129,18 @@ class NotesService {
             lastAction: "ADD",
             userId: authService.getUserId(),
             isLastActionSynced: 0,
-            isSynced: 0            
-        }
-
-        let inserted = await this.insertNote(noteToLocalInsert);
-        if (!inserted) {
-            return
-        }
-
-        if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
-            this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(inserted.insertId));
-        }
-
-        return {
-            ...addedNote,
-            key: inserted.insertId,
+            isSynced: 0,        
             uuid: noteUUID
         }
+
+        let note = await this.insertNote(noteToLocalInsert);
+        await this.setNoteRepeat(note);
+
+        if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+            this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(note.key));
+        }
+
+        return note;
     }
 
     async insertNote(note) {
@@ -182,27 +166,11 @@ class NotesService {
                 note.repeatType
             ]
         ).catch((err) => console.warn(err));
-
-        let tasksRepeatValue =  null;
-        if (note.repeatType === "week") {
-            tasksRepeatValue = moment(note.added).isoWeekday();
-        } else if (note.repeatType === "any") {
-            tasksRepeatValue = note.added;
-        }
-
-        if (tasksRepeatValue !== null) {
-            await executeSQL(
-                `INSERT INTO TasksRepeatValues
-                (taskId, value)
-                VALUES(?, ?);`,
-                [
-                    insert.insertId,
-                    tasksRepeatValue
-                ]
-            ).catch((err) => console.warn(err));
-        }
         
-        return insert;
+        return {
+            ...note,
+            key: insert.insertId
+        };
     }
 
     insertNoteRemote(note) {
@@ -350,7 +318,7 @@ class NotesService {
             lastActionTime: actionTime
         }      
 
-        let update = await executeSQL(
+        await executeSQL(
             `UPDATE Tasks 
             SET 
                 title = ?, 
@@ -363,7 +331,8 @@ class NotesService {
                 finished = ?, 
                 isLastActionSynced = 0, 
                 lastAction = ?, 
-                lastActionTime = ? 
+                lastActionTime = ?,
+                repeatType = ?
             WHERE id = ?;`,
             [
                 note.title, 
@@ -376,12 +345,11 @@ class NotesService {
                 +note.finished, 
                 "EDIT",
                 actionTime,
+                note.repeatType,
                 note.key
             ]
         ).catch((err) => console.log('Error: ', err));
-        if (!update) {
-            return
-        }
+        await this.setNoteRepeat(note);
 
         if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             fetch(`${config.apiURL}/notes`, {
@@ -398,6 +366,33 @@ class NotesService {
             })
                 .then(() => synchronizationService.setSynced(note.key))                
                 .catch((err) => console.warn(err));
+        }
+    }
+
+    async setNoteRepeat(note) {
+        if (note.repeatType === "no-repeat") {
+            return
+        }
+
+        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]).catch((err) => console.warn(err));
+
+        let tasksRepeatValue =  null;
+        if (note.repeatType === "week") {
+            tasksRepeatValue = moment(note.added).isoWeekday();
+        } else if (note.repeatType === "any") {
+            tasksRepeatValue = note.added;
+        }
+
+        if (tasksRepeatValue !== null) {
+            await executeSQL(
+                `INSERT INTO TasksRepeatValues
+                (taskId, value)
+                VALUES(?, ?);`,
+                [
+                    note.key,
+                    tasksRepeatValue
+                ]
+            ).catch((err) => console.warn(err));
         }
     }
 

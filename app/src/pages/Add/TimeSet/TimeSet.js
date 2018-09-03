@@ -4,6 +4,7 @@ import {translate} from "react-i18next";
 
 import {SwitchListItem, ListItem, ModalListItem, ValueListItem} from "../../../components/ListItem/ListItem";
 import Radio from '../../../components/Radio/Radio';
+import Calendar from '../../../components/Calendar/Calendar/Calendar';
 
 import notesService from '../../../services/notes.service';
 
@@ -72,6 +73,12 @@ class TimeSet extends Component {
     }
 
     onRepeatSet = (e) => {
+        this.props.onStateChange({
+            repeatType: e             
+        })
+    }
+
+    onRepeatDateSelect = (e) => {
         this.props.onStateChange({
             repeatType: e             
         })
@@ -156,12 +163,22 @@ class TimeSet extends Component {
                                     name="repeat-type"
                                     checked={this.props.repeatType === setting.val}
                                     value={setting.val}
-                                    onChange={this.onRepeatSet}
+                                    onChange={(e) => this.props.onStateChange({ repeatType: e })}
                                     text={t(setting.translateId)}
                                 />
                             ))
                         }
                     </div>
+
+                    {
+                        this.props.repeatType === "any" &&
+                        <Calendar 
+                            mode="multiselect"
+                            currentDate={this.props.currentDate}
+                            msSelectedDates={this.props.repeatDates}
+                            onDatesSet={(e) => this.props.onStateChange({ repeatDates: e })}
+                        />
+                    }
                 </ModalListItem>
             </div>
         )

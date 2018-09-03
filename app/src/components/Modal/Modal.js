@@ -49,7 +49,7 @@ export default class CustomModal extends Component {
                 shouldCloseOnOverlayClick={true}
                 shouldCloseOnEsc={false}
             >
-                <div className={`modal-inner ${this.props.innerClassName}`}>
+                <div className={`modal-inner ${this.props.innerClassName ? this.props.innerClassName : ""}`}>
                     {this.props.children}                        
                 </div>
             </Modal>

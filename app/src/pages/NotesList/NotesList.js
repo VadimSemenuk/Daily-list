@@ -221,7 +221,6 @@ class NotesList extends PureComponent {
                     {   
                         (!this.state.calendar && this.props.settings.showMiniCalendar) && 
                         <LightCalendar
-                            settings={this.props.settings}
                             onDateSet={this.setDate}
                             currentDate={this.props.currentDate}
                         />
@@ -236,7 +235,6 @@ class NotesList extends PureComponent {
                         this.state.calendar &&
                         <Calendar 
                             currentDate={this.props.currentDate}
-                            settings={this.props.settings}
                             onDateSet={this.setDate}
                             onCloseRequest={this.triggerCalendar}
                         />

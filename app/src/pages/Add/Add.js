@@ -38,6 +38,7 @@ class Add extends Component {
             added: this.props.date,
             finished: false,
             repeatType: "no-repeat",
+            repeatDates: [],
 
             calendar: false,
         }
@@ -166,7 +167,6 @@ class Add extends Component {
                     this.state.calendar &&
                     <Calendar 
                         currentDate={this.state.added}
-                        settings={this.props.settings}
                         onDateSet={this.onDateSelect}
                         onCloseRequest={this.triggerCalendar}
                     />
@@ -283,6 +283,8 @@ class Add extends Component {
                             endTime={this.state.endTime}
                             settings={this.props.settings}
                             repeatType={this.state.repeatType}
+                            currentDate={this.state.added}
+                            repeatDates={this.state.repeatDates}
                             onStateChange={(time) => this.setState({...time})} 
                         />
                         <ColorPicker 
