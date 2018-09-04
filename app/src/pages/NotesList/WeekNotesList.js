@@ -18,7 +18,7 @@ class DayNotesList extends PureComponent {
                             src={AddGeryImg}
                             alt="remove"
                         />
-                        <span>{dayNotes.date.locale("ru").format("dddd")}</span>
+                        <span>{dayNotes.date.format("dddd")}</span>
                     </div>  
                     <div>                  
                         {

@@ -18,13 +18,11 @@ export default class Calendar extends Component {
         let msSelectedDate = moment(this.props.currentDate).startOf("day").valueOf();
         let currentMonthStartDate = moment(msSelectedDate).startOf("month");        
 
-        console.log(this.props.msSelectedDates)
-
         this.state = {
             monthes: this.getMonthes(currentMonthStartDate),
             currentMonthStartDate,
             msSelectedDate,
-            msSelectedDates: this.props.msSelectedDates.length ? this.props.msSelectedDates : [msSelectedDate],
+            msSelectedDates: (this.props.msSelectedDates && this.props.msSelectedDates.length) ? this.props.msSelectedDates : [msSelectedDate],
             mode: this.props.mode || "default",
             count: {}
         }

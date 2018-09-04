@@ -76,8 +76,8 @@ export default class LightCalendar extends Component {
     }
 
     getMonthName(startWeekDate, endWeekDate) {
-        const weekStartDayMonthName = startWeekDate.locale("ru").format('MMMM');   
-        const weekEndDayMonthName = endWeekDate.locale("ru").format('MMMM');
+        const weekStartDayMonthName = startWeekDate.format('MMMM');   
+        const weekEndDayMonthName = endWeekDate.format('MMMM');
         
         if (weekStartDayMonthName !== weekEndDayMonthName) {
             return `${weekStartDayMonthName} - ${weekEndDayMonthName}`

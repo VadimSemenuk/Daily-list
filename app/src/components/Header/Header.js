@@ -30,8 +30,8 @@ let Header = (props) => (
                     onClick={props.onSelectToday}
                     className="current-date"
                 >
-                    <span className="day">{moment(props.currentDate).locale("ru").format('dddd')}</span>
-                    <span className="date">{moment().locale("ru").format('D MMMM')}</span> 
+                    <span className="day">{moment(props.currentDate).format('dddd')}</span>
+                    <span className="date">{moment().format('D MMMM')}</span> 
                 </div>
             }
             {
@@ -50,8 +50,8 @@ let Header = (props) => (
                         />
                     </button>
                     <div className="current-date">
-                        <span className="day">{moment(props.currentDate).locale("ru").format('dddd')}</span>
-                        <span className="date">{moment(props.currentDate).locale("ru").format('D MMMM')}</span> 
+                        <span className="day">{moment(props.currentDate).format('dddd')}</span>
+                        <span className="date">{moment(props.currentDate).format('D MMMM')}</span> 
                     </div>
                 </div>
             }

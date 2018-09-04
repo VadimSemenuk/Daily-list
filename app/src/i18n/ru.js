@@ -87,12 +87,14 @@ export default {
     "input-placeholder-title": "Заголовок",
     "input-placeholder-text": "Текст",
 
-
     // interface settings page
     "show-mini-calendar": "Показывать мини-календарь",
 
     // view settings page
     "notes-show-interval": "Отображать за период",
     "notes-show-interval-week": "Неделя",
-    "notes-show-interval-day": "День",    
+    "notes-show-interval-day": "День",
+    
+    // notes list page
+    "move-tomorrow": "Переместить на завтра"
 }

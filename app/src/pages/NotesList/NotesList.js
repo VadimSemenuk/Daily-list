@@ -207,6 +207,16 @@ class NotesList extends PureComponent {
         this.setDate(moment().startOf("day"))
     }
 
+    onListItemMove = async () => {
+        await this.props.addNote(JSON.parse(JSON.stringify(
+            {
+                ...this.state.listItemDialogVisible.note, 
+                added: moment(this.props.currentDate).add(1, "day").valueOf()
+            }
+        )));
+        this.props.deleteNote(this.state.listItemDialogVisible.note);
+    }
+
     render() {
         let {t} = this.props;
 
@@ -228,7 +238,7 @@ class NotesList extends PureComponent {
                     {
                         (!this.state.calendar && !this.props.settings.showMiniCalendar) && 
                         <div className="current-date-shower theme-header-background">
-                            {this.props.currentDate.locale("ru").format("dddd, D MMMM")}
+                            {this.props.currentDate.format("dddd, D MMMM")}
                         </div>
                     }
                     {
@@ -288,6 +298,11 @@ class NotesList extends PureComponent {
                         isOpen={this.state.listItemDialogVisible ? true : false} 
                         onRequestClose={this.closeDialog}
                     >
+                        <ButtonListItem
+                            className="no-border"
+                            text={t("move-tomorrow")}
+                            onClick={this.onListItemMove}
+                        />
                         <ButtonListItem
                             className="no-border"
                             text={t("edit")}

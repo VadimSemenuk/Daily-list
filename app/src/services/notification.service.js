@@ -7,41 +7,38 @@ class NotificationService {
                 window.cordova.plugins.notification.local.requestPermission(function (granted) {});
             }
 
-            let trigger = null;
+            let notificationConfig = {
+                title: note.title || 'Уведомление о заметке',
+                text: this.getMessgae(note),
+                id
+            }
+
             switch(note.repeatType) {
                 case "no-repeat": {
-                    trigger = { at: new Date(note.startTime.valueOf()) };
+                    notificationConfig.trigger = { at: new Date(note.startTime.valueOf()) };
                     break;
                 }
                 case "day": {
                     // trigger = { every: { hour: note.startTime.hour(), minute: note.startTime.minute() } };
-                    trigger = { every: "day", firstAt: new Date(note.startTime.valueOf()) };
+                    notificationConfig.trigger = { every: "day", firstAt: new Date(note.startTime.valueOf()) };
                     break;
                 } 
                 case "week": {
                     // trigger = { every: { weekday: note.startTime.weekday() }};
-                    trigger = { every: "week", firstAt: new Date(note.startTime.valueOf()) };
+                    notificationConfig.trigger = { every: "week", firstAt: new Date(note.startTime.valueOf()) };
                     break;
                 }
                 case "any": {
                     for (let date of note.repeatDates) {
-                        window.cordova.plugins.notification.local.schedule({
-                            title: note.title || 'Уведомление о заметке',
-                            text: this.getMessgae(note),
-                            trigger: { at: new Date(date) },
-                            id: date
-                        });
+                        notificationConfig.id = date;
+                        notificationConfig.trigger = { at: new Date(date) };
+                        window.cordova.plugins.notification.local.schedule(notificationConfig);
                     }
                     return;
                 }
             }
 
-            window.cordova.plugins.notification.local.schedule({
-                title: note.title || 'Уведомление о заметке',
-                text: this.getMessgae(note),
-                trigger,
-                id                
-            });
+            window.cordova.plugins.notification.local.schedule(notificationConfig);
         });       
     }
 

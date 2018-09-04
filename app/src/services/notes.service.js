@@ -134,7 +134,8 @@ class NotesService {
             uuid: noteUUID
         }
 
-        let note = await this.insertNote(noteToLocalInsert);
+        let noteKey = await this.insertNote(noteToLocalInsert);
+        let note = {...addedNote, key: noteKey};
         await this.setNoteRepeat(note);
         notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
         if (note.notificate) {
@@ -172,10 +173,8 @@ class NotesService {
             ]
         ).catch((err) => console.warn(err));
         
-        return {
-            ...note,
-            key: insert.insertId
-        };
+
+        return insert.insertId
     }
 
     insertNoteRemote(note) {
