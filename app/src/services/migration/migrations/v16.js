@@ -23,7 +23,8 @@ export default {
                 password TEXT,    
                 fontSize INTEGER,
                 showMiniCalendar INTEGER,
-                notesShowInterval INTEGER
+                notesShowInterval INTEGER,
+                lang TEXT 
             );
         `);
         await execureSQL(`
@@ -37,13 +38,22 @@ export default {
             direction: 1,
             finSort: 0
         }
+        
+        let lang = navigator.globalization ? (await new Promise((resolve, reject) => navigator.globalization.getPreferredLanguage(resolve, reject))) : "ru";
+        if (lang) {
+            lang = lang.value || "en";
+        }
+        if (lang.indexOf("-") !== -1) {
+            lang = lang.split("-")[0];
+        }
         await execureSQL(`
             UPDATE Settings 
             SET 
                 sort = ?, 
                 showMiniCalendar = ?,
-                notesShowInterval = ?;`, 
-            [JSON.stringify(sort), 1, 1]
+                notesShowInterval = ?,
+                lang = ?;`, 
+            [JSON.stringify(sort), 1, 1, lang]
         );
     }
 }

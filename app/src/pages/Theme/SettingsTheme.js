@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
+import i18n from "i18next";
 
 import * as AppActions from '../../actions'; 
 
@@ -18,6 +19,7 @@ import '../../components/ColorPicker/ColorPicker.scss';
 
 let themes = themesService.getThemesList();
 let fontSizeSettings = settingsService.getFontSizeSettings();
+let languageSettings = settingsService.getLanguageSettings();
 
 class SettingsTheme extends Component {
     constructor(props) {
@@ -53,6 +55,7 @@ class SettingsTheme extends Component {
 
     render () {
         let {t} = this.props;
+        let activeLanguageSettings = languageSettings.find((a) => a.val === this.props.settings.lang);        
 
         return (
             <div className="page-wrapper theme-page-wrapper">
@@ -117,6 +120,30 @@ class SettingsTheme extends Component {
                         checked={this.props.settings.showMiniCalendar}
                         onChange={(e) => this.props.setSetting('showMiniCalendar', e)}     
                     />
+
+                    <ModalListItem
+                        text={t("language")} 
+                        value={t(activeLanguageSettings.translateId)}
+                        listItem={ValueListItem}
+                    >
+                        <div className="radio-group">
+                            {
+                                languageSettings.map((setting, i) => (
+                                    <Radio 
+                                        key={i}
+                                        name="lang"
+                                        checked={this.props.settings.lang === setting.val}
+                                        value={setting.val}
+                                        onChange={(value) => {
+                                            this.props.setSetting('lang', value);
+                                            i18n.changeLanguage(value);
+                                        }}
+                                        text={t(setting.translateId)}
+                                    />
+                                ))
+                            }
+                        </div>
+                    </ModalListItem>
                 </div>
             </div>
         );

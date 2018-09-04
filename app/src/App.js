@@ -6,7 +6,7 @@ import {I18nextProvider} from "react-i18next";
 import 'moment/locale/ru';
 import moment from "moment";
 
-import i18n from "./i18n";
+import lang from "./i18n";
 
 import Root from "./Root";
 
@@ -16,6 +16,7 @@ import settingsService from "./services/settings.service";
 import themesService from "./services/themes.service";
 
 let store;
+let i18n;
 
 export default class App extends Component {
     constructor(props) {
@@ -62,7 +63,8 @@ export default class App extends Component {
             window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
         }
         themesService.applyTheme(settings.theme);
-        moment.locale('ru');
+        moment.locale(settings.lang);
+        i18n = lang.init(settings.lang);
     }
 
     render() {

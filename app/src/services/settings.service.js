@@ -27,6 +27,14 @@ let notesShowIntervalSettings = [{
     val: 1
 }];
 
+let languageSettings = [{
+    translateId: "ru",
+    val: "ru"
+}, {
+    translateId: "en",
+    val: "en"
+}];
+
 class SetitngsService {
 
     getSortTypeSettings() {
@@ -45,10 +53,14 @@ class SetitngsService {
         return [...notesShowIntervalSettings]
     }
 
+    getLanguageSettings() {
+        return [...languageSettings]
+    }
+
     async getSettings () {
         try {
             let select = await executeSQL(
-                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar, notesShowInterval
+                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar, notesShowInterval, lang
                 FROM Settings;`
             );
 

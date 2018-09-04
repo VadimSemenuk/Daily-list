@@ -89,6 +89,9 @@ export default {
 
     // interface settings page
     "show-mini-calendar": "Показывать мини-календарь",
+    "language": "Язык",
+    "ru": "Руссский",
+    "en": "Английский",
 
     // view settings page
     "notes-show-interval": "Отображать за период",
