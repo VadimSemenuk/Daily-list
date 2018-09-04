@@ -4,6 +4,7 @@ import config from "../config/config";
 import uuid from "uuid/v1";
 import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
+import notificationService from "./notification.service";
 
 let tags = [
     'transparent', 
@@ -135,6 +136,10 @@ class NotesService {
 
         let note = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(note);
+        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
+        if (note.notificate) {
+            notificationService.set(note.key, note);
+        };
 
         if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(note.key));
@@ -279,10 +284,8 @@ class NotesService {
                 actionTime,
                 note.key
             ]
-        ).catch((err) => console.warn(err));     
-        if (!del) {
-            return
-        }         
+        ).catch((err) => console.warn(err));          
+        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
 
         if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             fetch(`${config.apiURL}/notes`, {
@@ -350,6 +353,10 @@ class NotesService {
             ]
         ).catch((err) => console.log('Error: ', err));
         await this.setNoteRepeat(note);
+        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
+        if (note.notificate) {
+            notificationService.set(note.key, note);
+        };
 
         if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
             fetch(`${config.apiURL}/notes`, {
@@ -383,17 +390,23 @@ class NotesService {
             tasksRepeatValue = note.added;
         }
 
-        if (tasksRepeatValue !== null) {
-            await executeSQL(
-                `INSERT INTO TasksRepeatValues
-                (taskId, value)
-                VALUES(?, ?);`,
-                [
-                    note.key,
-                    tasksRepeatValue
-                ]
-            ).catch((err) => console.warn(err));
-        }
+        await executeSQL(
+            `INSERT INTO TasksRepeatValues
+            (taskId, value)
+            VALUES
+            ${
+                note.repeatDates.reduce((accumulator, currentValue) => {
+                    if (accumulator === false) {
+                        return `(${note.key}, ${currentValue})`;
+                    }
+                    return `${accumulator}, (${note.key}, ${currentValue})`;
+                }, false)
+            };`,
+            [
+                note.key,
+                tasksRepeatValue
+            ]
+        ).catch((err) => console.warn(err));
     }
 
     getTags() {

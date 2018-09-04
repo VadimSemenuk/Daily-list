@@ -1,21 +1,54 @@
 class NotificationService {
-    set = (id, data) => {       
+    set = (id, note) => {       
         if (!window.cordova) return
 
         window.cordova.plugins.notification.local.hasPermission((granted) => { 
+            if (!granted) {
+                window.cordova.plugins.notification.local.requestPermission(function (granted) {});
+            }
+
+            let trigger = null;
+            switch(note.repeatType) {
+                case "no-repeat": {
+                    trigger = { at: new Date(note.startTime.valueOf()) };
+                    break;
+                }
+                case "day": {
+                    // trigger = { every: { hour: note.startTime.hour(), minute: note.startTime.minute() } };
+                    trigger = { every: "day", firstAt: new Date(note.startTime.valueOf()) };
+                    break;
+                } 
+                case "week": {
+                    // trigger = { every: { weekday: note.startTime.weekday() }};
+                    trigger = { every: "week", firstAt: new Date(note.startTime.valueOf()) };
+                    break;
+                }
+                case "any": {
+                    for (let date of note.repeatDates) {
+                        window.cordova.plugins.notification.local.schedule({
+                            title: note.title || 'Уведомление о заметке',
+                            text: this.getMessgae(note),
+                            trigger: { at: new Date(date) },
+                            id: date
+                        });
+                    }
+                    return;
+                }
+            }
+
             window.cordova.plugins.notification.local.schedule({
-                title: data.title || 'Уведомление о заметке',
-                text: this.getMessgae(data),
-                trigger: { at: new Date(data.startTime.valueOf()) },
+                title: note.title || 'Уведомление о заметке',
+                text: this.getMessgae(note),
+                trigger,
                 id                
             });
         });       
     }
 
-    clear = (id) => {
+    clear = (ids) => {
         if (!window.cordova) return
         
-        window.cordova.plugins.notification.local.clear(id)
+        window.cordova.plugins.notification.local.cancel(ids)
     }
 
     getMessgae(data) {

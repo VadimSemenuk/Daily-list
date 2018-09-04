@@ -1,18 +1,10 @@
 import notesService from "../services/notes.service.js";
-import notificationService from "../services/notification.service";
 import settingsService from "../services/settings.service.js";
 
 // notes
 export function addNote (note) {
     return function(dispatch) {
         return notesService.addNote(note)
-            .then((note) => {
-                notificationService.clear(note.key);           
-                if (note.notificate) {
-                    notificationService.set(note.key, note);
-                };
-                return note;
-            })
             .then((note) => {
                 return dispatch({
                     type: "RECIVE_NOTE",
@@ -45,10 +37,6 @@ export function updateNoteDynamicFields (note, dynamicFields) {
 export function deleteNote (note) {
     return function(dispatch) {
         return notesService.deleteNote(note)
-            .then((note) => {
-                notificationService.clear(note.key);  
-                return note;
-            })
             .then((note) => dispatch({
                 type: "DELETE_NOTE",
                 note
