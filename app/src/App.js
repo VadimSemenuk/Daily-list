@@ -63,7 +63,8 @@ export default class App extends Component {
             window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
         }
         themesService.applyTheme(settings.theme);
-        moment.locale(settings.lang);
+        //moment.locale(settings.lang);
+        moment.locale("en");
         i18n = lang.init(settings.lang);
     }
 

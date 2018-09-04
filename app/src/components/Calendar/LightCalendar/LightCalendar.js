@@ -16,7 +16,7 @@ export default class LightCalendar extends Component {
         super(props);
 
         let msSelectedDate = moment(this.props.currentDate).startOf("day").valueOf();
-        let weeks = this.generateWeeksSequence(moment(msSelectedDate).startOf('isoWeek'));
+        let weeks = this.generateWeeksSequence(moment(msSelectedDate).startOf('week'));
 
         this.state = {
             weeks,
@@ -41,7 +41,7 @@ export default class LightCalendar extends Component {
 
     generateWeekDates(weekStartDate) {
         let weekDates = [weekStartDate];
-        for (let a = 2; a < 8; a++) {
+        for (let a = 1; a < 7; a++) {
             weekDates.push(moment(weekStartDate).day(a));
         }
         return weekDates;
@@ -95,7 +95,7 @@ export default class LightCalendar extends Component {
     }
 
     async componentWillReceiveProps(nextProps) {
-        let msSelectedWeekStartDate = moment(nextProps.currentDate).startOf('isoWeek').valueOf();
+        let msSelectedWeekStartDate = moment(nextProps.currentDate).startOf('week').valueOf();
 
         if (msSelectedWeekStartDate === this.state.weeks[this.activePageIndex][0].valueOf()) {
             this.setState({

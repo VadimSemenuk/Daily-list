@@ -144,6 +144,12 @@ class SettingsTheme extends Component {
                             }
                         </div>
                     </ModalListItem>
+
+                    <SwitchListItem 
+                        text={t("show-notes-count")}  
+                        checked={this.props.settings.calendarNotesCounter}
+                        onChange={(e) => this.props.setSetting('calendarNotesCounter', +e)}     
+                    />
                 </div>
             </div>
         );

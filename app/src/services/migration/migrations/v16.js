@@ -24,7 +24,8 @@ export default {
                 fontSize INTEGER,
                 showMiniCalendar INTEGER,
                 notesShowInterval INTEGER,
-                lang TEXT 
+                lang TEXT,
+                calendarNotesCounter INTEGER
             );
         `);
         await execureSQL(`
@@ -52,8 +53,9 @@ export default {
                 sort = ?, 
                 showMiniCalendar = ?,
                 notesShowInterval = ?,
-                lang = ?;`, 
-            [JSON.stringify(sort), 1, 1, lang]
+                lang = ?,
+                calendarNotesCounter = ?;`, 
+            [JSON.stringify(sort), 1, 1, lang, 1]
         );
     }
 }
