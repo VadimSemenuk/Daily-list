@@ -3,7 +3,7 @@ import {Provider} from "react-redux";
 import initStore from "./store";
 import {BeatLoader} from 'react-spinners';
 import {I18nextProvider} from "react-i18next";
-import 'moment/locale/ru';
+// import 'moment/locale/ru';
 import moment from "moment";
 
 import lang from "./i18n";
@@ -64,7 +64,7 @@ export default class App extends Component {
         }
         themesService.applyTheme(settings.theme);
         //moment.locale(settings.lang);
-        moment.locale("en");
+        // moment.locale("ru");
         i18n = lang.init(settings.lang);
     }
 
