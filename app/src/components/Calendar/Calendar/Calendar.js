@@ -15,9 +15,6 @@ export default class Calendar extends Component {
     constructor(props) {
         super(props);
 
-        this.startWeekIndex = 0;
-        this.finWeekIndex = 6;
-
         let msSelectedDate = moment(this.props.currentDate).startOf("day").valueOf();
         let currentMonthStartDate = moment(msSelectedDate).startOf("month");  
 
@@ -85,27 +82,23 @@ export default class Calendar extends Component {
         let monthStartDateWeekDay = monthStartDate.weekday();
         let monthEndDateWeekDay = monthEndDate.weekday() + 1;
 
-        console.log(monthStartDateWeekDay);
-        console.log(monthEndDateWeekDay);
-        window.moment = moment;
-
         let monthData = [];
         let weekData = [];
         
-        for (let i = this.startWeekIndex; i < monthStartDateWeekDay; i++) {
+        for (let i = 0; i < monthStartDateWeekDay; i++) {
             weekData.push(null);
         }
 
         for (let i = 1; i <= daysInMonth; i++) {
             let date = moment(monthStartDate).date(i);
-            if (date.weekday() === this.startWeekIndex) {
+            if (date.weekday() === 0) {
                 monthData.push(weekData);
                 weekData = [];
             }
             weekData.push(date);
         }
 
-        for (let i = monthEndDateWeekDay; i <= this.finWeekIndex; i++) {
+        for (let i = monthEndDateWeekDay; i <= 6; i++) {
             weekData.push(null);
         }
 
