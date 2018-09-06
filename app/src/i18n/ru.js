@@ -97,7 +97,7 @@ export default {
     "notes-show-interval": "Отображать за период",
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
-    "show-notes-count": "Отображать счетчик на календаре",
+    "show-notes-count": "Отображать счетчики на календаре",
     
     // notes list page
     "move-tomorrow": "Переместить на завтра"

@@ -25,7 +25,10 @@ export default class MonthDates extends PureComponent {
                                             active = weekDay.valueOf() === this.props.msSelectedDate;
                                         }
 
-                                        let count = this.props.count[msCurrentDay] || 0;
+                                        let count = null;
+                                        if (this.props.calendarNotesCounter) {
+                                            count = this.props.count[msCurrentDay] || 0;
+                                        }
 
                                         return (
                                             <button 
@@ -33,7 +36,7 @@ export default class MonthDates extends PureComponent {
                                                 key={i} 
                                                 onClick={() => this.props.onSelect(weekDay, active)}
                                             >
-                                                <span className="count">{count}</span> 
+                                                {this.props.calendarNotesCounter ? <span className="count">{count}</span> : null} 
                                                 {weekDay.format('DD')}
                                             </button> 
                                         )

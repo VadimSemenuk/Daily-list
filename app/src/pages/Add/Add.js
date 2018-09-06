@@ -167,6 +167,7 @@ class Add extends Component {
                     this.state.calendar &&
                     <Calendar 
                         currentDate={this.state.added}
+                        calendarNotesCounter={this.props.settings.calendarNotesCounter}
                         onDateSet={this.onDateSelect}
                         onCloseRequest={this.triggerCalendar}
                     />

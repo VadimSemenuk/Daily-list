@@ -1,14 +1,18 @@
 import React, {PureComponent} from 'react';
 import moment from "moment";
 
-let weekDays = moment.weekdaysMin(true);
-
 export default class WeekDays extends PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.weekDays = moment.weekdaysMin(true);
+    }
+
     render() {
         return (
             <div className="week-days">
                 {
-                    weekDays.map((day, i) => <span key={i}>{day}</span>)
+                    this.weekDays.map((day, i) => <span key={i}>{day}</span>)
                 }                  
             </div>
         )

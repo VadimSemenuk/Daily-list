@@ -1,12 +1,13 @@
 import {createStore, applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import moment from 'moment';
 
 import notesService from "../services/notes.service";
 
 import reducers from '../reducers';
 
 async function initStore (settings) {   
+    let moment = require("moment");
+
     let notes = await notesService.getNotesByDates(
         [
             moment().add(-1, "day"),
@@ -16,13 +17,15 @@ async function initStore (settings) {
         settings.notesShowInterval
     );
     let password = !settings.password;
+    let date = moment().startOf('day');
 
     return createStore(
         reducers,
         { 
             settings,
             password,
-            notes 
+            notes,
+            date
         },
         applyMiddleware(
             thunkMiddleware

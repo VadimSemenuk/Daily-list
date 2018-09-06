@@ -3,8 +3,8 @@ import {Provider} from "react-redux";
 import initStore from "./store";
 import {BeatLoader} from 'react-spinners';
 import {I18nextProvider} from "react-i18next";
-// import 'moment/locale/ru';
 import moment from "moment";
+import 'moment/locale/ru';
 
 import lang from "./i18n";
 
@@ -63,9 +63,9 @@ export default class App extends Component {
             window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
         }
         themesService.applyTheme(settings.theme);
-        //moment.locale(settings.lang);
-        // moment.locale("ru");
+        moment.locale(settings.lang);
         i18n = lang.init(settings.lang);
+        window.moment = moment;
     }
 
     render() {

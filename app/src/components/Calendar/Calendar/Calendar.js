@@ -36,11 +36,13 @@ export default class Calendar extends Component {
     async componentDidMount() {
         document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest)
 
-        calendarService.setNotesCountInterval(4);
-        let count = await calendarService.getNotesCount(this.state.msSelectedDate);
-        this.setState({
-            count
-        })
+        if (this.props.calendarNotesCounter) {
+            calendarService.setNotesCountInterval(4);
+            let count = await calendarService.getNotesCount(this.state.msSelectedDate);
+            this.setState({
+                count
+            })
+        }
     }   
 
     componentWillUnmount() {
@@ -59,7 +61,10 @@ export default class Calendar extends Component {
             nextMonthes[nextIndex] = this.getMonthDays(moment(nextCurrentMonthStartDate).add(1, 'month'));  
         }
 
-        let count = (await calendarService.updateNotesCountData(nextCurrentMonthStartDate.valueOf())) || this.state.count;        
+        let count = {};
+        if (this.props.calendarNotesCounter) {
+            count = (await calendarService.updateNotesCountData(nextCurrentMonthStartDate.valueOf())) || this.state.count;       
+        } 
 
         this.setState({
             monthes: nextMonthes,
@@ -188,7 +193,10 @@ export default class Calendar extends Component {
                 nextDate = prevMonthStartDate;
             }        
 
-            let count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
+            let count = {};
+            if (this.props.calendarNotesCounter) {
+                count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
+            }
 
             this.setState({
                 monthes,
@@ -232,6 +240,7 @@ export default class Calendar extends Component {
                                         onSelect={this.onDateSet}
                                         count={this.state.count}
                                         mode={this.state.mode}
+                                        calendarNotesCounter={this.props.calendarNotesCounter}
                                     /> 
                                 </div>  
                             )

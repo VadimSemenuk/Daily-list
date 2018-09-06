@@ -176,6 +176,7 @@ class TimeSet extends Component {
                             mode="multiselect"
                             currentDate={this.props.currentDate}
                             msSelectedDates={this.props.repeatDates}
+                            calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
                             onDatesSet={(e) => this.props.onStateChange({ repeatDates: e })}
                         />
                     }

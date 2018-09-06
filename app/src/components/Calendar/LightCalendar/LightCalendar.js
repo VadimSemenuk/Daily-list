@@ -32,17 +32,19 @@ export default class LightCalendar extends Component {
     }
 
     async componentDidMount() {
-        calendarService.setNotesCountInterval(50);
-        let count = await calendarService.getNotesCount(this.state.msSelectedDate);
-        this.setState({
-            count
-        })
+        if (this.props.calendarNotesCounter) {
+            calendarService.setNotesCountInterval(50);
+            let count = await calendarService.getNotesCount(this.state.msSelectedDate);
+            this.setState({
+                count
+            })
+        }
     }
 
     generateWeekDates(weekStartDate) {
         let weekDates = [weekStartDate];
         for (let a = 1; a < 7; a++) {
-            weekDates.push(moment(weekStartDate).day(a));
+            weekDates.push(moment(weekStartDate).weekday(a));
         }
         return weekDates;
     }
@@ -64,7 +66,10 @@ export default class LightCalendar extends Component {
             weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(1, 'week'));
         }
 
-        let count = (await calendarService.updateNotesCountData(weeks[nextIndex][0])) || this.state.count;
+        let count = {};
+        if (this.props.calendarNotesCounter) {
+            count = (await calendarService.updateNotesCountData(weeks[nextIndex][0])) || this.state.count;
+        }
 
         let monthName = this.getMonthName(weeks[index][0], weeks[index][6]);
         
@@ -134,7 +139,10 @@ export default class LightCalendar extends Component {
                 nextDate = prevWeekStartDate;
             }
 
-            let count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
+            let count = {};
+            if (this.props.calendarNotesCounter) {
+                count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
+            }
 
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
 
@@ -187,6 +195,7 @@ export default class LightCalendar extends Component {
                                         msSelectedDate={this.state.msSelectedDate}
                                         onSelect={this.setDate} 
                                         count={this.state.count}
+                                        calendarNotesCounter={this.props.calendarNotesCounter}
                                     />
                                 </div>
                             )

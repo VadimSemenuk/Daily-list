@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
 import i18n from "i18next";
+import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
@@ -121,6 +122,12 @@ class SettingsTheme extends Component {
                         onChange={(e) => this.props.setSetting('showMiniCalendar', e)}     
                     />
 
+                    <SwitchListItem 
+                        text={t("show-notes-count")}  
+                        checked={this.props.settings.calendarNotesCounter}
+                        onChange={(e) => this.props.setSetting('calendarNotesCounter', +e)}     
+                    />
+
                     <ModalListItem
                         text={t("language")} 
                         value={t(activeLanguageSettings.translateId)}
@@ -137,6 +144,7 @@ class SettingsTheme extends Component {
                                         onChange={(value) => {
                                             this.props.setSetting('lang', value);
                                             i18n.changeLanguage(value);
+                                            moment.locale(value);
                                         }}
                                         text={t(setting.translateId)}
                                     />
@@ -144,12 +152,6 @@ class SettingsTheme extends Component {
                             }
                         </div>
                     </ModalListItem>
-
-                    <SwitchListItem 
-                        text={t("show-notes-count")}  
-                        checked={this.props.settings.calendarNotesCounter}
-                        onChange={(e) => this.props.setSetting('calendarNotesCounter', +e)}     
-                    />
                 </div>
             </div>
         );
