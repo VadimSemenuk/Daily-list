@@ -111,7 +111,8 @@ class Add extends Component {
             },
             (err) => {console.log(err)},
             {
-                sourceType
+                sourceType,
+                saveToPhotoAlbum: true
             }
         );
     }
@@ -248,6 +249,7 @@ class Add extends Component {
                             </button>  
 
                             <ModalListItem
+                                ref={this.photoModal}
                                 listItem={(props) => (
                                     <button 
                                         onClick={props.onClick}
@@ -263,13 +265,19 @@ class Add extends Component {
                                 <ButtonListItem
                                     className="no-border"
                                     text={t("open-galery")}
-                                    onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM)}
+                                    onClick={() => {
+                                        this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM);
+                                        this.photoModal.trigger();
+                                    }}
                                 />
 
                                 <ButtonListItem
                                     className="no-border"
                                     text={t("make-shot")}
-                                    onClick={() => this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA)}
+                                    onClick={() => {
+                                        this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA);
+                                        this.photoModal.trigger();                                        
+                                    }}
                                 />
                             </ModalListItem>
                         </div>

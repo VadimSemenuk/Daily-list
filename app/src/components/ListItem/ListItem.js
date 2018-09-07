@@ -71,7 +71,7 @@ export class ModalListItem extends PureComponent {
         }
     }
 
-    triggerModal = () => {
+    trigger = () => {
         this.setState({
             isModalActive: !this.state.isModalActive
         })
@@ -82,13 +82,13 @@ export class ModalListItem extends PureComponent {
             <this.props.listItem
                 {...this.props}
                 key={0}
-                onClick={this.triggerModal} 
+                onClick={this.trigger} 
             />,
 
             <Modal 
                 key={1}            
                 isOpen={this.state.isModalActive}
-                onRequestClose={this.triggerModal}
+                onRequestClose={this.trigger}
                 innerClassName={this.props.innerClassName}
             >
                 {this.props.children}

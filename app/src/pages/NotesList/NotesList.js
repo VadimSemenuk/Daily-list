@@ -215,6 +215,9 @@ class NotesList extends PureComponent {
             }
         )));
         this.props.deleteNote(this.state.listItemDialogVisible.note);
+        this.setState({
+            listItemDialogVisible: false
+        })
     }
 
     render() {
