@@ -112,7 +112,13 @@ class Add extends Component {
             (err) => {console.log(err)},
             {
                 sourceType,
-                saveToPhotoAlbum: true
+                saveToPhotoAlbum: true,
+                quality: 50,
+                destinationType: Camera.DestinationType.FILE_URI,
+                encodingType: Camera.EncodingType.JPEG,
+                mediaType: Camera.MediaType.PICTURE,
+                allowEdit: true,
+                correctOrientation: true
             }
         );
     }
