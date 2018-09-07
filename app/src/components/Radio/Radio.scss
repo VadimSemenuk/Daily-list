@@ -1,8 +1,9 @@
 .radio {
-    width: 17px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
     border: 2px solid #414040;
-    border-radius: 10px;
+    border-radius: 20px;
+    box-sizing: border-box;
     position: relative;
     display: block;
 
@@ -15,10 +16,10 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        margin-top: -4px;
-        margin-left: -4px;
-        width: 8px;
-        height: 8px;
+        margin-top: -5px;
+        margin-left: -5px;
+        width: 10px;
+        height: 10px;
         background: #414040;
         border-radius: 10px;
     }
@@ -30,6 +31,11 @@
 .radio-wrapper {
     display: flex;
     align-items: center;
+
+    label {
+        display: flex;
+        align-items: center;
+    }
     
     span {
         display: inline-block;

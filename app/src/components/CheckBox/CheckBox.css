@@ -31,8 +31,8 @@
 .light-checkbox:after {
     content: '';
     position: absolute;
-    top: 8px;
-    left: 6px;
+    top: 7px;
+    left: 5px;
     width: 11px;
     height: 5px;
     background: transparent;
@@ -41,7 +41,6 @@
     border-right: none;
     transform: rotate(-45deg);
     opacity: 0;
-    box-sizing: border-box;
 }
 .light-checkbox.active:after {
     opacity: 1;

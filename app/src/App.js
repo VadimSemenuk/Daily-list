@@ -11,7 +11,7 @@ import lang from "./i18n";
 import Root from "./Root";
 
 import DB from './db/db';
-import migrationService from './services/migration/migration.service';
+import migration from './db/migration/migration';
 import settingsService from "./services/settings.service";
 import themesService from "./services/themes.service";
 
@@ -48,7 +48,7 @@ export default class App extends Component {
 
     async initDb() {
         window.db = await DB();
-        await migrationService.run();       
+        await migration.run();       
     }
 
     async initSettings() {

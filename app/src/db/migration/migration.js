@@ -2,7 +2,7 @@ import execureSQL from "../../utils/executeSQL";
 import migrations from "./migrations";
 import {init} from "./migrations";
 
-class MigrationService {
+class Migration {
     async checkDBExisting() {
         return (await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks';`)).rows.length;
     }
@@ -47,6 +47,6 @@ class MigrationService {
     }
 }
 
-let migrationService = new MigrationService();
+let migration = new Migration();
 
-export default migrationService;
+export default migration;
