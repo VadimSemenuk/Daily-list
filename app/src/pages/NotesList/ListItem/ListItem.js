@@ -1,24 +1,13 @@
 import React, {PureComponent} from 'react';
-import moment from "moment";
 
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
+import RepeatImg from "../../../assets/img/two-circling-arrows.svg"
 
 import './ListItem.scss';
-
-function getTime (date) {
-    if (date === "false") {
-        return ""
-    }
-    if (date) {
-        return moment(date).format('HH:mm')
-    } else {
-        return null
-    }
-}
 
 export default class Note extends PureComponent { 
     constructor(props) {
@@ -69,9 +58,9 @@ export default class Note extends PureComponent {
                 <div className="note-content">
                     <div className="note-header">
                         <div className="note-header-time-wrapper">
-                            {this.props.itemData.startTime && <span>{getTime(this.props.itemData.startTime)}</span>} 
+                            {this.props.itemData.startTime && <span>{this.props.itemData.startTime ? this.props.itemData.startTime.format('HH:mm') : null}</span>} 
                             {this.props.itemData.endTime && <span className="divider">-</span>}
-                            {this.props.itemData.endTime && <span>{getTime(this.props.itemData.endTime)}</span>}                                                    
+                            {this.props.itemData.endTime && <span>{this.props.itemData.endTime ? this.props.itemData.endTime.format('HH:mm') : null }</span>}                                                    
                         </div>
                         {
                             this.props.itemData.notificate &&
@@ -80,7 +69,15 @@ export default class Note extends PureComponent {
                                 src={AlarmImg}
                                 alt="notify"
                             />
-                        }                                     
+                        }    
+                        {
+                            this.props.itemData.repeatType !== "no-repeat" &&
+                            <img 
+                                className="repeat-identifier"
+                                src={RepeatImg}
+                                alt="repeat"
+                            />
+                        }                                   
                     </div>
                     {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
                     {

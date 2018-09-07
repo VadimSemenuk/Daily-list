@@ -40,7 +40,8 @@
                 display: flex;
                 font-size: 0.86em;
                 color: #6f6868;
-                align-items: center;        
+                align-items: center;    
+                margin-right: 10px;
 
                 .divider {
                     display: inline-block;
@@ -50,7 +51,10 @@
 
             .notification-identifier {
                 height: 16px;
-                margin-left: 10px;
+                margin-right: 10px;
+            }
+            .repeat-identifier {
+                height: 14px;
             }
         }
 

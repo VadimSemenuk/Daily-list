@@ -14,6 +14,27 @@ export function addNote (note) {
     }
 }
 
+export function getNotesByDates (dates, period) {
+    return function(dispatch) {
+        return notesService.getNotesByDates(dates, period).then((notes) => {
+            dispatch({
+                type: "RECIVE_NOTES",
+                dates,
+                notes
+            })
+        });
+    }
+}
+
+export function updateNote (note) {
+    return function(dispatch) {
+        return notesService.updateNote(note).then(() => dispatch({
+            type: "UPDATE_NOTE",
+            note
+        }))
+    }
+}
+
 export function setNoteCheckedState (note, state) {
     return function(dispatch) {
         return notesService.setNoteCheckedState(note, state).then(() => dispatch({
@@ -34,6 +55,16 @@ export function updateNoteDynamicFields (note, dynamicFields) {
     }
 }
 
+export function updateNoteDate (note, date) {
+    return function(dispatch) {
+        return notesService.updateNoteDate(note, date).then(() => dispatch({
+            type: "UPDATE_NOTE_DATE",
+            note,
+            date
+        }));
+    }
+}
+
 export function deleteNote (note) {
     return function(dispatch) {
         return notesService.deleteNote(note)
@@ -41,27 +72,6 @@ export function deleteNote (note) {
                 type: "DELETE_NOTE",
                 note
             }))
-    }
-}
-
-export function updateNote (note) {
-    return function(dispatch) {
-        return notesService.updateNote(note).then(() => dispatch({
-            type: "UPDATE_NOTE",
-            note
-        }))
-    }
-}
-
-export function getNotesByDates (dates, period) {
-    return function(dispatch) {
-        return notesService.getNotesByDates(dates, period).then((notes) => {
-            dispatch({
-                type: "RECIVE_NOTES",
-                dates,
-                notes
-            })
-        });
     }
 }
 

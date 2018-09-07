@@ -145,7 +145,7 @@ class NotesList extends PureComponent {
         await this.props.addNote(JSON.parse(JSON.stringify(
             {
                 ...this.state.copyBuffer, 
-                finished: false, 
+                repeatType: "no-repeat", 
                 added: moment(this.props.currentDate).valueOf()
             }
         )));
@@ -177,24 +177,16 @@ class NotesList extends PureComponent {
             let scrollEl = document.querySelectorAll(".notes-list-item-wrapper")[1];
             scroll.top(scrollEl, el.offsetTop)
         } else {
+            let cur = moment(date).startOf("day");
+            let prev = moment(cur).add(-1, "day");
+            let next = moment(cur).add(1, "day");
+
             if (this.activePageIndex === 2) {
-                this.props.setDatesAndUpdateNotes([
-                    moment(date).add(1, "day"),
-                    moment(date).add(-1, "day"),
-                    moment(date).startOf("day"),
-                ], 2, this.props.settings.notesShowInterval);
+                this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesShowInterval);
             } else if (this.activePageIndex === 0) {
-                this.props.setDatesAndUpdateNotes([
-                    moment(date).startOf("day"),
-                    moment(date).add(1, "day"),
-                    moment(date).add(-1, "day"),
-                ], 0, this.props.settings.notesShowInterval);
+                this.props.setDatesAndUpdateNotes([cur, next, prev], 0, this.props.settings.notesShowInterval);
             } else {
-                this.props.setDatesAndUpdateNotes([
-                    moment(date).add(-1, "day"),
-                    moment(date).startOf("day"),
-                    moment(date).add(1, "day"),
-                ], 1, this.props.settings.notesShowInterval);
+                this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesShowInterval);
             }
         }
     }
@@ -208,13 +200,7 @@ class NotesList extends PureComponent {
     }
 
     onListItemMove = async () => {
-        await this.props.addNote(JSON.parse(JSON.stringify(
-            {
-                ...this.state.listItemDialogVisible.note, 
-                added: moment(this.props.currentDate).add(1, "day").valueOf()
-            }
-        )));
-        this.props.deleteNote(this.state.listItemDialogVisible.note);
+        await this.props.updateNoteDate(this.state.listItemDialogVisible.note, moment(this.props.currentDate).add(1, "day").valueOf());
         this.setState({
             listItemDialogVisible: false
         })

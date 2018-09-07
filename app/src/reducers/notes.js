@@ -69,6 +69,20 @@ function notes (state = init, action) {
                 return list
             })
         }
+        case 'UPDATE_NOTE_DATE': {
+            return state.map((list, i) => {
+                if (list.date.valueOf() === action.note.added.valueOf()) {
+                    let nextList = list.items.map((note) => {
+                        if (note.key === action.note.key) {
+                            return Object.assign({}, note,  {added: action.date})
+                        }
+                        return note
+                    })
+                    return Object.assign({}, list, { items: nextList })
+                }
+                return list
+            })
+        }
         default: 
             return state;
     }

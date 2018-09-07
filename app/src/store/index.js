@@ -8,16 +8,12 @@ import reducers from '../reducers';
 async function initStore (settings) {   
     let moment = require("moment");
 
-    let notes = await notesService.getNotesByDates(
-        [
-            moment().add(-1, "day"),
-            moment().startOf("day"),
-            moment().add(1, "day")
-        ],
-        settings.notesShowInterval
-    );
+    let cur = moment().startOf("day");
+    let prev = moment(cur).add(-1, "day");
+    let next = moment(cur).add(1, "day");
+
+    let notes = await notesService.getNotesByDates([prev, cur, next], settings.notesShowInterval);
     let password = !settings.password;
-    let date = moment().startOf('day');
 
     return createStore(
         reducers,
@@ -25,7 +21,7 @@ async function initStore (settings) {
             settings,
             password,
             notes,
-            date
+            date: cur
         },
         applyMiddleware(
             thunkMiddleware

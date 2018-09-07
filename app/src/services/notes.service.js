@@ -67,7 +67,8 @@ class NotesService {
 
     async getDayNotes(date) {
         let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced, t.repeatType,
+            (SELECT value FROM TasksRepeatValues _rep WHERE _rep.taskId = t.id) as repeatDates
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE 
@@ -91,11 +92,16 @@ class NotesService {
                 ~item.endTime ? item.endTime = moment(item.endTime) : item.endTime = false;
                 ~item.added ? item.added = moment(item.added) : item.added = false;
                 item.finished = Boolean(item.finished);
-                item.notificate = Boolean(item.notificate);                
+                item.notificate = Boolean(item.notificate);             
                 
                 notes.push(item);
             }
         }
+
+        console.log({
+            date: date,
+            items: notes
+        })
 
         return {
             date: date,
@@ -142,7 +148,7 @@ class NotesService {
             notificationService.set(note.key, note);
         };
 
-        if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(note.key));
         }
 
@@ -210,7 +216,7 @@ class NotesService {
             return
         }
 
-        if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             fetch(`${config.apiURL}/notes/finish-state`, {
                 method: "POST",
                 credentials: "same-origin",
@@ -250,7 +256,7 @@ class NotesService {
             return
         }
 
-        if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             fetch(`${config.apiURL}/notes/dynamic-fields`, {
                 method: "POST",
                 credentials: "same-origin",
@@ -270,43 +276,6 @@ class NotesService {
                 .then(() => synchronizationService.setSynced(note.key))                
                 .catch((err) => console.warn(err));
         }
-    }
-
-    async deleteNote(note) {
-        let actionTime = moment().valueOf();     
-        let del = await executeSQL(
-            `UPDATE Tasks 
-            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
-            WHERE id = ?;`,
-            [
-                "DELETE",
-                actionTime,
-                note.key
-            ]
-        ).catch((err) => console.warn(err));          
-        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
-
-        if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
-            fetch(`${config.apiURL}/notes`, {
-                method: "DELETE",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": authService.getToken()                    
-                },
-                body: JSON.stringify({
-                    note: {
-                        uuid: note.uuid,
-                        lastActionTime: actionTime
-                    },
-                    deviceId: window.DEVICE_IMEI
-                })
-            })
-                .then(() => synchronizationService.setSynced(note.key))                            
-                .catch((err) => console.warn(err));
-        }
-
-        return note
     }
 
     async updateNote(updatedNote) {
@@ -357,7 +326,7 @@ class NotesService {
             notificationService.set(note.key, note);
         };
 
-        if (false && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine) {
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
             fetch(`${config.apiURL}/notes`, {
                 method: "PUT",
                 credentials: "same-origin",
@@ -375,6 +344,51 @@ class NotesService {
         }
     }
 
+    async updateNoteDate(note, date) {
+        await executeSQL(`
+            UPDATE Tasks
+            SET added = ?
+            WHERE id = ?;
+        `, [date, note.key])
+    }
+
+    async deleteNote(note) {
+        let actionTime = moment().valueOf();     
+        await executeSQL(
+            `UPDATE Tasks 
+            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
+            WHERE id = ?;`,
+            [
+                "DELETE",
+                actionTime,
+                note.key
+            ]
+        ).catch((err) => console.warn(err));          
+        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
+
+        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
+            fetch(`${config.apiURL}/notes`, {
+                method: "DELETE",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": authService.getToken()                    
+                },
+                body: JSON.stringify({
+                    note: {
+                        uuid: note.uuid,
+                        lastActionTime: actionTime
+                    },
+                    deviceId: window.DEVICE_IMEI
+                })
+            })
+                .then(() => synchronizationService.setSynced(note.key))                            
+                .catch((err) => console.warn(err));
+        }
+
+        return note
+    }
+
     async setNoteRepeat(note) {
         if (note.repeatType === "no-repeat") {
             return
@@ -382,11 +396,11 @@ class NotesService {
 
         await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]).catch((err) => console.warn(err));
 
-        let tasksRepeatValue =  null;
+        let repeatDates = note.repeatDates;
         if (note.repeatType === "week") {
-            tasksRepeatValue = moment(note.added).isoWeekday();
-        } else if (note.repeatType === "any") {
-            tasksRepeatValue = note.added;
+            repeatDates = [moment(note.added).isoWeekday()];
+        } else if (note.repeatType === "day") {
+            repeatDates = [note.added];
         }
 
         await executeSQL(
@@ -394,17 +408,13 @@ class NotesService {
             (taskId, value)
             VALUES
             ${
-                note.repeatDates.reduce((accumulator, currentValue) => {
+                repeatDates.reduce((accumulator, currentValue) => {
                     if (accumulator === false) {
                         return `(${note.key}, ${currentValue})`;
                     }
                     return `${accumulator}, (${note.key}, ${currentValue})`;
                 }, false)
             };`,
-            [
-                note.key,
-                tasksRepeatValue
-            ]
         ).catch((err) => console.warn(err));
     }
 
