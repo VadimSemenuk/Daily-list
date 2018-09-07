@@ -53,7 +53,7 @@ class AuthService {
     }
 
     getUserId() {
-        return this.token.id || 3;
+        return this.token.id || 1;
     }
 
     getUserInfoToken() {

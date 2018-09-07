@@ -5,9 +5,9 @@ export default {
     name: "1.6",
 
     async run() {
-        // await addMigrationsTable();
-        // await alterSettingsTable();
-        await alterTasksTable();
+        await addMigrationsTable();
+        await alterSettingsTable();
+        // await alterTasksTable();
 
         await execureSQL(
             `CREATE TABLE IF NOT EXISTS TasksRepeatValues
@@ -100,24 +100,24 @@ export default {
                     UNIQUE (uuid) ON CONFLICT REPLACE 
                 );
             `);
-            console.log(await execureSQL(`
-            SELECT
-                id,  
-                title, 
-                startTime, 
-                endTime, 
-                notificate, 
-                tag, 
-                dynamicFields, 
-                added, 
-                finished, 
-                0 as isSynced,
-                0 as isLastActionSynced,
-                'ADD' as lastAction,
-                ? as lastActionTime,
-                null as userId,
-                'no-repeat' as repeatType
-            FROM Tasks_OLD;`, [msNow]));
+            // console.log(await execureSQL(`
+            // SELECT
+            //     id,  
+            //     title, 
+            //     startTime, 
+            //     endTime, 
+            //     notificate, 
+            //     tag, 
+            //     dynamicFields, 
+            //     added, 
+            //     finished, 
+            //     0 as isSynced,
+            //     0 as isLastActionSynced,
+            //     'ADD' as lastAction,
+            //     ? as lastActionTime,
+            //     null as userId,
+            //     'no-repeat' as repeatType
+            // FROM Tasks_OLD;`, [msNow]));
             await execureSQL(`
                 INSERT INTO Tasks (
                     id, 
@@ -150,7 +150,7 @@ export default {
                     0 as isLastActionSynced,
                     'ADD' as lastAction,
                     ? as lastActionTime,
-                    null as userId,
+                    1 as userId,
                     'no-repeat' as repeatType
                 FROM Tasks_OLD;
             `, [msNow]);
