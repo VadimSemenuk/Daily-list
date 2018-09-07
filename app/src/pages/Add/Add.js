@@ -114,9 +114,9 @@ class Add extends Component {
                 sourceType,
                 saveToPhotoAlbum: true,
                 quality: 50,
-                destinationType: Camera.DestinationType.FILE_URI,
-                encodingType: Camera.EncodingType.JPEG,
-                mediaType: Camera.MediaType.PICTURE,
+                destinationType: window.navigator.camera.DestinationType.FILE_URI,
+                encodingType: window.navigator.camera.EncodingType.JPEG,
+                mediaType: window.navigator.camera.MediaType.PICTURE,
                 allowEdit: true,
                 correctOrientation: true
             }

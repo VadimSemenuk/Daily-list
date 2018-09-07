@@ -32,15 +32,6 @@ async function createTables () {
             UNIQUE (uuid) ON CONFLICT REPLACE                    
         );`
     )
-
-    await execureSQL(
-        `CREATE TABLE IF NOT EXISTS TasksRepeatValues
-        (
-            taskId INTEGER,
-            value INTEGER,
-            FOREIGN KEY(taskId) REFERENCES Tasks(id)
-        );`
-    )
     
     await execureSQL(
         `CREATE TABLE IF NOT EXISTS Settings

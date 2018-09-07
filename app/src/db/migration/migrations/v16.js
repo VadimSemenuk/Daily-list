@@ -1,4 +1,5 @@
 import execureSQL from "../../../utils/executeSQL";
+import config from "../../../config/config";
 
 export default {
     name: "1.6",
@@ -40,7 +41,7 @@ export default {
             finSort: 0
         }
         
-        let lang = navigator.globalization ? (await new Promise((resolve, reject) => navigator.globalization.getPreferredLanguage(resolve, reject))) : "ru";
+        let lang = navigator.globalization ? (await new Promise((resolve, reject) => navigator.globalization.getPreferredLanguage(resolve, reject))) : config.defaultLang;
         if (lang) {
             lang = lang.value || "en";
         }
@@ -57,5 +58,78 @@ export default {
                 calendarNotesCounter = ?;`, 
             [JSON.stringify(sort), 1, 1, lang, 1]
         );
+
+        let msNow = +new Date();
+        await execureSQL(`ALTER TABLE Tasks RENAME TO Tasks_OLD;`);
+        await execureSQL(`                           
+            CREATE TABLE IF NOT EXISTS Tasks
+            (
+                id INTEGER PRIMARY KEY,
+                uuid TEXT,
+                title TEXT,
+                startTime INTEGER,
+                endTime INTEGER,
+                notificate INTEGER,
+                tag TEXT,
+                dynamicFields TEXT,
+                added INTEGER,
+                finished INTEGER DEFAULT 0,
+                isSynced INTEGER DEFAULT 0,
+                isLastActionSynced INTEGER DEFAULT 0,
+                lastAction TEXT,
+                lastActionTime INTEGER,
+                userId INTEGER,
+                repeatType INTEGER DEFAULT "no-repeat",
+                UNIQUE (uuid) ON CONFLICT REPLACE 
+            );
+        `);
+        await execureSQL(`
+            INSERT INTO Settings (
+                id, 
+                uuid, 
+                title, 
+                startTime, 
+                endTime, 
+                notificate, 
+                tag, 
+                dynamicFields, 
+                added, 
+                finished, 
+                isSynced,
+                isLastActionSynced,
+                lastAction,
+                lastActionTime,
+                userId,
+                repeatType
+            ) 
+            SELECT
+                id, 
+                uuid, 
+                title, 
+                startTime, 
+                endTime, 
+                notificate, 
+                tag, 
+                dynamicFields, 
+                added, 
+                finished, 
+                0 as isSynced,
+                0 as isLastActionSynced,
+                'ADD' as lastAction,
+                ? as lastActionTime,
+                null as userId,
+                'no-repeat' as repeatType
+            FROM Settings_OLD;
+        `, [msNow]);
+        await execureSQL(`DROP TABLE Settings_OLD;`);
+
+        await execureSQL(
+            `CREATE TABLE IF NOT EXISTS TasksRepeatValues
+            (
+                taskId INTEGER,
+                value INTEGER,
+                FOREIGN KEY(taskId) REFERENCES Tasks(id)
+            );`
+        )
     }
 }
