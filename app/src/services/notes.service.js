@@ -67,8 +67,7 @@ class NotesService {
 
     async getDayNotes(date) {
         let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced, t.repeatType,
-            (SELECT value FROM TasksRepeatValues _rep WHERE _rep.taskId = t.id) as repeatDates
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced, t.repeatType
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE 

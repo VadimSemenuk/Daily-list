@@ -65,7 +65,6 @@ export default class App extends Component {
         themesService.applyTheme(settings.theme);
         moment.locale(settings.lang);
         i18n = lang.init(settings.lang);
-        window.moment = moment;
     }
 
     render() {

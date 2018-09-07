@@ -1,3 +1,5 @@
+import moment from "moment";
+
 import execureSQL from "../../../utils/executeSQL";
 
 export default {
@@ -14,7 +16,6 @@ async function createTables () {
         `CREATE TABLE IF NOT EXISTS Tasks
         (
             id INTEGER PRIMARY KEY,
-            uuid TEXT,
             title TEXT,
             startTime INTEGER,
             endTime INTEGER,
@@ -22,14 +23,7 @@ async function createTables () {
             tag TEXT,
             dynamicFields TEXT,
             added INTEGER,
-            finished INTEGER DEFAULT 0,
-            isSynced INTEGER DEFAULT 0,
-            isLastActionSynced INTEGER DEFAULT 0,
-            lastAction TEXT,
-            lastActionTime INTEGER,
-            userId INTEGER,
-            repeatType INTEGER DEFAULT "no-repeat",
-            UNIQUE (uuid) ON CONFLICT REPLACE                    
+            finished INTEGER DEFAULT 0                
         );`
     )
     
@@ -54,4 +48,62 @@ async function fillDb () {
         (defaultNotification, sort, fastAdd, colorTheme, fontSize, finishedSort, autoBackup)
         VALUES (1, 3, 0, 0, 14, 1, 0);`
     )
+
+    // await addInitNote();
+}
+
+function addInitNote() {
+    let initNote = {
+        endTime: -1,
+        finished: 0,
+        notificate: 0,
+        startTime: -1,
+        tag: "#c5282f",
+        title: "Привет",
+        added: moment().startOf("day").valueOf(),
+        dynamicFields: [
+            {
+                type: "text",
+                value: "Это - пример того, как выглядит заметка в Ежедневнике. Нажмите на заметку что-бы увидеть полное содержание.\nЗаметка может содержать в себе:"
+            },
+            {
+                type: "listItem",
+                value: "Обычный теск",
+                checked: true
+            },
+            {
+                type: "listItem",
+                value: "Списки",
+                checked: true
+            },
+            {
+                type: "listItem",
+                value: "Цветовую метку",
+                checked: true
+            },
+            {
+                type: "listItem",
+                value: "Фото",
+                checked: true
+            },
+            {
+                type: "listItem",
+                value: "Напоминание",
+                checked: true
+            },
+            {
+                type: "text",
+                value: "Можно настроить автоматическое повторение заметок."
+            },
+            {
+                type: "text",
+                value: "Приятного пользования!"
+            }
+        ]            
+    };
+    return execureSQL(`
+        INSERT INTO Tasks
+        (title, startTime, endTime, notificate, tag, dynamicFields, added, finished)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [initNote.title, initNote.startTime, initNote.endTime, initNote.notificate, initNote.tag, JSON.stringify(initNote.dynamicFields), initNote.added, initNote.finished])
 }

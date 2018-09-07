@@ -12,9 +12,9 @@ export default {
   
     // view settings page
     "sort": "Sorting",
-    "time-sort": "Time sorting",
-    "time-add-sort": "By time sorting",
-    "view-direction": "Display direction",
+    "time-sort": "Time sorting",  // check
+    "time-add-sort": "By time sorting",  //check
+    "view-direction": "Display direction",  //check
     "view-direction-asc": "Direct order",
     "view-direction-desc": "Reverse order",
     "fin-sort": "Move completed down",
@@ -63,5 +63,39 @@ export default {
     "description": "Description",
     
     // notes list page
-    "no-content": "No notes yet"
+    "no-content": "No notes yet",
+
+    // PART TWO
+
+    // settings page
+    "default-notification": "Автоматически добавлять уведомление",
+
+    // add
+    "notify": "Напомнить",
+    "set-time-first": "Установите время начала",
+    "time": "Время",
+    "open-galery": "Открыть галерею",
+    "make-shot": "Сделать снимок",
+    "repeat-type": "Повторять",
+    "repeat-type-no-repeat": "Не повторять",
+    "repeat-type-day": "Каждый день",
+    "repeat-type-week": "Каждую неделю",
+    "repeat-type-any": "Выбрать даты",
+    "input-placeholder-title": "Заголовок",
+    "input-placeholder-text": "Текст",
+
+    // interface settings page
+    "show-mini-calendar": "Показывать мини-календарь",
+    "language": "Язык",
+    "ru": "Руссский",
+    "en": "Английский",
+
+    // view settings page
+    "notes-show-interval": "Отображать за период",
+    "notes-show-interval-week": "Неделя",
+    "notes-show-interval-day": "День",
+    "show-notes-count": "Отображать счетчики на календаре",
+    
+    // notes list page
+    "move-tomorrow": "Переместить на завтра"
 } 
