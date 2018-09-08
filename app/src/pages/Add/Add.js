@@ -48,7 +48,11 @@ class Add extends Component {
 
     componentDidMount() {
         if (this.props.match.path === "/edit") {
-            this.setState({...this.props.location.state.note});
+            let repeatDates = [];
+            if (this.props.location.state.note.repeatType === "any") {
+                repeatDates = notesService.getNoteRepeatDates(this.props.location.state.note);
+            }
+            this.setState({...this.props.location.state.note, repeatDates});
         }
     }
 

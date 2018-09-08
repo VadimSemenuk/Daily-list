@@ -7,18 +7,18 @@ import authService from "./auth.service";
 import notificationService from "./notification.service";
 
 let tags = [
-    'transparent', 
-    '#00213C', 
-    '#c5282f', 
-    '#62A178', 
-    '#3498DB', 
-    '#BF0FB9', 
-    '#9A6B00', 
-    '#9CECC5', 
-    '#e2dd2d', 
-    '#e23494', 
-    '#7e17dc', 
-    '#333', 
+    'transparent',
+    '#00213C',
+    '#c5282f',
+    '#62A178',
+    '#3498DB',
+    '#BF0FB9',
+    '#9A6B00',
+    '#9CECC5',
+    '#e2dd2d',
+    '#e23494',
+    '#7e17dc',
+    '#333',
     "#bfbfbf"
 ];
 
@@ -29,12 +29,12 @@ class NotesService {
         let select = await executeSQL(
             `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
             FROM Tasks
-            WHERE added >= ? AND added <= ? AND userId = ? AND lastAction != 'DELETE';`, 
+            WHERE added >= ? AND added <= ? AND userId = ? AND lastAction != 'DELETE';`,
             [date.startOf("isoWeek").valueOf(), finDate, authService.getUserId()]
-        );  
+        );
 
         let notes = [];
-        if (select.rows) {    
+        if (select.rows) {
             for(let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
                 item.dynamicFields = JSON.parse(item.dynamicFields);
@@ -42,8 +42,8 @@ class NotesService {
                 ~item.endTime ? item.endTime = moment(item.endTime) : item.endTime = false;
                 ~item.added ? item.added = moment(item.added) : item.added = false;
                 item.finished = Boolean(item.finished);
-                item.notificate = Boolean(item.notificate);                
-                
+                item.notificate = Boolean(item.notificate);
+
                 notes.push(item);
             }
         }
@@ -54,7 +54,7 @@ class NotesService {
         }
 
         let res = weekDates.map((a) => {
-            let msDate = a.valueOf();        
+            let msDate = a.valueOf();
 
             return {
                 date: a,
@@ -70,20 +70,20 @@ class NotesService {
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced, t.repeatType
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-            WHERE 
-                t.userId = ? AND 
-                t.lastAction != 'DELETE' AND 
+            WHERE
+                t.userId = ? AND
+                t.lastAction != 'DELETE' AND
                 (
-                    (t.repeatType = "no-repeat" AND added = ?) OR 
-                    t.repeatType = "day" OR 
-                    (t.repeatType = "week" AND rep.value = ?) OR 
+                    (t.repeatType = "no-repeat" AND added = ?) OR
+                    t.repeatType = "day" OR
+                    (t.repeatType = "week" AND rep.value = ?) OR
                     (t.repeatType = "any" AND rep.value = ?)
-                );`, 
+                );`,
             [authService.getUserId(), date.valueOf(), date.isoWeekday(), date.valueOf()]
-        );   
+        );
 
         let notes = [];
-        if (select.rows) {    
+        if (select.rows) {
             for(let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
                 item.dynamicFields = JSON.parse(item.dynamicFields);
@@ -91,16 +91,11 @@ class NotesService {
                 ~item.endTime ? item.endTime = moment(item.endTime) : item.endTime = false;
                 ~item.added ? item.added = moment(item.added) : item.added = false;
                 item.finished = Boolean(item.finished);
-                item.notificate = Boolean(item.notificate);             
-                
+                item.notificate = Boolean(item.notificate);
+
                 notes.push(item);
             }
         }
-
-        console.log({
-            date: date,
-            items: notes
-        })
 
         return {
             date: date,
@@ -116,7 +111,7 @@ class NotesService {
 
     async addNote(addedNote) {
         let noteUUID = uuid();
-        let actionTime = moment().valueOf(); 
+        let actionTime = moment().valueOf();
         let noteToRemoteInsert = {
             ...addedNote,
             startTime: addedNote.startTime ? addedNote.startTime.valueOf() : -1,
@@ -127,15 +122,15 @@ class NotesService {
             finished: false,
             lastActionTime: actionTime,
             isSynced: 0
-        }   
+        }
         let noteToLocalInsert = {
             ...noteToRemoteInsert,
             notificate: +noteToRemoteInsert.notificate,
-            finished: +noteToRemoteInsert.finished,            
+            finished: +noteToRemoteInsert.finished,
             lastAction: "ADD",
             userId: authService.getUserId(),
             isLastActionSynced: 0,
-            isSynced: 0,        
+            isSynced: 0,
             uuid: noteUUID
         }
 
@@ -161,12 +156,12 @@ class NotesService {
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
-                note.title, 
-                note.startTime, 
-                note.endTime, 
-                note.notificate, 
-                note.tag, 
-                note.dynamicFields, 
+                note.title,
+                note.startTime,
+                note.endTime,
+                note.notificate,
+                note.tag,
+                note.dynamicFields,
                 note.added,
                 note.finished,
                 note.lastAction,
@@ -177,7 +172,7 @@ class NotesService {
                 note.repeatType
             ]
         ).catch((err) => console.warn(err));
-        
+
 
         return insert.insertId
     }
@@ -199,10 +194,10 @@ class NotesService {
     }
 
     async setNoteCheckedState(note, state) {
-        let actionTime = moment().valueOf();     
+        let actionTime = moment().valueOf();
         let update = await executeSQL(
-            `UPDATE Tasks 
-            SET finished = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ? 
+            `UPDATE Tasks
+            SET finished = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ?
             WHERE id = ?;`,
             [
                 +state,
@@ -221,7 +216,7 @@ class NotesService {
                 credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": authService.getToken()                    
+                    "Authorization": authService.getToken()
                 },
                 body: JSON.stringify({
                     note: {
@@ -230,19 +225,19 @@ class NotesService {
                         lastActionTime: actionTime
                     },
                     deviceId: window.DEVICE_IMEI,
-                    
+
                 })
             })
-                .then(() => synchronizationService.setSynced(note.key))        
+                .then(() => synchronizationService.setSynced(note.key))
                 .catch((err) => console.warn(err));
         }
     }
 
     async updateNoteDynamicFields(note, dynamicData) {
-        let actionTime = moment().valueOf();     
+        let actionTime = moment().valueOf();
         let update = await executeSQL(
-            `UPDATE Tasks 
-            SET dynamicFields = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ? 
+            `UPDATE Tasks
+            SET dynamicFields = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ?
             WHERE id = ?;`,
             [
                 JSON.stringify(dynamicData),
@@ -250,7 +245,7 @@ class NotesService {
                 actionTime,
                 note.key
             ]
-        ).catch((err) => console.warn(err)); 
+        ).catch((err) => console.warn(err));
         if (update) {
             return
         }
@@ -261,7 +256,7 @@ class NotesService {
                 credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": authService.getToken()                    
+                    "Authorization": authService.getToken()
                 },
                 body: JSON.stringify({
                     note: {
@@ -272,13 +267,13 @@ class NotesService {
                     deviceId: window.DEVICE_IMEI
                 })
             })
-                .then(() => synchronizationService.setSynced(note.key))                
+                .then(() => synchronizationService.setSynced(note.key))
                 .catch((err) => console.warn(err));
         }
     }
 
     async updateNote(updatedNote) {
-        let actionTime = moment().valueOf();     
+        let actionTime = moment().valueOf();
         let note = {
             ...updatedNote,
             startTime: updatedNote.startTime ? updatedNote.startTime.valueOf() : -1,
@@ -286,33 +281,33 @@ class NotesService {
             added: updatedNote.added ? updatedNote.added.valueOf() : -1,
             dynamicFields: JSON.stringify(updatedNote.dynamicFields),
             lastActionTime: actionTime
-        }      
+        }
 
         await executeSQL(
-            `UPDATE Tasks 
-            SET 
-                title = ?, 
-                startTime = ?, 
-                endTime = ?, 
-                notificate = ?, 
-                tag = ?, 
-                dynamicFields = ?, 
-                added = ?, 
-                finished = ?, 
-                isLastActionSynced = 0, 
-                lastAction = ?, 
+            `UPDATE Tasks
+            SET
+                title = ?,
+                startTime = ?,
+                endTime = ?,
+                notificate = ?,
+                tag = ?,
+                dynamicFields = ?,
+                added = ?,
+                finished = ?,
+                isLastActionSynced = 0,
+                lastAction = ?,
                 lastActionTime = ?,
                 repeatType = ?
             WHERE id = ?;`,
             [
-                note.title, 
-                note.startTime, 
-                note.endTime, 
-                +note.notificate, 
-                note.tag, 
-                note.dynamicFields, 
-                note.added, 
-                +note.finished, 
+                note.title,
+                note.startTime,
+                note.endTime,
+                +note.notificate,
+                note.tag,
+                note.dynamicFields,
+                note.added,
+                +note.finished,
                 "EDIT",
                 actionTime,
                 note.repeatType,
@@ -331,14 +326,14 @@ class NotesService {
                 credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": authService.getToken()                    
+                    "Authorization": authService.getToken()
                 },
                 body: JSON.stringify({
                     note,
                     deviceId: window.DEVICE_IMEI
                 })
             })
-                .then(() => synchronizationService.setSynced(note.key))                
+                .then(() => synchronizationService.setSynced(note.key))
                 .catch((err) => console.warn(err));
         }
     }
@@ -352,9 +347,9 @@ class NotesService {
     }
 
     async deleteNote(note) {
-        let actionTime = moment().valueOf();     
+        let actionTime = moment().valueOf();
         await executeSQL(
-            `UPDATE Tasks 
+            `UPDATE Tasks
             SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
             WHERE id = ?;`,
             [
@@ -362,7 +357,7 @@ class NotesService {
                 actionTime,
                 note.key
             ]
-        ).catch((err) => console.warn(err));          
+        ).catch((err) => console.warn(err));
         notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
 
         if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
@@ -371,7 +366,7 @@ class NotesService {
                 credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": authService.getToken()                    
+                    "Authorization": authService.getToken()
                 },
                 body: JSON.stringify({
                     note: {
@@ -381,7 +376,7 @@ class NotesService {
                     deviceId: window.DEVICE_IMEI
                 })
             })
-                .then(() => synchronizationService.setSynced(note.key))                            
+                .then(() => synchronizationService.setSynced(note.key))
                 .catch((err) => console.warn(err));
         }
 
@@ -417,6 +412,17 @@ class NotesService {
         ).catch((err) => console.warn(err));
     }
 
+    async getNoteRepeatDates(note) {
+        let select = executeSQL(`SELECT value from TaskRepeatValues WHERE taskId = ?`, [note.id]);
+
+        let values = [];
+        if (select.rows) {
+            for(let i = 0; i < select.rows.length; i++) {
+                values.push(select.rows.item(i));
+            }
+        }
+    }
+
     getTags() {
         return [...tags];
     }
@@ -424,23 +430,23 @@ class NotesService {
     getTagByIndex(index) {
         return tags[index];
     }
-    
+
     getRepeatTypeOptions() {
-        return [{ 
-            val: "no-repeat", 
-            translateId: "repeat-type-no-repeat" 
-        }, 
-        { 
-            val: "day", 
-            translateId: "repeat-type-day" 
-        }, 
-        { 
+        return [{
+            val: "no-repeat",
+            translateId: "repeat-type-no-repeat"
+        },
+        {
+            val: "day",
+            translateId: "repeat-type-day"
+        },
+        {
             val: "week",
-            translateId: "repeat-type-week" 
-        }, 
-        { 
+            translateId: "repeat-type-week"
+        },
+        {
             val: "any",
-            translateId: "repeat-type-any" 
+            translateId: "repeat-type-any"
         }]
     }
 }
