@@ -28,9 +28,9 @@ let Header = (props) => (
                 props.page === "notes" &&
                 <div 
                     onClick={props.onSelectToday}
-                    className="current-date"
+                    className="current-date clickable"
                 >
-                    <span className="day">{moment(props.currentDate).format('dddd')}</span>
+                    <span className="day">{moment().format('dddd')}</span>
                     <span className="date">{moment().format('D MMMM')}</span> 
                 </div>
             }
@@ -49,9 +49,9 @@ let Header = (props) => (
                             alt="date"    
                         />
                     </button>
-                    <div className="current-date">
-                        <span className="day">{moment(props.currentDate).format('dddd')}</span>
-                        <span className="date">{moment(props.currentDate).format('D MMMM')}</span> 
+                    <div className="current-date clickable">
+                        <span className="day">{props.currentDate.format('dddd')}</span>
+                        <span className="date">{props.currentDate.format('D MMMM')}</span> 
                     </div>
                 </div>
             }

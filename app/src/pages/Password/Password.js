@@ -37,23 +37,25 @@ class Password extends Component {
         let {t} = this.props;
 
 		return (
-            <div className="password-wrapper">
-                <span className="greeting">{getGreeting()}</span>
+            <div class="page-wrapper">
+                <div className="password-wrapper">
+                    <span className="greeting">{t(getGreeting())}</span>
 
-                <div className="password-input-wrapper">
-                    <input
-                        type="password"
-                        placeholder={t("pass-in")}
-                        onChange={(e) => this.setState({password: e.target.value})}
-                    /> 
-                    <button onClick={this.in}>
-                        <img 
-                            className="in"
-                            src={arrowRight} 
-                            alt="in"
-                        />
-                    </button>      
-                </div> 
+                    <div className="password-input-wrapper">
+                        <input
+                            type="password"
+                            placeholder={t("pass-in")}
+                            onChange={(e) => this.setState({password: e.target.value})}
+                        /> 
+                        <button onClick={this.in}>
+                            <img 
+                                className="in"
+                                src={arrowRight} 
+                                alt="in"
+                            />
+                        </button>      
+                    </div> 
+                </div>
             </div>
 		);
 	}
