@@ -95,7 +95,18 @@ export default {
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
     "show-notes-count": "Отображать счетчики на календаре",
+    "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
     
     // notes list page
-    "move-tomorrow": "Переместить на завтра"
+    "move-tomorrow": "Переместить на завтра",
+
+    // common
+    "afternoon": "день",
+    "evening": "вечер",
+    "night": "ночь",
+    "morning": "утро",
+    "g-afternoon": "Добрый день",
+    "g-evening": "Добрый вечер",
+    "g-night": "Доброй ночи",
+    "g-morning": "Доброе утро",
 } 

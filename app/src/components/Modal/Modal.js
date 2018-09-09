@@ -5,13 +5,13 @@ import "./Modal.scss";
 
 export default class CustomModal extends Component {
     componentDidMount() {
-        if (this.props.isOpen) {
+        if (this.props.isOpen && !this.props.noExit) {
             this.setBackButtonEventHandler();
         }
     }
 
     componentDidUpdate() {
-        if (this.props.isOpen) {
+        if (this.props.isOpen && !this.props.noExit) {
             this.setBackButtonEventHandler();   
         } else {
             this.removeBackButtonEventHandler();  
@@ -46,7 +46,7 @@ export default class CustomModal extends Component {
                 className={`modal ${this.props.className}`}
                 overlayClassName="modal-overlay"
                 animationDuration={0}
-                shouldCloseOnOverlayClick={true}
+                shouldCloseOnOverlayClick={!this.props.noExit}
                 shouldCloseOnEsc={false}
             >
                 <div className={`modal-inner ${this.props.innerClassName ? this.props.innerClassName : ""}`}>

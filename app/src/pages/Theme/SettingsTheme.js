@@ -27,7 +27,7 @@ class SettingsTheme extends Component {
         super(props);
 
         this.state = {
-            themeModal: false
+            langChanged: false
         }
     }
 
@@ -132,6 +132,7 @@ class SettingsTheme extends Component {
                         text={t("language")} 
                         value={t(activeLanguageSettings.translateId)}
                         listItem={ValueListItem}
+                        noExit={this.state.langChanged}
                     >
                         <div className="radio-group">
                             {
@@ -145,12 +146,25 @@ class SettingsTheme extends Component {
                                             this.props.setSetting('lang', value);
                                             i18n.changeLanguage(value);
                                             moment.locale(value);
+                                            this.setState({
+                                                langChanged: true
+                                            })
                                         }}
                                         text={t(setting.translateId)}
                                     />
                                 ))
                             }
                         </div>
+
+                        {   this.state.langChanged && 
+                            <div className="reload-app-note">
+                                {t("reload-app-note")} 
+                                <button 
+                                    className="text block"
+                                    onClick={() => window.location.reload(true)}
+                                >{t("reload")}</button>
+                            </div>
+                        }
                     </ModalListItem>
                 </div>
             </div>

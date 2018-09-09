@@ -1,11 +1,11 @@
 import moment from "moment";
 
 export function getDayPartName() {
-	const SPLIT_MORNING = 7;
-	const SPLIT_AFTERNOON = 12;
-    const SPLIT_EVENING = 17;
-    const SPLIT_NIGHT = 24;
-    const SPLIT_DAY_START = 0;
+	let SPLIT_MORNING = 7;
+	let SPLIT_AFTERNOON = 12;
+    let SPLIT_EVENING = 17;
+    let SPLIT_NIGHT = 24;
+    let SPLIT_DAY_START = 0;
     let currentHour = parseFloat(moment().format("HH"));    
     
     if (currentHour >= SPLIT_AFTERNOON && currentHour <= SPLIT_EVENING) {
