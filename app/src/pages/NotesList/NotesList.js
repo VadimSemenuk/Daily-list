@@ -289,11 +289,13 @@ class NotesList extends PureComponent {
                         isOpen={this.state.listItemDialogVisible ? true : false} 
                         onRequestClose={this.closeDialog}
                     >
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("move-tomorrow")}
-                            onClick={this.onListItemMove}
-                        />
+                        {   (this.state.listItemDialogVisible && this.state.listItemDialogVisible.note.repeatType === "no-repeat") &&
+                            <ButtonListItem
+                                className="no-border"
+                                text={t("move-tomorrow")}
+                                onClick={this.onListItemMove}
+                            />
+                        }
                         <ButtonListItem
                             className="no-border"
                             text={t("edit")}
