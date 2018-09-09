@@ -11,12 +11,34 @@ function notes (state = init, action) {
             return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
         }
         case 'RECIVE_NOTE': {
-            return state.map((list, i) => {
-                if (list.date.valueOf() === action.note.added.valueOf()) {
-                    return Object.assign({}, list, { items: [...list.items, action.note] })
+            let assignFn = (list) => Object.assign({}, list, { items: [...list.items, action.note] });
+            let fn;
+
+            switch(action.note.repeatType) {
+                case "day": {
+                    fn = assignFn;
+                    break;
                 }
-                return list
-            })
+                case "any": {
+                    fn = (list) => {
+                        if (action.note.repeatDates.includes(list.date.valueOf())) {
+                            return assignFn(list)
+                        }
+                        return list
+                    }
+                    break;
+                }
+                default: {
+                    fn = (list) => {
+                        if (list.date.valueOf() === action.note.added.valueOf()) {
+                            return assignFn(list)
+                        }
+                        return list
+                    }
+                }
+            }
+
+            return state.map(fn)
         }
         case 'UPDATE_NOTE_DYNAMIC_FIELDS': {
             return state.map((list) => {

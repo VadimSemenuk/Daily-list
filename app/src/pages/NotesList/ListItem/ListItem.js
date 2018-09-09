@@ -57,11 +57,9 @@ export default class Note extends PureComponent {
                 ></div>
                 <div className="note-content">
                     <div className="note-header">
-                        <div className="note-header-time-wrapper">
-                            {this.props.itemData.startTime && <span>{this.props.itemData.startTime ? this.props.itemData.startTime.format('HH:mm') : null}</span>} 
-                            {this.props.itemData.endTime && <span className="divider">-</span>}
-                            {this.props.itemData.endTime && <span>{this.props.itemData.endTime ? this.props.itemData.endTime.format('HH:mm') : null }</span>}                                                    
-                        </div>
+                        {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>} 
+                        {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
+                        {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>} 
                         {
                             this.props.itemData.notificate &&
                             <img 
