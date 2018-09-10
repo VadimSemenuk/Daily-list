@@ -338,8 +338,8 @@ class NotesService {
         }
     }
 
-    async updateNoteDate(note, date) {
-        await executeSQL(`
+    updateNoteDate(note, date) {
+        return executeSQL(`
             UPDATE Tasks
             SET added = ?
             WHERE id = ?;

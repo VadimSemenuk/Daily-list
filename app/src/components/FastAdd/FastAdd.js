@@ -29,7 +29,9 @@ class FastAdd extends Component {
                     value: this.state.fastAddInputValue
                 }
             ],
-            notificate: false
+            notificate: false,
+            repeatType: "no-repeat",
+            repeatDates: []
         }, this.props.activePageIndex);
         this.setState({
             fastAddInputValue: ""

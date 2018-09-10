@@ -1,17 +1,17 @@
 let init = [];
 
-function reciveNote(state, action) {
-    let assignFn = (list) => Object.assign({}, list, { items: [...list.items, action.note] });
+function reciveNote(state, note) {
+    let assignFn = (list) => Object.assign({}, list, { items: [...list.items, note] });
     let fn;
 
-    switch(action.note.repeatType) {
+    switch(note.repeatType) {
         case "day": {
             fn = assignFn;
             break;
         }
         case "any": {
             fn = (list) => {
-                if (action.note.repeatDates.includes(list.date.valueOf())) {
+                if (note.repeatDates.includes(list.date.valueOf())) {
                     return assignFn(list)
                 }
                 return list
@@ -20,7 +20,7 @@ function reciveNote(state, action) {
         }
         default: {
             fn = (list) => {
-                if (list.date.valueOf() === action.note.added.valueOf()) {
+                if (list.date.valueOf() === note.added.valueOf()) {
                     return assignFn(list)
                 }
                 return list
@@ -42,7 +42,7 @@ function notes (state = init, action) {
             return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
         }
         case 'RECIVE_NOTE': {
-            return reciveNote(state, action);
+            return reciveNote(state, action.note);
         }
         case 'UPDATE_NOTE_DYNAMIC_FIELDS': {
             let assignFn = (list) => {
@@ -86,26 +86,15 @@ function notes (state = init, action) {
 
             return state.map(fn);
         }
-        case 'UPDATE_NOTE': {
+        case 'UPDATE_NOTE':
+        case 'UPDATE_NOTE_DATE': {
             let startState = state.map((list) => {
                 return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
             });
 
-            return reciveNote(startState, action);
-        }
-        case 'UPDATE_NOTE_DATE': {
-            return state.map((list, i) => {
-                if (list.date.valueOf() === action.note.added.valueOf()) {
-                    let nextList = list.items.map((note) => {
-                        if (note.key === action.note.key) {
-                            return Object.assign({}, note,  {added: action.date})
-                        }
-                        return note
-                    })
-                    return Object.assign({}, list, { items: nextList })
-                }
-                return list
-            })
+            let note = action.type === "UPDATE_NOTE_DATE" ? {...action.note, added: action.date} : action.note;
+
+            return reciveNote(startState, note);
         }
         case 'DELETE_NOTE': {
             let assignFn = (list) => {
