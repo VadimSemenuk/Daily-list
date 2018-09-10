@@ -121,7 +121,6 @@ class Add extends Component {
                 destinationType: window.navigator.camera.DestinationType.FILE_URI,
                 encodingType: window.navigator.camera.EncodingType.JPEG,
                 mediaType: window.navigator.camera.MediaType.PICTURE,
-                allowEdit: true,
                 correctOrientation: true
             }
         );

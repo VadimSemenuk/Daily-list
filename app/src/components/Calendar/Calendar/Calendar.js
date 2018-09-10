@@ -9,7 +9,7 @@ import WeekDays from "./WeekDays";
 
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
-import { monthCalendarService as calendarService } from "../../../services/calendar.service";
+// import { monthCalendarService as calendarService } from "../../../services/calendar.service";
 
 export default class Calendar extends Component {
     constructor(props) {
@@ -36,13 +36,13 @@ export default class Calendar extends Component {
     async componentDidMount() {
         document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest)
 
-        if (this.props.calendarNotesCounter) {
-            calendarService.setNotesCountInterval(4);
-            let count = await calendarService.getNotesCount(this.state.msSelectedDate);
-            this.setState({
-                count
-            })
-        }
+        // if (this.props.calendarNotesCounter) {
+        //     calendarService.setNotesCountInterval(4);
+        //     let count = await calendarService.getNotesCount(this.state.msSelectedDate);
+        //     this.setState({
+        //         count
+        //     })
+        // }
     }   
 
     componentWillUnmount() {
@@ -62,9 +62,9 @@ export default class Calendar extends Component {
         }
 
         let count = {};
-        if (this.props.calendarNotesCounter) {
-            count = (await calendarService.updateNotesCountData(nextCurrentMonthStartDate.valueOf())) || this.state.count;       
-        } 
+        // if (this.props.calendarNotesCounter) {
+        //     count = (await calendarService.updateNotesCountData(nextCurrentMonthStartDate.valueOf())) || this.state.count;       
+        // } 
 
         this.setState({
             monthes: nextMonthes,
@@ -194,9 +194,9 @@ export default class Calendar extends Component {
             }        
 
             let count = {};
-            if (this.props.calendarNotesCounter) {
-                count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
-            }
+            // if (this.props.calendarNotesCounter) {
+            //     count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
+            // }
 
             this.setState({
                 monthes,

@@ -19,21 +19,23 @@ class NotificationService {
                     break;
                 }
                 case "day": {
-                    // trigger = { every: { hour: note.startTime.hour(), minute: note.startTime.minute() } };
-                    notificationConfig.trigger = { every: "day", firstAt: new Date(note.startTime.valueOf()) };
+                    notificationConfig.trigger = { every: { hour: note.startTime.hour(), minute: note.startTime.minute() } };
+                    // notificationConfig.trigger = { every: "day", firstAt: new Date(note.startTime.valueOf()) };
                     break;
                 } 
                 case "week": {
-                    // trigger = { every: { weekday: note.startTime.weekday() }};
-                    notificationConfig.trigger = { every: "week", firstAt: new Date(note.startTime.valueOf()) };
+                    notificationConfig.trigger = { every: { weekday: note.startTime.weekday() }};
+                    // notificationConfig.trigger = { every: "week", firstAt: new Date(note.startTime.valueOf()) };
                     break;
                 }
                 case "any": {
-                    for (let date of note.repeatDates) {
-                        notificationConfig.id = date;
-                        notificationConfig.trigger = { at: new Date(date) };
-                        window.cordova.plugins.notification.local.schedule(notificationConfig);
-                    }
+                    note.repeatDates.forEach((date) => {
+                        window.cordova.plugins.notification.local.schedule({
+                            ...notificationConfig,
+                            id: date,
+                            trigger: { at: new Date(date) }
+                        });
+                    })
                     return;
                 }
             }

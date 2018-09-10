@@ -82,20 +82,17 @@ class NotesService {
             [authService.getUserId(), date.valueOf(), date.isoWeekday(), date.valueOf()]
         );
 
-        let notes = [];
-        if (select.rows) {
-            for(let i = 0; i < select.rows.length; i++) {
-                let item = select.rows.item(i);
-                item.dynamicFields = JSON.parse(item.dynamicFields);
-                ~item.startTime ? item.startTime = moment(item.startTime) : item.startTime = false;
-                ~item.endTime ? item.endTime = moment(item.endTime) : item.endTime = false;
-                ~item.added ? item.added = moment(item.added) : item.added = false;
-                item.finished = Boolean(item.finished);
-                item.notificate = Boolean(item.notificate);
-
-                notes.push(item);
+        let notes = [...select.rows].map((item) => {
+            return {
+                ...item,
+                dynamicFields: JSON.parse(item.dynamicFields),
+                startTime: ~item.startTime ? moment(item.startTime) : false,
+                endTime: ~item.endTime ? moment(item.endTime) : false,
+                added: ~item.added ? moment(item.added) : item.added,
+                finished: Boolean(item.finished),
+                notificate: Boolean(item.notificate)
             }
-        }
+        });
 
         return {
             date: date,
