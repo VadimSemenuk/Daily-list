@@ -3,18 +3,17 @@ import authService from "./auth.service";
 import moment from 'moment';
 
 class CalendarService {
-    constructor(period) {
-        this.period = period;
+    async updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate) {
+        if (nextDate >= intervalEndDate || nextDate <= intervalStartDate || force) {
+            return this.getNotesCount(nextDate);
+        };
+
+        return false;
     }
 
-    interval = 10;
-    halfInterval = this.interval / 2;
-    intervalStartDate = null;
-    intervalEndDate = null;
-
-    async getNotesCount(date) {
-        let intervalStartDate = moment(date).startOf(this.period).subtract(this.halfInterval, this.period).valueOf();
-        let intervalEndDate = moment(date).startOf(this.period).add(this.halfInterval, this.period).valueOf();
+    async getNotesCount(date, period, halfInterval = 25) {
+        let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
+        let intervalEndDate = moment(date).startOf(period).add(halfInterval, period).valueOf();
 
         let select = await executeSQL(
             `SELECT COUNT(*) as count, added FROM Tasks
@@ -29,30 +28,14 @@ class CalendarService {
             count[countItem.added] = countItem.count
         }
 
-        this.intervalStartDate = intervalStartDate;
-        this.intervalEndDate = intervalEndDate;
-
-        return count;
-    }
-
-    async updateNotesCountData(nextDate) {
-        if (nextDate >= this.intervalEndDate || nextDate <= this.intervalStartDate) {
-            return this.getNotesCount(nextDate);
+        return {
+            intervalStartDate,
+            intervalEndDate,
+            count
         };
-
-        return false;
-    }
-
-    setNotesCountInterval(interval) {
-        this.interval = interval;
-        this.halfInterval = interval / 2;
     }
 }
 
-let weekCalendarService = new CalendarService("week");
-let monthCalendarService = new CalendarService("month");
+let calendarService = new CalendarService();
 
-export {
-    weekCalendarService,
-    monthCalendarService
-}
+export default calendarService;

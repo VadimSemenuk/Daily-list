@@ -175,7 +175,7 @@ class NotesList extends PureComponent {
         if (this.props.settings.notesShowInterval === 0) {
             let el = document.querySelectorAll(`[data-date='${date.valueOf()}']`)[1].parentElement.previousElementSibling;
             let scrollEl = document.querySelectorAll(".notes-list-item-wrapper")[1];
-            scroll.top(scrollEl, el.offsetTop)
+            scroll.top(scrollEl, el.offsetTop);
         } else {
             let cur = moment(date).startOf("day");
             let prev = moment(cur).add(-1, "day");
@@ -220,9 +220,9 @@ class NotesList extends PureComponent {
                     {   
                         (!this.state.calendar && this.props.settings.showMiniCalendar) && 
                         <LightCalendar
-                            onDateSet={this.setDate}
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
                             currentDate={this.props.currentDate}
+                            onDateSet={this.setDate}
                         />
                     }
                     {

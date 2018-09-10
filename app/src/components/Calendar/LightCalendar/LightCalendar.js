@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
 import ReactSwipe from 'react-swipe';
 import moment from 'moment';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+
+import * as AppActions from '../../../actions'; 
 
 import './LightCalendar.scss';
 
@@ -9,9 +13,7 @@ import WeekDatesRow from "./WeekDatesRow";
 
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
-import { weekCalendarService as calendarService } from "../../../services/calendar.service";
-
-export default class LightCalendar extends Component {
+class LightCalendar extends Component {
     constructor(props) {
         super(props);
 
@@ -21,8 +23,7 @@ export default class LightCalendar extends Component {
         this.state = {
             weeks,
             msSelectedDate,
-            monthName: this.getMonthName(weeks[1][0], weeks[1][6]),
-            count: {}
+            monthName: this.getMonthName(weeks[1][0], weeks[1][6])
         }
 
         this.activePageIndex = 1;  
@@ -33,11 +34,7 @@ export default class LightCalendar extends Component {
 
     async componentDidMount() {
         if (this.props.calendarNotesCounter) {
-            calendarService.setNotesCountInterval(50);
-            let count = await calendarService.getNotesCount(this.state.msSelectedDate);
-            this.setState({
-                count
-            })
+            this.props.getCount(this.state.msSelectedDate);
         }
     }
 
@@ -58,25 +55,18 @@ export default class LightCalendar extends Component {
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {   
-        let weeks = this.state.weeks.slice();
+        let nextDate = side === "left" ? moment(this.state.weeks[index][0]).subtract(1, 'week') : moment(this.state.weeks[index][0]).add(1, 'week');
+        let weeks = [...this.state.weeks.slice(0, nextIndex), this.generateWeekDates(nextDate), ...this.state.weeks.slice(nextIndex + 1)];
 
-        if (side === "left") {        
-            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).subtract(1, 'week'));                       
-        } else {   
-            weeks[nextIndex] = this.generateWeekDates(moment(weeks[index][0]).add(1, 'week'));
-        }
-
-        let count = {};
         if (this.props.calendarNotesCounter) {
-            count = (await calendarService.updateNotesCountData(weeks[nextIndex][0])) || this.state.count;
+            this.props.updateCount(false, weeks[nextIndex][0], this.props.intervalStartDate, this.props.intervalEndDate);
         }
 
         let monthName = this.getMonthName(weeks[index][0], weeks[index][6]);
         
         this.setState({
             weeks,
-            monthName,
-            count
+            monthName
         })
     }
 
@@ -139,9 +129,8 @@ export default class LightCalendar extends Component {
                 nextDate = prevWeekStartDate;
             }
 
-            let count = {};
             if (this.props.calendarNotesCounter) {
-                count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
+                this.props.updateCount(false, nextDate.valueOf(), this.props.intervalStartDate, this.props.intervalEndDate);
             }
 
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
@@ -149,8 +138,7 @@ export default class LightCalendar extends Component {
             this.setState({
                 weeks,
                 msSelectedDate: nextProps.currentDate.valueOf(),
-                monthName,
-                count
+                monthName
             })
         }
     }
@@ -194,7 +182,7 @@ export default class LightCalendar extends Component {
                                         week={week} 
                                         msSelectedDate={this.state.msSelectedDate}
                                         onSelect={this.setDate} 
-                                        count={this.state.count}
+                                        count={this.props.calendar.count}
                                         calendarNotesCounter={this.props.calendarNotesCounter}
                                     />
                                 </div>
@@ -206,3 +194,15 @@ export default class LightCalendar extends Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        calendar: state.calendar,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(AppActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LightCalendar);

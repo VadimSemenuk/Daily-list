@@ -1,16 +1,18 @@
-import notesService from "../services/notes.service.js";
-import settingsService from "../services/settings.service.js";
+import notesService from "../services/notes.service";
+import settingsService from "../services/settings.service";
+import calendarService from "../services/calendar.service";
 
 // notes
 export function addNote (note) {
     return function(dispatch) {
         return notesService.addNote(note)
-            .then((note) => {
-                return dispatch({
+            .then((note) => (
+                dispatch({
                     type: "RECIVE_NOTE",
                     note
                 })
-            })
+            ))
+            .then(() => dispatch(updateCount(true, note.added.valueOf())))
     }
 }
 
@@ -139,5 +141,28 @@ export function triggerSynchronizationLoader (state) {
     return {
         type: "TRIGGER_SYNCHRONIZATION_LOADER",
         state 
+    }
+}
+
+// calendar 
+export function getCount (date, period) {    
+    return function(dispatch) {
+        return calendarService.getNotesCount(date, period).then((nextCount) => dispatch({
+            type: "GET_NOTES_COUNT",
+            nextCount 
+        }));
+    }
+}
+
+export function updateCount (force, nextDate, intervalStartDate, intervalEndDate) {    
+    return function(dispatch) {
+        return calendarService.updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate).then((nextCount) => {
+            if (nextCount) {
+                return dispatch({
+                    type: "UPDATE_NOTES_COUNT",
+                    nextCount
+                })
+            }
+        });
     }
 }

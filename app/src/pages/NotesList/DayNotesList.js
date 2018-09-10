@@ -6,7 +6,7 @@ import ListItem from './ListItem/ListItem';
 class DayNotesList extends PureComponent {
     render() {
         let {t} = this.props;
-        // console.log("day list render");
+        
         return (
             this.props.notes.length ?
             this.props.notes.map((a, i) => (
