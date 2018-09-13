@@ -34,7 +34,7 @@ class LightCalendar extends Component {
 
     async componentDidMount() {
         if (this.props.calendarNotesCounter) {
-            this.props.getCount(this.state.msSelectedDate);
+            this.props.getCount(this.state.msSelectedDate, "week");
         }
     }
 
@@ -59,7 +59,7 @@ class LightCalendar extends Component {
         let weeks = [...this.state.weeks.slice(0, nextIndex), this.generateWeekDates(nextDate), ...this.state.weeks.slice(nextIndex + 1)];
 
         if (this.props.calendarNotesCounter) {
-            this.props.updateCount(false, weeks[nextIndex][0], this.props.intervalStartDate, this.props.intervalEndDate);
+            this.props.updateCount(false, weeks[nextIndex][0], this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "week");
         }
 
         let monthName = this.getMonthName(weeks[index][0], weeks[index][6]);
@@ -130,7 +130,7 @@ class LightCalendar extends Component {
             }
 
             if (this.props.calendarNotesCounter) {
-                this.props.updateCount(false, nextDate.valueOf(), this.props.intervalStartDate, this.props.intervalEndDate);
+                this.props.updateCount(false, nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "week");
             }
 
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
@@ -197,7 +197,7 @@ class LightCalendar extends Component {
 
 function mapStateToProps(state) {
     return {
-        calendar: state.calendar,
+        calendar: state.calendar.week
     }
 }
 

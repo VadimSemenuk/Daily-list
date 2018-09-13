@@ -154,9 +154,9 @@ export function getCount (date, period) {
     }
 }
 
-export function updateCount (force, nextDate, intervalStartDate, intervalEndDate) {    
+export function updateCount (force, nextDate, intervalStartDate, intervalEndDate, period) {    
     return function(dispatch) {
-        return calendarService.updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate).then((nextCount) => {
+        return calendarService.updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate, period).then((nextCount) => {
             if (nextCount) {
                 return dispatch({
                     type: "UPDATE_NOTES_COUNT",

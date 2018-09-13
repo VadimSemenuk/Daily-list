@@ -41,6 +41,7 @@ class Add extends Component {
             repeatDates: [],
 
             calendar: false,
+            pictureModal: false
         }
 
         this.tags = notesService.getTags();
@@ -265,18 +266,18 @@ class Add extends Component {
                                     src={AddGeryImg} 
                                     alt="tf"                                                                
                                 />   
-                                <span>Пункт списка</span>     
+                                <span>{t("list-item-btn")}</span>     
                             </button>  
                             <button onClick={this.addInput}>
                                 <img 
                                     src={AddGeryImg} 
                                     alt="lf"                                
                                 />   
-                                <span>Поле</span>     
+                                <span>{t("field-btn")}</span>     
                             </button>  
 
                             <ModalListItem
-                                ref={this.photoModal}
+                                ref={(r) => this.photoModal = r}
                                 listItem={(props) => (
                                     <button 
                                         onClick={props.onClick}

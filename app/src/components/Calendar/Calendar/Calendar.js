@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
 import ReactSwipe from 'react-swipe';
 import moment from 'moment';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+
+import * as AppActions from '../../../actions'; 
 
 import './Calendar.scss';
 
@@ -9,9 +13,7 @@ import WeekDays from "./WeekDays";
 
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
-// import { monthCalendarService as calendarService } from "../../../services/calendar.service";
-
-export default class Calendar extends Component {
+class Calendar extends Component {
     constructor(props) {
         super(props);
 
@@ -23,8 +25,7 @@ export default class Calendar extends Component {
             currentMonthStartDate,
             msSelectedDate,
             msSelectedDates: (this.props.msSelectedDates && this.props.msSelectedDates.length) ? this.props.msSelectedDates : [msSelectedDate],
-            mode: this.props.mode || "default",
-            count: {}
+            mode: this.props.mode || "default"
         }
 
         this.activePageIndex = 1;  
@@ -34,42 +35,29 @@ export default class Calendar extends Component {
     }
 
     async componentDidMount() {
-        document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest)
+        document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest);
 
-        // if (this.props.calendarNotesCounter) {
-        //     calendarService.setNotesCountInterval(4);
-        //     let count = await calendarService.getNotesCount(this.state.msSelectedDate);
-        //     this.setState({
-        //         count
-        //     })
-        // }
+        if (this.props.calendarNotesCounter) {
+            this.props.getCount(this.state.msSelectedDate, "month");
+        }
     }   
 
     componentWillUnmount() {
-        document.querySelector(".notes-list-swiper").removeEventListener("click", this.props.onCloseRequest)
+        document.querySelector(".notes-list-swiper").removeEventListener("click", this.props.onCloseRequest);
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {   
-        let nextMonthes = this.state.monthes.slice();
-        let nextCurrentMonthStartDate;
-        
-        if (side === "left") {
-            nextCurrentMonthStartDate = moment(this.state.currentMonthStartDate).subtract(1, 'month');
-            nextMonthes[nextIndex] = this.getMonthDays(moment(nextCurrentMonthStartDate).subtract(1, 'month'));   
-        } else {   
-            nextCurrentMonthStartDate = moment(this.state.currentMonthStartDate).add(1, 'month');
-            nextMonthes[nextIndex] = this.getMonthDays(moment(nextCurrentMonthStartDate).add(1, 'month'));  
-        }
+        let currentMonthStartDate = side === "left" ? moment(this.state.currentMonthStartDate).subtract(1, 'month') : moment(this.state.currentMonthStartDate).add(1, 'month');
+        let nextMonthStartDate = side === "left" ? moment(currentMonthStartDate).subtract(1, 'month') : moment(currentMonthStartDate).add(1, 'month');
+        let monthes = [...this.state.monthes.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.monthes.slice(nextIndex + 1)];        
 
-        let count = {};
-        // if (this.props.calendarNotesCounter) {
-        //     count = (await calendarService.updateNotesCountData(nextCurrentMonthStartDate.valueOf())) || this.state.count;       
-        // } 
+        if (this.props.calendarNotesCounter) {
+            this.props.updateCount(false, currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
+        } 
 
         this.setState({
-            monthes: nextMonthes,
-            currentMonthStartDate: nextCurrentMonthStartDate,
-            count
+            monthes: monthes,
+            currentMonthStartDate
         })
     }
 
@@ -193,16 +181,14 @@ export default class Calendar extends Component {
                 nextDate = prevMonthStartDate;
             }        
 
-            let count = {};
-            // if (this.props.calendarNotesCounter) {
-            //     count = (await calendarService.updateNotesCountData(nextDate.valueOf())) || this.state.count;
-            // }
+            if (this.props.calendarNotesCounter) {
+                this.props.updateCount(false, nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
+            }
 
             this.setState({
                 monthes,
                 currentMonthStartDate,
-                msSelectedDate,
-                count
+                msSelectedDate
             })
         }
     }
@@ -238,7 +224,7 @@ export default class Calendar extends Component {
                                         msSelectedDate={this.state.msSelectedDate}
                                         msSelectedDates={this.state.msSelectedDates}
                                         onSelect={this.onDateSet}
-                                        count={this.state.count}
+                                        count={this.props.calendar.count}
                                         mode={this.state.mode}
                                         calendarNotesCounter={this.props.calendarNotesCounter}
                                     /> 
@@ -251,3 +237,15 @@ export default class Calendar extends Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        calendar: state.calendar.month
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(AppActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Calendar);

@@ -86,6 +86,8 @@ export default {
     "repeat-type-any": "Выбрать даты",
     "input-placeholder-title": "Заголовок",
     "input-placeholder-text": "Текст",
+    "list-item-btn": "Пункт списка",
+    "field-btn": "Поле",
 
     // interface settings page
     "show-mini-calendar": "Показывать мини-календарь",

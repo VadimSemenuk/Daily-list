@@ -3,9 +3,9 @@ import authService from "./auth.service";
 import moment from 'moment';
 
 class CalendarService {
-    async updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate) {
+    async updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate, period) {
         if (nextDate >= intervalEndDate || nextDate <= intervalStartDate || force) {
-            return this.getNotesCount(nextDate);
+            return this.getNotesCount(nextDate, period);
         };
 
         return false;
@@ -29,9 +29,11 @@ class CalendarService {
         }
 
         return {
-            intervalStartDate,
-            intervalEndDate,
-            count
+            [period]: {
+                intervalStartDate,
+                intervalEndDate,
+                count
+            }
         };
     }
 }
