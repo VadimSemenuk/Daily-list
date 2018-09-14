@@ -82,8 +82,11 @@ class NotesService {
             [authService.getUserId(), date.valueOf(), date.isoWeekday(), date.valueOf()]
         );
 
-        let notes = [...select.rows].map((item) => {
-            return {
+        let notes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            let item = select.rows.item(i);
+
+            let nextItem = {
                 ...item,
                 dynamicFields: JSON.parse(item.dynamicFields),
                 startTime: ~item.startTime ? moment(item.startTime) : false,
@@ -92,7 +95,9 @@ class NotesService {
                 finished: Boolean(item.finished),
                 notificate: Boolean(item.notificate)
             }
-        });
+
+            notes.push(nextItem);
+        }
 
         return {
             date: date,

@@ -19,13 +19,23 @@ class NotificationService {
                     break;
                 }
                 case "day": {
-                    notificationConfig.trigger = { every: { hour: note.startTime.hour(), minute: note.startTime.minute() } };
-                    // notificationConfig.trigger = { every: "day", firstAt: new Date(note.startTime.valueOf()) };
+                    notificationConfig.trigger = { 
+                        every: { 
+                            hour: note.startTime.hour(), 
+                            minute: note.startTime.minute() 
+                        },
+                        count: 999
+                    };
                     break;
                 } 
                 case "week": {
-                    notificationConfig.trigger = { every: { weekday: note.startTime.weekday() }};
-                    // notificationConfig.trigger = { every: "week", firstAt: new Date(note.startTime.valueOf()) };
+                    notificationConfig.trigger = { 
+                        every: 
+                        { 
+                            weekday: note.startTime.weekday() 
+                        },
+                        count: 999
+                    };
                     break;
                 }
                 case "any": {
