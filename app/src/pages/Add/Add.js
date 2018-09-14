@@ -81,6 +81,23 @@ class Add extends Component {
         })
     }
 
+    onEnterPress = (i) => {
+        let field = {
+            type: "listItem",
+            value: "",
+            checked: false
+        };
+
+        this.setState({
+            dynamicFields: [...this.state.dynamicFields.slice(0, i), field, ...this.state.dynamicFields.slice(i + 1)]
+        }, () => {
+            let input = document.querySelector(".removable-text-checkbox-wrapper input:focus");
+            if (input) {
+                input.focus();
+            }
+        })
+    }
+
     onDynamicItemRemove = (i, ref) => {
         let nextSibling = ref.nextSibling;
         if (nextSibling.classList.contains("removable-text-checkbox-wrapper")) {
@@ -224,6 +241,7 @@ class Add extends Component {
                                                 dynamicFields[i] = {...dynamicFields[i], checked: value}                                            
                                                 this.setState({dynamicFields});
                                             }}
+                                            onEnterPress={() => this.onEnterPress(i)}
                                             textValue={a.value} 
                                             value={a.checked}                                                                                                                       
                                         />

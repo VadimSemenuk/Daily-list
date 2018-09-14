@@ -13,6 +13,10 @@ export default class RemovableTextCheckBox extends PureComponent {
 
     onListItemRemove = (e) => this.props.onListItemRemove(this.ref);
 
+    onListItemRemove = (e) => this.props.onListItemRemove(this.ref);
+
+    onKeyPress = (e) => e.key === "Enter" && this.props.onEnterPress()
+
     render () {
         return (
             <div 
@@ -28,6 +32,7 @@ export default class RemovableTextCheckBox extends PureComponent {
                     onChange={this.onTextChange}
                     value={this.props.textValue}
                     className={`content-input${this.props.value ? " crossed" : ""}`}
+                    onKeyPress={this.onKeyPress}
                 />
                 <button onClick={this.onListItemRemove}>
                     <img

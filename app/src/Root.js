@@ -33,9 +33,15 @@ class Root extends Component {
     setKeyoardEvents() {
         window.addEventListener('keyboardDidShow', () => {
             document.querySelector(".hide-with-active-keyboard").classList.add("hidden");
+            setTimeout(function() {
+                document.activeElement.scrollIntoViewIfNeeded();
+            }, 100);
         });
         window.addEventListener('keyboardDidHide', () => {
-            document.querySelector(".hide-with-active-keyboard").classList.remove("hidden");            
+            document.querySelector(".hide-with-active-keyboard").classList.remove("hidden"); 
+            setTimeout(function() {
+                document.activeElement.scrollIntoViewIfNeeded();
+            }, 100);           
         });
     }
        

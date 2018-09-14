@@ -27,14 +27,10 @@ class SynchronizationService {
             return false
         }
 
-        return newNotes.filter((note, i) => {
+        return newNotes.filter((note) => {
             let localChangedNote = notSynkedLocalNotes.find((a) => a.uuid === note.uuid);
             if (localChangedNote) {
-                if (localChangedNote.lastActionTime > note.lastActionTime) {
-                    return true
-                } else {
-                    return false
-                }
+                return localChangedNote.lastActionTime > note.lastActionTime
             }
             return true
         })
