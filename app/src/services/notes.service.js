@@ -144,7 +144,7 @@ class NotesService {
             notificationService.set(note.key, note);
         };
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
+        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
             this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(note.key));
         }
 
@@ -212,7 +212,7 @@ class NotesService {
             return
         }
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
+        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
             fetch(`${config.apiURL}/notes/finish-state`, {
                 method: "POST",
                 credentials: "same-origin",
@@ -252,7 +252,7 @@ class NotesService {
             return
         }
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
+        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
             fetch(`${config.apiURL}/notes/dynamic-fields`, {
                 method: "POST",
                 credentials: "same-origin",
@@ -322,7 +322,7 @@ class NotesService {
             notificationService.set(note.key, note);
         };
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
+        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
             fetch(`${config.apiURL}/notes`, {
                 method: "PUT",
                 credentials: "same-origin",
@@ -362,7 +362,7 @@ class NotesService {
         ).catch((err) => console.warn(err));
         notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
 
-        if (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine && false) {
+        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
             fetch(`${config.apiURL}/notes`, {
                 method: "DELETE",
                 credentials: "same-origin",

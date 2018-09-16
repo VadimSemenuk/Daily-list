@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import moment from "moment";
 import {translate} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
@@ -19,14 +18,6 @@ let sortDirectionSettings = settingsService.getSortDirectionSettings();
 let notesShowIntervalSettings = settingsService.getNotesShowIntervalSettings();
 
 class SettingsSort extends Component {
-    componentWillUnmount() {
-        // let cur = moment().startOf("day");
-        // let prev = moment(cur).add(-1, "day");
-        // let next = moment(cur).add(1, "day");
-    
-        // await notesService.getNotesByDates([prev, cur, next], settings.notesShowInterval);
-    }
-
     render() {
         let {t} = this.props;
         let activeSortType = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type);

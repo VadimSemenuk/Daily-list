@@ -32,11 +32,11 @@ export default class MonthDates extends PureComponent {
 
                                         return (
                                             <button 
-                                                className={`calendar-date ${active ? 'active' : ''}`}
+                                                className={`calendar-date${active ? ' active' : ''}`}
                                                 key={i} 
                                                 onClick={() => this.props.onSelect(weekDay, active)}
                                             >
-                                                {this.props.calendarNotesCounter ? <span className="count">{count}</span> : null} 
+                                                {this.props.calendarNotesCounter ? <span className="count theme-contrasting-color">{count}</span> : null} 
                                                 {weekDay.format('DD')}
                                             </button> 
                                         )

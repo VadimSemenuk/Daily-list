@@ -1,7 +1,6 @@
 export default {
     // settings page
     "settings": "Settings",
-    "default-notification": "Default notification turn on",
     "view": "Display",
     "interface": "Interface",
     "data-sync": "Data synchronization",
