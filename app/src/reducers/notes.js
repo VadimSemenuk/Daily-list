@@ -112,6 +112,14 @@ function notes (state = init, action) {
 
             return state.map(fn);
         }
+        case "RENDER_NOTES": {
+            return state.map((list) => {
+                return {
+                    ...list,
+                    items: list.items.slice()
+                }
+            })
+        }
         default: 
             return state;
     }

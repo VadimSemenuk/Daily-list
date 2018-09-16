@@ -15,7 +15,7 @@ export default class WeekDatesRow extends PureComponent {
 
                         return (
                             <button 
-                                className={`light-calendar-date ${active ? 'active' : ''}`}
+                                className={`light-calendar-date theme-contrasting-color ${active ? 'active' : ''}`}
                                 key={i} 
                                 onClick={() => this.props.onSelect(date)}
                             >     

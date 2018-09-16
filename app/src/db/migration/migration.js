@@ -2,6 +2,8 @@ import execureSQL from "../../utils/executeSQL";
 import migrations from "./migrations";
 import {init} from "./migrations";
 
+window.execureSQL = execureSQL;
+
 class Migration {
     async checkDBExisting() {
         return (await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks';`)).rows.length;

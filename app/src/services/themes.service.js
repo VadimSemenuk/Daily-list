@@ -128,6 +128,9 @@ class ThemesService {
             .page-content {
                 background: ${theme.body}
             }
+            .theme-contrasting-color {
+                color: ${theme.contrasting}
+            }
         `
     }
 }

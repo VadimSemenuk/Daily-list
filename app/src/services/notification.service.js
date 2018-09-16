@@ -48,6 +48,7 @@ class NotificationService {
                     })
                     return;
                 }
+                default: break;
             }
 
             window.cordova.plugins.notification.local.schedule(notificationConfig);

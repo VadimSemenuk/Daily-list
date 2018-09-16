@@ -12,7 +12,7 @@ export function addNote (note) {
                     note
                 })
             ))
-            .then(() => dispatch(updateCount(true, note.added.valueOf())))
+            .then(() => dispatch(getFullCount(note.added.valueOf())))
     }
 }
 
@@ -77,6 +77,12 @@ export function deleteNote (note) {
     }
 }
 
+export function renderNotes () {
+    return {
+        type: "RENDER_NOTES"
+    }
+}
+
 // date
 export function setCurrentDate (date) {
     return {
@@ -119,13 +125,14 @@ export function updateWeekDatesAndNotes (date, preRenderDate, nextIndex) {
 }
 
 // settings
-export function setSetting (settingName, value) {     
+export function setSetting (settingName, value, fn) {     
     return function(dispatch) {
         return settingsService.setSetting(settingName, value).then(() => dispatch({
             type: "SET_SETTING",
             settingName,
             value
-        }));
+        }))
+        .then(() => fn && fn())
     }
 }
 
@@ -147,22 +154,18 @@ export function triggerSynchronizationLoader (state) {
 // calendar 
 export function getCount (date, period) {    
     return function(dispatch) {
-        return calendarService.getNotesCount(date, period).then((nextCount) => dispatch({
-            type: "GET_NOTES_COUNT",
+        return calendarService.getCount(date, period).then((nextCount) => dispatch({
+            type: "GET_COUNT",
             nextCount 
         }));
     }
 }
 
-export function updateCount (force, nextDate, intervalStartDate, intervalEndDate, period) {    
+export function getFullCount (date, period) {    
     return function(dispatch) {
-        return calendarService.updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate, period).then((nextCount) => {
-            if (nextCount) {
-                return dispatch({
-                    type: "UPDATE_NOTES_COUNT",
-                    nextCount
-                })
-            }
-        });
+        return calendarService.getFullCount(date, period).then((nextCount) => dispatch({
+            type: "GET_COUNT",
+            nextCount 
+        }));
     }
 }

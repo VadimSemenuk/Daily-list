@@ -3,15 +3,11 @@ import authService from "./auth.service";
 import moment from 'moment';
 
 class CalendarService {
-    async updateNotesCount(force, nextDate, intervalStartDate, intervalEndDate, period) {
-        if (nextDate >= intervalEndDate || nextDate <= intervalStartDate || force) {
-            return this.getNotesCount(nextDate, period);
-        };
-
-        return false;
+    checkForCountUpdate(nextDate, intervalStartDate, intervalEndDate) {
+        return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
-    async getNotesCount(date, period, halfInterval = 25) {
+    async getCount(date, period, halfInterval = 25) {
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).startOf(period).add(halfInterval, period).valueOf();
 
@@ -35,6 +31,12 @@ class CalendarService {
                 count
             }
         };
+    }
+
+    async getFullCount(date) {
+        let counts = await Promise.all([this.getCount(date, "week"), this.getCount(date, "month")]);
+
+        return {...counts[0], ...counts[1]}
     }
 }
 

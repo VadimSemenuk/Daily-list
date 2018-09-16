@@ -13,6 +13,8 @@ import WeekDays from "./WeekDays";
 
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
+import calendarService from "../../../services/calendar.service";
+
 class Calendar extends Component {
     constructor(props) {
         super(props);
@@ -37,7 +39,7 @@ class Calendar extends Component {
     async componentDidMount() {
         document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest);
 
-        if (this.props.calendarNotesCounter) {
+        if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(this.state.msSelectedDate, this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
             this.props.getCount(this.state.msSelectedDate, "month");
         }
     }   
@@ -51,8 +53,8 @@ class Calendar extends Component {
         let nextMonthStartDate = side === "left" ? moment(currentMonthStartDate).subtract(1, 'month') : moment(currentMonthStartDate).add(1, 'month');
         let monthes = [...this.state.monthes.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.monthes.slice(nextIndex + 1)];        
 
-        if (this.props.calendarNotesCounter) {
-            this.props.updateCount(false, currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
+        if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+            this.props.getCount(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
         } 
 
         this.setState({
@@ -181,8 +183,8 @@ class Calendar extends Component {
                 nextDate = prevMonthStartDate;
             }        
 
-            if (this.props.calendarNotesCounter) {
-                this.props.updateCount(false, nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
+            if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+                this.props.getCount(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
             }
 
             this.setState({

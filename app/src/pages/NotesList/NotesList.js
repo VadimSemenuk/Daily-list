@@ -7,9 +7,6 @@ import {translate} from "react-i18next";
 import scroll from "scroll";
 import debounce from "debounce";
 
-import synchronizationService from '../../services/synchronization.service';
-import authService from "../../services/auth.service";
-
 import FastAdd from '../../components/FastAdd/FastAdd';
 import DayNotesList from './DayNotesList';
 import WeekNotesList from './WeekNotesList';
@@ -46,21 +43,6 @@ class NotesList extends PureComponent {
     }
 
     async componentDidMount() {
-        // this.props.triggerSynchronizationLoader(true);
-        // let deviceIMEI = window.DEVICE_IMEI;
-        // let userId = authService.getUserId();
-
-        // let newNotes = await synchronizationService.getNewNotes(deviceIMEI, userId);
-        // if (newNotes && newNotes.length) {
-        //     await synchronizationService.setNewNotes(newNotes, deviceIMEI);
-        // }
-
-        // let notSynkedLocalNotes = await synchronizationService.getNotSyncedLocalNotesFull(userId);
-        // if (notSynkedLocalNotes && notSynkedLocalNotes.length) {
-        //     await synchronizationService.sendNewLocalNotes(notSynkedLocalNotes, deviceIMEI, userId);
-        // }
-        // this.props.triggerSynchronizationLoader(false);    
-        
         if (this.props.settings.notesShowInterval === 0) {
             this.setScrollEvent();
         }
@@ -357,10 +339,10 @@ class NotesList extends PureComponent {
 }
 
 function mapStateToProps(state) {
-    sort(state.notes, state.settings);
+    let notes = sort(state.notes, state.settings);
 
     return {
-        notes: state.notes,
+        notes,
         currentDate: state.date,
         settings: state.settings
     }
