@@ -27,7 +27,12 @@ export default class MonthDates extends PureComponent {
 
                                         let count = null;
                                         if (this.props.calendarNotesCounter) {
+                                            let weekDayNumber = weekDay.isoWeekday();                                       
+
                                             count = this.props.count[msCurrentDay] || 0;
+                                            count += this.props.repeatable.day || 0; 
+                                            count += this.props.repeatable.week[weekDayNumber] || 0;
+                                            count += this.props.repeatable.any[msCurrentDay] || 0;
                                         }
 
                                         return (

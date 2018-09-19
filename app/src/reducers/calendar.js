@@ -1,10 +1,15 @@
-let init = {
-    week: {
-        count: {}
-    },
-    month: {
-        count: {}
+let count = {
+    count: {},
+    repeatable: {
+        day: 0,
+        week: {},
+        any: {}
     }
+}
+
+let init = {
+    week: count,
+    month: count
 }
 
 function date (state = init, action) {

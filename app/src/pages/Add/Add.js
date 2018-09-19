@@ -90,11 +90,12 @@ class Add extends Component {
         };
 
         this.setState({
-            dynamicFields: [...this.state.dynamicFields.slice(0, i), field, ...this.state.dynamicFields.slice(i + 1)]
+            dynamicFields: [...this.state.dynamicFields.slice(0, i + 1), field, ...this.state.dynamicFields.slice(i + 1)]
         }, () => {
             let input = document.querySelector(".removable-text-checkbox-wrapper input:focus");
             if (input) {
-                input.focus();
+                let next = input.parentElement.nextSibling.querySelector("input.content-input");
+                next.focus();
             }
         })
     }

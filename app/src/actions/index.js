@@ -6,12 +6,10 @@ import calendarService from "../services/calendar.service";
 export function addNote (note) {
     return function(dispatch) {
         return notesService.addNote(note)
-            .then((note) => (
-                dispatch({
-                    type: "RECIVE_NOTE",
-                    note
-                })
-            ))
+            .then((note) => dispatch({
+                type: "RECIVE_NOTE",
+                note
+            }))
             .then(() => dispatch(getFullCount(note.added.valueOf())))
     }
 }
@@ -30,10 +28,12 @@ export function getNotesByDates (dates, period) {
 
 export function updateNote (note) {
     return function(dispatch) {
-        return notesService.updateNote(note).then(() => dispatch({
+        return notesService.updateNote(note)
+        .then(() => dispatch({
             type: "UPDATE_NOTE",
             note
         }))
+        .then(() => dispatch(getFullCount(note.added.valueOf())))
     }
 }
 
@@ -59,7 +59,7 @@ export function updateNoteDynamicFields (note, dynamicFields) {
 
 export function updateNoteDate (note, date) {
     return function(dispatch) {
-        return notesService.updateNoteDate(note, date).then(() => dispatch({
+        return notesService.updateNoteDate(note, date.valueOf()).then(() => dispatch({
             type: "UPDATE_NOTE_DATE",
             note,
             date

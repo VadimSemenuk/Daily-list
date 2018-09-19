@@ -185,6 +185,7 @@ class LightCalendar extends Component {
                                         msSelectedDate={this.state.msSelectedDate}
                                         onSelect={this.setDate} 
                                         count={this.props.calendar.count}
+                                        repeatable={this.props.calendar.repeatable}
                                         calendarNotesCounter={this.props.calendarNotesCounter}
                                     />
                                 </div>

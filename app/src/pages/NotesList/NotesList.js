@@ -182,7 +182,7 @@ class NotesList extends PureComponent {
     }
 
     onListItemMove = async () => {
-        await this.props.updateNoteDate(this.state.listItemDialogVisible.note, moment(this.props.currentDate).add(1, "day").valueOf());
+        await this.props.updateNoteDate(this.state.listItemDialogVisible.note, moment(this.props.currentDate).add(1, "day"));
         this.setState({
             listItemDialogVisible: false
         })

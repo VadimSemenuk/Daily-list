@@ -32,7 +32,9 @@ class NotificationService {
                     notificationConfig.trigger = { 
                         every: 
                         { 
-                            weekday: note.startTime.weekday() 
+                            weekday: note.startTime.weekday(),
+                            hour: note.startTime.hour(), 
+                            minute: note.startTime.minute()
                         },
                         count: 999
                     };
@@ -58,7 +60,7 @@ class NotificationService {
     clear = (ids) => {
         if (!window.cordova) return
         
-        window.cordova.plugins.notification.local.cancel(ids)
+        window.cordova.plugins.notification.local.clear(ids);
     }
 
     getMessgae(data) {
