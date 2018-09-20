@@ -5,7 +5,7 @@ import './Fab.scss';
 
 export default (props) => (
     <button 
-        className="fab"
+        className="fab theme-header-background"
         onClick={props.onClick}
     >
         <img 

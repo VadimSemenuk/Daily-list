@@ -59,7 +59,7 @@ export function updateNoteDynamicFields (note, dynamicFields) {
 
 export function updateNoteDate (note, date) {
     return function(dispatch) {
-        return notesService.updateNoteDate(note, date.valueOf()).then(() => dispatch({
+        return notesService.updateNoteDate(note, date).then(() => dispatch({
             type: "UPDATE_NOTE_DATE",
             note,
             date

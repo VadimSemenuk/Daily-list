@@ -1,4 +1,4 @@
-let q = async (query, parametrs) => {
+export default async (query, parametrs) => {
     return new Promise((resolve, reject) => {
         let res;
         window.db.transaction((tx) => {
@@ -6,7 +6,3 @@ let q = async (query, parametrs) => {
         }, reject, () => resolve(res))
     })  
 }
-
-window.e = q;
-
-export default q;

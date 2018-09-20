@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Textarea from "react-textarea-autosize";
 import {translate} from "react-i18next";
+import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
@@ -101,14 +102,16 @@ class Add extends Component {
     }
 
     onDynamicItemRemove = (i, ref) => {
-        let nextSibling = ref.nextSibling;
-        if (nextSibling.classList.contains("removable-text-checkbox-wrapper")) {
-            nextSibling.querySelector("input").focus();
-        } else {
-            let prevSibling = ref.previousSibling;
-            if (prevSibling.classList.contains("removable-text-checkbox-wrapper")) {
-                prevSibling.querySelector("input").focus();
-            } 
+        if (ref) {
+            let nextSibling = ref.nextSibling;
+            if (nextSibling.classList.contains("removable-text-checkbox-wrapper")) {
+                nextSibling.querySelector("input").focus();
+            } else {
+                let prevSibling = ref.previousSibling;
+                if (prevSibling.classList.contains("removable-text-checkbox-wrapper")) {
+                    prevSibling.querySelector("input").focus();
+                } 
+            }
         }
 
         this.setState({
@@ -140,13 +143,29 @@ class Add extends Component {
                 destinationType: window.navigator.camera.DestinationType.FILE_URI,
                 encodingType: window.navigator.camera.EncodingType.JPEG,
                 mediaType: window.navigator.camera.MediaType.PICTURE,
-                correctOrientation: true
+                correctOrientation: true,
+                targetHeight: 3000,
+                targetWidth: 3000
             }
         );
     }
 
     getInputsValues = () => {
-        return {...this.state}
+        let startTime = this.state.startTime;
+        let endTime = this.state.endTime;
+
+        if (startTime) {
+            startTime = moment(this.state.added).hour(startTime.hour()).minute(startTime.minute());
+        }
+        if (endTime) {
+            endTime = moment(this.endTime.added).hour(endTime.hour()).minute(endTime.minute());
+        }
+
+        return {
+            ...this.state,
+            startTime,
+            endTime
+        }
     }
 
     onSubmit = async () => {

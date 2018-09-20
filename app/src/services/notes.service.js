@@ -316,10 +316,10 @@ class NotesService {
                 note.key
             ]
         ).catch((err) => console.log('Error: ', err));
-        await this.setNoteRepeat(note);
-        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
-        if (note.notificate) {
-            notificationService.set(note.key, note);
+        await this.setNoteRepeat(updatedNote);
+        notificationService.clear(updatedNote.repeatType === "any" ? updatedNote.repeatDates : [updatedNote.key]);
+        if (updatedNote.notificate) {
+            notificationService.set(updatedNote.key, updatedNote);
         };
 
         if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
@@ -340,12 +340,17 @@ class NotesService {
         }
     }
 
-    updateNoteDate(note, date) {
-        return executeSQL(`
+    async updateNoteDate(note, date) {
+        await executeSQL(`
             UPDATE Tasks
             SET added = ?
             WHERE id = ?;
-        `, [date, note.key])
+        `, [date.valueOf(), note.key])
+
+        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
+        if (note.notificate) {
+            notificationService.set(note.key, note);
+        };
     }
 
     async deleteNote(note) {

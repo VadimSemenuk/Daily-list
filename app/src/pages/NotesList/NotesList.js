@@ -124,13 +124,26 @@ class NotesList extends PureComponent {
     }
 
     pasteCopy = async () => {
-        await this.props.addNote(JSON.parse(JSON.stringify(
-            {
-                ...this.state.copyBuffer, 
-                repeatType: "no-repeat", 
-                added: moment(this.props.currentDate).valueOf()
-            }
-        )));
+        let nextDate = moment(this.props.currentDate);
+        let startDate = this.state.copyBuffer.startDate;
+        let endTime = this.state.copyBuffer.endTime;
+
+        if (startDate) {
+            startTime = moment(nextDate).hour(startTime.hour()).minute(startTime.minute());
+        }
+        if (endTime) {
+            endTime = moment(nextDate).hour(endTime.hour()).minute(endTime.minute());
+        }
+
+        let note = {
+            ...JSON.parse(JSON.stringify(this.state.copyBuffer)),
+            type = "no-repeat",
+            added: nextDate,
+            startTime: startTime,
+            endTime: endTime
+        }
+
+        await this.props.addNote(note);
         
         this.setState({
             copyBuffer: null
@@ -182,7 +195,24 @@ class NotesList extends PureComponent {
     }
 
     onListItemMove = async () => {
-        await this.props.updateNoteDate(this.state.listItemDialogVisible.note, moment(this.props.currentDate).add(1, "day"));
+        let startTime = this.state.listItemDialogVisible.note.startTime;
+        let endTime = this.state.listItemDialogVisible.note.endTime;
+        let nextDate = moment(this.props.currentDate).add(1, "day");
+
+        if (startTime) {
+            startTime = moment(nextDate).hour(startTime.hour()).minute(startTime.minute());
+        }
+        if (endTime) {
+            endTime = moment(nextDate).hour(endTime.hour()).minute(endTime.minute());
+        }
+
+        let nextNote = {
+            ...this.state.listItemDialogVisible.note,
+            startTime,
+            endTime
+        }
+
+        await this.props.updateNoteDate(nextNote, nextDate);
         this.setState({
             listItemDialogVisible: false
         })

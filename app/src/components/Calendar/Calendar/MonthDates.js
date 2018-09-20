@@ -22,16 +22,14 @@ export default class MonthDates extends PureComponent {
                                         if (this.props.mode === "multiselect") {
                                             active = ~this.props.msSelectedDates.findIndex((a) => a === msCurrentDay);
                                         } else {
-                                            active = weekDay.valueOf() === this.props.msSelectedDate;
+                                            active = msCurrentDay === this.props.msSelectedDate;
                                         }
 
                                         let count = null;
                                         if (this.props.calendarNotesCounter) {
-                                            let weekDayNumber = weekDay.isoWeekday();                                       
-
                                             count = this.props.count[msCurrentDay] || 0;
                                             count += this.props.repeatable.day || 0; 
-                                            count += this.props.repeatable.week[weekDayNumber] || 0;
+                                            count += this.props.repeatable.week[i + 1] || 0;
                                             count += this.props.repeatable.any[msCurrentDay] || 0;
                                         }
 

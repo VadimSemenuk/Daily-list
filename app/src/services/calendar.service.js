@@ -2,6 +2,8 @@ import executeSQL from '../utils/executeSQL';
 import authService from "./auth.service";
 import moment from 'moment';
 
+window.moment = moment;
+
 class CalendarService {
     checkForCountUpdate(nextDate, intervalStartDate, intervalEndDate) {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
@@ -14,23 +16,23 @@ class CalendarService {
         let selectTask = executeSQL(
             `SELECT COUNT(*) as count, added FROM (
                 SELECT added FROM Tasks
-                            WHERE
-                                added >= ? AND added <= ? AND
-                                userId = ? AND
-                                lastAction != 'DELETE' AND
-                                repeatType = 'no-repeat'
+                    WHERE
+                        added >= ? AND added <= ? AND
+                        userId = ? AND
+                        lastAction != 'DELETE' AND
+                        repeatType = 'no-repeat'
                 UNION ALL
                 SELECT rep.value as added FROM Tasks t
-                            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-                            WHERE
-                                rep.value >= ? AND rep.value <= ? AND
-                                userId = ? AND
-                                lastAction != 'DELETE' AND
-                                t.repeatType = 'any'
+                    LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+                    WHERE
+                        rep.value >= ? AND rep.value <= ? AND
+                        userId = ? AND
+                        lastAction != 'DELETE' AND
+                        t.repeatType = 'any'
                 )
             GROUP BY added;`, 
             [intervalStartDate, intervalEndDate, authService.getUserId(), intervalStartDate, intervalEndDate, authService.getUserId()]
-        );  
+        );   
 
         let selectRepeatableDayTask = executeSQL(
             `SELECT COUNT(*) as count, added FROM Tasks
@@ -52,11 +54,15 @@ class CalendarService {
             [authService.getUserId()]
         );      
 
-        let selects = await Promise.all([selectTask, selectRepeatableDayTask, selectRepeatableWeekTask]);
+        let selects = await Promise.all([
+            selectTask, 
+            selectRepeatableDayTask, 
+            selectRepeatableWeekTask
+        ]);
 
         let select = selects[0];
         let selectRepeatableDay = selects[1];
-        let selectRepeatableWeek = selects[2];
+        let selectRepeatableWeek = selects[2];   
 
         let count = {};
         for (let i = 0; i < select.rows.length; i++) {
