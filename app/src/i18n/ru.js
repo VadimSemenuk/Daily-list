@@ -8,6 +8,7 @@ export default {
     "remove-pass": "Удалить пароль", 
     "issues": "Устранение неисправностей",
     "about": "О программе",
+    "default-notification": "Автоматически добавлять уведомление",
     
     // view settings page
     "sort": "Сортировка",
@@ -17,12 +18,21 @@ export default {
     "view-direction-asc": "В прямом порядке",
     "view-direction-desc": "В обратном порядке",
     "fin-sort": "Перемещать завершенные вниз",
+    "notes-show-interval": "Отображать за период",
+    "notes-show-interval-week": "Неделя",
+    "notes-show-interval-day": "День",
+    "show-notes-count": "Отображать счетчики на календаре",
+    "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
     
     // interface page
     "theme": "Тема",
     "random-theme": "Случайная тема",
     "font-size": "Размер шрифта",
     "fast-add": "Поле быстрого добавления",
+    "show-mini-calendar": "Показывать мини-календарь",
+    "language": "Язык",
+    "ru": "Руссский",
+    "en": "Английский",
 
     // password page
     "password": "Пароль",
@@ -53,6 +63,15 @@ export default {
     "move": "Перейти",
     "star-app": "Оценить приложение",
     "internet-required": "Подключитесь к интернету для выполнения действия",
+    "afternoon": "день",
+    "evening": "вечер",
+    "night": "ночь",
+    "morning": "утро",
+    "g-afternoon": "Добрый день",
+    "g-evening": "Добрый вечер",
+    "g-night": "Доброй ночи",
+    "g-morning": "Доброе утро",
+    "reload": "Перезапустить",
 
     // share
     "share-theme": "Ежедневник",
@@ -66,11 +85,7 @@ export default {
     "edit": "Редактировать",
     "delete": "Удалить",
     "copy": "Копировать",
-
-    // -------------------------
-
-    // settings page
-    "default-notification": "Автоматически добавлять уведомление",
+    "move-tomorrow": "Переместить на завтра",
 
     // add
     "notify": "Напомнить",
@@ -87,31 +102,4 @@ export default {
     "input-placeholder-text": "Текст",
     "list-item-btn": "Пункт списка",
     "field-btn": "Поле",
-
-    // interface settings page
-    "show-mini-calendar": "Показывать мини-календарь",
-    "language": "Язык",
-    "ru": "Руссский",
-    "en": "Английский",
-
-    // view settings page
-    "notes-show-interval": "Отображать за период",
-    "notes-show-interval-week": "Неделя",
-    "notes-show-interval-day": "День",
-    "show-notes-count": "Отображать счетчики на календаре",
-    "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
-    
-    // notes list page
-    "move-tomorrow": "Переместить на завтра",
-
-    // common
-    "afternoon": "день",
-    "evening": "вечер",
-    "night": "ночь",
-    "morning": "утро",
-    "g-afternoon": "Добрый день",
-    "g-evening": "Добрый вечер",
-    "g-night": "Доброй ночи",
-    "g-morning": "Доброе утро",
-    "reload": "Перезапустить"
 }

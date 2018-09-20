@@ -11,7 +11,7 @@ class CalendarService {
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).startOf(period).add(halfInterval, period).valueOf();
 
-        let select = await executeSQL(
+        let selectTask = executeSQL(
             `SELECT COUNT(*) as count, added FROM Tasks
             WHERE 
                 added >= ? AND added <= ? AND 
@@ -22,7 +22,7 @@ class CalendarService {
             [intervalStartDate, intervalEndDate, authService.getUserId()]
         );  
 
-        let selectRepeatableDay = await executeSQL(
+        let selectRepeatableDayTask = executeSQL(
             `SELECT COUNT(*) as count, added FROM Tasks
             WHERE 
                 userId = ? AND 
@@ -31,7 +31,7 @@ class CalendarService {
             [authService.getUserId()]
         ); 
 
-        let selectRepeatableWeek = await executeSQL(
+        let selectRepeatableWeekTask = executeSQL(
             `SELECT COUNT(*) as count, rep.value as weekDay FROM Tasks t
 			LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
@@ -42,16 +42,24 @@ class CalendarService {
             [authService.getUserId()]
         );    
 
-        let selectRepeatableAny = await executeSQL(
+        let selectRepeatableAnyTask = executeSQL(
             `SELECT COUNT(*) as count, rep.value as added FROM Tasks t
 			LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
+                rep.value >= ? AND rep.value <= ? AND 
                 userId = ? AND
                 lastAction != 'DELETE' AND
 				t.repeatType = 'any'
 			GROUP BY rep.value;`, 
-            [authService.getUserId()]
+            [intervalStartDate, intervalEndDate, authService.getUserId()]
         );  
+
+        let selects = await Promise.all([selectTask, selectRepeatableDayTask, selectRepeatableWeekTask, selectRepeatableAnyTask]);
+
+        let select = selects[0];
+        let selectRepeatableDay = selects[1];
+        let selectRepeatableWeek = selects[2];
+        let selectRepeatableAny = selects[3];
 
         let count = {};
         for (let i = 0; i < select.rows.length; i++) {

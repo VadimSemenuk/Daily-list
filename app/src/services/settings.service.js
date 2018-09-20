@@ -10,10 +10,10 @@ let sortTypeSettings = [{
 }];
 
 let sortDirectionSettings = [{
-    translateId: "view-direction-asc",
+    translateId: "view-direction-desc",
     val: 0
 }, {
-    translateId: "view-direction-desc",
+    translateId: "view-direction-asc",
     val: 1
 }];
 

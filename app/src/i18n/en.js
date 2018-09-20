@@ -8,21 +8,31 @@ export default {
     "remove-pass": "Remove password",
     "issues": "Bug fixing",
     "about": "About program",
+    "default-notification": "Automatically set notification",
   
     // view settings page
     "sort": "Sorting",
-    "time-sort": "Time sorting",  // check
-    "time-add-sort": "By time sorting",  //check
-    "view-direction": "Display direction",  //check
+    "time-sort": "At the specified time",
+    "time-add-sort": "At the adding time",
+    "view-direction": "View order",
     "view-direction-asc": "Direct order",
     "view-direction-desc": "Reverse order",
     "fin-sort": "Move completed down",
+    "notes-show-interval": "Display for the period",
+    "notes-show-interval-week": "Week",
+    "notes-show-interval-day": "Day",
+    "show-notes-count": "Display counters on the calendar",
+    "reload-app-note": "Restart the app to apply changes",
   
     // interface page
     "theme": "Theme",
     "random-theme": "Random theme",
     "font-size": "Font size",
     "fast-add": "Qick add",
+    "show-mini-calendar": "Show mini-callendar",
+    "language": "Language",
+    "ru": "Russian",
+    "en": "English",
 
     // password page
     "password": "Password",
@@ -53,6 +63,14 @@ export default {
     "move": "Move to",
     "star-app": "Rate app",
     "internet-required": "Connect to the internet",
+    "afternoon": "Day",
+    "evening": "Evening",
+    "night": "Night",
+    "morning": "Morning",
+    "g-afternoon": "Good afternoon",
+    "g-evening": "Good evening",
+    "g-night": "Good night",
+    "g-morning": "Good morning",
 
     // share
     "share-theme": "Diary",
@@ -63,51 +81,24 @@ export default {
     
     // notes list page
     "no-content": "No notes yet",
-
-    // PART TWO
-
-    // settings page
-    "default-notification": "Автоматически добавлять уведомление",
+    "edit": "Edit",
+    "delete": "Delete",
+    "copy": "Copy",
+    "move-tomorrow": "Remove on tomorrow",
 
     // add
-    "notify": "Напомнить",
-    "set-time-first": "Установите время начала",
-    "time": "Время",
-    "open-galery": "Открыть галерею",
-    "make-shot": "Сделать снимок",
-    "repeat-type": "Повторять",
-    "repeat-type-no-repeat": "Не повторять",
-    "repeat-type-day": "Каждый день",
-    "repeat-type-week": "Каждую неделю",
-    "repeat-type-any": "Выбрать даты",
-    "input-placeholder-title": "Заголовок",
-    "input-placeholder-text": "Текст",
-    "list-item-btn": "Пункт списка",
-    "field-btn": "Поле",
-
-    // interface settings page
-    "show-mini-calendar": "Показывать мини-календарь",
-    "language": "Язык",
-    "ru": "Руссский",
-    "en": "Английский",
-
-    // view settings page
-    "notes-show-interval": "Отображать за период",
-    "notes-show-interval-week": "Неделя",
-    "notes-show-interval-day": "День",
-    "show-notes-count": "Отображать счетчики на календаре",
-    "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
-    
-    // notes list page
-    "move-tomorrow": "Переместить на завтра",
-
-    // common
-    "afternoon": "день",
-    "evening": "вечер",
-    "night": "ночь",
-    "morning": "утро",
-    "g-afternoon": "Добрый день",
-    "g-evening": "Добрый вечер",
-    "g-night": "Доброй ночи",
-    "g-morning": "Доброе утро",
+    "notify": "Remind",
+    "set-time-first": "Set time",
+    "time": "Time",
+    "open-galery": "Gallery open",
+    "make-shot": "Screen shot",
+    "repeat-type": "Repeat",
+    "repeat-type-no-repeat": "Don't repeat",
+    "repeat-type-day": "Every day",
+    "repeat-type-week": "Every week",
+    "repeat-type-any": "Choose dates",
+    "input-placeholder-title": "Title",
+    "input-placeholder-text": "Text",
+    "list-item-btn": "List item",
+    "field-btn": "Field",
 } 

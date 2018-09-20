@@ -139,7 +139,7 @@ class NotesService {
         let noteKey = await this.insertNote(noteToLocalInsert);
         let note = {...addedNote, key: noteKey};
         await this.setNoteRepeat(note);
-        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
+        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
             notificationService.set(note.key, note);
         };
@@ -317,7 +317,7 @@ class NotesService {
             ]
         ).catch((err) => console.log('Error: ', err));
         await this.setNoteRepeat(note);
-        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
+        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
             notificationService.set(note.key, note);
         };
@@ -360,7 +360,7 @@ class NotesService {
                 note.key
             ]
         ).catch((err) => console.warn(err));
-        notificationService.clear(note.repeatType === "any" ? [note.key] : note.repeatDates);
+        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
 
         if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
             fetch(`${config.apiURL}/notes`, {
@@ -397,6 +397,8 @@ class NotesService {
             repeatDates = [moment(note.added).isoWeekday()];
         } else if (note.repeatType === "day") {
             repeatDates = [note.added];
+        } else if (repeatDates.length && repeatDates.length === 0) {
+            return
         }
 
         await executeSQL(

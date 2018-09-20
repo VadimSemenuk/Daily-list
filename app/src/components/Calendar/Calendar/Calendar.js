@@ -141,9 +141,13 @@ class Calendar extends Component {
         this.onSlideChange(action);
     }
 
-    async componentWillReceiveProps(nextProps) {        
+    async componentWillReceiveProps(nextProps) {     
         let msSelectedDate = moment(nextProps.currentDate).startOf("day").valueOf();
         let currentMonthStartDate = moment(msSelectedDate).startOf("month");       
+
+        if (this.state.msSelectedDate === msSelectedDate) {
+            return
+        }
 
         if (currentMonthStartDate.valueOf() === this.state.currentMonthStartDate.valueOf()) {
             this.setState({

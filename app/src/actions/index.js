@@ -10,7 +10,7 @@ export function addNote (note) {
                 type: "RECIVE_NOTE",
                 note
             }))
-            .then(() => dispatch(getFullCount(note.added.valueOf())))
+            .then(() => dispatch(getFullCount(note.added.valueOf())));
     }
 }
 
@@ -33,7 +33,7 @@ export function updateNote (note) {
             type: "UPDATE_NOTE",
             note
         }))
-        .then(() => dispatch(getFullCount(note.added.valueOf())))
+        .then(() => dispatch(getFullCount(note.added.valueOf())));
     }
 }
 
@@ -63,7 +63,8 @@ export function updateNoteDate (note, date) {
             type: "UPDATE_NOTE_DATE",
             note,
             date
-        }));
+        }))
+        .then(() => dispatch(getFullCount(note.added.valueOf())));
     }
 }
 
@@ -74,6 +75,7 @@ export function deleteNote (note) {
                 type: "DELETE_NOTE",
                 note
             }))
+        .then(() => dispatch(getFullCount(note.added.valueOf())));        
     }
 }
 
