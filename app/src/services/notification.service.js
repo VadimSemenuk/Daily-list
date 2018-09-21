@@ -1,3 +1,5 @@
+import moment from "moment";
+
 class NotificationService {
     set = (id, note) => {       
         if (!window.cordova) return
@@ -15,7 +17,10 @@ class NotificationService {
 
             switch(note.repeatType) {
                 case "no-repeat": {
-                    notificationConfig.trigger = { at: new Date(note.startTime.valueOf()) };
+                    let atDate = moment(note.added).hour(note.startTime.hour()).minute(note.startTime.minute());
+                    atDate = new Date(atDate.valueOf())
+
+                    notificationConfig.trigger = { at: atDate };
                     break;
                 }
                 case "day": {
@@ -42,10 +47,13 @@ class NotificationService {
                 }
                 case "any": {
                     note.repeatDates.forEach((date) => {
+                        let atDate = moment(date).hour(note.startTime.hour()).minute(note.startTime.minute());
+                        atDate = new Date(date.valueOf())
+
                         window.cordova.plugins.notification.local.schedule({
                             ...notificationConfig,
                             id: date,
-                            trigger: { at: new Date(date) }
+                            trigger: { at: atDate }
                         });
                     })
                     return;

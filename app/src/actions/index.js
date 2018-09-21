@@ -29,7 +29,7 @@ export function getNotesByDates (dates, period) {
 export function updateNote (note) {
     return function(dispatch) {
         return notesService.updateNote(note)
-        .then(() => dispatch({
+        .then((note) => dispatch({
             type: "UPDATE_NOTE",
             note
         }))

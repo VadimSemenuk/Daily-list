@@ -151,21 +151,7 @@ class Add extends Component {
     }
 
     getInputsValues = () => {
-        let startTime = this.state.startTime;
-        let endTime = this.state.endTime;
-
-        if (startTime) {
-            startTime = moment(this.state.added).hour(startTime.hour()).minute(startTime.minute());
-        }
-        if (endTime) {
-            endTime = moment(this.endTime.added).hour(endTime.hour()).minute(endTime.minute());
-        }
-
-        return {
-            ...this.state,
-            startTime,
-            endTime
-        }
+        return {...this.state}
     }
 
     onSubmit = async () => {

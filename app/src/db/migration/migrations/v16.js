@@ -86,6 +86,8 @@ export default {
                     title TEXT,
                     startTime INTEGER,
                     endTime INTEGER,
+                    startTimeCheckSum, 
+                    endTimeCheckSum,
                     notificate INTEGER,
                     tag TEXT,
                     dynamicFields TEXT,

@@ -67,7 +67,7 @@ class NotesService {
 
     async getDayNotes(date) {
         let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced, t.repeatType
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced, t.repeatType
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
@@ -91,7 +91,7 @@ class NotesService {
                 dynamicFields: JSON.parse(item.dynamicFields),
                 startTime: ~item.startTime ? moment(item.startTime) : false,
                 endTime: ~item.endTime ? moment(item.endTime) : false,
-                added: ~item.added ? moment(item.added) : item.added,
+                // added: ~item.added ? moment(item.added) : item.added,
                 finished: Boolean(item.finished),
                 notificate: Boolean(item.notificate)
             }
@@ -114,6 +114,7 @@ class NotesService {
     async addNote(addedNote) {
         let noteUUID = uuid();
         let actionTime = moment().valueOf();
+        let timeCheckSums = this.calculateTimeCheckSum(addedNote);
         let noteToRemoteInsert = {
             ...addedNote,
             startTime: addedNote.startTime ? addedNote.startTime.valueOf() : -1,
@@ -123,7 +124,8 @@ class NotesService {
             dynamicFields: JSON.stringify(addedNote.dynamicFields),
             finished: false,
             lastActionTime: actionTime,
-            isSynced: 0
+            isSynced: 0,
+            ...timeCheckSums
         }
         let noteToLocalInsert = {
             ...noteToRemoteInsert,
@@ -137,7 +139,7 @@ class NotesService {
         }
 
         let noteKey = await this.insertNote(noteToLocalInsert);
-        let note = {...addedNote, key: noteKey};
+        let note = {...addedNote, ...timeCheckSums, key: noteKey};
         await this.setNoteRepeat(note);
         notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
@@ -154,13 +156,15 @@ class NotesService {
     async insertNote(note) {
         let insert = await executeSQL(
             `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, dynamicFields, added, finished, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
                 note.startTime,
                 note.endTime,
+                note.startTimeCheckSum,
+                note.endTimeCheckSum,
                 note.notificate,
                 note.tag,
                 note.dynamicFields,
@@ -276,13 +280,15 @@ class NotesService {
 
     async updateNote(updatedNote) {
         let actionTime = moment().valueOf();
+        let timeCheckSums = this.calculateTimeCheckSum(updatedNote);
         let note = {
             ...updatedNote,
             startTime: updatedNote.startTime ? updatedNote.startTime.valueOf() : -1,
             endTime: updatedNote.endTime ? updatedNote.endTime.valueOf() : -1,
             added: updatedNote.added ? updatedNote.added.valueOf() : -1,
             dynamicFields: JSON.stringify(updatedNote.dynamicFields),
-            lastActionTime: actionTime
+            lastActionTime: actionTime,
+            ...timeCheckSums
         }
 
         await executeSQL(
@@ -291,6 +297,8 @@ class NotesService {
                 title = ?,
                 startTime = ?,
                 endTime = ?,
+                startTimeCheckSum = ?, 
+                endTimeCheckSum = ?,
                 notificate = ?,
                 tag = ?,
                 dynamicFields = ?,
@@ -305,6 +313,8 @@ class NotesService {
                 note.title,
                 note.startTime,
                 note.endTime,
+                note.startTimeCheckSum,
+                note.endTimeCheckSum,
                 +note.notificate,
                 note.tag,
                 note.dynamicFields,
@@ -338,6 +348,8 @@ class NotesService {
                 .then(() => synchronizationService.setSynced(note.key))
                 .catch((err) => console.warn(err));
         }
+
+        return {...updatedNote, ...timeCheckSums}
     }
 
     async updateNoteDate(note, date) {
@@ -429,6 +441,16 @@ class NotesService {
             for(let i = 0; i < select.rows.length; i++) {
                 values.push(select.rows.item(i));
             }
+        }
+    }
+
+    calculateTimeCheckSum (note) {
+        let startTimeCheckSum = note.startTime ? note.startTime.hour() + note.startTime.minute() + note.startTime.second() : 0;
+        let endTimeCheckSum = note.endTime ? note.endTime.hour() + note.endTime.minute() + note.endTime.second() : 0;
+
+        return {
+            startTimeCheckSum,
+            endTimeCheckSum
         }
     }
 

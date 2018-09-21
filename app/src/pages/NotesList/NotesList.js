@@ -124,23 +124,10 @@ class NotesList extends PureComponent {
     }
 
     pasteCopy = async () => {
-        let nextDate = moment(this.props.currentDate);
-        let startDate = this.state.copyBuffer.startDate;
-        let endTime = this.state.copyBuffer.endTime;
-
-        if (startDate) {
-            startTime = moment(nextDate).hour(startTime.hour()).minute(startTime.minute());
-        }
-        if (endTime) {
-            endTime = moment(nextDate).hour(endTime.hour()).minute(endTime.minute());
-        }
-
         let note = {
             ...JSON.parse(JSON.stringify(this.state.copyBuffer)),
-            type = "no-repeat",
-            added: nextDate,
-            startTime: startTime,
-            endTime: endTime
+            type: "no-repeat",
+            added: moment(this.props.currentDate)
         }
 
         await this.props.addNote(note);
@@ -195,24 +182,9 @@ class NotesList extends PureComponent {
     }
 
     onListItemMove = async () => {
-        let startTime = this.state.listItemDialogVisible.note.startTime;
-        let endTime = this.state.listItemDialogVisible.note.endTime;
         let nextDate = moment(this.props.currentDate).add(1, "day");
 
-        if (startTime) {
-            startTime = moment(nextDate).hour(startTime.hour()).minute(startTime.minute());
-        }
-        if (endTime) {
-            endTime = moment(nextDate).hour(endTime.hour()).minute(endTime.minute());
-        }
-
-        let nextNote = {
-            ...this.state.listItemDialogVisible.note,
-            startTime,
-            endTime
-        }
-
-        await this.props.updateNoteDate(nextNote, nextDate);
+        await this.props.updateNoteDate(this.state.listItemDialogVisible, nextDate);
         this.setState({
             listItemDialogVisible: false
         })
@@ -408,25 +380,11 @@ function sort (data, settings) {
         if (settings.sort.type === 0) {
             if (settings.sort.direction === 1) {
                 return (a, b) => {
-                    let aVal = 0, bVal = 0;
-                    if (a.startTime) {
-                        aVal = a.startTime.valueOf();
-                    }
-                    if (b.startTime) {
-                        bVal = b.startTime.valueOf();
-                    }               
-                    return aVal - bVal; 
+                    return a.startTimeCheckSum - b.startTimeCheckSum
                 }   
             } else {
                 return (a, b) => {
-                    let aVal = 0, bVal = 0;
-                    if (a.startTime) {
-                        aVal = a.startTime.valueOf();
-                    }
-                    if (b.startTime) {
-                        bVal = b.startTime.valueOf();
-                    }
-                    return bVal - aVal; 
+                    return b.startTimeCheckSum - a.startTimeCheckSum
                 } 
             }    
         }
