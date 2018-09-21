@@ -32,7 +32,7 @@ class FastAdd extends Component {
             notificate: false,
             repeatType: "no-repeat",
             repeatDates: []
-        }, this.props.activePageIndex);
+        }, this.props.settings.calendarNotesCounter);
         this.setState({
             fastAddInputValue: ""
         })
@@ -60,8 +60,10 @@ class FastAdd extends Component {
     }
 }
 
-function mapStateToProps() {
-    return { }
+function mapStateToProps(state) {
+    return {
+        settings: state.settings      
+    }
 }
 
 function mapDispatchToProps(dispatch) {

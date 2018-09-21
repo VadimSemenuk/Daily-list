@@ -3,14 +3,16 @@ import settingsService from "../services/settings.service";
 import calendarService from "../services/calendar.service";
 
 // notes
-export function addNote (note) {
+export function addNote (note, updateCount) {
     return function(dispatch) {
         return notesService.addNote(note)
             .then((note) => dispatch({
                 type: "RECIVE_NOTE",
                 note
             }))
-            .then(() => dispatch(getFullCount(note.added.valueOf())));
+            .then(() => {
+                return updateCount && dispatch(getFullCount(note.added.valueOf()))
+            });
     }
 }
 
@@ -26,14 +28,16 @@ export function getNotesByDates (dates, period) {
     }
 }
 
-export function updateNote (note) {
+export function updateNote (note, updateCount) {
     return function(dispatch) {
         return notesService.updateNote(note)
         .then((note) => dispatch({
             type: "UPDATE_NOTE",
             note
         }))
-        .then(() => dispatch(getFullCount(note.added.valueOf())));
+        .then(() => {
+            return updateCount && dispatch(getFullCount(note.added.valueOf()))
+        });
     }
 }
 
@@ -57,14 +61,16 @@ export function updateNoteDynamicFields (note, dynamicFields) {
     }
 }
 
-export function updateNoteDate (note, date) {
+export function updateNoteDate (note, date, updateCount) {
     return function(dispatch) {
         return notesService.updateNoteDate(note, date).then(() => dispatch({
             type: "UPDATE_NOTE_DATE",
             note,
             date
         }))
-        .then(() => dispatch(getFullCount(note.added.valueOf())));
+        .then(() => {
+            return updateCount && dispatch(getFullCount(note.added.valueOf()))
+        });
     }
 }
 
@@ -75,7 +81,9 @@ export function deleteNote (note) {
                 type: "DELETE_NOTE",
                 note
             }))
-        .then(() => dispatch(getFullCount(note.added.valueOf())));        
+        .then(() => {
+            return updateCount && dispatch(getFullCount(note.added.valueOf()))
+        });        
     }
 }
 

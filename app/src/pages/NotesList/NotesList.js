@@ -130,7 +130,7 @@ class NotesList extends PureComponent {
             added: moment(this.props.currentDate)
         }
 
-        await this.props.addNote(note);
+        await this.props.addNote(note, this.props.settings.calendarNotesCounter);
         
         this.setState({
             copyBuffer: null
@@ -184,7 +184,7 @@ class NotesList extends PureComponent {
     onListItemMove = async () => {
         let nextDate = moment(this.props.currentDate).add(1, "day");
 
-        await this.props.updateNoteDate(this.state.listItemDialogVisible, nextDate);
+        await this.props.updateNoteDate(this.state.listItemDialogVisible, nextDate, this.props.settings.calendarNotesCounter);
         this.setState({
             listItemDialogVisible: false
         })

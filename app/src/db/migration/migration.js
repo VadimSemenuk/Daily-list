@@ -1,6 +1,7 @@
 import execureSQL from "../../utils/executeSQL";
 import migrations from "./migrations";
 import {init} from "./migrations";
+import {addFakeListItemsData} from "../../utils/fakeData";
 
 window.execureSQL = execureSQL;
 
@@ -45,6 +46,10 @@ class Migration {
                 await migration.run();
                 await this.acceptMigration(migration);
             }
+        }
+
+        if (!isDbExist) {
+            addFakeListItemsData();
         }
     }
 }
