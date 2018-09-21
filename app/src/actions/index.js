@@ -81,9 +81,9 @@ export function deleteNote (note) {
                 type: "DELETE_NOTE",
                 note
             }))
-        .then(() => {
-            return updateCount && dispatch(getFullCount(note.added.valueOf()))
-        });        
+            .then(() => {
+                return updateCount && dispatch(getFullCount(note.added.valueOf()))
+            });        
     }
 }
 

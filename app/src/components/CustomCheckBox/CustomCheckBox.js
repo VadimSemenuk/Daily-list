@@ -14,7 +14,7 @@ export default class CustomCheckBox extends PureComponent {
     render() {
         return (
             <div 
-                className="customcheckbox-wrapper"
+                className="customcheckbox-wrapper clickable"
                 onClick={this.handleToggleChecked}
             >
                 <img 
