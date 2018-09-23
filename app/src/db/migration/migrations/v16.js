@@ -76,7 +76,7 @@ export default {
         }
 
         async function alterTasksTable () {
-            let msNow = +new Date();
+            let msNow = +new Date(); 
             await execureSQL(`ALTER TABLE Tasks RENAME TO Tasks_OLD;`);
             await execureSQL(`                           
                 CREATE TABLE IF NOT EXISTS Tasks
@@ -108,6 +108,8 @@ export default {
                     title, 
                     startTime, 
                     endTime, 
+                    startTimeCheckSum, 
+                    endTimeCheckSum,
                     notificate, 
                     tag, 
                     dynamicFields, 
@@ -125,6 +127,8 @@ export default {
                     title, 
                     startTime, 
                     endTime, 
+                    startTime - added as startTimeCheckSum,
+                    endTime - added as endTimeCheckSum,
                     notificate, 
                     tag, 
                     dynamicFields, 

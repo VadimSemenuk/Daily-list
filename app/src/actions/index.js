@@ -61,12 +61,11 @@ export function updateNoteDynamicFields (note, dynamicFields) {
     }
 }
 
-export function updateNoteDate (note, date, updateCount) {
+export function updateNoteDate (note, updateCount) {
     return function(dispatch) {
-        return notesService.updateNoteDate(note, date).then(() => dispatch({
-            type: "UPDATE_NOTE_DATE",
-            note,
-            date
+        return notesService.updateNoteDate(note).then(() => dispatch({
+            type: "UPDATE_NOTE",
+            note
         }))
         .then(() => {
             return updateCount && dispatch(getFullCount(note.added.valueOf()))

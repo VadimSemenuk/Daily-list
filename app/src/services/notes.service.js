@@ -6,6 +6,8 @@ import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
 import notificationService from "./notification.service";
 
+window.moment = moment;
+
 let tags = [
     'transparent',
     '#00213C',
@@ -114,7 +116,7 @@ class NotesService {
                 dynamicFields: JSON.parse(item.dynamicFields),
                 startTime: ~item.startTime ? moment(item.startTime) : false,
                 endTime: ~item.endTime ? moment(item.endTime) : false,
-                // added: ~item.added ? moment(item.added) : item.added,
+                added: moment(item.added),
                 finished: Boolean(item.finished),
                 notificate: Boolean(item.notificate)
             }
@@ -335,7 +337,7 @@ class NotesService {
             ]
         ).catch((err) => console.log('Error: ', err));
         await this.setNoteRepeat(updatedNote);
-        notificationService.clear(updatedNote.repeatType === "any" ? updatedNote.repeatDates : [updatedNote.key]);
+        notificationService.clear(updatedNote.repeatType === "any" ? updatedNote.prevNote.repeatDates : [updatedNote.key]);
         if (updatedNote.notificate) {
             notificationService.set(updatedNote.key, updatedNote);
         };
@@ -360,12 +362,12 @@ class NotesService {
         return {...updatedNote, ...timeCheckSums}
     }
 
-    async updateNoteDate(note, date) {
+    async updateNoteDate(note) {
         await executeSQL(`
             UPDATE Tasks
             SET added = ?
             WHERE id = ?;
-        `, [date.valueOf(), note.key])
+        `, [note.added.valueOf(), note.key])
 
         notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
@@ -442,19 +444,21 @@ class NotesService {
     }
 
     async getNoteRepeatDates(note) {
-        let select = executeSQL(`SELECT value from TaskRepeatValues WHERE taskId = ?`, [note.id]);
+        let select = await executeSQL(`SELECT value from TasksRepeatValues WHERE taskId = ?`, [note.key]);
 
         let values = [];
         if (select.rows) {
             for(let i = 0; i < select.rows.length; i++) {
-                values.push(select.rows.item(i));
+                values.push(select.rows.item(i).value);
             }
         }
+
+        return values;
     }
 
     calculateTimeCheckSum (note) {
-        let startTimeCheckSum = note.startTime ? note.startTime.hour() + note.startTime.minute() + note.startTime.second() : 0;
-        let endTimeCheckSum = note.endTime ? note.endTime.hour() + note.endTime.minute() + note.endTime.second() : 0;
+        let startTimeCheckSum = note.startTime ? note.startTime.valueOf() - note.added : 0;
+        let endTimeCheckSum = note.endTime ? note.endTime.valueOf() - note.added : 0;
 
         return {
             startTimeCheckSum,

@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react';
+import {translate} from "react-i18next";
 
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
@@ -9,7 +10,7 @@ import RepeatImg from "../../../assets/img/two-circling-arrows.svg"
 
 import './ListItem.scss';
 
-export default class Note extends PureComponent { 
+class Note extends PureComponent { 
     constructor(props) {
         super(props);
 
@@ -46,6 +47,8 @@ export default class Note extends PureComponent {
     }
 
     render () {
+        let {t} = this.props;
+        
         return (
             <div 
                 className={`note-wrapper ${this.state.expanded && 'expanded'}`} 
@@ -110,13 +113,14 @@ export default class Note extends PureComponent {
                                     )
                                 } else {
                                     return (
-                                        <span key={i} className="attached-image-label">Прикрепленное изображение</span>
+                                        <span key={i} className="attached-image-label">{t("attached-image")}</span>
                                     )
                                 }
                             }
                             return null
                         })
                     }
+                    
                     <div className="more-button">
                         <button onClick={this.onItemActionsWindowRequest}>                             
                             <img
@@ -136,3 +140,5 @@ export default class Note extends PureComponent {
         )
     }
 }
+
+export default translate("translations")(Note)

@@ -2,8 +2,6 @@ import executeSQL from '../utils/executeSQL';
 import authService from "./auth.service";
 import moment from 'moment';
 
-window.moment = moment;
-
 class CalendarService {
     checkForCountUpdate(nextDate, intervalStartDate, intervalEndDate) {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate

@@ -37,7 +37,7 @@ class NotificationService {
                     notificationConfig.trigger = { 
                         every: 
                         { 
-                            weekday: note.startTime.weekday(),
+                            weekday: note.startTime.isoWeekday(),
                             hour: note.startTime.hour(), 
                             minute: note.startTime.minute()
                         },
@@ -48,7 +48,7 @@ class NotificationService {
                 case "any": {
                     note.repeatDates.forEach((date) => {
                         let atDate = moment(date).hour(note.startTime.hour()).minute(note.startTime.minute());
-                        atDate = new Date(date.valueOf())
+                        atDate = new Date(atDate.valueOf());
 
                         window.cordova.plugins.notification.local.schedule({
                             ...notificationConfig,
@@ -68,7 +68,7 @@ class NotificationService {
     clear = (ids) => {
         if (!window.cordova) return
         
-        window.cordova.plugins.notification.local.clear(ids);
+        window.cordova.plugins.notification.local.cancel(ids);
     }
 
     getMessgae(data) {

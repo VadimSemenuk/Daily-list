@@ -102,4 +102,7 @@ export default {
     "input-placeholder-text": "Текст",
     "list-item-btn": "Пункт списка",
     "field-btn": "Поле",
+
+    // note-item
+    "attached-image": "Прикрепленное изображение"
 }

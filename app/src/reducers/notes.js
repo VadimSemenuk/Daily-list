@@ -86,15 +86,12 @@ function notes (state = init, action) {
 
             return state.map(fn);
         }
-        case 'UPDATE_NOTE':
-        case 'UPDATE_NOTE_DATE': {
+        case 'UPDATE_NOTE': {
             let startState = state.map((list) => {
                 return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
             });
 
-            let note = action.type === "UPDATE_NOTE_DATE" ? {...action.note, added: action.date} : action.note;
-
-            return reciveNote(startState, note);
+            return reciveNote(startState, action.note);
         }
         case 'DELETE_NOTE': {
             let assignFn = (list) => {

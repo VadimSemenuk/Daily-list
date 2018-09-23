@@ -101,4 +101,7 @@ export default {
     "input-placeholder-text": "Text",
     "list-item-btn": "List item",
     "field-btn": "Field",
+
+    // note-item
+    "attached-image": "Attached image"
 } 

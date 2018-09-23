@@ -39,22 +39,27 @@ class Add extends Component {
             added: this.props.date,
             finished: false,
             repeatType: "no-repeat",
-            repeatDates: [],
+            repeatDates: [moment(this.props.date).valueOf()],
 
             calendar: false,
-            pictureModal: false
+            pictureModal: false,
+            prevNote: null
         }
 
         this.tags = notesService.getTags();
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (this.props.match.path === "/edit") {
             let repeatDates = [];
             if (this.props.location.state.note.repeatType === "any") {
-                repeatDates = notesService.getNoteRepeatDates(this.props.location.state.note);
+                repeatDates = await notesService.getNoteRepeatDates(this.props.location.state.note);
             }
-            this.setState({...this.props.location.state.note, repeatDates});
+            this.setState({
+                ...this.props.location.state.note, 
+                repeatDates,
+                prevNote: Object.assign({}, this.props.location.state.note)
+            });
         }
     }
 
@@ -342,7 +347,7 @@ class Add extends Component {
     }
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {
         date: state.date,
         settings: state.settings      

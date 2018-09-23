@@ -20,6 +20,7 @@ import {ButtonListItem} from "../../components/ListItem/ListItem";
 import * as AppActions from '../../actions'; 
 
 import sliderChangeSide from "../../utils/sliderChangeSide";
+import deepCopyObject from "../../utils/DeepCopyObject";
 
 import './NotesList.scss';
 
@@ -119,16 +120,15 @@ class NotesList extends PureComponent {
     }
 
     onListItemRemove = () => {
-        this.props.deleteNote(this.state.listItemDialogVisible.note);
+        this.props.deleteNote(this.state.listItemDialogVisible.note, this.props.settings.calendarNotesCounter);
         this.closeDialog();              
     }
 
     pasteCopy = async () => {
-        let note = {
-            ...JSON.parse(JSON.stringify(this.state.copyBuffer)),
+        let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
             type: "no-repeat",
             added: moment(this.props.currentDate)
-        }
+        }))
 
         await this.props.addNote(note, this.props.settings.calendarNotesCounter);
         
@@ -184,7 +184,7 @@ class NotesList extends PureComponent {
     onListItemMove = async () => {
         let nextDate = moment(this.props.currentDate).add(1, "day");
 
-        await this.props.updateNoteDate(this.state.listItemDialogVisible, nextDate, this.props.settings.calendarNotesCounter);
+        await this.props.updateNoteDate({...this.state.listItemDialogVisible.note, added: nextDate}, this.props.settings.calendarNotesCounter);
         this.setState({
             listItemDialogVisible: false
         })
