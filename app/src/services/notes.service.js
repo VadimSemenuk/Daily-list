@@ -137,46 +137,35 @@ class NotesService {
         return await Promise.all(tasks);
     }
 
-    async addNote(addedNote) {
+    async addNote(note) {
         let noteUUID = uuid();
         let actionTime = moment().valueOf();
-        let timeCheckSums = this.calculateTimeCheckSum(addedNote);
-        let noteToRemoteInsert = {
-            ...addedNote,
-            startTime: addedNote.startTime ? addedNote.startTime.valueOf() : -1,
-            endTime: addedNote.endTime ? addedNote.endTime.valueOf() : -1,
-            added: addedNote.added ? addedNote.added.valueOf() : -1,
-            uuid: noteUUID,
-            dynamicFields: JSON.stringify(addedNote.dynamicFields),
-            finished: false,
-            lastActionTime: actionTime,
-            isSynced: 0,
-            ...timeCheckSums
-        }
+        let timeCheckSums = this.calculateTimeCheckSum(note);
         let noteToLocalInsert = {
-            ...noteToRemoteInsert,
-            notificate: +noteToRemoteInsert.notificate,
-            finished: +noteToRemoteInsert.finished,
+            ...note,
             lastAction: "ADD",
             userId: authService.getUserId(),
             isLastActionSynced: 0,
             isSynced: 0,
-            uuid: noteUUID
+            uuid: noteUUID,
+            lastActionTime: actionTime,
+            ...timeCheckSums
         }
 
-        let noteKey = await this.insertNote(noteToLocalInsert);
-        let note = {...addedNote, ...timeCheckSums, key: noteKey};
-        await this.setNoteRepeat(note);
+        let addedNote = await this.insertNote(noteToLocalInsert);
+
         notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
             notificationService.set(note.key, note);
         };
 
         if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
-            this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(note.key));
+            let noteToRemoteInsert = {...addedNote}
+
+            this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(addedNote.key));
         }
 
-        return note;
+        return addedNote;
     }
 
     async insertNote(note) {
@@ -187,15 +176,15 @@ class NotesService {
             [
                 note.uuid,
                 note.title,
-                note.startTime,
-                note.endTime,
+                note.startTime ? note.startTime.valueOf() : -1,
+                note.endTime ? note.endTime.valueOf() : -1,
                 note.startTimeCheckSum,
                 note.endTimeCheckSum,
-                note.notificate,
+                Number(note.notificate),
                 note.tag,
-                note.dynamicFields,
-                note.added,
-                note.finished,
+                JSON.stringify(note.dynamicFields),
+                note.added.valueOf(),
+                Number(note.finished),
                 note.lastAction,
                 note.lastActionTime,
                 note.userId,
@@ -204,9 +193,13 @@ class NotesService {
                 note.repeatType
             ]
         ).catch((err) => console.warn(err));
+        await this.setNoteRepeat(note);
 
 
-        return insert.insertId
+        return {
+            key: insert.insertId,
+            ...note
+        }
     }
 
     async setNoteCheckedState(note, state) {
@@ -216,7 +209,7 @@ class NotesService {
             SET finished = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ?
             WHERE id = ?;`,
             [
-                +state,
+                Boolean(state),
                 "EDIT",
                 actionTime,
                 note.key
@@ -288,17 +281,14 @@ class NotesService {
         }
     }
 
-    async updateNote(updatedNote) {
+    async updateNote(note) {
         let actionTime = moment().valueOf();
-        let timeCheckSums = this.calculateTimeCheckSum(updatedNote);
-        let note = {
-            ...updatedNote,
-            startTime: updatedNote.startTime ? updatedNote.startTime.valueOf() : -1,
-            endTime: updatedNote.endTime ? updatedNote.endTime.valueOf() : -1,
-            added: updatedNote.added ? updatedNote.added.valueOf() : -1,
-            dynamicFields: JSON.stringify(updatedNote.dynamicFields),
-            lastActionTime: actionTime,
-            ...timeCheckSums
+        let timeCheckSums = this.calculateTimeCheckSum(note);
+        let noteToLocalUpdate = {
+            ...note,
+            ...timeCheckSums,
+            lastAction: "EDIT",
+            lastActionTime: actionTime
         }
 
         await executeSQL(
@@ -320,26 +310,27 @@ class NotesService {
                 repeatType = ?
             WHERE id = ?;`,
             [
-                note.title,
-                note.startTime,
-                note.endTime,
-                note.startTimeCheckSum,
-                note.endTimeCheckSum,
-                +note.notificate,
-                note.tag,
-                note.dynamicFields,
-                note.added,
-                +note.finished,
-                "EDIT",
-                actionTime,
-                note.repeatType,
-                note.key
+                noteToLocalUpdate.title,
+                noteToLocalUpdate.startTime ? noteToLocalUpdate.startTime.valueOf() : -1,
+                noteToLocalUpdate.endTime ? noteToLocalUpdate.endTime.valueOf() : -1,
+                noteToLocalUpdate.startTimeCheckSum,
+                noteToLocalUpdate.endTimeCheckSum,
+                Boolean(noteToLocalUpdate.notificate),
+                noteToLocalUpdate.tag,
+                JSON.stringify(noteToLocalUpdate.dynamicFields),
+                noteToLocalUpdate.added.valueOf(),
+                Boolean(noteToLocalUpdate.finished),
+                noteToLocalUpdate.lastAction,
+                noteToLocalUpdate.lastActionTime,
+                noteToLocalUpdate.repeatType,
+                noteToLocalUpdate.key
             ]
         ).catch((err) => console.log('Error: ', err));
-        await this.setNoteRepeat(updatedNote);
-        notificationService.clear(updatedNote.repeatType === "any" ? updatedNote.prevNote.repeatDates : [updatedNote.key]);
-        if (updatedNote.notificate) {
-            notificationService.set(updatedNote.key, updatedNote);
+        await this.setNoteRepeat(noteToLocalUpdate);
+
+        notificationService.clear(noteToLocalUpdate.repeatType === "any" ? noteToLocalUpdate.prevNote.repeatDates : [noteToLocalUpdate.key]);
+        if (noteToLocalUpdate.notificate) {
+            notificationService.set(noteToLocalUpdate.key, noteToLocalUpdate);
         };
 
         if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
@@ -359,7 +350,7 @@ class NotesService {
                 .catch((err) => console.warn(err));
         }
 
-        return {...updatedNote, ...timeCheckSums}
+        return noteToLocalUpdate
     }
 
     async updateNoteDate(note) {

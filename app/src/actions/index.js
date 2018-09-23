@@ -69,7 +69,10 @@ export function updateNoteDate (note, updateCount) {
         }))
         .then(() => {
             return updateCount && dispatch(getFullCount(note.added.valueOf()))
-        });
+        })
+        .then(() => {
+            return dispatch(renderNotes())
+        })
     }
 }
 
