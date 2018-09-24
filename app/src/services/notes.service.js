@@ -1,6 +1,5 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
-import config from "../config/config";
 import uuid from "uuid/v1";
 import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
@@ -87,27 +86,31 @@ class NotesService {
     }
 
     async getDayNotes(date) {
+        let currentDate = date.valueOf();
         let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.dynamicFields, t.added, t.finished, t.isSynced, t.repeatType
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.dynamicFields, t.finished, t.isSynced, t.repeatType, t.originalTaskId, t.userId,
+            CASE WHEN t.added != ? OR (t.originalTaskId = -1 AND t.repeatType != "no-repeat") THEN 1 ELSE 0 END as isShadow,
+            CASE t.added WHEN ? THEN t.added ELSE ? END as added
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
                 t.userId = ? AND
                 t.lastAction != 'DELETE' AND
                 (
-                    (t.repeatType = "no-repeat" AND added = ?) OR
-                    t.repeatType = "day" OR
-                    (t.repeatType = "week" AND rep.value = ?) OR
-                    (t.repeatType = "any" AND rep.value = ?)
+                    ((t.originalTaskId != -1 OR t.repeatType = "no-repeat") AND added = ?) OR
+                    (t.originalTaskId = -1 AND t.repeatType = "day") OR
+                    (t.originalTaskId = -1 AND t.repeatType = "week" AND rep.value = ?) OR
+                    (t.originalTaskId = -1 AND t.repeatType = "any" AND rep.value = ?)
                 );`,
-            [authService.getUserId(), date.valueOf(), date.isoWeekday(), date.valueOf()]
+            [currentDate, currentDate, currentDate, authService.getUserId(), currentDate, date.isoWeekday(), currentDate]
         );
 
         let unique = {};
         for(let i = 0; i < select.rows.length; i++) {
             let item = select.rows.item(i);
+            let key = item.originalTaskId === -1 ? item.key : item.originalTaskId;
 
-            if (unique[item.key] && !unique[item.key].isShadow) {
+            if (unique[key] && !unique[key].isShadow) {
                 continue;
             }
 
@@ -118,12 +121,30 @@ class NotesService {
                 endTime: ~item.endTime ? moment(item.endTime) : false,
                 added: moment(item.added),
                 finished: Boolean(item.finished),
-                notificate: Boolean(item.notificate)
+                notificate: Boolean(item.notificate),
+                isShadow: Boolean(item.isShadow)
             }
 
-            unique[nextItem.key] = nextItem;
+            unique[key] = nextItem;
         }
         let notes = Object.values(unique);
+
+        // let notes = [];
+        // for(let i = 0; i < select.rows.length; i++) {
+        //     let item = select.rows.item(i);
+
+        //     let nextItem = {
+        //         ...item,
+        //         dynamicFields: JSON.parse(item.dynamicFields),
+        //         startTime: ~item.startTime ? moment(item.startTime) : false,
+        //         endTime: ~item.endTime ? moment(item.endTime) : false,
+        //         added: moment(item.added),
+        //         finished: Boolean(item.finished),
+        //         notificate: Boolean(item.notificate)
+        //     }
+
+        //     notes.push(nextItem);
+        // }
 
         return {
             date: date,
@@ -149,10 +170,12 @@ class NotesService {
             isSynced: 0,
             uuid: noteUUID,
             lastActionTime: actionTime,
+            // added: note.repeatType === "no-repeat" ? note.added : -1,
             ...timeCheckSums
         }
 
         let addedNote = await this.insertNote(noteToLocalInsert);
+        await this.setNoteRepeat(addedNote);
 
         notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
@@ -167,8 +190,8 @@ class NotesService {
     async insertNote(note) {
         let insert = await executeSQL(
             `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, dynamicFields, added, finished, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, dynamicFields, added, finished, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType, originalTaskId)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -186,15 +209,14 @@ class NotesService {
                 note.userId,
                 note.isSynced,
                 note.isLastActionSynced,
-                note.repeatType
+                note.repeatType,
+                note.originalTaskId || -1
             ]
         ).catch((err) => console.warn(err));
-        await this.setNoteRepeat(note);
-
 
         return {
-            key: insert.insertId,
-            ...note
+            ...note,
+            key: insert.insertId
         }
     }
 
@@ -207,6 +229,14 @@ class NotesService {
             lastAction: "EDIT",
             lastActionTime: actionTime
         };
+
+        console.log(nextNote.isShadow);
+
+        if (nextNote.isShadow) {
+            nextNote.originalTaskId = nextNote.key;
+            nextNote.uuid = uuid();
+            nextNote = await this.insertNote(nextNote);
+        }
 
         let update = await executeSQL(
             `UPDATE Tasks
@@ -237,6 +267,12 @@ class NotesService {
             lastAction: "EDIT",
             lastActionTime: actionTime
         };
+
+        if (nextNote.isShadow) {
+            nextNote.originalTaskId = nextNote.key;
+            nextNote.uuid = uuid();
+            nextNote = await this.insertNote(nextNote);
+        }
 
         let update = await executeSQL(
             `UPDATE Tasks
@@ -281,12 +317,11 @@ class NotesService {
                 tag = ?,
                 dynamicFields = ?,
                 added = ?,
-                finished = ?,
                 isLastActionSynced = 0,
                 lastAction = ?,
                 lastActionTime = ?,
                 repeatType = ?
-            WHERE id = ?;`,
+            WHERE id = ? OR originalTaskId = ?;`,
             [
                 noteToLocalUpdate.title,
                 noteToLocalUpdate.startTime ? noteToLocalUpdate.startTime.valueOf() : -1,
@@ -297,10 +332,10 @@ class NotesService {
                 noteToLocalUpdate.tag,
                 JSON.stringify(noteToLocalUpdate.dynamicFields),
                 noteToLocalUpdate.added.valueOf(),
-                Boolean(noteToLocalUpdate.finished),
                 noteToLocalUpdate.lastAction,
                 noteToLocalUpdate.lastActionTime,
                 noteToLocalUpdate.repeatType,
+                noteToLocalUpdate.key,
                 noteToLocalUpdate.key
             ]
         ).catch((err) => console.log('Error: ', err));

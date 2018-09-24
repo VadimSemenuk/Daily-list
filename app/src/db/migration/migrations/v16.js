@@ -92,13 +92,14 @@ export default {
                     tag TEXT,
                     dynamicFields TEXT,
                     added INTEGER,
-                    finished INTEGER DEFAULT 0,
-                    isSynced INTEGER DEFAULT 0,
-                    isLastActionSynced INTEGER DEFAULT 0,
+                    finished INTEGER,
+                    isSynced INTEGER,
+                    isLastActionSynced INTEGER,
                     lastAction TEXT,
                     lastActionTime INTEGER,
                     userId INTEGER,
-                    repeatType INTEGER DEFAULT "no-repeat",
+                    repeatType INTEGER,
+                    originalTaskId INETEGR,
                     UNIQUE (uuid) ON CONFLICT REPLACE 
                 );
             `);

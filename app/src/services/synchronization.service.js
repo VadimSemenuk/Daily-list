@@ -127,25 +127,30 @@ class SynchronizationService {
     }
 
     async syncNote(action, note) {
-        if (true && (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine)) {
+        if (true || (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine)) {
             return false
         }
 
         switch(action) {
             case "ADD": {
                 await this.insertNote(note);
+                break;
             }
             case "UPDATE": {
                 await this.updateNote(note);
+                break;
             }
             case "UPDATE_FINISHED_STATE": {
-                await this.updateFinishedState(note)
+                await this.updateFinishedState(note);
+                break;
             }
             case "UPDATE_DYNAMIC_FIELDS": {
                 await this.updateDynamicFields(note);
+                break;
             }
             case "DELETE": {
-                await this.deleteNote(note)
+                await this.deleteNote(note);
+                break;
             }   
         }
 
