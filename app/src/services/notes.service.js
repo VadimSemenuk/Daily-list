@@ -159,11 +159,7 @@ class NotesService {
             notificationService.set(note.key, note);
         };
 
-        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
-            let noteToRemoteInsert = {...addedNote}
-
-            this.insertNoteRemote(noteToRemoteInsert).then(() => synchronizationService.setSynced(addedNote.key));
-        }
+        synchronizationService.syncNote("ADD", note);
 
         return addedNote;
     }
@@ -204,81 +200,62 @@ class NotesService {
 
     async setNoteCheckedState(note, state) {
         let actionTime = moment().valueOf();
+        let nextNote = {
+            ...note,
+            finished: state,
+            isLastActionSynced: 0,
+            lastAction: "EDIT",
+            lastActionTime: actionTime
+        };
+
         let update = await executeSQL(
             `UPDATE Tasks
             SET finished = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ?
             WHERE id = ?;`,
             [
-                Boolean(state),
-                "EDIT",
-                actionTime,
-                note.key
+                Boolean(nextNote.finished),
+                nextNote.lastAction,
+                nextNote.lastActionTime,
+                nextNote.key
             ]
         ).catch((err) => console.warn(err))
         if (!update) {
             return
         }
 
-        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
-            fetch(`${config.apiURL}/notes/finish-state`, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": authService.getToken()
-                },
-                body: JSON.stringify({
-                    note: {
-                        state,
-                        uuid: note.uuid,
-                        lastActionTime: actionTime
-                    },
-                    deviceId: window.DEVICE_IMEI,
+        synchronizationService.syncNote("UPDATE_FINISHED_STATE", nextNote);
 
-                })
-            })
-                .then(() => synchronizationService.setSynced(note.key))
-                .catch((err) => console.warn(err));
-        }
+        return nextNote;
     }
 
     async updateNoteDynamicFields(note, dynamicData) {
         let actionTime = moment().valueOf();
+        let nextNote = {
+            ...note,
+            dynamicFields: dynamicData,
+            isLastActionSynced: 0,
+            lastAction: "EDIT",
+            lastActionTime: actionTime
+        };
+
         let update = await executeSQL(
             `UPDATE Tasks
             SET dynamicFields = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ?
             WHERE id = ?;`,
             [
-                JSON.stringify(dynamicData),
-                "EDIT",
-                actionTime,
-                note.key
+                JSON.stringify(nextNote.dynamicFields),
+                nextNote.lastAction,
+                nextNote.lastActionTime,
+                nextNote.key
             ]
         ).catch((err) => console.warn(err));
-        if (update) {
+        if (!update) {
             return
         }
 
-        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
-            fetch(`${config.apiURL}/notes/dynamic-fields`, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": authService.getToken()
-                },
-                body: JSON.stringify({
-                    note: {
-                        dynamicData,
-                        uuid: note.uuid,
-                        lastActionTime: actionTime
-                    },
-                    deviceId: window.DEVICE_IMEI
-                })
-            })
-                .then(() => synchronizationService.setSynced(note.key))
-                .catch((err) => console.warn(err));
-        }
+        synchronizationService.syncNote("UPDATE_DYNAMIC_FIELDS", nextNote);
+
+        return nextNote;
     }
 
     async updateNote(note) {
@@ -288,7 +265,8 @@ class NotesService {
             ...note,
             ...timeCheckSums,
             lastAction: "EDIT",
-            lastActionTime: actionTime
+            lastActionTime: actionTime,
+            isLastActionSynced: 0
         }
 
         await executeSQL(
@@ -333,24 +311,9 @@ class NotesService {
             notificationService.set(noteToLocalUpdate.key, noteToLocalUpdate);
         };
 
-        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
-            fetch(`${config.apiURL}/notes`, {
-                method: "PUT",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": authService.getToken()
-                },
-                body: JSON.stringify({
-                    note,
-                    deviceId: window.DEVICE_IMEI
-                })
-            })
-                .then(() => synchronizationService.setSynced(note.key))
-                .catch((err) => console.warn(err));
-        }
+        synchronizationService.syncNote("UPDATE_DYNAMIC_FIELDS", noteToLocalUpdate);
 
-        return noteToLocalUpdate
+        return noteToLocalUpdate;
     }
 
     async updateNoteDate(note) {
@@ -380,25 +343,7 @@ class NotesService {
         ).catch((err) => console.warn(err));
         notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
 
-        if (false && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)) {
-            fetch(`${config.apiURL}/notes`, {
-                method: "DELETE",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": authService.getToken()
-                },
-                body: JSON.stringify({
-                    note: {
-                        uuid: note.uuid,
-                        lastActionTime: actionTime
-                    },
-                    deviceId: window.DEVICE_IMEI
-                })
-            })
-                .then(() => synchronizationService.setSynced(note.key))
-                .catch((err) => console.warn(err));
-        }
+        synchronizationService.syncNote("DELETE", note);
 
         return note
     }

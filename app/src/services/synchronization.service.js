@@ -135,7 +135,6 @@ class SynchronizationService {
             case "ADD": {
                 await this.insertNote(note);
             }
-            
             case "UPDATE": {
                 await this.updateNote(note);
             }
