@@ -22,6 +22,25 @@ let tags = [
     "#bfbfbf"
 ];
 
+let repeatOptions = [
+    {
+        val: "no-repeat",
+        translateId: "repeat-type-no-repeat"
+    },
+    {
+        val: "day",
+        translateId: "repeat-type-day"
+    },
+    {
+        val: "week",
+        translateId: "repeat-type-week"
+    },
+    {
+        val: "any",
+        translateId: "repeat-type-any"
+    }
+];
+
 class NotesService {
     async getWeekNotes(date) {
         let finDate = moment(date).startOf("isoWeek").valueOf() + 604800000;
@@ -82,9 +101,13 @@ class NotesService {
             [authService.getUserId(), date.valueOf(), date.isoWeekday(), date.valueOf()]
         );
 
-        let notes = [];
+        let unique = {};
         for(let i = 0; i < select.rows.length; i++) {
             let item = select.rows.item(i);
+
+            if (unique[item.key] && !unique[item.key].isShadow) {
+                continue;
+            }
 
             let nextItem = {
                 ...item,
@@ -96,8 +119,9 @@ class NotesService {
                 notificate: Boolean(item.notificate)
             }
 
-            notes.push(nextItem);
+            unique[nextItem.key] = nextItem;
         }
+        let notes = Object.values(unique);
 
         return {
             date: date,
@@ -181,22 +205,6 @@ class NotesService {
 
 
         return insert.insertId
-    }
-
-    insertNoteRemote(note) {
-        return fetch(`${config.apiURL}/notes`, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            },
-            body: JSON.stringify({
-                note,
-                deviceId: window.DEVICE_IMEI
-            })
-        })
-            .catch((err) => console.warn(err));
     }
 
     async setNoteCheckedState(note, state) {
@@ -463,22 +471,7 @@ class NotesService {
     }
 
     getRepeatTypeOptions() {
-        return [{
-            val: "no-repeat",
-            translateId: "repeat-type-no-repeat"
-        },
-        {
-            val: "day",
-            translateId: "repeat-type-day"
-        },
-        {
-            val: "week",
-            translateId: "repeat-type-week"
-        },
-        {
-            val: "any",
-            translateId: "repeat-type-any"
-        }]
+        return [...repeatOptions]
     }
 }
 

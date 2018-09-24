@@ -74,7 +74,7 @@ export function updateNoteDate (note, date, updateCount) {
     }
 }
 
-export function deleteNote (note) {
+export function deleteNote (note, updateCount) {
     return function(dispatch) {
         return notesService.deleteNote(note)
             .then((note) => dispatch({

@@ -125,6 +125,87 @@ class SynchronizationService {
             [noteKey]
         ).catch((err) => console.warn(err));
     }
+
+    async syncNote(action, note) {
+        if (true && (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine)) {
+            return false
+        }
+
+        switch(action) {
+            case "ADD": {
+                await this.insertNote(note);
+            }
+            
+            case "UPDATE": {
+                await this.updateNote(note);
+            }
+            case "UPDATE_FINISHED_STATE": {
+                await this.updateFinishedState(note)
+            }
+            case "UPDATE_DYNAMIC_FIELDS": {
+                await this.updateDynamicFields(note);
+            }
+            case "DELETE": {
+                await this.deleteNote(note)
+            }   
+        }
+
+        this.setSynced(note.key)
+    }
+
+    insertNote(note) {
+        return this.syncRequest("/notes", "POST", { 
+            note
+        })
+    }
+
+    updateNote(note) {
+        return this.syncRequest("/notes", "PUT", {
+            note
+        })
+    }
+
+    updateFinishedState(note) {
+        return this.syncRequest("/notes/finish-state", "POST", {
+            note: {
+                state: note.state,
+                uuid: note.uuid,
+                lastActionTime: note.lastActionTime
+            }
+        })
+    }
+
+    updateDynamicFields(note) {
+        return this.syncRequest("/notes/dynamic-fields", "POST", {
+            note: {
+                dynamicFields: note.dynamicFields,
+                uuid: note.uuid,
+                lastActionTime: note.lastActionTime
+            }
+        })
+    }
+
+    deleteNote(note) {
+        return this.syncRequest("/notes", "DELETE", {
+            note: {
+                uuid: note.uuid,
+                lastActionTime: note.lastActionTime
+            }
+        })
+    }
+
+    syncRequest(path, method, body) {
+        return fetch(`${config.apiURL}${path}`, {
+            method,
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": authService.getToken()
+            },
+            body: JSON.stringify({...body, deviceId: window.DEVICE_IMEI})
+        })
+        .catch((err) => console.warn(err));
+    }
 }
 
 let synchronizationService = new SynchronizationService();
