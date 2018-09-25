@@ -12,7 +12,7 @@ export default class WeekDatesRow extends PureComponent {
                         if (this.props.calendarNotesCounter) {
                             count = this.props.count[msDate] || 0;
                             count += this.props.repeatable.day || 0; 
-                            count += this.props.repeatable.week[i + 1] || 0;
+                            count += this.props.repeatable.week[date.isoWeekday()] || 0;
                             count += this.props.repeatable.any[msDate] || 0;
                         }
 

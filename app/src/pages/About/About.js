@@ -44,7 +44,7 @@ class About extends Component {
         let {t} = this.props;
 
         return (
-            <div className="page-wrapper">
+            <div className="page-wrapper page-about">
                 <Header title={t("about")}/>
                 <div className="scroll page-content padding">
                     <img 

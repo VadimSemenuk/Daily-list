@@ -1,5 +1,6 @@
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
+import { exec } from "child_process";
 
 export default {
     name: "1.6",
@@ -8,15 +9,6 @@ export default {
         await addMigrationsTable();
         await alterSettingsTable();
         await alterTasksTable();
-
-        await execureSQL(
-            `CREATE TABLE IF NOT EXISTS TasksRepeatValues
-            (
-                taskId INTEGER,
-                value INTEGER,
-                FOREIGN KEY(taskId) REFERENCES Tasks(id)
-            );`
-        )
 
         async function addMigrationsTable () {
             await execureSQL(
@@ -90,19 +82,39 @@ export default {
                     endTimeCheckSum,
                     notificate INTEGER,
                     tag TEXT,
-                    dynamicFields TEXT,
-                    added INTEGER,
-                    finished INTEGER,
                     isSynced INTEGER,
                     isLastActionSynced INTEGER,
                     lastAction TEXT,
                     lastActionTime INTEGER,
                     userId INTEGER,
                     repeatType INTEGER,
-                    originalTaskId INETEGR,
+                    added INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE 
                 );
             `);
+
+            await execureSQL(
+                `CREATE TABLE IF NOT EXISTS TasksDynamicFields
+                (
+                    id INTEGER PRIMARY KEY,
+                    taskId INTEGER,
+                    added INTEGER,
+                    finished INTEGER,
+                    dynamicFields TEXT,
+                    FOREIGN KEY(taskId) REFERENCES Tasks(id)
+                );`
+            );
+
+
+            await execureSQL(
+                `CREATE TABLE IF NOT EXISTS TasksRepeatValues
+                (
+                    taskId INTEGER,
+                    value INTEGER,
+                    FOREIGN KEY(taskId) REFERENCES Tasks(id)
+                );`
+            );
+
             await execureSQL(`
                 INSERT INTO Tasks (
                     id, 
@@ -113,9 +125,6 @@ export default {
                     endTimeCheckSum,
                     notificate, 
                     tag, 
-                    dynamicFields, 
-                    added, 
-                    finished, 
                     isSynced,
                     isLastActionSynced,
                     lastAction,
@@ -132,9 +141,6 @@ export default {
                     endTime - added as endTimeCheckSum,
                     notificate, 
                     tag, 
-                    dynamicFields, 
-                    added, 
-                    finished, 
                     0 as isSynced,
                     0 as isLastActionSynced,
                     'ADD' as lastAction,
@@ -143,6 +149,14 @@ export default {
                     'no-repeat' as repeatType
                 FROM Tasks_OLD;
             `, [msNow]);
+
+            await execureSQL(`
+                INSERT INTO TasksDynamicFields
+                (taskId, dynamicFields, added, finished)
+                SELECT id, dynamicFields, added, finished
+                FROM Tasks_OLD;
+            `);
+
             await execureSQL(`DROP TABLE Tasks_OLD;`);
         }
     }
