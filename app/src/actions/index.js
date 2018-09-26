@@ -6,11 +6,11 @@ import calendarService from "../services/calendar.service";
 export function addNote (note, updateCount) {
     return function(dispatch) {
         return notesService.addNote(note)
-            .then((note) => dispatch({
+            .then((nextNote) => dispatch({
                 type: "RECIVE_NOTE",
-                note
+                note: nextNote
             }))
-            .then(() => {
+            .then(({note}) => {
                 return updateCount && dispatch(getFullCount(note.added.valueOf()))
             });
     }
@@ -31,11 +31,11 @@ export function getNotesByDates (dates, period) {
 export function updateNote (note, updateCount) {
     return function(dispatch) {
         return notesService.updateNote(note)
-        .then((note) => dispatch({
+        .then((nextNote) => dispatch({
             type: "UPDATE_NOTE",
-            note
+            note: nextNote
         }))
-        .then(() => {
+        .then(({note}) => {
             return updateCount && dispatch(getFullCount(note.added.valueOf()))
         });
     }
@@ -43,31 +43,29 @@ export function updateNote (note, updateCount) {
 
 export function setNoteCheckedState (note, state) {
     return function(dispatch) {
-        return notesService.setNoteCheckedState(note, state).then(() => dispatch({
-            type: "SET_NOTE_CHECKED_STATE",
-            note,
-            state
+        return notesService.setNoteCheckedState(note, state).then((nextNote) => dispatch({
+            type: "UPDATE_NOTE",
+            note: nextNote
         }));
     }
 }
 
 export function updateNoteDynamicFields (note, dynamicFields) {
     return function(dispatch) {
-        return notesService.updateNoteDynamicFields(note, dynamicFields).then(() => dispatch({
-            type: "UPDATE_NOTE_DYNAMIC_FIELDS",
-            note,
-            dynamicFields
+        return notesService.updateNoteDynamicFields(note, dynamicFields).then((nextNote) => dispatch({
+            type: "UPDATE_NOTE",
+            note: nextNote
         }));
     }
 }
 
 export function updateNoteDate (note, updateCount) {
     return function(dispatch) {
-        return notesService.updateNoteDate(note).then(() => dispatch({
+        return notesService.updateNoteDate(note).then((nextNote) => dispatch({
             type: "UPDATE_NOTE",
-            note
+            note: nextNote
         }))
-        .then(() => {
+        .then(({note}) => {
             return updateCount && dispatch(getFullCount(note.added.valueOf()))
         })
         .then(() => {

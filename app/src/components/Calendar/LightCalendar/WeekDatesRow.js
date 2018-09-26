@@ -8,7 +8,7 @@ export default class WeekDatesRow extends PureComponent {
                     this.props.week.map((date, i) => {
                         let msDate = date.valueOf();
                         let active = this.props.msSelectedDate === msDate;
-                        let count = null; 
+                        let count = 0; 
                         if (this.props.calendarNotesCounter) {
                             count = this.props.count[msDate] || 0;
                             count += this.props.repeatable.day || 0; 
@@ -22,7 +22,7 @@ export default class WeekDatesRow extends PureComponent {
                                 key={i} 
                                 onClick={() => this.props.onSelect(date)}
                             >     
-                                {this.props.calendarNotesCounter ? <span className="count theme-contrasting-color">{count}</span> : null} 
+                                {(this.props.calendarNotesCounter && count !== 0) && <span className="count theme-contrasting-color">{count}</span>} 
                                 <span className="light-calendar-date-number">{date.format("DD")}</span>                            
                             </button> 
                         ) 

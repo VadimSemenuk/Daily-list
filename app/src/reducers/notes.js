@@ -44,48 +44,6 @@ function notes (state = init, action) {
         case 'RECIVE_NOTE': {
             return reciveNote(state, action.note);
         }
-        case 'UPDATE_NOTE_DYNAMIC_FIELDS': {
-            let assignFn = (list) => {
-                let nextList = list.items.map((note) => {
-                    if (note.key === action.note.key) {
-                        return Object.assign({}, note, {dynamicFields: action.dynamicFields})
-                    }
-                    return note
-                })
-                return Object.assign({}, list, { items: nextList })
-            }
-            let fn = (action.note.repeatType === "no-repeat" || action.note.repeatType === "week") ?
-                (list) => {
-                    if (list.date.valueOf() === action.note.added.valueOf()) {
-                        return assignFn(list);
-                    }
-                    return list
-                } :
-                assignFn
-
-            return state.map(fn);
-        }
-        case 'SET_NOTE_CHECKED_STATE': {
-            let assignFn = (list) => {
-                let nextList = list.items.map((note) => {
-                    if (note.key === action.note.key) {
-                        return Object.assign({}, note,  {finished: action.state})
-                    }
-                    return note
-                })
-                return Object.assign({}, list, { items: nextList })
-            }
-            let fn = (action.note.repeatType === "no-repeat" || action.note.repeatType === "week") ?
-                (list) => {
-                    if (list.date.valueOf() === action.note.added.valueOf()) {
-                        return assignFn(list);
-                    }
-                    return list
-                } :
-                assignFn
-
-            return state.map(fn);
-        }
         case 'UPDATE_NOTE': {
             let startState = state.map((list) => {
                 return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
