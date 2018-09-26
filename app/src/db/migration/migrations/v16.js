@@ -76,6 +76,7 @@ export default {
                     id INTEGER PRIMARY KEY,
                     uuid TEXT,
                     title TEXT,
+                    added INTEGER,
                     startTime INTEGER,
                     endTime INTEGER,
                     startTimeCheckSum, 
@@ -88,7 +89,6 @@ export default {
                     lastActionTime INTEGER,
                     userId INTEGER,
                     repeatType INTEGER,
-                    added INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE 
                 );
             `);
@@ -119,6 +119,7 @@ export default {
                 INSERT INTO Tasks (
                     id, 
                     title, 
+                    added,
                     startTime, 
                     endTime, 
                     startTimeCheckSum, 
@@ -135,6 +136,7 @@ export default {
                 SELECT
                     id,  
                     title, 
+                    added,
                     startTime, 
                     endTime, 
                     startTime - added as startTimeCheckSum,

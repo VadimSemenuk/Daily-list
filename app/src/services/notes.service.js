@@ -91,7 +91,7 @@ class NotesService {
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.repeatType, t.userId,
             tdf.dynamicFields, tdf.finished, tdf.added, tdf.id as dynamicFieldsKey,
             CASE WHEN tdf.added != ? THEN 1 ELSE 0 END as isShadow,
-            CASE t.added WHEN ? THEN t.added ELSE ? END as added
+            CASE tdf.added WHEN ? THEN tdf.added ELSE ? END as added
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             LEFT JOIN TasksDynamicFields tdf ON t.id = tdf.taskId
@@ -191,11 +191,12 @@ class NotesService {
     async insertNote(note) {
         let insert = await executeSQL(
             `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType, added)
+            (uuid, title, added, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType)
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
+                note.added.valueOf(),
                 note.startTime ? note.startTime.valueOf() : -1,
                 note.endTime ? note.endTime.valueOf() : -1,
                 note.startTimeCheckSum,
@@ -207,8 +208,7 @@ class NotesService {
                 note.userId,
                 note.isSynced,
                 note.isLastActionSynced,
-                note.repeatType,
-                note.added.valueOf()
+                note.repeatType
             ]
         ).catch((err) => console.warn(err));
 
@@ -283,20 +283,27 @@ class NotesService {
         };
 
         if (nextNote.isShadow) {
-            nextNote.originalTaskId = nextNote.key;
-            nextNote.uuid = uuid();
-            nextNote = await this.insertNote(nextNote);
+            let insert = await executeSQL(`
+                INSERT INTO TasksDynamicFields
+                (taskId, dynamicFields, added, finished)
+                VALUES (?, ?, ?, ?)
+            `, [
+                nextNote.key,
+                JSON.stringify(nextNote.dynamicFields),
+                nextNote.added.valueOf(),
+                Number(nextNote.finished),
+            ])
+
+            nextNote.dynamicFieldsKey = insert.insertId;
         }
 
         let update = await executeSQL(
-            `UPDATE Tasks
-            SET dynamicFields = ?, isLastActionSynced = 0, lastAction = ?, lastActionTime = ?
+            `UPDATE TasksDynamicFields
+            SET dynamicFields = ?,
             WHERE id = ?;`,
             [
                 JSON.stringify(nextNote.dynamicFields),
-                nextNote.lastAction,
-                nextNote.lastActionTime,
-                nextNote.key
+                nextNote.dynamicFieldsKey
             ]
         ).catch((err) => console.warn(err));
         if (!update) {
@@ -323,36 +330,46 @@ class NotesService {
             `UPDATE Tasks
             SET
                 title = ?,
+                added = ?,
                 startTime = ?,
                 endTime = ?,
                 startTimeCheckSum = ?, 
                 endTimeCheckSum = ?,
                 notificate = ?,
                 tag = ?,
-                dynamicFields = ?,
-                added = ?,
                 isLastActionSynced = 0,
                 lastAction = ?,
                 lastActionTime = ?,
-                repeatType = ?
-            WHERE id = ? OR originalTaskId = ?;`,
+                repeatType = ?,
+            WHERE id = ?;`,
             [
                 noteToLocalUpdate.title,
+                noteToLocalUpdate.added.valueOf(),
                 noteToLocalUpdate.startTime ? noteToLocalUpdate.startTime.valueOf() : -1,
                 noteToLocalUpdate.endTime ? noteToLocalUpdate.endTime.valueOf() : -1,
                 noteToLocalUpdate.startTimeCheckSum,
                 noteToLocalUpdate.endTimeCheckSum,
                 Boolean(noteToLocalUpdate.notificate),
                 noteToLocalUpdate.tag,
-                JSON.stringify(noteToLocalUpdate.dynamicFields),
-                noteToLocalUpdate.added.valueOf(),
                 noteToLocalUpdate.lastAction,
                 noteToLocalUpdate.lastActionTime,
                 noteToLocalUpdate.repeatType,
-                noteToLocalUpdate.key,
                 noteToLocalUpdate.key
             ]
         ).catch((err) => console.log('Error: ', err));
+
+        await executeSQL(`
+            UPDATE TasksDynamicFields
+            SET
+                dynamicFields = ?,
+                added = ?
+            WHERE id = ?
+        `, [
+            JSON.stringify(noteToLocalUpdate.dynamicFields),
+            noteToLocalUpdate.repeatDates === "no-repeat" ? noteToLocalUpdate.added.valueOf() : -1,
+            noteToLocalUpdate.dynamicFieldsKey
+        ]);
+
         await this.setNoteRepeat(noteToLocalUpdate);
 
         notificationService.clear(noteToLocalUpdate.repeatType === "any" ? noteToLocalUpdate.prevNote.repeatDates : [noteToLocalUpdate.key]);
@@ -367,10 +384,14 @@ class NotesService {
 
     async updateNoteDate(note) {
         await executeSQL(`
-            UPDATE Tasks
-            SET added = ?
-            WHERE id = ?;
-        `, [note.added.valueOf(), note.key])
+            UPDATE TasksDynamicFields
+            SET
+                added = ?
+            WHERE id = ?
+        `, [
+            note.added.valueOf(),
+            note.dynamicFieldsKey
+        ]);
 
         notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
