@@ -41,19 +41,10 @@ export function updateNote (note, updateCount) {
     }
 }
 
-export function setNoteCheckedState (note, state) {
+export function updateNoteDynamicFields (note, state) {
     return function(dispatch) {
-        return notesService.setNoteCheckedState(note, state).then((nextNote) => dispatch({
-            type: "UPDATE_NOTE",
-            note: nextNote
-        }));
-    }
-}
-
-export function updateNoteDynamicFields (note, dynamicFields) {
-    return function(dispatch) {
-        return notesService.updateNoteDynamicFields(note, dynamicFields).then((nextNote) => dispatch({
-            type: "UPDATE_NOTE",
+        return notesService.updateNoteDynamicFields(note, state).then((nextNote) => dispatch({
+            type: "UPDATE_CURRENT_NOTE",
             note: nextNote
         }));
     }

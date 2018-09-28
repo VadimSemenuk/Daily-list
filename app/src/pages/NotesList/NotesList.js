@@ -245,7 +245,6 @@ class NotesList extends PureComponent {
                                             <WeekNotesList 
                                                 notes={notes} 
                                                 onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                                onItemFinishChange={this.props.setNoteCheckedState}
                                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                             />
                                         </div>
@@ -259,7 +258,6 @@ class NotesList extends PureComponent {
                                             <DayNotesList 
                                                 notes={notes.items} 
                                                 onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                                onItemFinishChange={this.props.setNoteCheckedState}
                                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                             />
                                         </div>

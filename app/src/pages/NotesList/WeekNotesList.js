@@ -27,7 +27,6 @@ class DayNotesList extends PureComponent {
                                     key={a.key}
                                     itemData={a} 
                                     onShowImage={this.props.onImageShowRequest}
-                                    onItemFinishChange={this.props.onItemFinishChange}
                                     onDynaicFieldChange={this.props.onItemDynaicFieldChange}
                                     onItemActionsWindowRequest={this.props.onItemActionsWindowRequest}
                                 /> 
