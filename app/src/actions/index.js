@@ -28,13 +28,26 @@ export function getNotesByDates (dates, period) {
     }
 }
 
-export function updateNote (note, updateCount) {
+export function updateNote (note, updateType, updateCount) {
     return function(dispatch) {
-        return notesService.updateNote(note)
-        .then((nextNote) => dispatch({
-            type: "UPDATE_NOTE",
-            note: nextNote
-        }))
+        return notesService.updateNote(note, updateType)
+        .then((nextNote) => {
+            let type = null;
+            switch(updateType) {
+                case "update-all": {
+                    type = "UPDATE_NOTE_REPEAT_ALL";
+                }
+                case "update-current":
+                default: {
+                    type = "UPDATE_NOTE";
+                }
+            }
+            dispatch({
+                type,
+                note: nextNote,
+                prevNote: note
+            })
+        })
         .then(({note}) => {
             return updateCount && dispatch(getFullCount(note.added.valueOf()))
         });
@@ -44,9 +57,10 @@ export function updateNote (note, updateCount) {
 export function updateNoteDynamicFields (note, state) {
     return function(dispatch) {
         return notesService.updateNoteDynamicFields(note, state).then((nextNote) => dispatch({
-            type: "UPDATE_CURRENT_NOTE",
-            note: nextNote
-        }));
+            type: "UPDATE_NOTE",
+            note: nextNote,
+            prevNote: note
+        }))
     }
 }
 

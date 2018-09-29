@@ -102,6 +102,9 @@ export default {
     "input-placeholder-text": "Текст",
     "list-item-btn": "Пункт списка",
     "field-btn": "Поле",
+    "update-current": "Обновить только текущую",
+    "update-all": "Оновить все",
+    "update-shadow": "Обновить только не затронутые",
 
     // note-item
     "attached-image": "Прикрепленное изображение"

@@ -1,5 +1,17 @@
 let init = [];
 
+function reciveSingleNote(state, note) {
+    let assignFn = (list) => Object.assign({}, list, { items: [...list.items, note] });
+    let fn = (list) => {
+        if (list.date.valueOf() === note.added.valueOf()) {
+            return assignFn(list)
+        }
+        return list
+    };
+
+    return state.map(fn);    
+}
+
 function reciveNote(state, note) {
     let assignFn = (list) => Object.assign({}, list, { items: [...list.items, note] });
     let fn;
@@ -45,9 +57,40 @@ function notes (state = init, action) {
             return reciveNote(state, action.note);
         }
         case 'UPDATE_NOTE': {
-            let startState = state.map((list) => {
-                return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
-            });
+            let startState = null;
+
+            if (action.prevNote.isShadow && !action.note.isShadow) {
+                startState = state.map((list) => {
+                    if (list.date.valueOf() === action.prevNote.added.valueOf()) {
+                        return {...list, items: list.items.filter((note) => note.key !== action.prevNote.key)}
+                    }
+                    return list
+                });
+            } else {
+                startState = state.map((list) => {
+                    return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
+                }); 
+            }
+
+            return reciveSingleNote(startState, action.note);
+        }
+        case "UPDATE_NOTE_REPEAT_ALL": {
+            let startState = null;
+            if (action.note.isShadow) {
+                startState = state.map((list) => {
+                    return {...list, items: list.items.filter((note) => (
+                        (note.key !== action.note.key) || 
+                        (note.forkFrom !== action.note.key)
+                    ))}
+                });
+            } else {
+                startState = state.map((list) => {
+                    return {...list, items: list.items.filter((note) => (
+                        (note.key !== action.note.forkFrom) || 
+                        (note.forkFrom !== action.note.forkFrom)
+                    ))}
+                });
+            }
 
             return reciveNote(startState, action.note);
         }

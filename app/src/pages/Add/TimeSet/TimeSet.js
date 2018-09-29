@@ -150,7 +150,7 @@ class TimeSet extends Component {
                 />
 
                 <ModalListItem
-                    className="tiny"
+                    className={`tiny${(this.props.mode === "edit" && this.props.repeatType !== "no-repeat") ? " disabled" : ""}`}
                     text={t("repeat-type")} 
                     value={t(selectedRepeatTypeOption.translateId)}
                     listItem={ValueListItem}

@@ -77,6 +77,8 @@ export default {
                     uuid TEXT,
                     title TEXT,
                     added INTEGER,
+                    finished INTEGER,
+                    dynamicFields TEXT,
                     startTime INTEGER,
                     endTime INTEGER,
                     startTimeCheckSum, 
@@ -89,22 +91,10 @@ export default {
                     lastActionTime INTEGER,
                     userId INTEGER,
                     repeatType INTEGER,
+                    forkFrom INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE 
                 );
             `);
-
-            await execureSQL(
-                `CREATE TABLE IF NOT EXISTS TasksDynamicFields
-                (
-                    id INTEGER PRIMARY KEY,
-                    taskId INTEGER,
-                    added INTEGER,
-                    finished INTEGER,
-                    dynamicFields TEXT,
-                    FOREIGN KEY(taskId) REFERENCES Tasks(id)
-                );`
-            );
-
 
             await execureSQL(
                 `CREATE TABLE IF NOT EXISTS TasksRepeatValues
@@ -120,6 +110,8 @@ export default {
                     id, 
                     title, 
                     added,
+                    finished,
+                    dynamicFields,
                     startTime, 
                     endTime, 
                     startTimeCheckSum, 
@@ -131,12 +123,15 @@ export default {
                     lastAction,
                     lastActionTime,
                     userId,
-                    repeatType
+                    repeatType,
+                    forkFrom
                 ) 
                 SELECT
                     id,  
                     title, 
                     added,
+                    finished,
+                    dynamicFields,
                     startTime, 
                     endTime, 
                     startTime - added as startTimeCheckSum,
@@ -148,16 +143,10 @@ export default {
                     'ADD' as lastAction,
                     ? as lastActionTime,
                     1 as userId,
-                    'no-repeat' as repeatType
+                    'no-repeat' as repeatType,
+                    -1
                 FROM Tasks_OLD;
             `, [msNow]);
-
-            await execureSQL(`
-                INSERT INTO TasksDynamicFields
-                (taskId, dynamicFields, added, finished)
-                SELECT id, dynamicFields, added, finished
-                FROM Tasks_OLD;
-            `);
 
             await execureSQL(`DROP TABLE Tasks_OLD;`);
         }
