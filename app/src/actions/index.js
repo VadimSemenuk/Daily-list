@@ -36,13 +36,17 @@ export function updateNote (note, updateType, updateCount) {
             switch(updateType) {
                 case "update-all": {
                     type = "UPDATE_NOTE_REPEAT_ALL";
+                    break;
                 }
-                case "update-current":
+                case "update-shadow": {
+                    type = "UPDATE_NOTE_REPEAT_SHADOW";
+                    break;
+                }
                 default: {
                     type = "UPDATE_NOTE";
                 }
             }
-            dispatch({
+            return dispatch({
                 type,
                 note: nextNote,
                 prevNote: note

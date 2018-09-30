@@ -1,7 +1,10 @@
 let init = [];
 
 function reciveSingleNote(state, note) {
-    let assignFn = (list) => Object.assign({}, list, { items: [...list.items, note] });
+    let assignFn = (list) => ({
+        date: list.date, 
+        items: [...list.items, note] 
+    });
     let fn = (list) => {
         if (list.date.valueOf() === note.added.valueOf()) {
             return assignFn(list)
@@ -13,7 +16,16 @@ function reciveSingleNote(state, note) {
 }
 
 function reciveNote(state, note) {
-    let assignFn = (list) => Object.assign({}, list, { items: [...list.items, note] });
+    let assignFn = (list) => ({
+        date: list.date, 
+        items: [
+            ...list.items, 
+            {
+                ...note,
+                added: list.date
+            }
+        ] 
+    });
     let fn;
 
     switch(note.repeatType) {
@@ -59,6 +71,9 @@ function notes (state = init, action) {
         case 'UPDATE_NOTE': {
             let startState = null;
 
+            console.log(action.prevNote);
+            console.log(action.note);
+
             if (action.prevNote.isShadow && !action.note.isShadow) {
                 startState = state.map((list) => {
                     if (list.date.valueOf() === action.prevNote.added.valueOf()) {
@@ -72,25 +87,44 @@ function notes (state = init, action) {
                 }); 
             }
 
+            console.log(startState)
+
             return reciveSingleNote(startState, action.note);
         }
         case "UPDATE_NOTE_REPEAT_ALL": {
             let startState = null;
+
             if (action.note.isShadow) {
                 startState = state.map((list) => {
                     return {...list, items: list.items.filter((note) => (
-                        (note.key !== action.note.key) || 
+                        (note.key !== action.note.key) &&
                         (note.forkFrom !== action.note.key)
                     ))}
                 });
             } else {
                 startState = state.map((list) => {
                     return {...list, items: list.items.filter((note) => (
-                        (note.key !== action.note.forkFrom) || 
+                        (note.key !== action.note.forkFrom) &&
                         (note.forkFrom !== action.note.forkFrom)
                     ))}
                 });
             }
+
+            return reciveNote(startState, action.note);
+        }
+        case "UPDATE_NOTE_REPEAT_SHADOW": {
+            let startState = null;
+            startState = state.map((list) => {
+                let index = list.items.findIndex((note) => note.key !== action.note.key);
+
+                if (index !== -1) {
+                    return {
+                        ...list,
+                        items: [...list.items.slice(0, index), action.note, ...list.items.slice(index + 1)]
+                    }
+                }
+                return list
+            });
 
             return reciveNote(startState, action.note);
         }

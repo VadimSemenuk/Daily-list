@@ -9,7 +9,7 @@ class DayNotesList extends PureComponent {
 
         return (
             this.props.notes.length ?
-            this.props.notes.map((a, i) => (
+            this.props.notes.map((a) => (
                 <ListItem 
                     key={a.key}
                     itemData={a} 

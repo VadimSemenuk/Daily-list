@@ -26,7 +26,8 @@ class CalendarService {
                         rep.value >= ? AND rep.value <= ? AND
                         userId = ? AND
                         lastAction != 'DELETE' AND
-                        t.repeatType = 'any'
+                        t.repeatType = 'any' AND
+                        t.forkFrom = -1
                 )
             GROUP BY added;`, 
             [intervalStartDate, intervalEndDate, authService.getUserId(), intervalStartDate, intervalEndDate, authService.getUserId()]
@@ -37,7 +38,8 @@ class CalendarService {
             WHERE 
                 userId = ? AND 
                 lastAction != 'DELETE' AND
-                repeatType = "day";`, 
+                repeatType = "day" AND
+                forkFrom = -1;`, 
             [authService.getUserId()]
         ); 
 
@@ -47,7 +49,8 @@ class CalendarService {
             WHERE
                 userId = ? AND
                 lastAction != 'DELETE' AND
-                repeatType = "week"
+                repeatType = "week" AND
+                t.forkFrom = -1
 			GROUP BY rep.value;`, 
             [authService.getUserId()]
         );      
