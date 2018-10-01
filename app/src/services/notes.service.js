@@ -87,7 +87,6 @@ class NotesService {
 
     async getDayNotes(date) {
         let currentDate = date.valueOf();
-        // CASE t.added WHEN ? THEN t.id ELSE t.id || 'rp' || ? END as key,
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.repeatType, t.userId,
             t.dynamicFields, t.finished, t.forkFrom,
@@ -267,7 +266,7 @@ class NotesService {
         return nextNote;
     }
 
-    async updateNote(note, updateType) {
+    async updateNote(note) {
         let actionTime = moment().valueOf();
         let timeCheckSums = this.calculateTimeCheckSum(note);
         let nextNote = {
@@ -278,13 +277,10 @@ class NotesService {
             isLastActionSynced: 0
         }
 
-        if (updateType === "update-current" || updateType === "default") {
+        if (nextNote.repeatType === "no-repeat") {
             nextNote = await this.updateCurrentNote(nextNote)
-        } else if (updateType === "update-all") {
-            await this.updateRepeatableNoteAll(nextNote);
-            nextNote.finished = false;
-        } else if (updateType === "update-shadow") {
-            await this.updateRepeatableNoteShadow(nextNote);
+        } else {
+            nextNote = await this.updateRepeatableNoteAll(nextNote);
         }
 
         notificationService.clear(nextNote.repeatType === "any" ? nextNote.prevNote.repeatDates : [nextNote.key]);
@@ -295,29 +291,6 @@ class NotesService {
         synchronizationService.syncNote("UPDATE_DYNAMIC_FIELDS", nextNote);
 
         return nextNote;
-    }
-
-    async updateRepeatableNoteShadow(nextNote) {
-        await executeSQL(
-            `UPDATE Tasks
-            SET title = ?, startTime = ?, endTime = ?, startTimeCheckSum = ?, endTimeCheckSum = ?, notificate = ?, tag = ?, isLastActionSynced = 0,
-                lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?
-            WHERE id = ?;`,
-            [
-                nextNote.title,
-                nextNote.startTime ? nextNote.startTime.valueOf() : -1,
-                nextNote.endTime ? nextNote.endTime.valueOf() : -1,
-                nextNote.startTimeCheckSum,
-                nextNote.endTimeCheckSum,
-                Number(nextNote.notificate),
-                nextNote.tag,
-                nextNote.lastAction,
-                nextNote.lastActionTime,
-                nextNote.repeatType,
-                JSON.stringify(nextNote.dynamicFields),
-                nextNote.key
-            ]
-        ).catch((err) => console.log('Error: ', err));
     }
 
     async updateRepeatableNoteAll(nextNote) {
@@ -342,6 +315,11 @@ class NotesService {
                 nextNote.key
             ]
         ).catch((err) => console.log('Error: ', err));
+
+        return {
+            ...nextNote,
+            finished: false
+        }
     }
 
     async updateCurrentNote(nextNote) {

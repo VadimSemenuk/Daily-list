@@ -28,24 +28,12 @@ export function getNotesByDates (dates, period) {
     }
 }
 
-export function updateNote (note, updateType, updateCount) {
+export function updateNote (note, updateCount) {
     return function(dispatch) {
-        return notesService.updateNote(note, updateType)
+        return notesService.updateNote(note)
         .then((nextNote) => {
-            let type = null;
-            switch(updateType) {
-                case "update-all": {
-                    type = "UPDATE_NOTE_REPEAT_ALL";
-                    break;
-                }
-                case "update-shadow": {
-                    type = "UPDATE_NOTE_REPEAT_SHADOW";
-                    break;
-                }
-                default: {
-                    type = "UPDATE_NOTE";
-                }
-            }
+            let type = nextNote.repeatType === "no-repeat" ? 'UPDATE_NOTE' : 'UPDATE_NOTE_REPEAT_ALL';
+
             return dispatch({
                 type,
                 note: nextNote,

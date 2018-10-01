@@ -71,9 +71,6 @@ function notes (state = init, action) {
         case 'UPDATE_NOTE': {
             let startState = null;
 
-            console.log(action.prevNote);
-            console.log(action.note);
-
             if (action.prevNote.isShadow && !action.note.isShadow) {
                 startState = state.map((list) => {
                     if (list.date.valueOf() === action.prevNote.added.valueOf()) {
@@ -86,8 +83,6 @@ function notes (state = init, action) {
                     return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
                 }); 
             }
-
-            console.log(startState)
 
             return reciveSingleNote(startState, action.note);
         }
@@ -109,22 +104,6 @@ function notes (state = init, action) {
                     ))}
                 });
             }
-
-            return reciveNote(startState, action.note);
-        }
-        case "UPDATE_NOTE_REPEAT_SHADOW": {
-            let startState = null;
-            startState = state.map((list) => {
-                let index = list.items.findIndex((note) => note.key !== action.note.key);
-
-                if (index !== -1) {
-                    return {
-                        ...list,
-                        items: [...list.items.slice(0, index), action.note, ...list.items.slice(index + 1)]
-                    }
-                }
-                return list
-            });
 
             return reciveNote(startState, action.note);
         }

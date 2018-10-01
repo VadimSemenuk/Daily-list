@@ -14,7 +14,6 @@ import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
-import Modal from '../../components/Modal/Modal';
 
 import notesService from '../../services/notes.service';
 
@@ -165,24 +164,7 @@ class Add extends Component {
         let note = this.getInputsValues();
 
         if (this.props.match.path === "/edit") {
-            let updateType = "default";
-            if (note.repeatType !== "no-repeat") {
-                updateType = await new Promise((resolve, reject) => {
-                    this.setState({
-                        editRepeatableDialog: {resolve, reject}
-                    })
-                }).catch((err) => {
-                    this.setState({
-                        editRepeatableDialog: false
-                    })
-                    return false;
-                })
-            }
-            if (!updateType) {
-                return
-            }
-
-            await this.props.updateNote(note, updateType, this.props.settings.calendarNotesCounter);
+            await this.props.updateNote(note, this.props.settings.calendarNotesCounter);
         } else {
             await this.props.addNote(note, this.props.settings.calendarNotesCounter);
         }
@@ -222,7 +204,7 @@ class Add extends Component {
                     currentDate={this.state.added}
                 />
                 {
-                    (this.state.calendar && !(this.props.match.path === "/edit" && this.state.repeatType !== "no-repeat")) &&
+                    this.state.calendar &&
                     <Calendar 
                         currentDate={this.state.added}
                         calendarNotesCounter={this.props.settings.calendarNotesCounter}
@@ -338,32 +320,6 @@ class Add extends Component {
                                     }}
                                 />
                             </ModalListItem>
-
-                            <Modal 
-                                isOpen={Boolean(this.state.editRepeatableDialog)} 
-                                onRequestClose={() => {
-                                    this.state.editRepeatableDialog.reject()
-                                }}
-                            >
-                                <ButtonListItem
-                                    className="no-border"
-                                    text={t("update-current")}
-                                    onClick={() => this.state.editRepeatableDialog.resolve("update-current")}
-                                />
-                                <ButtonListItem
-                                    className="no-border"
-                                    text={t("update-all")}
-                                    onClick={() => this.state.editRepeatableDialog.resolve("update-all")}
-                                />
-                                {
-                                    this.state.isShadow &&
-                                    <ButtonListItem
-                                        className="no-border"
-                                        text={t("update-shadow")}
-                                        onClick={() => this.state.editRepeatableDialog.resolve("update-shadow")}
-                                    />
-                                }
-                            </Modal>
                         </div>
                     </div>
                     <div 
