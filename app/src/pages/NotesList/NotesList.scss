@@ -58,4 +58,32 @@
             text-transform: capitalize;            
         }
     }
+
+    .finished-split {
+        text-align: center;
+        font-size: 1.1em;
+        margin: 16px;
+        color: #cac7c7;
+        text-transform: uppercase;
+        position: relative;
+
+        .finished-split-content {
+            padding: 0 16px;
+            background: #fff;
+            z-index: 2;
+            position: relative;
+        }
+
+        &:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            margin-top: -1px;
+            height: 1px;
+            width: 100%;
+            background: #dedede;
+            z-index: 1;
+        }
+    }
 }

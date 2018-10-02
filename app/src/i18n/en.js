@@ -85,6 +85,7 @@ export default {
     "delete": "Delete",
     "copy": "Copy",
     "move-tomorrow": "Remove on tomorrow",
+    "finished-split": "Finished",
 
     // add
     "notify": "Remind",

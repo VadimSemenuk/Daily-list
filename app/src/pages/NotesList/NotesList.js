@@ -257,6 +257,7 @@ class NotesList extends PureComponent {
                                         >
                                             <DayNotesList 
                                                 notes={notes.items} 
+                                                finSort={this.props.settings.sort.finSort}
                                                 onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                             />
@@ -358,31 +359,21 @@ function sort (data, settings) {
     let notesCompareFn = getNotesCompareFn();
 
     return data.map((list) => {
-        if (settings.sort.finSort) {
-            list.items.sort((a, b) => {
-                if (a.finished === b.finished) {
-                    return notesCompareFn(a, b)
-                } else {
-                    return a.finished - b.finished
-                }
-            })
-        } else {
-            list.items.sort((a, b) => {
-                return notesCompareFn(a, b)
-            })
-        }
-        return list
+        list.items.sort((a, b) => {
+            return notesCompareFn(a, b);
+        });
+        return list;
     })
 
     function getNotesCompareFn() {
         if (settings.sort.type === 0) {
             if (settings.sort.direction === 1) {
                 return (a, b) => {
-                    return a.startTimeCheckSum - b.startTimeCheckSum
+                    return a.startTimeCheckSum - b.startTimeCheckSum;
                 }   
             } else {
                 return (a, b) => {
-                    return b.startTimeCheckSum - a.startTimeCheckSum
+                    return b.startTimeCheckSum - a.startTimeCheckSum;
                 } 
             }    
         }

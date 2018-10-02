@@ -86,6 +86,7 @@ export default {
     "delete": "Удалить",
     "copy": "Копировать",
     "move-tomorrow": "Переместить на завтра",
+    "finished-split": "Завершенные",
 
     // add
     "notify": "Напомнить",
