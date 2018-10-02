@@ -32,12 +32,9 @@ export function updateNote (note, updateCount) {
     return function(dispatch) {
         return notesService.updateNote(note)
         .then((nextNote) => {
-            let type = nextNote.repeatType === "no-repeat" ? 'UPDATE_NOTE' : 'UPDATE_NOTE_REPEAT_ALL';
-
             return dispatch({
-                type,
-                note: nextNote,
-                prevNote: note
+                type: "UPDATE_NOTE",
+                note: nextNote
             })
         })
         .then(({note}) => {
@@ -51,7 +48,7 @@ export function updateNoteDynamicFields (note, state) {
         return notesService.updateNoteDynamicFields(note, state).then((nextNote) => dispatch({
             type: "UPDATE_NOTE",
             note: nextNote,
-            prevNote: note
+            inserted: note.isShadow && !nextNote.isShadow
         }))
     }
 }

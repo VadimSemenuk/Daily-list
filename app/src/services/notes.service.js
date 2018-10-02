@@ -277,30 +277,20 @@ class NotesService {
             isLastActionSynced: 0
         }
 
-        if (nextNote.repeatType === "no-repeat") {
-            nextNote = await this.updateCurrentNote(nextNote)
-        } else {
-            nextNote = await this.updateRepeatableNoteAll(nextNote);
+        if (nextNote.prevNote.repeatType !== "no-repeat") {
+            let key = nextNote.isShadow ? nextNote.key : nextNote.forkFrom;
+            await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [key]);
+            nextNote.isShadow = true;
         }
 
-        notificationService.clear(nextNote.repeatType === "any" ? nextNote.prevNote.repeatDates : [nextNote.key]);
-        if (nextNote.notificate) {
-            notificationService.set(nextNote.key, nextNote);
-        };
-
-        synchronizationService.syncNote("UPDATE_DYNAMIC_FIELDS", nextNote);
-
-        return nextNote;
-    }
-
-    async updateRepeatableNoteAll(nextNote) {
         await executeSQL(
             `UPDATE Tasks
-            SET title = ?, startTime = ?, endTime = ?, startTimeCheckSum = ?, endTimeCheckSum = ?, notificate = ?, tag = ?, isLastActionSynced = 0,
-                lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0
-            WHERE id = ? OR forkFrom = ?;`,
+            SET title = ?, added = ?, startTime = ?, endTime = ?, startTimeCheckSum = ?, endTimeCheckSum = ?, notificate = ?, tag = ?, 
+                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0
+            WHERE id = ?;`,
             [
                 nextNote.title,
+                nextNote.isShadow ? -1 : nextNote.added.valueOf(),
                 nextNote.startTime ? nextNote.startTime.valueOf() : -1,
                 nextNote.endTime ? nextNote.endTime.valueOf() : -1,
                 nextNote.startTimeCheckSum,
@@ -311,48 +301,20 @@ class NotesService {
                 nextNote.lastActionTime,
                 nextNote.repeatType,
                 JSON.stringify(nextNote.dynamicFields),
-                nextNote.key,
-                nextNote.key
+                nextNote.forkFrom === -1 ? nextNote.key : nextNote.forkFrom
             ]
         ).catch((err) => console.log('Error: ', err));
 
-        return {
-            ...nextNote,
-            finished: false
-        }
-    }
+        nextNote.finished = false;
 
-    async updateCurrentNote(nextNote) {
-        if (nextNote.isShadow) {
-            let noteUUID = uuid();
-            let actionTime = moment().valueOf();
-            nextNote.uuid = noteUUID;
-            nextNote.actionTime = actionTime;
-            nextNote.forkFrom = nextNote.key,            
-            nextNote = await this.insertNote(nextNote);
-        } else {
-            await executeSQL(
-                `UPDATE Tasks
-                SET title = ?, added = ?, startTime = ?, endTime = ?, startTimeCheckSum = ?, endTimeCheckSum = ?, notificate = ?, tag = ?, 
-                    isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?
-                WHERE id = ?;`,
-                [
-                    nextNote.title,
-                    nextNote.added.valueOf(),
-                    nextNote.startTime ? nextNote.startTime.valueOf() : -1,
-                    nextNote.endTime ? nextNote.endTime.valueOf() : -1,
-                    nextNote.startTimeCheckSum,
-                    nextNote.endTimeCheckSum,
-                    Number(nextNote.notificate),
-                    nextNote.tag,
-                    nextNote.lastAction,
-                    nextNote.lastActionTime,
-                    nextNote.repeatType,
-                    JSON.stringify(nextNote.dynamicFields),
-                    nextNote.key
-                ]
-            ).catch((err) => console.log('Error: ', err));
-        }
+        await this.setNoteRepeat(nextNote);
+
+        notificationService.clear(nextNote.repeatType === "any" ? nextNote.prevNote.repeatDates : [nextNote.key]);
+        if (nextNote.notificate) {
+            notificationService.set(nextNote.key, nextNote);
+        };
+
+        synchronizationService.syncNote("UPDATE_DYNAMIC_FIELDS", nextNote);
 
         return nextNote;
     }
@@ -396,11 +358,13 @@ class NotesService {
     }
 
     async setNoteRepeat(note) {
+        let key = note.forkFrom === -1 ? note.key : note.forkFrom;
+
+        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ key ]).catch((err) => console.warn(err));
+        
         if (note.repeatType === "no-repeat") {
             return
         }
-
-        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]).catch((err) => console.warn(err));
 
         let repeatDates = note.repeatDates;
         if (note.repeatType === "week") {
@@ -418,16 +382,18 @@ class NotesService {
             ${
                 repeatDates.reduce((accumulator, currentValue) => {
                     if (accumulator === false) {
-                        return `(${note.key}, ${currentValue})`;
+                        return `(${key}, ${currentValue})`;
                     }
-                    return `${accumulator}, (${note.key}, ${currentValue})`;
+                    return `${accumulator}, (${key}, ${currentValue})`;
                 }, false)
             };`,
         ).catch((err) => console.warn(err));
     }
 
     async getNoteRepeatDates(note) {
-        let select = await executeSQL(`SELECT value from TasksRepeatValues WHERE taskId = ?`, [note.key]);
+        let key = note.forkFrom === -1 ? note.key : note.forkFrom;
+
+        let select = await executeSQL(`SELECT value from TasksRepeatValues WHERE taskId = ?`, [key]);
 
         let values = [];
         if (select.rows) {
