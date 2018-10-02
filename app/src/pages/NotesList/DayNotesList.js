@@ -31,7 +31,7 @@ class DayNotesList extends PureComponent {
                         notFinished.map(this.renderItem)
                     }
                     {
-                        finished.length !== 0 && <div className="finished-split"><span className="finished-split-content">{t("finished-split")}s</span></div>
+                        finished.length !== 0 && <div className="finished-split"><span className="finished-split-content">{t("finished-split")}</span></div>
                     }
                     {
                         finished.map(this.renderItem)
