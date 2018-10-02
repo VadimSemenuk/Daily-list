@@ -77,21 +77,12 @@ function notes (state = init, action) {
                         return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
                     }); 
                 } else {
-                    if (action.note.prevNote.isShadow) {
-                        startState = state.map((list) => {
-                            return {...list, items: list.items.filter((note) => (
-                                (note.key !== action.note.key) &&
-                                (note.forkFrom !== action.note.key)
-                            ))}
-                        });
-                    } else {
-                        startState = state.map((list) => {
-                            return {...list, items: list.items.filter((note) => (
-                                (note.key !== action.note.forkFrom) &&
-                                (note.forkFrom !== action.note.forkFrom)
-                            ))}
-                        });
-                    }
+                    startState = state.map((list) => {
+                        return {...list, items: list.items.filter((note) => (
+                            (note.key !== action.note.key) &&
+                            (note.forkFrom !== action.note.key)
+                        ))}
+                    });
                 }
 
                 return reciveNote(startState, action.note);
@@ -113,27 +104,6 @@ function notes (state = init, action) {
 
                 return reciveSingleNote(startState, action.note);
             }
-        }
-        case "UPDATE_NOTE_REPEAT_ALL": {
-            let startState = null;
-
-            if (action.note.isShadow) {
-                startState = state.map((list) => {
-                    return {...list, items: list.items.filter((note) => (
-                        (note.key !== action.note.key) &&
-                        (note.forkFrom !== action.note.key)
-                    ))}
-                });
-            } else {
-                startState = state.map((list) => {
-                    return {...list, items: list.items.filter((note) => (
-                        (note.key !== action.note.forkFrom) &&
-                        (note.forkFrom !== action.note.forkFrom)
-                    ))}
-                });
-            }
-
-            return reciveNote(startState, action.note);
         }
         case 'DELETE_NOTE': {
             let assignFn = (list) => {

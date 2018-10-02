@@ -278,9 +278,12 @@ class NotesService {
         }
 
         if (nextNote.prevNote.repeatType !== "no-repeat") {
-            let key = nextNote.isShadow ? nextNote.key : nextNote.forkFrom;
-            await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [key]);
-            nextNote.isShadow = true;
+            if (!nextNote.isShadow) {
+                nextNote.isShadow = true;
+                nextNote.key = nextNote.forkFrom;
+                nextNote.forkFrom = -1;
+            }
+            await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [nextNote.key]);
         }
 
         await executeSQL(
@@ -301,7 +304,7 @@ class NotesService {
                 nextNote.lastActionTime,
                 nextNote.repeatType,
                 JSON.stringify(nextNote.dynamicFields),
-                nextNote.forkFrom === -1 ? nextNote.key : nextNote.forkFrom
+                nextNote.key
             ]
         ).catch((err) => console.log('Error: ', err));
 
@@ -358,9 +361,7 @@ class NotesService {
     }
 
     async setNoteRepeat(note) {
-        let key = note.forkFrom === -1 ? note.key : note.forkFrom;
-
-        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ key ]).catch((err) => console.warn(err));
+        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]).catch((err) => console.warn(err));
         
         if (note.repeatType === "no-repeat") {
             return
@@ -382,9 +383,9 @@ class NotesService {
             ${
                 repeatDates.reduce((accumulator, currentValue) => {
                     if (accumulator === false) {
-                        return `(${key}, ${currentValue})`;
+                        return `(${note.key}, ${currentValue})`;
                     }
-                    return `${accumulator}, (${key}, ${currentValue})`;
+                    return `${accumulator}, (${note.key}, ${currentValue})`;
                 }, false)
             };`,
         ).catch((err) => console.warn(err));
