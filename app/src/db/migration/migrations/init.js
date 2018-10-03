@@ -1,4 +1,5 @@
 import moment from "moment";
+import config from "../../../config/config";
 
 import execureSQL from "../../../utils/executeSQL";
 
@@ -49,61 +50,128 @@ async function fillDb () {
         VALUES (1, 3, 0, 0, 14, 1, 0);`
     )
 
-    // await addInitNote();
+    await addInitNote();
 }
 
-function addInitNote() {
-    let initNote = {
-        endTime: -1,
-        finished: 0,
-        notificate: 0,
-        startTime: -1,
-        tag: "#c5282f",
-        title: "Привет",
-        added: moment().startOf("day").valueOf(),
-        dynamicFields: [
-            {
-                type: "text",
-                value: "Это - пример того, как выглядит заметка в Ежедневнике. Нажмите на заметку что-бы увидеть полное содержание.\nЗаметка может содержать в себе:"
-            },
-            {
-                type: "listItem",
-                value: "Обычный теск",
-                checked: true
-            },
-            {
-                type: "listItem",
-                value: "Списки",
-                checked: true
-            },
-            {
-                type: "listItem",
-                value: "Цветовую метку",
-                checked: true
-            },
-            {
-                type: "listItem",
-                value: "Фото",
-                checked: true
-            },
-            {
-                type: "listItem",
-                value: "Напоминание",
-                checked: true
-            },
-            {
-                type: "text",
-                value: "Можно настроить автоматическое повторение заметок."
-            },
-            {
-                type: "text",
-                value: "Приятного пользования!"
-            }
-        ]            
-    };
+async function addInitNote() {
+    let lang = navigator.globalization ? 
+        (await new Promise((resolve, reject) => navigator.globalization.getPreferredLanguage(resolve, reject))) : 
+        config.defaultLang;
+
+    let initNote = null;
+
+    if (lang === "ru") {
+        initNote = {
+            endTime: -1,
+            finished: 0,
+            notificate: 0,
+            startTime: -1,
+            tag: "#c5282f",
+            title: "Привет",
+            added: moment().startOf("day").valueOf(),
+            dynamicFields: [
+                {
+                    type: "text",
+                    value: "Это - пример того, как выглядит заметка в Ежедневнике. Нажмите на заметку что-бы увидеть полное содержание.\nЗаметка может содержать в себе:"
+                },
+                {
+                    type: "listItem",
+                    value: "Обычный текст",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "Списки",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "Цветовую метку",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "Фото",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "Напоминание",
+                    checked: false
+                },
+                {
+                    type: "text",
+                    value: "Можно настроить автоматическое повторение заметок."
+                },
+                {
+                    type: "text",
+                    value: "Приятного пользования!"
+                }
+            ]            
+        };
+    } else {
+        initNote = {
+            endTime: -1,
+            finished: 0,
+            notificate: 0,
+            startTime: -1,
+            tag: "#c5282f",
+            title: "Hello",
+            added: moment().startOf("day").valueOf(),
+            dynamicFields: [
+                {
+                    type: "text",
+                    value: "This is an example of the note in the Diary. Tap on the note to look the full content.\nThe note might consist:"
+                },
+                {
+                    type: "listItem",
+                    value: "Default text",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "Lists",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "Color mark",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "Photo",
+                    checked: false
+                },
+                {
+                    type: "listItem",
+                    value: "A remind",
+                    checked: false
+                },
+                {
+                    type: "text",
+                    value: "You can setup automatic repetition of notes ."
+                },
+                {
+                    type: "text",
+                    value: "Pleasant enjoyment!"
+                }
+            ]           
+        }       
+    }
+console.log()
     return execureSQL(`
         INSERT INTO Tasks
         (title, startTime, endTime, notificate, tag, dynamicFields, added, finished)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [initNote.title, initNote.startTime, initNote.endTime, initNote.notificate, initNote.tag, JSON.stringify(initNote.dynamicFields), initNote.added, initNote.finished])
+    `, [
+        initNote.title,
+        initNote.startTime, 
+        initNote.endTime, 
+        initNote.notificate, 
+        initNote.tag, 
+        JSON.stringify(initNote.dynamicFields), 
+        initNote.added, 
+        initNote.finished
+    ])
 }

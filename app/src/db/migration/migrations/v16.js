@@ -1,6 +1,5 @@
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
-import { exec } from "child_process";
 
 export default {
     name: "1.6",
@@ -46,7 +45,7 @@ export default {
             let sort = {
                 type: 1,
                 direction: 1,
-                finSort: 0
+                finSort: 1
             }
             let lang = navigator.globalization ? (await new Promise((resolve, reject) => navigator.globalization.getPreferredLanguage(resolve, reject))) : config.defaultLang;
             if (lang) {

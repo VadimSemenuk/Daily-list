@@ -104,7 +104,7 @@ class TimeSet extends Component {
                                     className="pick"
                                     onClick={() => this.pickTime('startTime')}
                                 >
-                                    <span>{this.props.startTime ? this.props.startTime.format('HH:mm') : 'Указать'}</span>     
+                                    <span>{this.props.startTime ? this.props.startTime.format('HH:mm') : t('specify-btn')}</span>     
                                 </button>
                                 {
                                     this.props.startTime &&
@@ -125,7 +125,7 @@ class TimeSet extends Component {
                                     className="pick"
                                     onClick={() => this.pickTime('endTime')}
                                 >
-                                    <span>{this.props.endTime ? this.props.endTime.format('HH:mm') : 'Указать'}</span>   
+                                    <span>{this.props.endTime ? this.props.endTime.format('HH:mm') : t('specify-btn')}</span>   
                                 </button>
                                 {
                                     this.props.endTime &&

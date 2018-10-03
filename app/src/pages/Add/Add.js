@@ -32,7 +32,7 @@ class Add extends Component {
                 type: "text",
                 value: ""
             }],
-            notificate: true,
+            notificate: false,
             startTime: false,
             endTime: false,
             tag: 'transparent',

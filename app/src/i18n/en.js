@@ -59,7 +59,7 @@ export default {
     "graphics": "Graphics",
 
     // common
-    "save": "Save data",
+    "save": "Save",
     "move": "Move to",
     "star-app": "Rate app",
     "internet-required": "Connect to the internet",
@@ -102,6 +102,7 @@ export default {
     "input-placeholder-text": "Text",
     "list-item-btn": "List item",
     "field-btn": "Field",
+    "specify-btn": "Select",
 
     // note-item
     "attached-image": "Attached image"

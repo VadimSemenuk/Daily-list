@@ -106,6 +106,7 @@ export default {
     "update-current": "Обновить только текущую",
     "update-all": "Оновить все",
     "update-shadow": "Обновить только не затронутые",
+    "specify-btn": "Указать",
 
     // note-item
     "attached-image": "Прикрепленное изображение"
