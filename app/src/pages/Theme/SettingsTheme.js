@@ -5,7 +5,7 @@ import {translate} from "react-i18next";
 import i18n from "i18next";
 import moment from "moment";
 
-import * as AppActions from '../../actions'; 
+import * as AppActions from '../../actions';
 
 import Header from '../../components/Header/Header';
 import {SwitchListItem, ButtonListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";

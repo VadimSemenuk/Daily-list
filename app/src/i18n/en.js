@@ -92,7 +92,7 @@ export default {
     "set-time-first": "Set time",
     "time": "Time",
     "open-galery": "Gallery open",
-    "make-shot": "Screen shot",
+    "make-shot": "Take a photo",
     "repeat-type": "Repeat",
     "repeat-type-no-repeat": "Don't repeat",
     "repeat-type-day": "Every day",

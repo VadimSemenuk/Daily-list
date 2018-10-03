@@ -1,5 +1,9 @@
 import React, {Component} from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import {translate} from "react-i18next";
+
+import * as AppActions from '../../actions';
 
 import Logo from '../../assets/img/logo.png';
 
@@ -14,7 +18,16 @@ class About extends Component {
 
         this.state = {
             bazinga: false,
-            logoClicksCounter: 0
+            logoClicksCounter: 0,
+            lang: "en"
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.settings.lang === "ru") {
+            this.setState({
+                lang: "ru"
+            })
         }
     }
 
@@ -25,24 +38,6 @@ class About extends Component {
         }
 
         window.LaunchReview.launch();
-    }
-
-    share = () => {
-        if (navigator.connection.type === window.Connection.NONE) {
-            window.plugins.toast.showLongBottom(this.props.t("internet-required"));       
-            return 
-        }
-
-        window.plugins.socialsharing.share(
-            this.props.t("share-content"), 
-            this.props.t("share-theme"), 
-            Logo, 
-            'https://ce22s.app.goo.gl/u9DC'
-        )
-    }
-
-    getPreviousVersion = () => {
-        window.open('https://4pda.ru/forum/index.php?showtopic=800369', '_system', 'location=yes');        
     }
 
     openSettings() {
@@ -115,17 +110,17 @@ class About extends Component {
                                 className="text block"
                             >{t("move")}</button>
                             <img 
-                                src={require("../../assets/img/issues/issue1.0.jpg")}
+                                src={require("../../assets/img/issues/issue1.0-" + this.state.lang + ".jpg")}
                                 alt="issue"
                             />
                             {t("no-notification-b")}
                             <img 
-                                src={require("../../assets/img/issues/issue1.1.jpg")}
+                                src={require("../../assets/img/issues/issue1.1-" + this.state.lang + ".jpg")}
                                 alt="issue"                            
                             />
                             {t("no-notification-c")}                            
                             <img 
-                                src={require("../../assets/img/issues/issue1.2.jpg")}
+                                src={require("../../assets/img/issues/issue1.2-" + this.state.lang + ".jpg")}
                                 alt="issue"                            
                             />
                         </div>
@@ -136,4 +131,14 @@ class About extends Component {
     }
 }
 
-export default translate("translations")(About)
+function mapStateToProps(state, props) {
+    return {
+        settings: state.settings
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(AppActions, dispatch);
+}
+
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(About))
