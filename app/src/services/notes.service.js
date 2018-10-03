@@ -294,7 +294,7 @@ class NotesService {
 
         await this.setNoteRepeat(nextNote);
 
-        notificationService.clear(nextNote.repeatType === "any" ? nextNote.prevNote.repeatDates : [nextNote.key]);
+        notificationService.clear(nextNote.prevNote.repeatType === "any" ? nextNote.prevNote.repeatDates : [nextNote.key]);
         if (nextNote.notificate) {
             notificationService.set(nextNote.key, nextNote);
         };

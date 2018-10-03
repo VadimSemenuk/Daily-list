@@ -1,7 +1,7 @@
 import moment from "moment";
 
 class NotificationService {
-    set = (id, note) => {       
+    set = (id, note) => { 
         if (!window.cordova) return
 
         window.cordova.plugins.notification.local.hasPermission((granted) => { 

@@ -21,9 +21,12 @@ class TimeSet extends Component {
 
     onTimeSet = (date, state) => {     
         let notificate;
-        if (date < moment().startOf("minute").valueOf()) {
-            notificate = false;
-        } else if (this.props.settings.defaultNotification && !this.removeNotificationFromDefault && !this.props.notificate && state === "startTime") {
+        if (
+            this.props.settings.defaultNotification && 
+            !this.removeNotificationFromDefault && 
+            !this.props.notificate && 
+            state === "startTime"
+        ) {
             notificate = true
         } else {
             notificate = this.props.notificate;
