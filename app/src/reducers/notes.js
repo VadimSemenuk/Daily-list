@@ -16,6 +16,8 @@ function reciveSingleNote(state, note) {
 }
 
 function reciveNote(state, note) {
+    delete note.prevNote;
+
     let assignFn = (list) => ({
         date: list.date, 
         items: [
@@ -106,20 +108,16 @@ function notes (state = init, action) {
             }
         }
         case 'DELETE_NOTE': {
-            let assignFn = (list) => {
-                let nextList = list.items.filter((note) => note.key !== action.note.key)
-                return Object.assign({}, list, { items: nextList })
-            }
-            let fn = (action.note.repeatType === "no-repeat" || action.note.repeatType === "week") ?
-                (list) => {
-                    if (list.date.valueOf() === action.note.added.valueOf()) {
-                        return assignFn(list);
-                    }
-                    return list
-                } :
-                assignFn
-
-            return state.map(fn);
+            return state.map((list) => {
+                let nextList = list.items.filter((note) => (
+                    (note.key !== action.note.key) &&
+                    (note.forkFrom !== action.note.key)
+                ))
+                return {
+                    date: list.date, 
+                    items: nextList
+                }
+            });
         }
         case "RENDER_NOTES": {
             return state.map((list) => {

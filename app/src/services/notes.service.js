@@ -343,21 +343,29 @@ class NotesService {
 
     async deleteNote(note) {
         let actionTime = moment().valueOf();
+        let nextNote = {...note}
+        if (nextNote.repeatType !== "no-repeat" && !nextNote.isShadow) {
+            nextNote.isShadow = true;
+            nextNote.key = nextNote.forkFrom;
+            nextNote.forkFrom = -1;
+        }
+
         await executeSQL(
             `UPDATE Tasks
             SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
-            WHERE id = ?;`,
+            WHERE id = ? OR forkFrom = ?;`,
             [
                 "DELETE",
                 actionTime,
-                note.key
+                nextNote.key,
+                nextNote.key
             ]
         ).catch((err) => console.warn(err));
-        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
+        notificationService.clear(nextNote.repeatType === "any" ? nextNote.repeatDates : [nextNote.key]);
 
-        synchronizationService.syncNote("DELETE", note);
+        synchronizationService.syncNote("DELETE", nextNote);
 
-        return note
+        return nextNote
     }
 
     async setNoteRepeat(note) {
