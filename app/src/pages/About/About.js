@@ -9,6 +9,15 @@ import {InsetListItem, TriggerListItem} from "../../components/ListItem/ListItem
 import './About.scss';
 
 class About extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            bazinga: false,
+            logoClicksCounter: 0
+        }
+    }
+
     launthMarket = () => {
         if (navigator.connection.type === window.Connection.NONE) {
             window.plugins.toast.showLongBottom(this.props.t("internet-required"));       
@@ -40,6 +49,16 @@ class About extends Component {
         window.cordova.plugins.settings.open(["application_details", true])
     }
 
+    onLogoClick = () => {
+        let nextClickCount = ++this.state.logoClicksCounter;
+        let bazinga = nextClickCount === 5;
+
+        this.setState({
+            logoClicksCounter: nextClickCount,
+            bazinga
+        })
+    }
+
     render () {
         let {t} = this.props;
 
@@ -47,15 +66,26 @@ class About extends Component {
             <div className="page-wrapper page-about">
                 <Header title={t("about")}/>
                 <div className="scroll page-content padding">
-                    <img 
-                        className="app-logo"
-                        src={Logo}
-                        alt="app-logo"
-                    />
+                    {   this.state.bazinga &&
+                        <img 
+                            className="bazinga app-logo"
+                            src={require("../../assets/img/bazinga.jpg")}
+                            alt="bazinga"
+                        />
+                    }
+                    {
+                        !this.state.bazinga &&
+                        <img 
+                            className="app-logo"
+                            src={Logo}
+                            alt="app-logo"
+                            onClick={this.onLogoClick}
+                        />
+                    }
                     <div className="text-center">
                         <strong>{t("app-name")}</strong>
                         <p>&#9400; 2017 Mamindeveloper</p>
-                        <p>mamindeveloper@gmail.com</p>                        
+                        <p>mamindeveloper@gmail.com</p>
                     </div> 
                     <InsetListItem 
                         text={t("star-app")}
