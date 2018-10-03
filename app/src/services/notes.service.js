@@ -130,24 +130,6 @@ class NotesService {
         }
         let notes = Object.values(unique);
 
-        // let notes = [];
-        // for(let i = 0; i < select.rows.length; i++) {
-        //     let item = select.rows.item(i);
-
-        //     let nextItem = {
-        //         ...item,
-        //         dynamicFields: JSON.parse(item.dynamicFields),
-        //         startTime: ~item.startTime ? moment(item.startTime) : false,
-        //         endTime: ~item.endTime ? moment(item.endTime) : false,
-        //         added: moment(item.added),
-        //         finished: Boolean(item.finished),
-        //         notificate: Boolean(item.notificate),
-        //         isShadow: Boolean(item.isShadow)
-        //     }
-
-        //     notes.push(nextItem);
-        // }
-
         return {
             date: date,
             items: notes
@@ -179,12 +161,12 @@ class NotesService {
         let addedNote = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(addedNote);
 
-        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
-        if (note.notificate) {
-            notificationService.set(note.key, note);
+        notificationService.clear(addedNote.repeatType === "any" ? addedNote.repeatDates : [addedNote.key]);
+        if (addedNote.notificate) {
+            notificationService.set(addedNote.key, addedNote);
         };
 
-        synchronizationService.syncNote("ADD", note);
+        synchronizationService.syncNote("ADD", addedNote);
 
         return addedNote;
     }

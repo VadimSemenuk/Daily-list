@@ -23,10 +23,10 @@ class Migration {
             };
             return migrations.filter((a) => !appliedMigrations.some((b) => a.name === b.name));
         } catch (err) {      
-            console.warn(err);    
-            if (err.code === 5) {
+            console.warn(err);  
+            if (!(await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Migrations';`)).rows.length) {
                 return migrations
-            }
+            }  
         }
     }
 
