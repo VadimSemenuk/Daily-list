@@ -258,15 +258,19 @@ class NotesService {
             lastActionTime: actionTime,
             isLastActionSynced: 0
         }
-
         if (nextNote.prevNote.repeatType !== "no-repeat") {
             if (!nextNote.isShadow) {
-                nextNote.isShadow = true;
                 nextNote.key = nextNote.forkFrom;
-                nextNote.forkFrom = -1;
             }
             await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [nextNote.key]);
         }
+        if (nextNote.repeatType === "no-repeat") {
+            nextNote.isShadow = false;
+        } else {
+            nextNote.isShadow = true;
+        }
+        nextNote.forkFrom = -1;
+        nextNote.finished = false;
 
         await executeSQL(
             `UPDATE Tasks
@@ -289,8 +293,6 @@ class NotesService {
                 nextNote.key
             ]
         ).catch((err) => console.log('Error: ', err));
-
-        nextNote.finished = false;
 
         await this.setNoteRepeat(nextNote);
 
