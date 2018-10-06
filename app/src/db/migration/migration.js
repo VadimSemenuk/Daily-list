@@ -48,9 +48,9 @@ class Migration {
             }
         }
 
-        // if (!isDbExist) {
-        //     addFakeListItemsData();
-        // }
+        if (!isDbExist) {
+            addFakeListItemsData();
+        }
     }
 }
 

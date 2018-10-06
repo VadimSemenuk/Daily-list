@@ -9,7 +9,7 @@ module.exports = (usersRep) => (
             session: false
         },
         async (email, password, done) => {           
-            const user = await usersRep.getUserByEmail(email);
+            const user = await usersRep.getUserByField("email", email);
             if (!user) {
                 return done(null, false, {message: "User with this email hasn't registered"});
             }

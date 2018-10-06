@@ -5,8 +5,6 @@ import synchronizationService from "./synchronization.service";
 import authService from "./auth.service";
 import notificationService from "./notification.service";
 
-window.moment = moment;
-
 let tags = [
     'transparent',
     '#00213C',

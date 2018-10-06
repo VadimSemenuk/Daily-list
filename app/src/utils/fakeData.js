@@ -2,7 +2,9 @@ import moment from "moment";
 import execureSQL from "../utils/executeSQL";
 
 export async function addFakeListItemsData () {
-    let dates = generateDates(moment().startOf("day").valueOf(), 10);
+    console.log("Start adding test data");
+
+    let dates = generateDates(moment().startOf("day").valueOf(), 100);
     let sequence = generateSequence(10);  
     
     let dynamicDataJson = `[{"type":"text","value":"Where rt"},{"type":"listItem","value":"Xc","checked":false},{"type":"listItem","value":"Cvvb","checked":false},{"type":"listItem","value":"Cbnjknh","checked":true},{"type":"listItem","value":"Cbbnj","checked":false},{"type":"text","value":"Vhhjhh"},{"type":"snapshot","uri":"/storage/emulated/0/DCIM/P71202-160439.jpg"}]`;

@@ -139,6 +139,14 @@ button,
             transform: rotate(90deg) translate(-50%, 0);
         }
     }
+
+    &.img-text-button {
+        img {
+            margin: 0;
+            margin-right: 16px;
+            height: 20px;
+        }
+    }
 }
 .clickable {
     &:active {

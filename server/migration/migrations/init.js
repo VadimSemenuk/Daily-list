@@ -12,7 +12,8 @@ module.exports.up = async (db) => {
             id SERIAL PRIMARY KEY,
             name VARCHAR,
             password VARCHAR,
-            email VARCHAR
+            email VARCHAR,
+            google_id VARCHAR
         );
 
         CREATE TABLE IF NOT EXISTS Tasks

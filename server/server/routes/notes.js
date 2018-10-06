@@ -27,5 +27,9 @@ module.exports = function (notesRep) {
         res.end();
     });
 
+    router.post('/backup', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
+        
+    });
+
     return router
 }

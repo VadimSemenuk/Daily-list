@@ -22,6 +22,8 @@ class AuthService {
             .catch((err) => console.warn(err));
 
         this.setToken(token);
+
+        return token;
     }
 
     async signIn(user) {
@@ -41,6 +43,39 @@ class AuthService {
             .catch((err) => console.warn(err));
 
         this.setToken(token);
+
+        return token;
+    }
+
+    googleSignIn = async () => {
+        let token = await new Promise((resolve, reject) => {
+            window.plugins.googleplus.login(
+                {
+                    webClientId: config.webClientId,
+                },
+                (googleUser) => {
+                    return fetch(`${config.apiURL}/auth/sign-in-google`, {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(googleUser)
+                    })
+                        .then((res) => {
+                            if (res.status === 200) {
+                                return res.json();
+                            }
+                        })            
+                        .catch((err) => console.warn(err));
+                },
+                (err) => console.log(err)
+            );
+        });
+
+        this.setToken(token);
+
+        return token;
     }
 
     setToken(token) {

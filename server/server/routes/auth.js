@@ -3,6 +3,9 @@ const config = require("../config");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const {OAuth2Client} = require('google-auth-library');
+
+const client = new OAuth2Client(CLIENT_ID);
 
 module.exports = function (authRep) {  
     router.post('/sign-in', async (req, res, next) => {
@@ -21,7 +24,25 @@ module.exports = function (authRep) {
 				});
 			}
 		})(req, res, next);
-    });
+	});
+	
+    router.post('/sign-in-google', async (req, res, next) => {
+		const ticket = await client.verifyIdToken({
+			idToken: req.body.idToken,
+			audience: req.body.userId
+		});
+		const payload = ticket.getPayload();
+		const user = await authRep.getUserByField("google-id", payload.sub);
+
+		const token = jwt.sign({
+			id: user.id	
+		}, config.jwtSecret);
+
+		res.json({
+			id: user.id,
+			token: `Bearer ${token}`
+		});
+	});
 
     router.post('/sign-up', async (req, res, next) => {
         const id = await authRep.createUser({
@@ -36,7 +57,7 @@ module.exports = function (authRep) {
 			...payload,
 			token: `Bearer ${token}`
 		});
-    });
-
+	});
+	
     return router
 }

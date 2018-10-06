@@ -31,12 +31,10 @@ class Settings extends Component {
                         text={t("interface")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/theme`)} 
                     />
-                    {   false && 
-                        <InsetListItem 
-                            text={t("data-sync")}
-                            onClick={() => this.props.history.push(`${this.props.match.url}/backup`)}
-                        />
-                    }
+                    <InsetListItem 
+                        text={t("data-sync")}
+                        onClick={() => this.props.history.push(`${this.props.match.url}/backup`)}
+                    />
                     <InsetListItem 
                         text={this.props.settings.password === null ? t("add-pass") : t("remove-pass")}
                         onClick={() => {
