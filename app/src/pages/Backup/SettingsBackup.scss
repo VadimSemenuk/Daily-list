@@ -6,4 +6,33 @@
     button.google-in {
         background: #db4437;
     }
+
+    .profile-wrapper {
+        display: flex;
+    }
+    .profile-img-wrapper {
+        width: 96px;
+        height: 96px;
+        margin-right: 10px;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    .profile-data-wrapper {
+        flex-grow: 1;
+        align-items: safe;
+        align-items: flex-start;
+        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+
+        .profile-info-wrapper {
+            .name {
+                font-size: 1.3em;
+            }
+        }
+
+        button.log-out {
+            margin-top: 10px;
+        }
+    }
 }

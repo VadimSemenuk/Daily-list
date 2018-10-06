@@ -1,6 +1,8 @@
 import notesService from "../services/notes.service";
 import settingsService from "../services/settings.service";
 import calendarService from "../services/calendar.service";
+import authService from "../services/auth.service";
+import backupService from "../services/auth.service";
 
 // notes
 export function addNote (note, updateCount) {
@@ -171,5 +173,31 @@ export function getFullCount (date, period) {
             type: "GET_COUNT",
             nextCount 
         }));
+    }
+}
+
+// auth
+export function googleSignIn() {
+    return function(dispatch) {
+        return authService.googleSignIn().then((user) => dispatch({
+            type: "RECIVE_USER",
+            user
+        }))
+    }
+}
+
+export function signOut() {
+    return function(dispatch) {
+        return authService.signOut().then(() => dispatch({
+            type: "CLEAR_USER"
+        }))
+    }
+}
+
+// backup
+
+export function uploadBackup() {
+    return function() {
+
     }
 }

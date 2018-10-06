@@ -45,7 +45,7 @@ class About extends Component {
     }
 
     onLogoClick = () => {
-        let nextClickCount = ++this.state.logoClicksCounter;
+        let nextClickCount = this.state.logoClicksCounter + 1;
         let bazinga = nextClickCount === 5;
 
         this.setState({

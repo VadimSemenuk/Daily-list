@@ -6,6 +6,7 @@ import settings from './settings';
 import password from './password';
 import synchronization from "./synchronization";
 import calendar from "./calendar";
+import user from "./user";
 
 let reducers = combineReducers({
     settings,
@@ -13,7 +14,8 @@ let reducers = combineReducers({
     password,
     notes,
     synchronization,
-    calendar
+    calendar,
+    user
 });
 
 export default reducers;

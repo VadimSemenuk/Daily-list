@@ -2,6 +2,7 @@ import {createStore, applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
 import notesService from "../services/notes.service";
+import authService from "../services/auth.service";
 
 import reducers from '../reducers';
 
@@ -21,7 +22,8 @@ async function initStore (settings) {
             settings,
             password,
             notes,
-            date: cur
+            date: cur,
+            user: authService.getUserInfoToken()
         },
         applyMiddleware(
             thunkMiddleware

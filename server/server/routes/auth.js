@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const {OAuth2Client} = require('google-auth-library');
 
-const client = new OAuth2Client(CLIENT_ID);
+const client = new OAuth2Client(config.webClientId);
 
 module.exports = function (authRep) {  
     router.post('/sign-in', async (req, res, next) => {
@@ -29,17 +29,24 @@ module.exports = function (authRep) {
     router.post('/sign-in-google', async (req, res, next) => {
 		const ticket = await client.verifyIdToken({
 			idToken: req.body.idToken,
-			audience: req.body.userId
-		});
+		}).catch((err) => {
+			console.log(err)
+		})
 		const payload = ticket.getPayload();
-		const user = await authRep.getUserByField("google-id", payload.sub);
+		let user = await authRep.getUserByField("google_id", payload.sub);
+		if (!user) {
+	 		user = await authRep.createUser(payload);
+		}
 
 		const token = jwt.sign({
-			id: user.id	
+			id: user.id
 		}, config.jwtSecret);
 
 		res.json({
 			id: user.id,
+			email: user.email,
+			name: user.name,
+			picture: user.picture,
 			token: `Bearer ${token}`
 		});
 	});
