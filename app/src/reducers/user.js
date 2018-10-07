@@ -1,9 +1,9 @@
 function user (state = {}, action) {
     switch(action.type) {   
         case 'RECIVE_USER':
-            return action.user
+            return action.user;
         case 'CLEAR_USER':
-            return {}
+            return {};
         default:        
             return state;
     }

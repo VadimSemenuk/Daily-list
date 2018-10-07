@@ -3,12 +3,12 @@ export default {
     "settings": "Настройки",
     "view": "Отображение",
     "interface": "Интерфейс",
-    "data-sync": "Синхронизация данных",
     "add-pass": "Добавить пароль",
     "remove-pass": "Удалить пароль", 
     "issues": "Устранение неисправностей",
     "about": "О программе",
     "default-notification": "Автоматически добавлять уведомление",
+    "backup": "Резервное копирование",
     
     // view settings page
     "sort": "Сортировка",
@@ -57,6 +57,12 @@ export default {
     "share-app": "Поделиться приложением",
     "resources": "Использованные ресурсы",
     "graphics": "Графика",
+
+    // backup page
+    "google-sign-in": "Войти с помощью Google",
+    "sign-out": "Выйти",
+    "create-backup": "Создать резервную копию",
+    "restore-backup": "Загрузить резервную копию",
 
     // common
     "save": "Сохранить",

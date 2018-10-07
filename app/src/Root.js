@@ -14,7 +14,7 @@ import SettingsSort from './pages/Sort/SettingsSort';
 import SettingsPassword from './pages/Password/SettingsPassword';
 import SettingsBackup from './pages/Backup/SettingsBackup';
 import About from './pages/About/About';
-import SynchronizationLoader from "./components/SynchronizationLoader/SynchronizationLoader";
+import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
 
 class Root extends Component {
@@ -101,7 +101,7 @@ class Root extends Component {
                         path="/settings/about" 
                         component={About} 
                     />                                              
-                    <SynchronizationLoader />
+                    <Loader />
                 </div>
             </HashRouter>
         );

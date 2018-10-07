@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import {translate} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
@@ -9,30 +10,38 @@ import './SettingsBackup.scss';
 import Header from '../../components/Header/Header';
 
 import GoogleImg from '../../assets/img/google.svg';
-import ExportImg from '../../assets/img/export.svg';
-import ImportImg from '../../assets/img/import.svg';
-
+import ExportImg from '../../assets/img/upload-to-cloud.svg';
+import ImportImg from '../../assets/img/cloud-computing.svg';
+import LogoutImg from '../../assets/img/logout.svg';
 
 class SettingsBackup extends Component {
 	constructor(props) {
         super(props);  
     }
 
+    componentDidMount() {
+        if (this.props.user.id && !this.props.user.backupFile.id) {
+            this.props.getBackupFile(this.props.user);
+        }
+    }
+
     render () {
+        let {t} = this.props;
+        
         return (
             <div className="page-wrapper backup-page-wrapper">
-                <Header />
+                <Header title={t("backup")}/>
                 <div className="scroll page-content padding">
                     {   
                         !this.props.user.id &&
                         <div className="not-logined-wrapper">
                             <div className="backup-info">Данные будут привязаны к учетной записи. При входе в учетную запись с различных устройств данные будут синхронизированы.</div>
 
-                            <button 
-                                className="text block google-in img-text-button" 
+                            <button
+                                className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
                                 type="button"
                                 onClick={this.props.googleSignIn}
-                            ><img src={GoogleImg} />Войти с помощью Google</button>
+                            ><img src={GoogleImg} />{t("google-sign-in")}</button>
                         </div>
                     }
                     {
@@ -41,29 +50,29 @@ class SettingsBackup extends Component {
                             <div className="profile-wrapper">
                                 <div className="profile-img-wrapper clickable"><img src={this.props.user.picture} /></div>
                                 <div className="profile-data-wrapper">
-                                    <div className="profile-info-wrapper">
-                                        <div className="name">{this.props.user.name}</div>
-                                        <div className="email">{this.props.user.email}</div>
-                                    </div>
-
-                                    <button 
-                                        className="text log-out" 
-                                        type="button"
-                                        onClick={this.props.googleSignIn}
-                                    >Выйти</button>
+                                    <div className="name">{this.props.user.name}</div>
+                                    <div className="email">{this.props.user.email}</div>
                                 </div>
+                                <button 
+                                    className="log-out" 
+                                    type="button"
+                                    onClick={this.props.googleSignOut}
+                                ><img src={LogoutImg}/></button>
                             </div>
 
                             <button 
-                                className="text block img-text-button" 
+                                className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
                                 type="button"
-                                onClick={this.props.googleSignIn}
-                            ><img src={ExportImg} />Создать резервную копию</button>
-                            <button 
-                                className="text block img-text-button" 
-                                type="button"
-                                onClick={this.props.googleSignIn}
-                            ><img src={ImportImg} />Загрузить резервную копию</button>
+                                onClick={() => this.props.uploadBackup(this.props.user)}
+                            ><img src={ExportImg} />{t("create-backup")}</button>
+                            {
+                                this.props.user.backupFile.id &&
+                                <button 
+                                    className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
+                                    type="button"
+                                    onClick={() => this.props.restoreBackup(this.props.user)}
+                                ><img src={ImportImg} />{t("restore-backup")}</button>
+                            }
                         </div>
                     }
                 </div>
@@ -76,7 +85,8 @@ function mapStateToProps(state) {
     return {
         settings: state.settings,
         currentDate: state.date,
-        user: state.user      
+        user: state.user,
+        loader: state.loader 
     }
 }
 
@@ -84,4 +94,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsBackup);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(SettingsBackup));

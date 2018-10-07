@@ -4,7 +4,7 @@ import notes from './notes';
 import date from './date';
 import settings from './settings';
 import password from './password';
-import synchronization from "./synchronization";
+import loader from "./loader";
 import calendar from "./calendar";
 import user from "./user";
 
@@ -13,7 +13,7 @@ let reducers = combineReducers({
     date,
     password,
     notes,
-    synchronization,
+    loader,
     calendar,
     user
 });

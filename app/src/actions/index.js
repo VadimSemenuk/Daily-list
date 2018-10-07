@@ -2,7 +2,7 @@ import notesService from "../services/notes.service";
 import settingsService from "../services/settings.service";
 import calendarService from "../services/calendar.service";
 import authService from "../services/auth.service";
-import backupService from "../services/auth.service";
+import backupService from "../services/backup.service";
 
 // notes
 export function addNote (note, updateCount) {
@@ -149,11 +149,12 @@ export function setPasswordValid () {
     }
 }
 
-// synchronization loader
-export function triggerSynchronizationLoader (state) {    
+// loader
+export function triggerLoader (loader, state) {    
     return {
-        type: "TRIGGER_SYNCHRONIZATION_LOADER",
-        state 
+        type: "TRIGGER_LOADER",
+        loader,
+        state
     }
 }
 
@@ -179,25 +180,68 @@ export function getFullCount (date, period) {
 // auth
 export function googleSignIn() {
     return function(dispatch) {
-        return authService.googleSignIn().then((user) => dispatch({
-            type: "RECIVE_USER",
-            user
-        }))
+        dispatch(triggerLoader());
+
+        return authService.googleSignIn().then((user) => {
+            dispatch(triggerLoader());
+            
+            return dispatch({
+                type: "RECIVE_USER",
+                user
+            })
+        })
     }
 }
 
-export function signOut() {
+export function googleSignOut() {
     return function(dispatch) {
-        return authService.signOut().then(() => dispatch({
-            type: "CLEAR_USER"
-        }))
+        dispatch(triggerLoader());
+
+        return authService.googleSignOut().then(() => {
+            dispatch(triggerLoader());
+
+            return dispatch({
+                type: "CLEAR_USER"
+            })
+        })
+    }
+}
+
+export function setToken(token) {
+    return function(dispatch) {
+        authService.setToken(token);
+        return dispatch({
+            type: "RECIVE_USER",
+            user: token
+        });
     }
 }
 
 // backup
+export function uploadBackup(token) {
+    return function(dispatch) {
+        dispatch(triggerLoader());
 
-export function uploadBackup() {
-    return function() {
+        return backupService.uploadBackup(token).then((backupFile) => {
+            dispatch(setToken({...token, ...backupFile}));
+            dispatch(triggerLoader());
+        });
+    }
+}
+export function restoreBackup(token) {
+    return function(dispatch) {
+        dispatch(triggerLoader());
 
+        return backupService.restoreBackup(token).then(() => dispatch(triggerLoader()));
+    }
+}
+export function getBackupFile(token) {
+    return function(dispatch) {
+        dispatch(triggerLoader());
+
+        return backupService.getBackupFile(token).then((backupFile) => {
+            dispatch(setToken({...token, ...backupFile}));
+            dispatch(triggerLoader());
+        });
     }
 }

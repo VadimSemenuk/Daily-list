@@ -32,7 +32,7 @@ class Settings extends Component {
                         onClick={() => this.props.history.push(`${this.props.match.url}/theme`)} 
                     />
                     <InsetListItem 
-                        text={t("data-sync")}
+                        text={t("backup")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/backup`)}
                     />
                     <InsetListItem 
