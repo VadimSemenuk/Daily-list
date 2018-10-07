@@ -1,4 +1,5 @@
 import filesService from "./files.service";
+import authService from "./auth.service";
 
 class BackupService {
     async createBackupFile(token) {
@@ -25,7 +26,11 @@ class BackupService {
     }
 
     async getBackupFile(token) {
-        let files = await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder", {
+        if (token.tokenExpireDate > new Date()) {
+            token = await authService.googleRefreshAccessToken(token);
+        }
+
+        let files = await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name,modifiedTime)", {
             method: "GET",
             credentials: "same-origin",
             headers: {
@@ -50,6 +55,10 @@ class BackupService {
     } 
 
     async uploadBackup(token) {
+        if (token.tokenExpireDate > new Date()) {
+            token = await authService.googleRefreshAccessToken(token);
+        }
+
         if (!token.backupFile.id) {
             let backupFile = await this.createBackupFile(token);
             token.backupFile = backupFile;
@@ -77,6 +86,10 @@ class BackupService {
     }
 
     async restoreBackup(token) {
+        if (token.tokenExpireDate > new Date()) {
+            token = await authService.googleRefreshAccessToken(token);
+        }
+
         return new Promise((resolve, reject) => {
             let oReq = new XMLHttpRequest();
             oReq.open("GET", `https://www.googleapis.com/drive/v3/files/${token.backupFileId}?alt=media`, true);

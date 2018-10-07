@@ -119,6 +119,7 @@ class AuthService {
             picture: googleUser.imageUrl,
             token: "Bearer " + googleAccessToken.access_token,
             refreshToken: googleAccessToken.refresh_token,
+            tokenExpireDate: +new Date() + 3400000,
             backupFile: {}
         }
 
@@ -161,7 +162,8 @@ class AuthService {
 
         let nextToken = {
             ...token,
-            token: googleAccessToken
+            token: googleAccessToken,
+            tokenExpireDate: +new Date() + 3400000
         }
 
         this.setToken(nextToken);
