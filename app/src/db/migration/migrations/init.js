@@ -159,7 +159,7 @@ async function addInitNote() {
             ]           
         }       
     }
-console.log()
+
     return execureSQL(`
         INSERT INTO Tasks
         (title, startTime, endTime, notificate, tag, dynamicFields, added, finished)

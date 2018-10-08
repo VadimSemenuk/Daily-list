@@ -76,7 +76,10 @@ class AuthService {
                     serverAuthCode: "4/cQDIFz_v7zaITvQERxHpZ_ByHSQD6fNknDZAJYXoVmQCpsd8Wixy2xp5-Ux-h8WD_l0Tu4EO4h8hgqhvGZTSyHg"
                 })
             }
-        });
+        }).catch((err) => console.warn(err));
+        if (!googleUser) {
+            return {};
+        }
 
         if (!window.cordova) {
             return new Promise((resolve) => {
