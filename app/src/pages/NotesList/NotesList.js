@@ -293,7 +293,7 @@ class NotesList extends PureComponent {
                         />
                         <ButtonListItem
                             className="no-border"
-                            text={t("copy")}
+                            text={t("to-copy")}
                             onClick={this.onCopyRequest}
                         />
                     </Modal>

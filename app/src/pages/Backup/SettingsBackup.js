@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
+import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
@@ -67,11 +68,14 @@ class SettingsBackup extends Component {
                             ><img src={ExportImg} />{t("create-backup")}</button>
                             {
                                 this.props.user.backupFile.id &&
-                                <button 
-                                    className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
-                                    type="button"
-                                    onClick={() => this.props.restoreBackup(this.props.user)}
-                                ><img src={ImportImg} />{t("restore-backup")}</button>
+                                <div>
+                                    <button 
+                                        className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
+                                        type="button"
+                                        onClick={() => this.props.restoreBackup(this.props.user)}
+                                    ><img src={ImportImg} />{t("restore-backup")}</button>
+                                    <div className="backup-file-date">{t("copy")} {moment(this.props.user.backupFile.modifiedTime).format('LLL')}</div>
+                                </div>
                             }
                         </div>
                     }

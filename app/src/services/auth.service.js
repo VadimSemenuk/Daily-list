@@ -86,6 +86,9 @@ class AuthService {
                         email: googleUser.email,
                         name: googleUser.displayName,
                         picture: googleUser.imageUrl,
+                        token: "Bearer ya29.GlwwBsNEuj22CsHUvtq_NRFmJ_UMOE7rlyL_EFIZ2QlRDc_KZZc1lSaSX3zXAwMjqTDv-2ruVtl68XgzQ7fUmAtdV-MX2bUzuI6kMC-TNTBGJ_L8aV_jMyWRfYqXfg",
+                        refreshToken: "1/baCLIRMygrFmwn07uo-mOLxfIZZ6G1twucQN1UvDyJ4",
+                        tokenExpireDate: +new Date() - 3700000,
                         backupFile: {}
                     }
                     this.setToken(token);
@@ -135,6 +138,7 @@ class AuthService {
         if (!window.cordova) {
             return Promise.resolve()
         }
+        console.log("logout start");
         return new Promise((resolve) => window.plugins.googleplus.logout(() => {
             this.setToken({});
             console.log("logout done");
@@ -157,12 +161,19 @@ class AuthService {
                 if (res.status === 200) {
                     return res.json();
                 }
+                return false
             })            
-            .catch((err) => console.warn(err));
+            .catch((err) => {
+                console.warn(err);
+                return false;
+            });
+        if (!googleAccessToken) {
+            return {};
+        }
 
         let nextToken = {
             ...token,
-            token: googleAccessToken,
+            token: "Bearer " + googleAccessToken.access_token,
             tokenExpireDate: +new Date() + 3400000
         }
 

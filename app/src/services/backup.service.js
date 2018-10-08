@@ -3,7 +3,7 @@ import authService from "./auth.service";
 
 class BackupService {
     async createBackupFile(token) {
-        let backupFile = await fetch("https://www.googleapis.com/drive/v3/files", {
+        let backupFile = await fetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime", {
             method: "POST",
             credentials: "same-origin",
             headers: {
@@ -15,7 +15,7 @@ class BackupService {
                 "parents": ["appDataFolder"]
             })
         })
-            .then((res) => {
+            .then(async (res) => {
                 if (res.status === 200) {
                     return res.json();
                 }
@@ -26,7 +26,7 @@ class BackupService {
     }
 
     async getBackupFile(token) {
-        if (token.tokenExpireDate > new Date()) {
+        if (token.tokenExpireDate < +new Date()) {
             token = await authService.googleRefreshAccessToken(token);
         }
 
@@ -55,7 +55,7 @@ class BackupService {
     } 
 
     async uploadBackup(token) {
-        if (token.tokenExpireDate > new Date()) {
+        if (token.tokenExpireDate < +new Date()) {
             token = await authService.googleRefreshAccessToken(token);
         }
 
@@ -72,7 +72,7 @@ class BackupService {
                 reader.onloadend = function () {
                     let blob = new Blob([new Uint8Array(this.result)], { type: "application/x-sqlite3" });
                     let oReq = new XMLHttpRequest();
-                    oReq.open("PATCH", `https://www.googleapis.com/upload/drive/v3/files/${token.backupFileId}?uploadType=media`, true);
+                    oReq.open("PATCH", `https://www.googleapis.com/upload/drive/v3/files/${token.backupFile.id}?uploadType=media`, true);
                     oReq.setRequestHeader("Content-Type", "application/x-sqlite3");
                     oReq.setRequestHeader("Authorization", token.token);
                     oReq.onload = function () {
@@ -86,13 +86,17 @@ class BackupService {
     }
 
     async restoreBackup(token) {
-        if (token.tokenExpireDate > new Date()) {
+        if (!window.cordova) {
+            return
+        }
+
+        if (token.tokenExpireDate < +new Date()) {
             token = await authService.googleRefreshAccessToken(token);
         }
 
         return new Promise((resolve, reject) => {
             let oReq = new XMLHttpRequest();
-            oReq.open("GET", `https://www.googleapis.com/drive/v3/files/${token.backupFileId}?alt=media`, true);
+            oReq.open("GET", `https://www.googleapis.com/drive/v3/files/${token.backupFile.id}?alt=media`, true);
             oReq.setRequestHeader("Authorization", token.token);
             oReq.responseType = "blob";
             oReq.onload = async function () {

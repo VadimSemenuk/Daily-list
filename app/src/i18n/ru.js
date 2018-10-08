@@ -63,6 +63,8 @@ export default {
     "sign-out": "Выйти",
     "create-backup": "Создать резервную копию",
     "restore-backup": "Загрузить резервную копию",
+    "copy": "Копия",
+    "auth-error": "Произошла ошибка. Повторите позже",
 
     // common
     "save": "Сохранить",
@@ -90,7 +92,7 @@ export default {
     "no-content": "Нет записей",
     "edit": "Редактировать",
     "delete": "Удалить",
-    "copy": "Копировать",
+    "to-copy": "Копировать",
     "move-tomorrow": "Переместить на завтра",
     "finished-split": "Завершенные",
 
