@@ -16,7 +16,6 @@ class CalendarService {
                 SELECT added FROM Tasks
                     WHERE
                         added >= ? AND added <= ? AND
-                        userId = ? AND
                         lastAction != 'DELETE' AND
                         repeatType = 'no-repeat'
                 UNION ALL
@@ -24,36 +23,31 @@ class CalendarService {
                     LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
                     WHERE
                         rep.value >= ? AND rep.value <= ? AND
-                        userId = ? AND
                         lastAction != 'DELETE' AND
                         t.repeatType = 'any' AND
                         t.forkFrom = -1
                 )
             GROUP BY added;`, 
-            [intervalStartDate, intervalEndDate, authService.getUserId(), intervalStartDate, intervalEndDate, authService.getUserId()]
+            [intervalStartDate, intervalEndDate, intervalStartDate, intervalEndDate]
         );   
 
         let selectRepeatableDayTask = executeSQL(
             `SELECT COUNT(*) as count, added FROM Tasks
             WHERE 
-                userId = ? AND 
                 lastAction != 'DELETE' AND
                 repeatType = "day" AND
-                forkFrom = -1;`, 
-            [authService.getUserId()]
-        ); 
+                forkFrom = -1;
+        `); 
 
         let selectRepeatableWeekTask = executeSQL(
             `SELECT COUNT(*) as count, rep.value as weekDay FROM Tasks t
 			LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
-                userId = ? AND
                 lastAction != 'DELETE' AND
                 repeatType = "week" AND
                 t.forkFrom = -1
-			GROUP BY rep.value;`, 
-            [authService.getUserId()]
-        );      
+			GROUP BY rep.value;
+        `);      
 
         let selects = await Promise.all([
             selectTask, 

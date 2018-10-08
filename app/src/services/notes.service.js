@@ -47,8 +47,8 @@ class NotesService {
         let select = await executeSQL(
             `SELECT id as key, uuid, title, startTime, endTime, notificate, tag, dynamicFields, added, finished, isSynced
             FROM Tasks
-            WHERE added >= ? AND added <= ? AND userId = ? AND lastAction != 'DELETE';`,
-            [date.startOf("isoWeek").valueOf(), finDate, authService.getUserId()]
+            WHERE added >= ? AND added <= ? AND lastAction != 'DELETE';`,
+            [date.startOf("isoWeek").valueOf(), finDate]
         );
 
         let notes = [];
@@ -93,7 +93,6 @@ class NotesService {
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
-                t.userId = ? AND
                 t.lastAction != 'DELETE' AND
                 (
                     t.added = ? OR
@@ -101,7 +100,7 @@ class NotesService {
                     (t.added = -1 AND t.repeatType = "week" AND rep.value = ?) OR
                     (t.added = -1 AND t.repeatType = "any" AND rep.value = ?)
                 );`,
-            [currentDate, currentDate, authService.getUserId(), currentDate, date.isoWeekday(), currentDate]
+            [currentDate, currentDate, currentDate, date.isoWeekday(), currentDate]
         );
 
         let unique = {};

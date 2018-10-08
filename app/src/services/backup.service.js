@@ -72,7 +72,7 @@ class BackupService {
                 reader.onloadend = function () {
                     let blob = new Blob([new Uint8Array(this.result)], { type: "application/x-sqlite3" });
                     let oReq = new XMLHttpRequest();
-                    oReq.open("PATCH", `https://www.googleapis.com/upload/drive/v3/files/${token.backupFile.id}?uploadType=media`, true);
+                    oReq.open("PATCH", `https://www.googleapis.com/upload/drive/v3/files/${token.backupFile.id}?uploadType=media&fields=modifiedTime,name,id`, true);
                     oReq.setRequestHeader("Content-Type", "application/x-sqlite3");
                     oReq.setRequestHeader("Authorization", token.token);
                     oReq.onload = function () {
