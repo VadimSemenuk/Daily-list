@@ -1,6 +1,7 @@
 .vscode/
 
 server/node_modules/
+server/.env
 
 app/node_modules/
 app/platforms

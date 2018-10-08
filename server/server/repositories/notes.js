@@ -240,4 +240,14 @@ module.exports = class {
             { uuid: note.uuid }
         )
     }
+
+    backup(note) {
+        this.db.query(`
+            INSERT INTO notes (uuid, data)
+            VALUES ($uuid, $note);
+        `, {
+            uuid: note.uuid,
+            note: JSON.stringify(note)
+        }).catch((err) => console.log(err))
+    }
 };

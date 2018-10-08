@@ -28,7 +28,8 @@ module.exports = function (notesRep) {
     });
 
     router.post('/backup', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
-        
+        await notesRep.backup(req.body.note); 
+        res.end();       
     });
 
     return router
