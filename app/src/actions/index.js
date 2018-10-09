@@ -223,7 +223,9 @@ export function uploadBackup(token) {
         dispatch(triggerLoader());
 
         return backupService.uploadBackup(token).then((backupFile) => {
-            dispatch(setToken({...token, ...backupFile}));
+            if (backupFile) {
+                dispatch(setToken({...token, ...backupFile}));
+            }
             dispatch(triggerLoader());
         });
     }
@@ -232,7 +234,7 @@ export function restoreBackup(token) {
     return function(dispatch) {
         dispatch(triggerLoader());
 
-        return backupService.restoreBackup(token).then(() => window.location.reload(true));
+        return backupService.restoreBackup(token).then((isUpdated) => isUpdated && window.location.reload(true));
     }
 }
 export function getBackupFile(token) {
@@ -240,7 +242,9 @@ export function getBackupFile(token) {
         dispatch(triggerLoader());
 
         return backupService.getBackupFile(token).then((backupFile) => {
-            dispatch(setToken({...token, backupFile: backupFile}));
+            if (backupFile) {
+                dispatch(setToken({...token, backupFile: backupFile}));
+            }
             dispatch(triggerLoader());
         });
     }

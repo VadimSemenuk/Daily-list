@@ -80,6 +80,7 @@ export default {
     "g-night": "Доброй ночи",
     "g-morning": "Доброе утро",
     "reload": "Перезапустить",
+    "error-repeat-common": "Произошла ошибка. Повторите позже",
 
     // share
     "share-theme": "Ежедневник",

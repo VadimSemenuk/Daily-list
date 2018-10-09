@@ -1,7 +1,7 @@
 class FilesService {
     async getFileEntry(path) {
         return new Promise((resolve) => {
-            window.requestFileSystem(window.LocalFileSystem.PERSISTENT, 0, (fs) => {
+            window.requestFileSystem(window.LocalFileSystem.PERSISTENT, 0, () => {
                 window.resolveLocalFileSystemURL(path, resolve);
             })
         })

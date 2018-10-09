@@ -1,3 +1,5 @@
+import i18next from 'i18next';
+
 import config from "../config/config";
 
 import backupService from "./backup.service";
@@ -50,6 +52,11 @@ class AuthService {
     }
 
     googleSignIn = async () => {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
+            return {};
+        }
+
         let googleUser = await new Promise((resolve, reject) => {
             if (window.cordova) {
                 window.plugins.googleplus.login(
@@ -117,6 +124,10 @@ class AuthService {
                 }
             })            
             .catch((err) => console.warn(err));
+        if (!googleAccessToken) {
+            window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));            
+            return {};
+        }
 
         let token = {
             id: googleUser.userId,
@@ -130,7 +141,7 @@ class AuthService {
         }
 
         let backupFile = await backupService.getBackupFile(token);
-        token.backupFile = backupFile;
+        token.backupFile = backupFile || {};
 
         this.setToken(token);
 
@@ -141,10 +152,11 @@ class AuthService {
         if (!window.cordova) {
             return Promise.resolve()
         }
-        console.log("logout start");
-        return new Promise((resolve) => window.plugins.googleplus.logout(() => {
+        return new Promise((resolve, reject) => window.plugins.googleplus.logout(() => {
             this.setToken({});
-            console.log("logout done");
+            resolve();
+        }, (err) => {
+            console.warn(err);
             resolve();
         }));
     }
@@ -171,7 +183,7 @@ class AuthService {
                 return false;
             });
         if (!googleAccessToken) {
-            return {};
+            return false;
         }
 
         let nextToken = {

@@ -1,3 +1,5 @@
+import i18next from 'i18next';
+
 import filesService from "./files.service";
 import authService from "./auth.service";
 
@@ -22,12 +24,16 @@ class BackupService {
             })            
             .catch((err) => console.warn(err));
 
-        return backupFile || {};
+        return backupFile;
     }
 
     async getBackupFile(token) {
         if (token.tokenExpireDate < +new Date()) {
             token = await authService.googleRefreshAccessToken(token);
+            if (!token) {
+                window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
+                return false;
+            }
         }
 
         let files = await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name,modifiedTime)", {
@@ -42,25 +48,38 @@ class BackupService {
                 if (res.status === 200) {
                     return res.json();
                 }
-                return {};
+                return false;
             })            
             .catch((err) => {
                 console.warn(err);
-                return {};
+                return false;;
             });
 
-        let backupFile = (files.files && files.files.length > 0) ? files.files[0] : {};
+        let backupFile = (files && files.files && files.files.length > 0) ? files.files[0] : false;
 
         return backupFile;
     } 
 
     async uploadBackup(token) {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
+            return false;
+        }
+
         if (token.tokenExpireDate < +new Date()) {
             token = await authService.googleRefreshAccessToken(token);
+            if (!token) {
+                window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
+                return false;
+            }
         }
 
         if (!token.backupFile.id) {
             let backupFile = await this.createBackupFile(token);
+            if (!backupFile) {
+                window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
+                return false;         
+            }
             token.backupFile = backupFile;
         }
 
@@ -87,11 +106,20 @@ class BackupService {
 
     async restoreBackup(token) {
         if (!window.cordova) {
-            return
+            return true
+        }
+
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
+            return false;
         }
 
         if (token.tokenExpireDate < +new Date()) {
             token = await authService.googleRefreshAccessToken(token);
+            if (!token) {
+                window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
+                return false;
+            }
         }
 
         return new Promise((resolve, reject) => {
@@ -106,7 +134,7 @@ class BackupService {
     
                 fileEntry.createWriter(function (fileWriter) {
                     fileWriter.onwriteend = function() {
-                        resolve();
+                        resolve(true);
                     };
                     fileWriter.onerror = function(e) {
                         reject(e);
