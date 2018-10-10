@@ -65,6 +65,10 @@
             opacity: 0.6;  
             pointer-events: none;
         }
+
+        &.no-border {
+            border-bottom: none;
+        }
     }
 
     &.tiny {

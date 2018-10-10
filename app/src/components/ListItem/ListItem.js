@@ -117,7 +117,7 @@ export class TriggerListItem extends PureComponent {
         return ([
             <button 
                 key={0}
-                className={`list-item trigger-list-item ${this.state.isActive ? " active" : ""}`}
+                className={`list-item trigger-list-item ${this.state.isActive ? " active" : ""}${this.props.noBorder ? " no-border" : ""}`}
                 onClick={this.trigger}                                
             >
                 <span className="list-item-text">{this.props.text}</span>

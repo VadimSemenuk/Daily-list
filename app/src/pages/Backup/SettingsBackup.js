@@ -9,6 +9,7 @@ import * as AppActions from '../../actions';
 import './SettingsBackup.scss';
 
 import Header from '../../components/Header/Header';
+import {TriggerListItem} from "../../components/ListItem/ListItem";
 
 import GoogleImg from '../../assets/img/google.svg';
 import ExportImg from '../../assets/img/upload-to-cloud.svg';
@@ -36,6 +37,10 @@ class SettingsBackup extends Component {
                     {
                         !this.props.user.id &&
                         <div className="not-logined-wrapper">
+                            <TriggerListItem 
+                                text={t("how-it-works-btn")}
+                                noBorder={true}    
+                            >{t("how-it-works")}</TriggerListItem>
                             <button
                                 className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
                                 type="button"
