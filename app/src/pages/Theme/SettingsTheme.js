@@ -125,7 +125,7 @@ class SettingsTheme extends Component {
                     <SwitchListItem 
                         text={t("show-notes-count")}  
                         checked={this.props.settings.calendarNotesCounter}
-                        onChange={(e) => this.props.setSetting('calendarNotesCounter', e, "boolean")}     
+                        onChange={(e) => this.props.setSetting('calendarNotesCounter', e, "boolean", this.props.getFullCount)}     
                     />
 
                     <ModalListItem
@@ -172,9 +172,10 @@ class SettingsTheme extends Component {
     }
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {
-        settings: state.settings
+        settings: state.settings,
+        currentDate: state.date
     }
 }
 

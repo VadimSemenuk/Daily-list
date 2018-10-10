@@ -3,12 +3,12 @@ export default {
     "settings": "Settings",
     "view": "Display",
     "interface": "Interface",
-    "data-sync": "Data synchronization",
     "add-pass": "Add password",
     "remove-pass": "Remove password",
     "issues": "Bug fixing",
     "about": "About program",
     "default-notification": "Automatically set notification",
+    "backup": "Backup",
   
     // view settings page
     "sort": "Sorting",
@@ -58,6 +58,14 @@ export default {
     "resources": "Used resources",
     "graphics": "Graphics",
 
+    // backup page
+    "google-sign-in": "Sign in with Google",
+    "sign-out": "Sign out",
+    "create-backup": "Make backup",
+    "restore-backup": "Restore backup",
+    "copy": "Copy",
+    "auth-error": "An error has occurred. Repeat later",
+
     // common
     "save": "Save",
     "move": "Move to",
@@ -71,6 +79,8 @@ export default {
     "g-evening": "Good evening",
     "g-night": "Good night",
     "g-morning": "Good morning",
+    "reload": "Перезапустить",
+    "error-repeat-common": "An error has occurred. Repeat later",
 
     // share
     "share-theme": "Diary",
@@ -102,6 +112,8 @@ export default {
     "input-placeholder-text": "Text",
     "list-item-btn": "List item",
     "field-btn": "Field",
+    "update-all": "Update all",
+    "update-shadow": "Update only not touched",
     "specify-btn": "Select",
 
     // note-item
