@@ -65,6 +65,7 @@ export default {
     "restore-backup": "Restore backup",
     "copy": "Copy",
     "auth-error": "An error has occurred. Repeat later",
+    "restore-local-backup": "Restore local backup",
 
     // common
     "save": "Save",

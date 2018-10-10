@@ -33,11 +33,9 @@ class SettingsBackup extends Component {
             <div className="page-wrapper backup-page-wrapper">
                 <Header title={t("backup")}/>
                 <div className="scroll page-content padding">
-                    {   
+                    {
                         !this.props.user.id &&
                         <div className="not-logined-wrapper">
-                            <div className="backup-info">Данные будут привязаны к учетной записи. При входе в учетную запись с различных устройств данные будут синхронизированы.</div>
-
                             <button
                                 className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
                                 type="button"
@@ -79,6 +77,14 @@ class SettingsBackup extends Component {
                             }
                         </div>
                     }
+                    
+                    <div className="local-backup-wrapper">
+                        <button
+                            className="text block" 
+                            type="button"
+                            onClick={this.props.restoreLocalBackup}
+                        >{t("restore-local-backup")}</button>
+                    </div>
                 </div>
             </div>
         );

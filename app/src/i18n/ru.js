@@ -65,6 +65,7 @@ export default {
     "restore-backup": "Загрузить резервную копию",
     "copy": "Копия",
     "auth-error": "Произошла ошибка. Повторите позже",
+    "restore-local-backup": "Восстановить лькальную копию",
 
     // common
     "save": "Сохранить",

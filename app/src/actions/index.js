@@ -230,6 +230,7 @@ export function uploadBackup(token) {
         });
     }
 }
+
 export function restoreBackup(token) {
     return function(dispatch) {
         dispatch(triggerLoader());
@@ -237,6 +238,7 @@ export function restoreBackup(token) {
         return backupService.restoreBackup(token).then((isUpdated) => isUpdated && window.location.reload(true));
     }
 }
+
 export function getBackupFile(token) {
     return function(dispatch) {
         dispatch(triggerLoader());
@@ -247,5 +249,11 @@ export function getBackupFile(token) {
             }
             dispatch(triggerLoader());
         });
+    }
+}
+
+export function restoreLocalBackup() {
+    return function () {
+        return backupService.restoreLocalBackup().then((file) => file && window.location.reload(true));
     }
 }

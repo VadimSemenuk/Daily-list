@@ -131,19 +131,26 @@ class BackupService {
                 let blob = oReq.response;
     
                 let fileEntry = await filesService.getFileEntry(window.cordova.file.applicationStorageDirectory + "databases/com.mamindeveloper.dailylist.db");
-    
-                fileEntry.createWriter(function (fileWriter) {
-                    fileWriter.onwriteend = function() {
-                        resolve(true);
-                    };
-                    fileWriter.onerror = function(e) {
-                        reject(e);
-                    };
-                    fileWriter.write(blob);
-                });
+                await filesService.writeFile(fileEntry, blob).catch((err) => {
+                    console.warn(err);
+                    reject(err);
+                })
+                resolve(true);
             };
             oReq.send(null);
         });
+    }
+
+    async restoreLocalBackup() {
+        let backupFileEntry = await filesService.getFileEntry(window.cordova.file.externalRootDirectory + "DailyList_Backup.db")
+            .catch((err) => console.warn(err));
+        if (!backupFileEntry) {
+            window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
+            return false
+        }
+
+        let targetDirEntry = await filesService.getFileEntry(window.cordova.file.applicationStorageDirectory + "databases/");
+        return new Promise((resolve, reject) => backupFileEntry.copyTo(targetDirEntry, "com.mamindeveloper.dailylist.db", resolve, reject));
     }
 }
 
