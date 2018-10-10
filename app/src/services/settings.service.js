@@ -80,12 +80,16 @@ class SetitngsService {
         }
     }
 
-    async setSetting (item, value) {
+    async setSetting (item, value, type) {
         switch(item) {
             case("theme"): value = value.id; break;
             case("sort"): value = JSON.stringify(value); break;
             default: break;
         }
+        if (value === "boolean") {
+            value = +value;
+        }
+
         try {
             await executeSQL(
                 `UPDATE Settings 

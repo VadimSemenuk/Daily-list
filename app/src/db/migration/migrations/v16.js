@@ -49,7 +49,7 @@ export default {
             }
             let lang = navigator.globalization ? (await new Promise((resolve, reject) => navigator.globalization.getPreferredLanguage(resolve, reject))) : config.defaultLang;
             if (lang) {
-                lang = lang.value || "en";
+                lang = lang.value || config.defaultLang;
             }
             if (lang.indexOf("-") !== -1) {
                 lang = lang.split("-")[0];

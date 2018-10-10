@@ -131,9 +131,9 @@ export function updateWeekDatesAndNotes (date, preRenderDate, nextIndex) {
 }
 
 // settings
-export function setSetting (settingName, value, fn) {     
+export function setSetting (settingName, value, type, fn) {     
     return function(dispatch) {
-        return settingsService.setSetting(settingName, value).then(() => dispatch({
+        return settingsService.setSetting(settingName, value, type).then(() => dispatch({
             type: "SET_SETTING",
             settingName,
             value

@@ -41,7 +41,7 @@ class SettingsSort extends Component {
                                         name="sort-type"
                                         checked={this.props.settings.sort.type === setting.val}
                                         value={setting.val}
-                                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}), this.props.renderNotes)}
+                                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}), null, this.props.renderNotes)}
                                         text={t(setting.translateId)}
                                     />
                                 ))
@@ -62,7 +62,7 @@ class SettingsSort extends Component {
                                         name="sort-direction"
                                         checked={this.props.settings.sort.direction === setting.val}
                                         value={setting.val}
-                                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}), this.props.renderNotes)}
+                                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}), null, this.props.renderNotes)}
                                         text={t(setting.translateId)}
                                     />
                                 ))
@@ -73,7 +73,7 @@ class SettingsSort extends Component {
                     <SwitchListItem 
                         text={t("fin-sort")}  
                         checked={this.props.settings.sort.finSort}
-                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {finSort: e}), this.props.renderNotes)}     
+                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {finSort: e}), null, this.props.renderNotes)}     
                     />   
 
                     {
@@ -91,7 +91,7 @@ class SettingsSort extends Component {
                                             name="sort-direction"
                                             checked={this.props.settings.notesShowInterval === setting.val}
                                             value={setting.val}
-                                            onChange={(e) => this.props.setSetting("notesShowInterval", +e)}
+                                            onChange={(e) => this.props.setSetting("notesShowInterval", e, "boolean")}
                                             text={t(setting.translateId)}
                                         />
                                     ))
