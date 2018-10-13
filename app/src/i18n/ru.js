@@ -32,7 +32,8 @@ export default {
     "show-mini-calendar": "Показывать мини-календарь",
     "language": "Язык",
     "ru": "Руссский",
-    "en": "Английский",
+    "en": "English",
+    "be": "Беларускі",
 
     // password page
     "password": "Пароль",
@@ -65,9 +66,9 @@ export default {
     "restore-backup": "Загрузить резервную копию",
     "copy": "Копия",
     "auth-error": "Произошла ошибка. Повторите позже",
-    "restore-local-backup": "Восстановить лькальную копию",
+    "restore-local-backup": "Восстановить локальную копию",
     "how-it-works-btn": "Как это работает",
-    "how-it-works": "Файлы приложения сохраняются на вашем Google Drive. Приложение будет иметь доступ только с созданным им файлам.",
+    "how-it-works": "Файлы приложения сохраняются на вашем Google Drive. Приложение будет иметь доступ только к созданным им файлам",
 
     // common
     "save": "Сохранить",
@@ -116,7 +117,7 @@ export default {
     "list-item-btn": "Пункт списка",
     "field-btn": "Поле",
     "update-current": "Обновить только текущую",
-    "update-all": "Оновить все",
+    "update-all": "Обновить все",
     "update-shadow": "Обновить только не затронутые",
     "specify-btn": "Указать",
 

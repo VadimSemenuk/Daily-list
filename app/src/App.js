@@ -5,6 +5,7 @@ import {BeatLoader} from 'react-spinners';
 import {I18nextProvider} from "react-i18next";
 import moment from "moment";
 import 'moment/locale/ru';
+import 'moment/locale/be';
 
 import lang from "./i18n";
 

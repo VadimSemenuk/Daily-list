@@ -33,6 +33,9 @@ let languageSettings = [{
 }, {
     translateId: "en",
     val: "en"
+}, {
+    translateId: "be",
+    val: "be"
 }];
 
 class SetitngsService {

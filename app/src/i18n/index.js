@@ -2,6 +2,7 @@ import i18n from "i18next";
 
 import en from "./en";
 import ru from "./ru";
+import be from "./be";
 
 let init = (lang) => {
   i18n.init({
@@ -12,6 +13,9 @@ let init = (lang) => {
       },
       ru: {
         translations: ru
+      },
+      be: {
+        translations: be
       }
     },
     fallbackLng: "en",

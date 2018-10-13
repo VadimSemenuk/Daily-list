@@ -6,7 +6,7 @@ export default {
     "add-pass": "Add password",
     "remove-pass": "Remove password",
     "issues": "Bug fixing",
-    "about": "About program",
+    "about": "About app",
     "default-notification": "Automatically set notification",
     "backup": "Backup",
   
@@ -31,8 +31,9 @@ export default {
     "fast-add": "Qick add",
     "show-mini-calendar": "Show mini-callendar",
     "language": "Language",
-    "ru": "Russian",
+    "ru": "Русский",
     "en": "English",
+    "be": "Беларускі",
 
     // password page
     "password": "Password",
@@ -67,7 +68,7 @@ export default {
     "auth-error": "An error has occurred. Repeat later",
     "restore-local-backup": "Restore local backup",
     "how-it-works-btn": "How it works",
-    "how-it-works": "Application files are saved on your Google Drive. The application will have access only to the files created by it.",
+    "how-it-works": "Application files are saved on your Google Drive. The application will have access only to the files created by it",
 
     // common
     "save": "Save",
@@ -90,7 +91,7 @@ export default {
     "share-content": "Diary notes and notifications in conviniet form",
 
     // fast-add field
-    "description": "Description",
+    "description": "Description...",
     
     // notes list page
     "no-content": "No notes yet",
