@@ -14,10 +14,11 @@ class DeviceService {
 
         return fetch(`${config.apiURL}/log/load`, {
             method: "POST",
+            credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: { deviceId }        
+            body: JSON.stringify({deviceId})        
         }).catch((err) => console.warn(err))
     }
 }
