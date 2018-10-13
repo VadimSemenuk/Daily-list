@@ -126,9 +126,9 @@ class NotesList extends PureComponent {
 
     pasteCopy = async () => {
         let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
-            type: "no-repeat",
+            repeatType: "no-repeat",
             added: moment(this.props.currentDate),
-            forkedFrom: -1,
+            forkFrom: -1,
             isShadow: false
         }))
 
