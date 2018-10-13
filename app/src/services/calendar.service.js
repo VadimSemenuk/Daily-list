@@ -1,5 +1,4 @@
 import executeSQL from '../utils/executeSQL';
-import authService from "./auth.service";
 import moment from 'moment';
 
 class CalendarService {

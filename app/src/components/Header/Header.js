@@ -13,9 +13,10 @@ import CalendarImg from "../../assets/img/calendar.svg";
 import LeftArrowImg from "../../assets/img/left-arrow.svg";
 import CheckedImg from "../../assets/img/checked.svg";
 import SettimgsImg from "../../assets/img/settings.svg";
+import ExportImg from '../../assets/img/upload-to-cloud.svg';
 
 let buttons = {
-    "notes": [4, 0, 1],
+    "notes": [5, 4, 0, 1],
     "add": [2, 3],  
     "password": [],
     default: [2],                       
@@ -128,6 +129,19 @@ let Header = (props) => (
                                 />
                             </Link>
                         )
+                    case 5: 
+                        return ( 
+                            props.user.id && 
+                            <button 
+                                key={a}
+                                onClick={props.uploadBackup}
+                            >
+                                <img 
+                                    src={ExportImg}
+                                    alt="backup"    
+                                />
+                            </button>
+                        )
                     default: return null
                     }
                 })
@@ -138,7 +152,8 @@ let Header = (props) => (
 
 function mapStateToProps(state) {
     return {      
-        settings: state.settings
+        settings: state.settings,
+        user: state.user
     }
 }
 

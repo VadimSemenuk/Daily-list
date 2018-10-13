@@ -218,9 +218,11 @@ export function setToken(token) {
 }
 
 // backup
-export function uploadBackup(token) {
-    return function(dispatch) {
+export function uploadBackup() {
+    return function(dispatch, getState) {
         dispatch(triggerLoader());
+
+        let token = getState().user;
 
         return backupService.uploadBackup(token).then((backupFile) => {
             if (backupFile) {

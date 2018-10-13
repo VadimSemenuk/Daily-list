@@ -1,5 +1,6 @@
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
+import uuid from "uuid/v1";
 
 export default {
     name: "1.6",
@@ -8,6 +9,7 @@ export default {
         await addMigrationsTable();
         await alterSettingsTable();
         await alterTasksTable();
+        await addMetaInfoTable();
 
         async function addMigrationsTable () {
             await execureSQL(
@@ -148,6 +150,19 @@ export default {
             `, [msNow]);
 
             await execureSQL(`DROP TABLE Tasks_OLD;`);
+        }
+
+        async function addMetaInfoTable () {
+            await execureSQL(`
+                CREATE TABLE IF NOT EXISTS MetaInfo
+                (   
+                    deviceId TEXT
+                );
+            `)
+
+            await execureSQL(`
+                INSERT INTO MetaInfo (deviceId) VALUES( ? );
+            `, [uuid()]);
         }
     }
 }

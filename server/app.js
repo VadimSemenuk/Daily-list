@@ -23,13 +23,14 @@ app.use(function (req, res, next) {
     next();
 });
 
+const noresRep = new (require("./server/repositories/notes.js"))(DB);
+const logRep = new (require("./server/repositories/log.js"))(DB);
+const usersRep = new (require("./server/repositories/users"))(DB);
+
 const localStrategy = require("./server/auth/local-strategy");
 const jwtStrategy = require("./server/auth/jwt-strategy");
-const usersRep = new (require("./server/repositories/users"))(DB);
 passport.use(localStrategy(usersRep));
 passport.use(jwtStrategy(usersRep));
-
-const noresRep = new (require("./server/repositories/notes.js"))(DB);
 
 const auth = require('./server/routes/auth');
 app.use("/api/auth/", auth(usersRep));
@@ -40,8 +41,10 @@ app.use("/api/notes/", notes(noresRep));
 const synchronization = require('./server/routes/synchronization');
 app.use("/api/sync/", synchronization(noresRep));
 
-app.use(express.static(path.join(__dirname, 'public')));
+const log = require('./server/routes/log');
+app.use("/api/log/", log(logRep));
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('*', express.static(path.join(__dirname, '/public/index.html')));
 
 app.use(function error404Handler(req, res, next) {

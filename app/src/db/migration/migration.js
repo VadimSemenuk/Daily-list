@@ -3,8 +3,6 @@ import migrations from "./migrations";
 import {init} from "./migrations";
 import {addFakeListItemsData} from "../../utils/fakeData";
 
-window.execureSQL = execureSQL;
-
 class Migration {
     async checkDBExisting() {
         return (await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks';`)).rows.length;
