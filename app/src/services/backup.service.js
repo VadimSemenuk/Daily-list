@@ -85,7 +85,7 @@ class BackupService {
 
         let fileEntry = await filesService.getFileEntry(window.cordova.file.applicationStorageDirectory + "databases/com.mamindeveloper.dailylist.db");
 
-        await new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             fileEntry.file(function (file) {
                 let reader = new FileReader();
                 reader.onloadend = function () {
@@ -95,7 +95,11 @@ class BackupService {
                     oReq.setRequestHeader("Content-Type", "application/x-sqlite3");
                     oReq.setRequestHeader("Authorization", token.token);
                     oReq.onload = function () {
-                        resolve({backupFile: token.backupFile});
+                        let backupFile = oReq.response;
+                        if (backupFile) {
+                            backupFile = JSON.parse(backupFile);
+                        }
+                        resolve({backupFile});
                     };
                     oReq.send(blob);
                 };

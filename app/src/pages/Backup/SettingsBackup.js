@@ -22,7 +22,7 @@ class SettingsBackup extends Component {
     }
 
     componentDidMount() {
-        if (this.props.user.id && !this.props.user.backupFile.id) {
+        if (this.props.user.id) {
             this.props.getBackupFile(this.props.user);
         }
     }
