@@ -79,8 +79,8 @@ if (config.allowHttps === "true") {
 
     let https = require('https');
     let options = {
-        key: fs.readFileSync('~/keys/selfsigned.key'),
-        cert: fs.readFileSync('~/keys.selfsigned.crt')
+        key: fs.readFileSync(),
+        cert: fs.readFileSync()
     };
     server = https.createServer(options, app);
 } else {
