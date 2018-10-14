@@ -8,6 +8,7 @@ require('dotenv').config({ path: path.join(__dirname, ".env")});
 const config = require("./server/config");
 const DB = require("./server/db");
 const passport = require("passport");
+const fs = require('fs');
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -44,6 +45,9 @@ app.use("/api/sync/", synchronization(noresRep));
 const log = require('./server/routes/log');
 app.use("/api/log/", log(logRep));
 
+const telegram = require('./server/routes/log');
+app.use("/api/telegram/", telegram());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('*', express.static(path.join(__dirname, '/public/index.html')));
 
@@ -64,12 +68,17 @@ app.use(function commonErrorHandler(err, req, res, next) {
 
 
 let debug = require('debug')('untitled:server');
-let http = require('http');
+let https = require('https');
+
+let options = {
+    key: fs.readFileSync('~/keys/selfsigned.key'),
+    cert: fs.readFileSync('~/keys.selfsigned.crt')
+};
 
 let port = config.port;
 app.set('port', port);
 
-let server = http.createServer(app);
+let server = https.createServer(options, app);
 
 server.listen(port);
 server.on('error',
