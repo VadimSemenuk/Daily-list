@@ -14,9 +14,8 @@ module.exports = function (reportRep) {
         let period = normalizedMessage.split("-")[1] || "today";
 
         reportRep.logsReport(period).then((result) => {
-            let text = 
-            `Total ${period} loads: ${result.total_loads}
-            Avarage ${period} loads count ${result.avarage_load_count}`;
+            let text = `Total ${period} loads: ${result.total_loads} \n` + 
+            `Avarage ${period} loads count ${result.avarage_load_count}`;
 
             axios.post(
                 `https://api.telegram.org/bot${config.telegramToken}/sendMessage`, 
