@@ -13,6 +13,15 @@ export function addNote (note, updateCount) {
                 note: nextNote
             }))
             .then(({note}) => {
+                dispatch(triggerLoader());
+
+                let token = getState().user;
+
+                return backupService.uploadNoteBackup(note, "ADD", token);
+            })
+            .then(({note}) => {
+                dispatch(triggerLoader());
+
                 return updateCount && dispatch(getFullCount(note.added.valueOf()))
             });
     }

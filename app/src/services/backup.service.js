@@ -3,6 +3,8 @@ import i18next from 'i18next';
 import filesService from "./files.service";
 import authService from "./auth.service";
 
+import config from "../config/config";
+
 class BackupService {
     async createBackupFile(token) {
         let backupFile = await fetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime", {
@@ -155,6 +157,46 @@ class BackupService {
 
         let targetDirEntry = await filesService.getFileEntry(window.cordova.file.applicationStorageDirectory + "databases/");
         return new Promise((resolve, reject) => backupFileEntry.copyTo(targetDirEntry, "com.mamindeveloper.dailylist.db", resolve, reject));
+    }
+
+    uploadNoteBackup(note, action, token) {
+        let httpMethod = null;
+        switch(action) {
+            case("ADD"): {
+                httpMethod = "POST";
+                break;
+            }
+            case("EDIT"): {
+                httpMethod = "PUT";
+                break;
+            }
+            case("DELETE"): {
+                httpMethod = "DELETE";
+                break;
+            }
+            default: {
+                httpMethod = "POST";
+            }
+        }
+
+        return fetch(`${config.apiURL}/notes/backup`, {
+            method: httpMethod,
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token.token
+            },
+            body: JSON.stringify({
+                note,
+                userId: token.id
+            })
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    return res.json();
+                }
+            })            
+            .catch((err) => console.warn(err));
     }
 }
 
