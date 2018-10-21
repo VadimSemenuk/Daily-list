@@ -112,6 +112,7 @@ button,
         &.block {
             width: 100%;
             margin-top: 10px;
+            border-radius: 6px;
         }
     }
 
@@ -224,5 +225,5 @@ select {
 }
 
 .ReactModal__Body--open #root {
-    filter: blur(1px);
+    // filter: blur(1px);
 }

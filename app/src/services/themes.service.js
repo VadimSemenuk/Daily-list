@@ -146,6 +146,9 @@ class ThemesService {
             .theme-contrasting-color {
                 color: ${theme.contrasting}
             }
+            .button.text.block {
+                background: ${theme.header};
+            }
         `
     }
 }
