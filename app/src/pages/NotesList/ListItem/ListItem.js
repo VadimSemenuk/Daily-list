@@ -65,19 +65,23 @@ class Note extends PureComponent {
                         {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>} 
                         {
                             this.props.itemData.notificate &&
-                            <img 
-                                className="notification-identifier"
-                                src={AlarmImg}
-                                alt="notify"
-                            />
+                            <div className="notification-identifier-wrapper">
+                                <img 
+                                    className="notification-identifier"
+                                    src={AlarmImg}
+                                    alt="notify"
+                                />
+                            </div>
                         }    
                         {
                             this.props.itemData.repeatType !== "no-repeat" &&
-                            <img 
-                                className="repeat-identifier"
-                                src={RepeatImg}
-                                alt="repeat"
-                            />
+                            <div className="repeat-identifier-wrapper">
+                                <img 
+                                    className="repeat-identifier"
+                                    src={RepeatImg}
+                                    alt="repeat"
+                                />
+                            </div>
                         }                                   
                     </div>
                     {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}

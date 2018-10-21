@@ -157,7 +157,11 @@ class Add extends Component {
     }
 
     getInputsValues = () => {
-        return {...this.state}
+        let dynamicFields = this.state.dynamicFields.filter((a) => a !== null);
+        return {
+            ...this.state, 
+            dynamicFields
+        }
     }
 
     onSubmit = async () => {

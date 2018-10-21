@@ -4,12 +4,9 @@ import {connect} from 'react-redux';
 import moment from "moment";
 import ReactSwipe from 'react-swipe';
 import {translate} from "react-i18next";
-import scroll from "scroll";
-import debounce from "debounce";
 
 import FastAdd from '../../components/FastAdd/FastAdd';
 import DayNotesList from './DayNotesList';
-import WeekNotesList from './WeekNotesList';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
@@ -237,36 +234,19 @@ class NotesList extends PureComponent {
                         key={this.props.notes.length}
                     >
                         {
-                            this.props.notes.map((notes, i) => {
-                                if (this.props.settings.notesShowInterval === 0) {
-                                    return (
-                                        <div 
-                                            className="notes-list-item-wrapper" 
-                                            key={i}
-                                        >
-                                            <WeekNotesList 
-                                                notes={notes} 
-                                                onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                                onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                            />
-                                        </div>
-                                    )
-                                } else {
-                                    return (
-                                        <div 
-                                            className="notes-list-item-wrapper" 
-                                            key={i}
-                                        >
-                                            <DayNotesList 
-                                                notes={notes.items} 
-                                                finSort={this.props.settings.sort.finSort}
-                                                onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
-                                                onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                            />
-                                        </div>
-                                    )
-                                }
-                            })
+                            this.props.notes.map((notes, i) => (
+                                <div 
+                                    className="notes-list-item-wrapper" 
+                                    key={i}
+                                >
+                                    <DayNotesList 
+                                        notes={notes.items} 
+                                        finSort={this.props.settings.sort.finSort}
+                                        onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                        onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                    />
+                                </div>
+                            ))
                         }
                     </ReactSwipe>
 
