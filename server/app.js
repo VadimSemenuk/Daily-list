@@ -40,9 +40,6 @@ app.use("/api/auth/", auth(usersRep));
 let notes = require('./server/routes/notes');
 app.use("/api/notes/", notes(noresRep));
 
-let synchronization = require('./server/routes/synchronization');
-app.use("/api/sync/", synchronization(noresRep));
-
 let log = require('./server/routes/log');
 app.use("/api/log/", log(logRep));
 

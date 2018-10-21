@@ -39,6 +39,13 @@ module.exports.up = async (db) => {
             deviceId VARCHAR,
             userId INTEGER references Users(id)
         );
+
+        CREATE TABLE NoteBackups
+        (
+            uuid VARCHAR,
+            note JSON,
+            userId INTEGER references Users(id)
+        )
     `);
 };
 

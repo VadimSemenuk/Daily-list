@@ -241,13 +241,18 @@ module.exports = class {
         )
     }
 
-    backup(note) {
-        this.db.query(`
-            INSERT INTO notes (uuid, data)
-            VALUES ($uuid, $note);
+
+
+    // backup 
+
+    backup(note, userId) {
+        return this.db.query(`
+            INSERT INTO TasksBackups (uuid, note, userId)
+            VALUES ($uuid, $note, $userId);
         `, {
             uuid: note.uuid,
-            note: JSON.stringify(note)
-        }).catch((err) => console.log(err))
+            note: JSON.stringify(note),
+            userId: userId
+        })
     }
 };
