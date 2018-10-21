@@ -140,6 +140,9 @@ class NotesService {
     }
 
     async addNote(note) {
+        // note.startTime = moment();
+        // note.endTime = moment();
+
         let noteUUID = uuid();
         let actionTime = moment().valueOf();
         let timeCheckSums = this.calculateTimeCheckSum(note);
