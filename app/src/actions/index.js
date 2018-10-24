@@ -12,18 +12,13 @@ export function addNote (note, updateCount) {
                 type: "RECIVE_NOTE",
                 note: nextNote
             }))
-            // .then(({note}) => {
-            //     dispatch(triggerLoader());
-
-            //     let token = getState().user;
-
-            //     return backupService.uploadNoteBackup(note, "ADD", token);
-            // })
             .then(({note}) => {
-                dispatch(triggerLoader());
-
                 return updateCount && dispatch(getFullCount(note.added.valueOf()))
-            });
+            })
+            .then(({note}) => {
+                let token = getState().user;
+                return backupService.uploadorScheduleNoteBackup(note, "ADD", token);
+            })
     }
 }
 
@@ -50,17 +45,26 @@ export function updateNote (note, updateCount) {
         })
         .then(({note}) => {
             return updateCount && dispatch(getFullCount(note.added.valueOf()))
+        })
+        .then(({note}) => {
+            let token = getState().user;
+            return backupService.uploadorScheduleNoteBackup(note, "UPDATE", token);
         });
     }
 }
 
 export function updateNoteDynamicFields (note, state) {
     return function(dispatch) {
-        return notesService.updateNoteDynamicFields(note, state).then((nextNote) => dispatch({
-            type: "UPDATE_NOTE",
-            note: nextNote,
-            inserted: note.isShadow && !nextNote.isShadow
-        }))
+        return notesService.updateNoteDynamicFields(note, state)
+            .then((nextNote) => dispatch({
+                type: "UPDATE_NOTE",
+                note: nextNote,
+                inserted: note.isShadow && !nextNote.isShadow
+            }))
+            .then(({note}) => {
+                let token = getState().user;
+                return backupService.uploadorScheduleNoteBackup(note, "UPDATE", token);
+            })
     }
 }
 
@@ -76,6 +80,10 @@ export function updateNoteDate (note, updateCount) {
         .then(() => {
             return dispatch(renderNotes())
         })
+        .then(({note}) => {
+            let token = getState().user;
+            return backupService.uploadorScheduleNoteBackup(note, "UPDATE", token);
+        })
     }
 }
 
@@ -88,7 +96,11 @@ export function deleteNote (note, updateCount) {
             }))
             .then(() => {
                 return updateCount && dispatch(getFullCount(note.added.valueOf()))
-            });        
+            })
+            .then(({note}) => {
+                let token = getState().user;
+                return backupService.uploadorScheduleNoteBackup(note, "DELETE", token);
+            })     
     }
 }
 

@@ -159,7 +159,7 @@ class BackupService {
         return new Promise((resolve, reject) => backupFileEntry.copyTo(targetDirEntry, "com.mamindeveloper.dailylist.db", resolve, reject));
     }
 
-    uploadNoteBackup(note, action, token) {
+    uploadorScheduleNoteBackup(note, action, token) {
         let httpMethod = null;
         switch(action) {
             case("ADD"): {

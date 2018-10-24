@@ -1,8 +1,6 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 import uuid from "uuid/v1";
-import synchronizationService from "./synchronization.service";
-import authService from "./auth.service";
 import notificationService from "./notification.service";
 
 let tags = [
@@ -120,8 +118,6 @@ class NotesService {
             notificationService.set(addedNote.key, addedNote);
         };
 
-        synchronizationService.syncNote("ADD", addedNote);
-
         return addedNote;
     }
 
@@ -197,8 +193,6 @@ class NotesService {
             }
         }
 
-        synchronizationService.syncNote("UPDATE_DYNAMIC_FIELDS", nextNote);
-
         return nextNote;
     }
 
@@ -255,8 +249,6 @@ class NotesService {
             notificationService.set(nextNote.key, nextNote);
         };
 
-        synchronizationService.syncNote("UPDATE_DYNAMIC_FIELDS", nextNote);
-
         return nextNote;
     }
 
@@ -300,8 +292,6 @@ class NotesService {
             ]
         ).catch((err) => console.warn(err));
         notificationService.clear(nextNote.repeatType === "any" ? nextNote.repeatDates : [nextNote.key]);
-
-        synchronizationService.syncNote("DELETE", nextNote);
 
         return nextNote
     }
