@@ -53,14 +53,9 @@
         flex-basis: 178px;
         flex-shrink: 0;
         height: 178px;  
-        padding: 0 10px; 
-        // border: 1px solid #e0d9d9;
-        // background: #fcfcfc;
-        // border-radius: 3px;
-        // margin: 6px;
-        // transition: 200ms ease all;
-        
-        // background: #fafafa;
+        padding: 0 10px;         
+        background: #fafafa;
+        border-top: 1px solid #e7e7e7;
 
         &.hidden {
             display: none;

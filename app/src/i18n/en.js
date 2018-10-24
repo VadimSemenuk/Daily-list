@@ -62,8 +62,8 @@ export default {
     // backup page
     "google-sign-in": "Sign in with Google",
     "sign-out": "Sign out",
-    "create-backup": "Make backup",
-    "restore-backup": "Restore backup",
+    "create-backup": "Backup",
+    "restore-backup": "Restore",
     "copy": "Copy",
     "auth-error": "An error has occurred. Repeat later",
     "restore-local-backup": "Restore local backup",

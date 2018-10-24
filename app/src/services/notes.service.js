@@ -103,7 +103,7 @@ class NotesService {
         let noteToLocalInsert = {
             ...note,
             lastAction: "ADD",
-            userId: authService.getUserId(),
+            userId: 1,
             isLastActionSynced: 0,
             isSynced: 0,
             uuid: noteUUID,

@@ -23,7 +23,7 @@ async function initStore (settings) {
             password,
             notes,
             date: cur,
-            user: authService.getUserInfoToken()
+            user: authService.getToken()
         },
         applyMiddleware(
             thunkMiddleware

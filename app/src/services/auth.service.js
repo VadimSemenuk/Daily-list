@@ -5,10 +5,6 @@ import config from "../config/config";
 import backupService from "./backup.service";
 
 class AuthService {
-    constructor() {
-        this.token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
-    }
-
     async signUp(user) {
         let token = await fetch(`${config.apiURL}/auth/sign-up`, {
             method: "POST",
@@ -199,24 +195,14 @@ class AuthService {
 
     setToken(token) {
         localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
-        this.token = token;
     }
 
     getToken() {
-        return this.token.token || "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNTMwMTM2NDQ1fQ.3QaBBwESmbCoRvuy6E6D4w4pv6GIw0I-tvkZlHJM5pQ";
-    }
-
-    getUserId() {
-        return this.token.id || 1;
-    }
-
-    getUserInfoToken() {
-        return this.token;
+        return JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
     }
 
     resetToken() {
         localStorage.removeItem(config.LSTokenKey);
-        this.token = null;
     }
 }
 

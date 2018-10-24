@@ -50,4 +50,12 @@
         margin-top: 20px;
         border-top: 1px solid #dedede;
     }
+
+    .backup-actions-buttons-wrapper {
+        display: flex;
+
+        button:not(:last-of-type) {
+            margin-right: 10px;
+        }
+    }
 }

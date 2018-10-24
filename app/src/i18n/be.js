@@ -62,8 +62,8 @@ export default {
     // backup page
     "google-sign-in": "Увайсці з дапамогай Google",
     "sign-out": "Выйсці",
-    "create-backup": "Стварыць рэзервовую копію",
-    "restore-backup": "Загрузіць рэзервовую копію",
+    "create-backup": "Загрузіць",
+    "restore-backup": "Аднавіць",
     "copy": "Копія",
     "auth-error": "Адбылася памылка. Паўтарыце пазней",
     "restore-local-backup": "Аднавіць лькальную копію",

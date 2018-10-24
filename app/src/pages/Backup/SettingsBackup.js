@@ -63,22 +63,23 @@ class SettingsBackup extends Component {
                                     onClick={this.props.googleSignOut}
                                 ><img src={LogoutImg}/></button>
                             </div>
+                            
+                            <div className="backup-actions-buttons-wrapper">
+                                <button 
+                                    className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
+                                    type="button"
+                                    onClick={() => this.props.uploadBackup(this.props.user)}
+                                ><img src={ExportImg} />{t("create-backup")}</button>
 
-                            <button 
-                                className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
-                                type="button"
-                                onClick={() => this.props.uploadBackup(this.props.user)}
-                            ><img src={ExportImg} />{t("create-backup")}</button>
+                                <button 
+                                    className={`text block img-text-button${(this.props.loader || !this.props.user.backupFile.id) ? " disabled" : ""}`} 
+                                    type="button"
+                                    onClick={() => this.props.restoreBackup(this.props.user)}
+                                ><img src={ImportImg} />{t("restore-backup")}</button>
+                            </div>
                             {
                                 this.props.user.backupFile.id &&
-                                <div>
-                                    <button 
-                                        className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
-                                        type="button"
-                                        onClick={() => this.props.restoreBackup(this.props.user)}
-                                    ><img src={ImportImg} />{t("restore-backup")}</button>
-                                    <div className="backup-file-date">{t("copy")} {moment(this.props.user.backupFile.modifiedTime).format('LLL')}</div>
-                                </div>
+                                <div className="backup-file-date">{t("copy")} {moment(this.props.user.backupFile.modifiedTime).format('LLL')}</div>
                             }
                         </div>
                     }
