@@ -6,19 +6,19 @@ import backupService from "../services/backup.service";
 
 // notes
 export function addNote (note, updateCount) {
-    return function(dispatch) {
+    return function(dispatch, getState) {
         return notesService.addNote(note)
             .then((nextNote) => dispatch({
                 type: "RECIVE_NOTE",
                 note: nextNote
             }))
-            .then(({note}) => {
-                dispatch(triggerLoader());
+            // .then(({note}) => {
+            //     dispatch(triggerLoader());
 
-                let token = getState().user;
+            //     let token = getState().user;
 
-                return backupService.uploadNoteBackup(note, "ADD", token);
-            })
+            //     return backupService.uploadNoteBackup(note, "ADD", token);
+            // })
             .then(({note}) => {
                 dispatch(triggerLoader());
 
