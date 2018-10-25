@@ -2,10 +2,11 @@ const files = [
     require('./migrations/init')  
 ];
 
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, "../.env")});
 const { Client } = require('pg'),
     fs       = require('fs'),
-    config   = require('../server/config').db,
-    path     = require('path');
+    config   = require('../server/config').db;
 
 require.extensions['.txt'] = function (module, filename) {
     module.exports = fs.readFileSync(filename, 'utf8');
