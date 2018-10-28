@@ -3,6 +3,8 @@ import moment from 'moment';
 import uuid from "uuid/v1";
 import notificationService from "./notification.service";
 
+window.e = executeSQL;
+
 let tags = [
     'transparent',
     '#00213C',
@@ -348,33 +350,35 @@ class NotesService {
 
     async getNoteForBackup(noteKey) {
         let dataSelectWhereStatement = "";
-        let repeatDatesSelectWhereStatement = "";
         let dataSelectParams = [];
-        let repeatDatesSelectParams = [];
         if (noteKey !== undefined) {
-            dataSelectWhereStatement = ` WHERE id = ?`;
-            repeatDatesSelectWhereStatement = ` WHERE taskId = ?`;
-            dataSelectParams = noteKey;
-            repeatDatesSelectParams = noteKey;
+            dataSelectWhereStatement = ` WHERE t.id = ?`;
+            dataSelectParams = [noteKey];
         }
-
-        let dataSelect = await executeSQL(`
-            SELECT uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, isSynced, isLastActionSynced, 
-                repeatType, userId, added, dynamicFields, finished, forkFrom
-            FROM Tasks${dataSelectWhereStatement};
+        console.log(dataSelectParams);
+        let select = await executeSQL(`
+            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, 
+                t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, rep.value as repeatValue
+            FROM Tasks t
+            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+            ${dataSelectWhereStatement};
         `, dataSelectParams);
-        let repeatDatesSelect = await executeSQL(`SELECT value FROM TasksRepeatValues${repeatDatesSelectWhereStatement};`, repeatDatesSelectParams);
-        console.log(dataSelect);
-        console.log(repeatDatesSelect);
 
-        if (noteKey !== undefined) {
-
-        } else {
-            return {
-                data: dataSelect.rows[0],
-                repeatDates: repeatDatesSelect.rows[0]
-            };
+        let unique = {};
+        for(let i = 0; i < select.rows.length; i++) {
+            let item = select.rows.item(i);
+            if (unique[item.id]) {
+                if (!unique[item.id].repeatValues) {
+                    unique[item.id].repeatValues = [unique[item.id].repeatValue];
+                }
+                unique[item.id].repeatValues.push(item.repeatValue);
+                continue;
+            }
+            unique[item.id] = item;
         }
+        let notes = Object.values(unique);
+
+        return JSON.stringify(notes);
     }
 
     async restoreNotesBackup(notes) {
@@ -388,7 +392,7 @@ class NotesService {
         valuesString = valuesString.slice(2);
 
         let values = notes.reduce((accumulator, note) => {
-            note = note.note.data;
+            note = note.note;
             return [
                 ...accumulator, 
                 note.uuid,

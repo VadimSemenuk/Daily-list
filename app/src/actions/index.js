@@ -19,16 +19,16 @@ export function addNote (note, updateCount) {
             .then((noteKey) => {
                 return notesService.getNoteForBackup(noteKey);
             })
-            .then((note) => {
-                let token = getState().user;
-                return backupService.uploadOrScheduleNoteBackup(note, "ADD", token);
-            })
-            .then((note) => {
-                return notesService.setNoteBackupState(note, true, true);
-            })
-            .catch((err) => {
-                console.warn(err);
-            });
+            // .then((note) => {
+            //     let token = getState().user;
+            //     return backupService.uploadOrScheduleNoteBackup(note, "ADD", token);
+            // })
+            // .then((note) => {
+            //     return notesService.setNoteBackupState(note, true, true);
+            // })
+            // .catch((err) => {
+            //     console.warn(err);
+            // });
     }
 }
 
