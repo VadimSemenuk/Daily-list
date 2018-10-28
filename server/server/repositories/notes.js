@@ -250,7 +250,7 @@ module.exports = class {
             INSERT INTO NotesBackups (uuid, note, userId)
             VALUES ($uuid, $note, $userId);
         `, {
-            uuid: note.uuid,
+            uuid: note.data.uuid,
             note: JSON.stringify(note),
             userId: userId
         })
@@ -262,7 +262,7 @@ module.exports = class {
             SET note = $note
             WHERE uuid = $uuid;
         `, {
-            uuid: note.uuid,
+            uuid: note.data.uuid,
             note: JSON.stringify(note)            
         });
     }

@@ -346,15 +346,35 @@ class NotesService {
         await executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ? WHERE id = ?`, [+isSynced, +isLastActionSynced, note.key])
     }
 
-    async aggregateNotBackupedNotesBatch() {
-        let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, 
-                t.isSynced, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom
-            FROM Tasks t
-            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId;
-        `);
+    async getNoteForBackup(noteKey) {
+        let dataSelectWhereStatement = "";
+        let repeatDatesSelectWhereStatement = "";
+        let dataSelectParams = [];
+        let repeatDatesSelectParams = [];
+        if (noteKey !== undefined) {
+            dataSelectWhereStatement = ` WHERE id = ?`;
+            repeatDatesSelectWhereStatement = ` WHERE taskId = ?`;
+            dataSelectParams = noteKey;
+            repeatDatesSelectParams = noteKey;
+        }
 
-        return select.rows;
+        let dataSelect = await executeSQL(`
+            SELECT uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, isSynced, isLastActionSynced, 
+                repeatType, userId, added, dynamicFields, finished, forkFrom
+            FROM Tasks${dataSelectWhereStatement};
+        `, dataSelectParams);
+        let repeatDatesSelect = await executeSQL(`SELECT value FROM TasksRepeatValues${repeatDatesSelectWhereStatement};`, repeatDatesSelectParams);
+        console.log(dataSelect);
+        console.log(repeatDatesSelect);
+
+        if (noteKey !== undefined) {
+
+        } else {
+            return {
+                data: dataSelect.rows[0],
+                repeatDates: repeatDatesSelect.rows[0]
+            };
+        }
     }
 
     async restoreNotesBackup(notes) {
@@ -362,22 +382,43 @@ class NotesService {
             return
         }
 
-        let valuesString = notes.reduce((accumulator, note) => {
-            note = note.note;
-            return `${accumulator}, ('${note.uuid}', '${note.title}', ${note.startTime}, ${note.endTime}, ${note.startTimeCheckSum}, ${note.endTimeCheckSum}, 
-                ${note.notificate}, '${note.tag}', '${note.lastAction}', ${note.lastActionTime}, ${note.userId}, ${note.isSynced}, ${note.isLastActionSynced}, 
-                '${note.repeatType}', '${JSON.stringify(note.dynamicFields)}', ${note.finished}, ${note.added}, ${note.forkFrom})`;
+        let valuesString = notes.reduce((accumulator) => {
+            return `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         }, "");
         valuesString = valuesString.slice(2);
-        console.log(valuesString);
+
+        let values = notes.reduce((accumulator, note) => {
+            note = note.note.data;
+            return [
+                ...accumulator, 
+                note.uuid,
+                note.title,
+                note.startTime,
+                note.endTime,
+                note.startTimeCheckSum,
+                note.endTimeCheckSum,
+                note.notificate,
+                note.tag,
+                note.lastAction,
+                note.lastActionTime,
+                note.userId,
+                note.isSynced,
+                note.isLastActionSynced,
+                note.repeatType,
+                note.dynamicFields,
+                note.finished,
+                note.added,
+                note.forkFrom
+            ]
+        }, []);
 
         let insert = await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom)
             VALUES
-            ${valuesString};`,
-        ).catch((err) => console.warn(err));
+            ${valuesString};
+        `, values).catch((err) => console.warn(err));
     }
 
     calculateTimeCheckSum (note) {

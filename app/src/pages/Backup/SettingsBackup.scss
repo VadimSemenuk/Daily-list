@@ -12,12 +12,14 @@
         position: relative;
     }
     .profile-img-wrapper {
-        width: 96px;
-        height: 96px;
+        width: 44px;
+        height: 44px;
         margin-right: 10px;
         flex-shrink: 0;
         overflow: hidden;
         border-radius: 10px;
+        background-size: cover;
+        background-position: center;
     }
     .profile-data-wrapper {
         flex-grow: 1;
@@ -53,6 +55,7 @@
 
     .backup-actions-buttons-wrapper {
         display: flex;
+        margin-top: 20px;
 
         button:not(:last-of-type) {
             margin-right: 10px;

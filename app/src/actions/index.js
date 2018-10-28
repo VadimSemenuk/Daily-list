@@ -14,12 +14,14 @@ export function addNote (note, updateCount) {
             }))
             .then(({note}) => {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
-                return Promise.resolve(note);
+                return Promise.resolve(note.key);
+            })
+            .then((noteKey) => {
+                return notesService.getNoteForBackup(noteKey);
             })
             .then((note) => {
                 let token = getState().user;
                 return backupService.uploadOrScheduleNoteBackup(note, "ADD", token);
-                // return backupService.uploadNotesBatchBackup(note, token);
             })
             .then((note) => {
                 return notesService.setNoteBackupState(note, true, true);
@@ -281,12 +283,13 @@ export function uploadBackup() {
 
         let token = getState().user;
 
-        return backupService.uploadBackup(token).then((backupFile) => {
-            if (backupFile) {
-                dispatch(setToken({...token, ...backupFile}));
-            }
-            dispatch(triggerLoader());
-        });
+        return notesService.getNoteForBackup()
+            // .then(() => {
+            //     backupService.uploadNotesBatchBackup(token)
+            // })
+            // .then((backupFile) => {
+            //     dispatch(triggerLoader());
+            // });
     }
 }
 
@@ -296,6 +299,7 @@ export function restoreBackup(token) {
 
         return backupService.restoreNotesBackup(token)
             .then((isUpdated) => {
+                dispatch(triggerLoader());
                 // isUpdated && window.location.reload(true);
             });
     }

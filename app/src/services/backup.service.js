@@ -191,7 +191,7 @@ class BackupService {
             return false;
         }
 
-        let notes = await notesService.aggregateNotBackupedNotesBatch();
+        let notes = await notesService.getNoteForBackup();
 
         await fetch(`${config.apiURL}/notes/backup/batch`, {
             method: "POST",
@@ -241,8 +241,6 @@ class BackupService {
                 httpMethod = "POST";
             }
         }
-
-        console.log(JSON.stringify(note));
 
         await fetch(`${config.apiURL}/notes/backup`, {
             method: httpMethod,

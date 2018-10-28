@@ -52,7 +52,7 @@ class SettingsBackup extends Component {
                         this.props.user.id &&
                         <div className="logined-wrapper">
                             <div className="profile-wrapper">
-                                <div className="profile-img-wrapper clickable"><img src={this.props.user.picture} /></div>
+                                <div className="profile-img-wrapper clickable" style={{backgroundImage: `url(${this.props.user.picture})`}}></div>
                                 <div className="profile-data-wrapper">
                                     <div className="name">{this.props.user.name}</div>
                                     <div className="email">{this.props.user.email}</div>
