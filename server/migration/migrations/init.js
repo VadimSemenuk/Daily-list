@@ -18,9 +18,16 @@ module.exports.up = async (db) => {
 
         CREATE TABLE NoteBackups
         (
-            uuid VARCHAR,
+            uuid VARCHAR UNIQUE,
             note JSON,
             userId INTEGER references Users(id)
+        )
+
+        CREATE TABLE LoadLogs 
+        (
+            id SERIAL PRIMARY KEY,
+            deviceId VARCHAR,
+            date timestamp with time zone
         )
     `)
 };

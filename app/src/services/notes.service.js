@@ -342,6 +342,44 @@ class NotesService {
         return values;
     }
 
+    async setNoteBackupState(note, isSynced, isLastActionSynced) {
+        await executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ? WHERE id = ?`, [+isSynced, +isLastActionSynced, note.key])
+    }
+
+    async aggregateNotBackupedNotesBatch() {
+        let select = await executeSQL(
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, 
+                t.isSynced, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom
+            FROM Tasks t
+            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId;
+        `);
+
+        return select.rows;
+    }
+
+    async restoreNotesBackup(notes) {
+        if (!notes || notes.length === 0) {
+            return
+        }
+
+        let valuesString = notes.reduce((accumulator, note) => {
+            note = note.note;
+            return `${accumulator}, ('${note.uuid}', '${note.title}', ${note.startTime}, ${note.endTime}, ${note.startTimeCheckSum}, ${note.endTimeCheckSum}, 
+                ${note.notificate}, '${note.tag}', '${note.lastAction}', ${note.lastActionTime}, ${note.userId}, ${note.isSynced}, ${note.isLastActionSynced}, 
+                '${note.repeatType}', '${JSON.stringify(note.dynamicFields)}', ${note.finished}, ${note.added}, ${note.forkFrom})`;
+        }, "");
+        valuesString = valuesString.slice(2);
+        console.log(valuesString);
+
+        let insert = await executeSQL(
+            `INSERT INTO Tasks
+            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom)
+            VALUES
+            ${valuesString};`,
+        ).catch((err) => console.warn(err));
+    }
+
     calculateTimeCheckSum (note) {
         let startTimeCheckSum = note.startTime ? note.startTime.valueOf() - note.added : 0;
         let endTimeCheckSum = note.endTime ? note.endTime.valueOf() - note.added : 0;

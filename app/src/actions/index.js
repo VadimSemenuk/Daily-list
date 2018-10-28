@@ -13,12 +13,20 @@ export function addNote (note, updateCount) {
                 note: nextNote
             }))
             .then(({note}) => {
-                return updateCount && dispatch(getFullCount(note.added.valueOf()))
+                updateCount && dispatch(getFullCount(note.added.valueOf()));
+                return Promise.resolve(note);
             })
-            .then(({note}) => {
+            .then((note) => {
                 let token = getState().user;
-                return backupService.uploadorScheduleNoteBackup(note, "ADD", token);
+                return backupService.uploadOrScheduleNoteBackup(note, "ADD", token);
+                // return backupService.uploadNotesBatchBackup(note, token);
             })
+            .then((note) => {
+                return notesService.setNoteBackupState(note, true, true);
+            })
+            .catch((err) => {
+                console.warn(err);
+            });
     }
 }
 
@@ -35,7 +43,7 @@ export function getNotesByDates (dates, period) {
 }
 
 export function updateNote (note, updateCount) {
-    return function(dispatch) {
+    return function(dispatch, getState) {
         return notesService.updateNote(note)
         .then((nextNote) => {
             return dispatch({
@@ -44,17 +52,24 @@ export function updateNote (note, updateCount) {
             })
         })
         .then(({note}) => {
-            return updateCount && dispatch(getFullCount(note.added.valueOf()))
+            updateCount && dispatch(getFullCount(note.added.valueOf()))
+            return Promise.resolve(note);
         })
-        .then(({note}) => {
+        .then((note) => {
             let token = getState().user;
-            return backupService.uploadorScheduleNoteBackup(note, "UPDATE", token);
+            return backupService.uploadOrScheduleNoteBackup(note, "EDIT", token);
+        })
+        .then((note) => {
+            return notesService.setNoteBackupState(note, true, true);
+        })
+        .catch((err) => {
+            console.warn(err);
         });
     }
 }
 
 export function updateNoteDynamicFields (note, state) {
-    return function(dispatch) {
+    return function(dispatch, getState) {
         return notesService.updateNoteDynamicFields(note, state)
             .then((nextNote) => dispatch({
                 type: "UPDATE_NOTE",
@@ -63,44 +78,65 @@ export function updateNoteDynamicFields (note, state) {
             }))
             .then(({note}) => {
                 let token = getState().user;
-                return backupService.uploadorScheduleNoteBackup(note, "UPDATE", token);
+                return backupService.uploadOrScheduleNoteBackup(note, "EDIT", token);
             })
+            .then((note) => {
+                return notesService.setNoteBackupState(note, true, true);
+            })
+            .catch((err) => {
+                console.warn(err);
+            });
     }
 }
 
 export function updateNoteDate (note, updateCount) {
-    return function(dispatch) {
+    return function(dispatch, getState) {
         return notesService.updateNoteDate(note).then((nextNote) => dispatch({
             type: "UPDATE_NOTE",
             note: nextNote
         }))
         .then(({note}) => {
-            return updateCount && dispatch(getFullCount(note.added.valueOf()))
+            updateCount && dispatch(getFullCount(note.added.valueOf()));
+            return Promise.resolve(note);
         })
-        .then(() => {
-            return dispatch(renderNotes())
+        .then((note) => {
+            dispatch(renderNotes())
+            return Promise.resolve(note);
         })
         .then(({note}) => {
             let token = getState().user;
-            return backupService.uploadorScheduleNoteBackup(note, "UPDATE", token);
+            return backupService.uploadOrScheduleNoteBackup(note, "EDIT", token);
         })
+        .then((note) => {
+            return notesService.setNoteBackupState(note, true, true);
+        })
+        .catch((err) => {
+            console.warn(err);
+        });
     }
 }
 
 export function deleteNote (note, updateCount) {
-    return function(dispatch) {
+    return function(dispatch, getState) {
         return notesService.deleteNote(note)
             .then((note) => dispatch({
                 type: "DELETE_NOTE",
                 note
             }))
-            .then(() => {
-                return updateCount && dispatch(getFullCount(note.added.valueOf()))
-            })
             .then(({note}) => {
+                updateCount && dispatch(getFullCount(note.added.valueOf()))
+                return Promise.resolve(note);
+            })
+            .then((note) => {
                 let token = getState().user;
-                return backupService.uploadorScheduleNoteBackup(note, "DELETE", token);
-            })     
+                return backupService.uploadOrScheduleNoteBackup(note, "DELETE", token);
+            })
+            .then((note) => {
+                return notesService.setNoteBackupState(note, true, true);
+            })
+            .catch((err) => {
+                console.warn(err);
+            });
     }
 }
 
@@ -258,7 +294,10 @@ export function restoreBackup(token) {
     return function(dispatch) {
         dispatch(triggerLoader());
 
-        return backupService.restoreBackup(token).then((isUpdated) => isUpdated && window.location.reload(true));
+        return backupService.restoreNotesBackup(token)
+            .then((isUpdated) => {
+                // isUpdated && window.location.reload(true);
+            });
     }
 }
 

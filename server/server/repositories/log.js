@@ -5,7 +5,7 @@ module.exports = class {
 
     async logLoad(deviceId) {
         let insert = await this.db.query(`
-            INSERT INTO load_logs (deviceId, date) VALUES ($deviceId, $date);
+            INSERT INTO LoadLogs (deviceId, date) VALUES ($deviceId, $date);
         `, {
             deviceId,
             date: new Date()

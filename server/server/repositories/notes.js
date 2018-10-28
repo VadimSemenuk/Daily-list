@@ -247,12 +247,33 @@ module.exports = class {
 
     backup(note, userId) {
         return this.db.query(`
-            INSERT INTO TasksBackups (uuid, note, userId)
+            INSERT INTO NotesBackups (uuid, note, userId)
             VALUES ($uuid, $note, $userId);
         `, {
             uuid: note.uuid,
             note: JSON.stringify(note),
             userId: userId
         })
+    }
+
+    updateBackup(note) {
+        return this.db.query(`
+            UPDATE NotesBackups 
+            SET note = $note
+            WHERE uuid = $uuid;
+        `, {
+            uuid: note.uuid,
+            note: JSON.stringify(note)            
+        });
+    }
+
+    async getUserBackups(userId) {
+        let select = await this.db.query(`
+            SELECT note 
+            FROM NotesBackups
+            WHERE userId = $userId
+        `, {userId});
+
+        return select.rows;
     }
 };

@@ -2,8 +2,10 @@ import i18next from 'i18next';
 
 import filesService from "./files.service";
 import authService from "./auth.service";
+import notesService from "./notes.service";
 
 import config from "../config/config";
+import executeSQL from '../utils/executeSQL';
 
 class BackupService {
     async createBackupFile(token) {
@@ -159,7 +161,68 @@ class BackupService {
         return new Promise((resolve, reject) => backupFileEntry.copyTo(targetDirEntry, "com.mamindeveloper.dailylist.db", resolve, reject));
     }
 
-    uploadorScheduleNoteBackup(note, action, token) {
+    async restoreNotesBackup(token) {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
+            return false;
+        }
+
+        let notes = await fetch(`${config.apiURL}/notes/backup`, {
+            method: "GET",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token.token
+            }
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    return res.json();
+                }
+            })            
+            .catch((err) => console.warn(err));
+    
+        return await notesService.restoreNotesBackup(notes);    
+    }
+
+    async uploadNotesBatchBackup(token) {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
+            return false;
+        }
+
+        let notes = await notesService.aggregateNotBackupedNotesBatch();
+
+        await fetch(`${config.apiURL}/notes/backup/batch`, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token.token
+            },
+            body: JSON.stringify({
+                notes,
+            })
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    return true
+                }
+            })            
+            .catch((err) => console.warn(err));
+    }
+
+    async uploadOrScheduleNoteBackup(note, action, token) {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
+            return false;
+        }
+
+        if (!note.isSynced) {
+            action = "ADD";
+        }
+
+        
         let httpMethod = null;
         switch(action) {
             case("ADD"): {
@@ -179,7 +242,9 @@ class BackupService {
             }
         }
 
-        return fetch(`${config.apiURL}/notes/backup`, {
+        console.log(JSON.stringify(note));
+
+        await fetch(`${config.apiURL}/notes/backup`, {
             method: httpMethod,
             credentials: "same-origin",
             headers: {
@@ -187,16 +252,17 @@ class BackupService {
                 "Authorization": token.token
             },
             body: JSON.stringify({
-                note,
-                userId: token.id
+                note
             })
         })
             .then((res) => {
                 if (res.status === 200) {
-                    return res.json();
+                    return true
                 }
             })            
             .catch((err) => console.warn(err));
+
+        return note;
     }
 }
 

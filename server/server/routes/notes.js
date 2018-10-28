@@ -45,10 +45,40 @@ module.exports = function (notesRep) {
 
     // backup
 
-    router.post('/backup', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
-        notesRep.backup(req.body.note, req.body.userId)
+    router.post('/backup', (req, res, next) => {
+        notesRep.backup(req.body.note, 1)
+            .then((insert) => {
+                console.log(insert);
+                res.end();  
+            })
+            .catch((err) => {
+                console.warn(err);
+                res.status(500);
+                res.end();
+            })
+    });
+
+    router.put('/backup', (req, res, next) => {
+        notesRep.updateBackup(req.body.note)
             .then((insert) => {
                 res.end();  
+            })
+            .catch((err) => {
+                console.warn(err);
+                res.status(500);
+                res.end();
+            })
+    });
+
+    router.get('/backup', (req, res, next) => {
+        notesRep.getUserBackups(1)
+            .then((notes) => {
+                res.json(notes);  
+            })
+            .catch((err) => {
+                console.warn(err);
+                res.status(500);
+                res.end();
             })
     });
 
