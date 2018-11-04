@@ -383,7 +383,6 @@ class NotesService {
             console.warn(err);
             return null;
         });
-        console.log(select.rows)
 
         if (!select || !select.rows) {
             return null

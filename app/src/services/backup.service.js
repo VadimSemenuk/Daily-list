@@ -220,7 +220,7 @@ class BackupService {
         }
 
         let method = "POST";
-        if (!note.isSynced) {
+        if (note.isSynced) {
             method = "PUT";
         }
 

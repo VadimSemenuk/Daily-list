@@ -4,6 +4,8 @@ import calendarService from "../services/calendar.service";
 import authService from "../services/auth.service";
 import backupService from "../services/backup.service";
 
+import throttle from "../utils/throttle";
+
 // notes
 export function addNote (note, updateCount) {
     return function(dispatch, getState) {
@@ -62,7 +64,8 @@ export function updateNoteDynamicFields (note, state) {
                     note: nextNote,
                     inserted: note.isShadow && !nextNote.isShadow
                 });
-                true && dispatch(uploadBackup(nextNote.key));
+                
+                dispatch(uploadBackup(nextNote.key));
             })
             .catch((err) => {
                 console.warn(err);
@@ -244,23 +247,26 @@ export function setToken(token) {
 // backup
 export function uploadBackup(noteId) {
     return function(dispatch, getState) {
-        let token = getState().user;
-
-        return notesService.getNoteForBackup(noteId)
-            .then((note) => {
-                return backupService.uploadNoteBackup(note[0], token);
-            })
-            .then((note) => {
-                // return notesService.setNoteBackupState(note, true, true);
-            })
-            // .then((note) => {
-            //     return dispatch({
-            //         type: "UPDATE_NOTE",
-            //         note
-            //     })
-            // })
+        return debouncedUploadBackup(noteId, dispatch, getState);
     }
 }
+let debouncedUploadBackup = throttle((noteId, dispatch, getState) => {
+    let token = getState().user;
+
+    return notesService.getNoteForBackup(noteId)
+        .then((note) => {
+            return backupService.uploadNoteBackup(note[0], token);
+        })
+        .then((note) => {
+            return notesService.setNoteBackupState(note, true, true);
+        })
+        // .then((note) => {
+        //     return dispatch({
+        //         type: "UPDATE_NOTE",
+        //         note
+        //     })
+        // })
+}, 5000)
 
 export function uploadBatchBackup() {
     return function(dispatch, getState) {
@@ -271,7 +277,7 @@ export function uploadBatchBackup() {
                 return backupService.uploadNotesBatchBackup(notes, token);
             })
             .then(() => {
-                // return notesService.setNoteBackupState(null, true, true);
+                return notesService.setNoteBackupState(null, true, true);
             })
             .catch((err) => {
                 console.warn(err);
