@@ -9,7 +9,7 @@ import * as AppActions from '../../actions';
 import './SettingsBackup.scss';
 
 import Header from '../../components/Header/Header';
-import {TriggerListItem} from "../../components/ListItem/ListItem";
+import {TriggerListItem, SwitchListItem} from "../../components/ListItem/ListItem";
 
 import GoogleImg from '../../assets/img/google.svg';
 import ExportImg from '../../assets/img/upload-to-cloud.svg';
@@ -64,6 +64,14 @@ class SettingsBackup extends Component {
                                 ><img src={LogoutImg}/></button>
                             </div>
                             
+                            <div className="backup-settings-wrapper">
+                                <SwitchListItem 
+                                    text={t("auto-backup")}
+                                    checked={this.props.user.settings.autoBackup}
+                                    onChange={(e) => this.props.setToken({...this.props.user, settings: { ...this.props.user.settings, autoBackup: e }})}
+                                />
+                            </div>
+                            
                             <div className="backup-actions-buttons-wrapper">
                                 <button 
                                     className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
@@ -83,14 +91,6 @@ class SettingsBackup extends Component {
                             }
                         </div>
                     }
-                    
-                    <div className="local-backup-wrapper">
-                        <button
-                            className="text block" 
-                            type="button"
-                            onClick={this.props.restoreLocalBackup}
-                        >{t("restore-local-backup")}</button>
-                    </div>
                 </div>
             </div>
         );

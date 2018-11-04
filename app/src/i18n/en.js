@@ -69,6 +69,7 @@ export default {
     "restore-local-backup": "Restore local backup",
     "how-it-works-btn": "How it works",
     "how-it-works": "Application files are saved on your Google Drive. The application will have access only to the files created by it",
+    "auto-backup": "Auto backup",
 
     // common
     "save": "Save",

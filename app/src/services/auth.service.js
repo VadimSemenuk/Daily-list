@@ -95,7 +95,10 @@ class AuthService {
                         token: "Bearer ya29.GlwwBsNEuj22CsHUvtq_NRFmJ_UMOE7rlyL_EFIZ2QlRDc_KZZc1lSaSX3zXAwMjqTDv-2ruVtl68XgzQ7fUmAtdV-MX2bUzuI6kMC-TNTBGJ_L8aV_jMyWRfYqXfg",
                         refreshToken: "1/baCLIRMygrFmwn07uo-mOLxfIZZ6G1twucQN1UvDyJ4",
                         tokenExpireDate: +new Date() - 3700000,
-                        backupFile: {}
+                        backupFile: {},
+                        settings: {
+                            autoBackup: false
+                        }
                     }
                     this.setToken(token);
         
@@ -133,7 +136,10 @@ class AuthService {
             token: "Bearer " + googleAccessToken.access_token,
             refreshToken: googleAccessToken.refresh_token,
             tokenExpireDate: +new Date() + 3400000,
-            backupFile: {}
+            backupFile: {},
+            settings: {
+                autoBackup: false
+            }
         }
 
         let backupFile = await backupService.getBackupFile(token);

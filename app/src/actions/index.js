@@ -16,7 +16,9 @@ export function addNote (note, updateCount) {
             }))
             .then(({note}) => {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
-                true && dispatch(uploadBackup(note.key));
+
+                let token = getState().user;
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));
             })
             .catch((err) => {
                 console.warn(err);
@@ -46,8 +48,10 @@ export function updateNote (note, updateCount) {
             })
         })
         .then(({note}) => {
-            updateCount && dispatch(getFullCount(note.added.valueOf()))
-            true && dispatch(uploadBackup(note.key));        
+            updateCount && dispatch(getFullCount(note.added.valueOf()));
+
+            let token = getState().user;
+            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));        
         })
         .catch((err) => {
             console.warn(err);
@@ -64,8 +68,9 @@ export function updateNoteDynamicFields (note, state) {
                     note: nextNote,
                     inserted: note.isShadow && !nextNote.isShadow
                 });
-                
-                dispatch(uploadBackup(nextNote.key));
+
+                let token = getState().user;
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote.key, token));
             })
             .catch((err) => {
                 console.warn(err);
@@ -85,7 +90,9 @@ export function updateNoteDate (note, updateCount) {
         })
         .then((note) => {
             dispatch(renderNotes());
-            true && dispatch(uploadBackup(note.key));            
+
+            let token = getState().user;
+            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));            
         })
         .catch((err) => {
             console.warn(err);
@@ -102,7 +109,9 @@ export function deleteNote (note, updateCount) {
             }))
             .then(({note}) => {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
-                true && dispatch(uploadBackup(note.key));
+
+                let token = getState().user;
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));
             })
             .catch((err) => {
                 console.warn(err);
@@ -245,13 +254,15 @@ export function setToken(token) {
 }
 
 // backup
-export function uploadBackup(noteId) {
+export function uploadBackup(noteId, token) {
     return function(dispatch, getState) {
-        return debouncedUploadBackup(noteId, dispatch, getState);
+        return debouncedUploadBackup(noteId, token, dispatch, getState);
     }
 }
-let debouncedUploadBackup = throttle((noteId, dispatch, getState) => {
-    let token = getState().user;
+let debouncedUploadBackup = throttle((noteId, token, dispatch, getState) => {
+    if (!token) {
+        token = getState().user;
+    }
 
     return notesService.getNoteForBackup(noteId)
         .then((note) => {
@@ -285,9 +296,11 @@ export function uploadBatchBackup() {
     }
 }
 
-export function restoreBackup(token) {
-    return function(dispatch) {
+export function restoreBackup() {
+    return function(dispatch, getState) {
         dispatch(triggerLoader());
+
+        let token = getState().user;
 
         return backupService.restoreNotesBackup(token)
             .then((isUpdated) => {

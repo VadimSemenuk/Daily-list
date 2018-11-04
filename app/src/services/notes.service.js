@@ -457,8 +457,9 @@ class NotesService {
         })
         rdValuesString = rdValuesString.slice(2);
 
-        console.log(rdValues);
-        console.log(rdValuesString);
+        if (rdValues.length === 0) {
+            return
+        }
 
         await executeSQL(`
             INSERT INTO TasksRepeatValues
