@@ -41,6 +41,7 @@
         "cordova-plugin-x-toast": "^2.7.0",
         "cordova-sqlite-storage": "^2.5.0",
         "css-loader": "0.28.7",
+        "debounce": "^1.2.0",
         "dotenv": "4.0.0",
         "dotenv-expand": "4.2.0",
         "es6-promise-plugin": "^4.2.2",
