@@ -185,13 +185,14 @@ class BackupService {
         return await notesService.restoreNotesBackup(notes);    
     }
 
-    async uploadNotesBatchBackup(token) {
+    async uploadNotesBatchBackup(notes, token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
             window.plugins.toast.showLongBottom(i18next.t("internet-required"));
             return false;
         }
-
-        let notes = await notesService.getNoteForBackup();
+        if (!notes || !notes.length) {
+            return false;
+        }
 
         await fetch(`${config.apiURL}/notes/backup/batch`, {
             method: "POST",
@@ -201,7 +202,7 @@ class BackupService {
                 "Authorization": token.token
             },
             body: JSON.stringify({
-                notes,
+                notes
             })
         })
             .then((res) => {
@@ -212,38 +213,19 @@ class BackupService {
             .catch((err) => console.warn(err));
     }
 
-    async uploadOrScheduleNoteBackup(note, action, token) {
+    async uploadNoteBackup(note, token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
             window.plugins.toast.showLongBottom(i18next.t("internet-required"));
             return false;
         }
 
+        let method = "POST";
         if (!note.isSynced) {
-            action = "ADD";
-        }
-
-        
-        let httpMethod = null;
-        switch(action) {
-            case("ADD"): {
-                httpMethod = "POST";
-                break;
-            }
-            case("EDIT"): {
-                httpMethod = "PUT";
-                break;
-            }
-            case("DELETE"): {
-                httpMethod = "DELETE";
-                break;
-            }
-            default: {
-                httpMethod = "POST";
-            }
+            method = "PUT";
         }
 
         await fetch(`${config.apiURL}/notes/backup`, {
-            method: httpMethod,
+            method,
             credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json",

@@ -44,7 +44,7 @@ class NotesService {
     async getDayNotes(date) {
         let currentDate = date.valueOf();
         let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.repeatType, t.userId,
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
             t.dynamicFields, t.finished, t.forkFrom,
             CASE t.added WHEN ? THEN 0 ELSE 1 END as isShadow,
             ? as added
@@ -78,7 +78,9 @@ class NotesService {
                 added: moment(item.added),
                 finished: Boolean(item.finished),
                 notificate: Boolean(item.notificate),
-                isShadow: Boolean(item.isShadow)
+                isShadow: Boolean(item.isShadow),
+                isSynced: Boolean(item.isSynced),
+                isLastActionSynced: Boolean(item.isLastActionSynced),
             }
 
             unique[key] = nextItem;
@@ -299,11 +301,11 @@ class NotesService {
     }
 
     async setNoteRepeat(note) {
-        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]).catch((err) => console.warn(err));
-        
         if (note.repeatType === "no-repeat") {
             return
         }
+
+        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]).catch((err) => console.warn(err));
 
         let repeatDates = note.repeatDates;
         if (note.repeatType === "week") {
@@ -344,41 +346,54 @@ class NotesService {
         return values;
     }
 
-    async setNoteBackupState(note, isSynced, isLastActionSynced) {
-        await executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ? WHERE id = ?`, [+isSynced, +isLastActionSynced, note.key])
+    setNoteBackupState(note, isSynced, isLastActionSynced) {
+        let whereStatement = "";
+        let params = [+isSynced, +isLastActionSynced];
+        if (note) {
+            whereStatement = " WHERE id = ?";
+            params.push(note.id);
+        } else {
+            whereStatement = " WHERE isSynced != 1 AND isLastActionSynced != 1";
+        }
+        return executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ?${whereStatement};`, params).catch(err => console.warn(err))
     }
 
     async getNoteForBackup(noteKey) {
         let dataSelectWhereStatement = "";
         let dataSelectParams = [];
         if (noteKey !== undefined) {
-            dataSelectWhereStatement = ` WHERE t.id = ?`;
+            dataSelectWhereStatement = " WHERE t.id = ?";
             dataSelectParams = [noteKey];
+        } else {
+            dataSelectWhereStatement = " WHERE t.isSynced != 1 AND t.isLastActionSynced != 1";
         }
-        console.log(dataSelectParams);
+
         let select = await executeSQL(`
-            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, 
-                t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, rep.value as repeatValue
-            FROM Tasks t
-            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-            ${dataSelectWhereStatement};
-        `, dataSelectParams);
+            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced,
+                t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, tr.repeatValues
+			FROM (
+				SELECT t.id, GROUP_CONCAT(rep.value, ',') as repeatValues
+            	FROM Tasks t
+                LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+                ${dataSelectWhereStatement}
+				GROUP BY t.id
+			) tr
+			LEFT JOIN Tasks t ON t.id = tr.id;
+        `, dataSelectParams).catch((err) => {
+            console.warn(err);
+            return null;
+        });
+        console.log(select.rows)
 
-        let unique = {};
-        for(let i = 0; i < select.rows.length; i++) {
-            let item = select.rows.item(i);
-            if (unique[item.id]) {
-                if (!unique[item.id].repeatValues) {
-                    unique[item.id].repeatValues = [unique[item.id].repeatValue];
-                }
-                unique[item.id].repeatValues.push(item.repeatValue);
-                continue;
-            }
-            unique[item.id] = item;
+        if (!select || !select.rows) {
+            return null
         }
-        let notes = Object.values(unique);
 
-        return JSON.stringify(notes);
+        let res = [];
+        for (let i = 0; i < select.rows.length; i++ ){
+            res.push(select.rows.item(i));
+        }
+        return res;
     }
 
     async restoreNotesBackup(notes) {
@@ -406,8 +421,8 @@ class NotesService {
                 note.lastAction,
                 note.lastActionTime,
                 note.userId,
-                note.isSynced,
-                note.isLastActionSynced,
+                1,
+                1,
                 note.repeatType,
                 note.dynamicFields,
                 note.finished,
@@ -423,6 +438,35 @@ class NotesService {
             VALUES
             ${valuesString};
         `, values).catch((err) => console.warn(err));
+
+
+
+        let rdValuesString = "";
+        let rdValues = [];
+        notes.forEach((note) => {
+            note = note.note;
+            if (!note.repeatValues) {
+                return
+            }
+
+            let repeatValues = note.repeatValues.split(",");
+            repeatValues.forEach((rdValue) => {
+                rdValues.push(note.id);
+                rdValues.push(+rdValue);
+                rdValuesString +=  ", (?, ?)"
+            });
+        })
+        rdValuesString = rdValuesString.slice(2);
+
+        console.log(rdValues);
+        console.log(rdValuesString);
+
+        await executeSQL(`
+            INSERT INTO TasksRepeatValues
+            (taskId, value)
+            VALUES
+            ${rdValuesString};
+        `, rdValues).catch((err) => console.warn(err));
     }
 
     calculateTimeCheckSum (note) {

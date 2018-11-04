@@ -1,3 +1,5 @@
+var format = require('pg-format');
+
 module.exports = class {
     constructor(db) {
         this.db = db;
@@ -275,5 +277,17 @@ module.exports = class {
         `, {userId});
 
         return select.rows;
+    }
+
+    async backupBatch(notes, userId) {
+        if (!notes || !notes.length) {
+            return; 
+        }
+        let values = notes.map((note, i) => {
+            return [note.uuid, note, userId];
+        });
+        let sql = format(`INSERT INTO NotesBackups (uuid, note, userId) VALUES %L`, values);
+
+        return this.db.query(sql);
     }
 };

@@ -48,7 +48,6 @@ module.exports = function (notesRep) {
     router.post('/backup', (req, res, next) => {
         notesRep.backup(req.body.note, 1)
             .then((insert) => {
-                console.log(insert);
                 res.end();  
             })
             .catch((err) => {
@@ -74,6 +73,18 @@ module.exports = function (notesRep) {
         notesRep.getUserBackups(1)
             .then((notes) => {
                 res.json(notes);  
+            })
+            .catch((err) => {
+                console.warn(err);
+                res.status(500);
+                res.end();
+            })
+    });
+
+    router.post('/backup/batch', (req, res, next) => {
+        notesRep.backupBatch(req.body.notes, 1)
+            .then((insert) => {
+                res.end();  
             })
             .catch((err) => {
                 console.warn(err);

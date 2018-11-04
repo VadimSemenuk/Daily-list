@@ -68,13 +68,13 @@ class SettingsBackup extends Component {
                                 <button 
                                     className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
                                     type="button"
-                                    onClick={() => this.props.uploadBackup(this.props.user)}
+                                    onClick={() => this.props.uploadBatchBackup()}
                                 ><img src={ExportImg} />{t("create-backup")}</button>
 
                                 <button 
                                     className={`text block img-text-button${(this.props.loader || !this.props.user.backupFile.id) ? " disabled" : ""}`} 
                                     type="button"
-                                    onClick={() => this.props.restoreBackup(this.props.user)}
+                                    onClick={() => this.props.restoreBackup()}
                                 ><img src={ImportImg} />{t("restore-backup")}</button>
                             </div>
                             {
