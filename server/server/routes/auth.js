@@ -30,12 +30,26 @@ module.exports = function (authRep) {
 		const ticket = await client.verifyIdToken({
 			idToken: req.body.idToken,
 		}).catch((err) => {
-			console.log(err)
+			console.log(err);
+			return null;
 		})
+		if (!ticket) {
+			res.status(500);
+			res.end();
+		}
+
 		const payload = ticket.getPayload();
 		let user = await authRep.getUserByField("google_id", payload.sub);
 		if (!user) {
-	 		user = await authRep.createUser(payload);
+			user = {
+				id: null,
+				name: payload.name,
+				password: null,
+				email: payload.email,
+				google_id: payload.sub,
+			}
+			 let userId = await authRep.createUser(user);
+			 user.id = userId;
 		}
 
 		const token = jwt.sign({

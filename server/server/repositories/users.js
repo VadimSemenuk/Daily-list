@@ -18,8 +18,8 @@ module.exports = class {
     async createUser(user) {
         const insert = await this.db.query(`
             INSERT INTO users
-            (name, password, email)
-            VALUES($name, $password, $email)
+            (name, password, email, google_id)
+            VALUES($name, $password, $email, $google_id)
             RETURNING id;
         `, user).catch((err) => console.log(err));
 

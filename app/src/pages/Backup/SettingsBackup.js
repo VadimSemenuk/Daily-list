@@ -67,7 +67,7 @@ class SettingsBackup extends Component {
                             <div className="backup-settings-wrapper">
                                 <SwitchListItem 
                                     text={t("auto-backup")}
-                                    checked={this.props.user.settings.autoBackup}
+                                    checked={this.props.user.settings ? this.props.user.settings.autoBackup : false}
                                     onChange={(e) => this.props.setToken({...this.props.user, settings: { ...this.props.user.settings, autoBackup: e }})}
                                 />
                             </div>
