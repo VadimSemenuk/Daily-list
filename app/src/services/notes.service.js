@@ -184,7 +184,8 @@ class NotesService {
                 `UPDATE Tasks
                 SET 
                     dynamicFields = ?,
-                    finished = ?
+                    finished = ?,
+                    isLastActionSynced = 0
                 WHERE id = ?;`,
                 [
                     JSON.stringify(nextNote.dynamicFields),
@@ -260,7 +261,8 @@ class NotesService {
         await executeSQL(`
             UPDATE Tasks
             SET
-                added = ?
+                added = ?,
+                isLastActionSynced = 0
             WHERE id = ?
         `, [
             note.added.valueOf(),
@@ -346,12 +348,12 @@ class NotesService {
         return values;
     }
 
-    setNoteBackupState(note, isSynced, isLastActionSynced) {
+    setNoteBackupState(noteId, isSynced, isLastActionSynced) {
         let whereStatement = "";
         let params = [+isSynced, +isLastActionSynced];
-        if (note) {
+        if (noteId) {
             whereStatement = " WHERE id = ?";
-            params.push(note.id);
+            params.push(noteId);
         } else {
             whereStatement = " WHERE isSynced != 1 AND isLastActionSynced != 1";
         }
@@ -365,7 +367,7 @@ class NotesService {
             dataSelectWhereStatement = " WHERE t.id = ?";
             dataSelectParams = [noteKey];
         } else {
-            dataSelectWhereStatement = " WHERE t.isSynced != 1 AND t.isLastActionSynced != 1";
+            dataSelectWhereStatement = " WHERE t.isLastActionSynced != 1";
         }
 
         let select = await executeSQL(`

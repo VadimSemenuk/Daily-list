@@ -1,3 +1,5 @@
+import moment from "moment";
+
 import notesService from "../services/notes.service";
 import settingsService from "../services/settings.service";
 import calendarService from "../services/calendar.service";
@@ -18,7 +20,7 @@ export function addNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
             })
             .catch((err) => {
                 console.warn(err);
@@ -51,7 +53,7 @@ export function updateNote (note, updateCount) {
             updateCount && dispatch(getFullCount(note.added.valueOf()));
 
             let token = getState().user;
-            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));        
+            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));        
         })
         .catch((err) => {
             console.warn(err);
@@ -70,7 +72,7 @@ export function updateNoteDynamicFields (note, state) {
                 });
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote.key, token));
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote, token));
             })
             .catch((err) => {
                 console.warn(err);
@@ -92,7 +94,7 @@ export function updateNoteDate (note, updateCount) {
             dispatch(renderNotes());
 
             let token = getState().user;
-            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));            
+            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));            
         })
         .catch((err) => {
             console.warn(err);
@@ -111,7 +113,7 @@ export function deleteNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note.key, token));
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
             })
             .catch((err) => {
                 console.warn(err);
@@ -254,43 +256,70 @@ export function setToken(token) {
 }
 
 // backup
-export function uploadBackup(noteId, token) {
+export function uploadBackup(note, token) {
     return function(dispatch, getState) {
-        return debouncedUploadBackup(noteId, token, dispatch, getState);
+        if (!token) {
+            token = getState().user;
+        }
+
+        return debouncedUploadBackup(note, token, dispatch);
     }
 }
-let debouncedUploadBackup = throttle((noteId, token, dispatch, getState) => {
-    if (!token) {
-        token = getState().user;
-    }
-
-    return notesService.getNoteForBackup(noteId)
-        .then((note) => {
-            return backupService.uploadNoteBackup(note[0], token);
+let debouncedUploadBackup = throttle((note, token, dispatch) => {
+    return notesService.getNoteForBackup(note.key)
+        .then((noteForBackup) => {
+            return backupService.uploadNoteBackup(noteForBackup[0], token);
         })
-        .then((note) => {
-            return notesService.setNoteBackupState(note, true, true);
+        .then((isBackuped) => {
+            if (!isBackuped) {
+                throw Error("not backuped");
+            }
+            return notesService.setNoteBackupState(note.key, true, true);
         })
-        // .then((note) => {
-        //     return dispatch({
-        //         type: "UPDATE_NOTE",
-        //         note
-        //     })
-        // })
+        .then(() => {
+            let nextToken = { 
+                ...token, 
+                backup: {
+                    ...token.backup,
+                    lastBackupTime: moment().valueOf()
+                }  
+            };
+            return dispatch(setToken(nextToken));
+        })
+        .catch((err) => {
+            console.warn(err);
+            return null
+        })
 }, 5000)
 
 export function uploadBatchBackup() {
     return function(dispatch, getState) {
+        dispatch(triggerLoader());
         let token = getState().user;
 
         return notesService.getNoteForBackup()
             .then((notes) => {
                 return backupService.uploadNotesBatchBackup(notes, token);
             })
-            .then(() => {
+            .then((isBackuped) => {
+                if (!isBackuped) {
+                    throw Error("not backuped");
+                }
                 return notesService.setNoteBackupState(null, true, true);
             })
+            .then(() => {
+                let nextToken = { 
+                    ...token, 
+                    backup: {
+                        ...token.backup,
+                        lastBackupTime: moment().valueOf()
+                    }  
+                };
+                dispatch(setToken(nextToken));
+                dispatch(triggerLoader());
+            })
             .catch((err) => {
+                dispatch(triggerLoader());
                 console.warn(err);
             })
     }
@@ -320,11 +349,5 @@ export function getBackupFile(token) {
             }
             dispatch(triggerLoader());
         });
-    }
-}
-
-export function restoreLocalBackup() {
-    return function () {
-        return backupService.restoreLocalBackup().then((file) => file && window.location.reload(true));
     }
 }

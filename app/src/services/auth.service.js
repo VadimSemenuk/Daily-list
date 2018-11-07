@@ -96,6 +96,9 @@ class AuthService {
                         refreshToken: "1/baCLIRMygrFmwn07uo-mOLxfIZZ6G1twucQN1UvDyJ4",
                         tokenExpireDate: +new Date() - 3700000,
                         backupFile: {},
+                        backup: {
+                            lastBackupTime: null,
+                        },
                         settings: {
                             autoBackup: false
                         }
@@ -137,13 +140,13 @@ class AuthService {
             refreshToken: googleAccessToken.refresh_token,
             tokenExpireDate: +new Date() + 3400000,
             backupFile: {},
+            backup: {
+                lastBackupTime: null,
+            },
             settings: {
                 autoBackup: false
             }
         }
-
-        let backupFile = await backupService.getBackupFile(token);
-        token.backupFile = backupFile || {};
 
         this.setToken(token);
 

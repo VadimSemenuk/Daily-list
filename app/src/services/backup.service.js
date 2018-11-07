@@ -5,7 +5,7 @@ import authService from "./auth.service";
 import notesService from "./notes.service";
 
 import config from "../config/config";
-import executeSQL from '../utils/executeSQL';
+import moment from 'moment';
 
 class BackupService {
     async createBackupFile(token) {
@@ -149,18 +149,6 @@ class BackupService {
         });
     }
 
-    async restoreLocalBackup() {
-        let backupFileEntry = await filesService.getFileEntry(window.cordova.file.externalRootDirectory + "DailyList_Backup.db")
-            .catch((err) => console.warn(err));
-        if (!backupFileEntry) {
-            window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
-            return false
-        }
-
-        let targetDirEntry = await filesService.getFileEntry(window.cordova.file.applicationStorageDirectory + "databases/");
-        return new Promise((resolve, reject) => backupFileEntry.copyTo(targetDirEntry, "com.mamindeveloper.dailylist.db", resolve, reject));
-    }
-
     async restoreNotesBackup(token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
             window.plugins.toast.showLongBottom(i18next.t("internet-required"));
@@ -194,7 +182,7 @@ class BackupService {
             return false;
         }
 
-        await fetch(`${config.apiURL}/notes/backup/batch`, {
+        let isBackuped = await fetch(`${config.apiURL}/notes/backup/batch`, {
             method: "POST",
             credentials: "same-origin",
             headers: {
@@ -207,10 +195,16 @@ class BackupService {
         })
             .then((res) => {
                 if (res.status === 200) {
-                    return true
+                    window.res = res;
+                    return res.json();
                 }
             })            
-            .catch((err) => console.warn(err));
+            .catch((err) => {
+                console.warn(err)
+                return false;
+            });
+
+        return isBackuped;        
     }
 
     async uploadNoteBackup(note, token) {
@@ -224,7 +218,7 @@ class BackupService {
             method = "PUT";
         }
 
-        await fetch(`${config.apiURL}/notes/backup`, {
+        let isBackuped = await fetch(`${config.apiURL}/notes/backup`, {
             method,
             credentials: "same-origin",
             headers: {
@@ -232,17 +226,21 @@ class BackupService {
                 "Authorization": token.token
             },
             body: JSON.stringify({
-                note
+                note,
+                date: moment()
             })
         })
             .then((res) => {
                 if (res.status === 200) {
-                    return true
+                    return res.json();
                 }
             })            
-            .catch((err) => console.warn(err));
+            .catch((err) => {
+                console.warn(err)
+                return false;
+            });
 
-        return note;
+        return isBackuped;
     }
 }
 

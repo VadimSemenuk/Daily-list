@@ -48,7 +48,8 @@ module.exports = function (notesRep) {
     router.post('/backup', (req, res, next) => {
         notesRep.backup(req.body.note, 1)
             .then((insert) => {
-                res.end();  
+                let inserted = insert ? Boolean(insert.rowCount) : false;
+                res.send(inserted); 
             })
             .catch((err) => {
                 console.warn(err);
@@ -59,8 +60,9 @@ module.exports = function (notesRep) {
 
     router.put('/backup', (req, res, next) => {
         notesRep.updateBackup(req.body.note)
-            .then((insert) => {
-                res.end();  
+            .then((update) => {
+                let updated = update ? Boolean(update.rowCount) : false;
+                res.send(updated);  
             })
             .catch((err) => {
                 console.warn(err);
@@ -84,7 +86,8 @@ module.exports = function (notesRep) {
     router.post('/backup/batch', (req, res, next) => {
         notesRep.backupBatch(req.body.notes, 1)
             .then((insert) => {
-                res.end();  
+                let inserted = insert ? Boolean(insert.rowCount) : false;
+                res.send(inserted); 
             })
             .catch((err) => {
                 console.warn(err);
