@@ -1,5 +1,9 @@
 const router = require('express-promise-router')();
 const passport = require("passport");
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const sqlite3 = require('sqlite3');
 
 module.exports = function (notesRep) {  
     router.post('/', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
@@ -95,6 +99,62 @@ module.exports = function (notesRep) {
                 res.end();
             })
     });
+
+    // restore old backup
+    router.post('/backup/old/transform-to-new', (req, res, next) => {
+        const filePath = path.join(__dirname, `../../sqlite-databases/${req.body.fileId}`);
+
+        axios.get(
+            `https://www.googleapis.com/drive/v3/files/${req.body.fileId}?alt=media`,
+            {
+                headers: {
+                    'Authorization': req.body.token
+                },
+                responseType: 'stream'
+            }
+        )
+            .then((response) => {
+                const writeStream = fs.createWriteStream(filePath);
+                return new Promise((resolve, reject) => {
+                    writeStream.on('error', () => {
+                        reject();
+                    });
+                    writeStream.on('finish', () => {
+                        resolve();
+                    });
+                    response.data.pipe(writeStream);
+                });
+            })
+            .then(() => {
+                const db = new sqlite3.Database(filePath, sqlite3.OPEN_READWRITE, (err) => {
+                    if (err) {
+                        throw err;
+                    }
+                
+                    db.all(`
+                        SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, 
+                            t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, 
+                            tr.repeatValues
+                        FROM (
+                            SELECT t.id, GROUP_CONCAT(rep.value, ',') as repeatValues
+                            FROM Tasks t
+                            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+                            GROUP BY t.id
+                        ) tr
+                        LEFT JOIN Tasks t ON t.id = tr.id;
+                    `, (err, res) => {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log(res);
+                    });
+                });
+            })
+            .catch(err => {
+                res.status(500);
+                res.end();
+            })
+    })
 
     return router
 }
