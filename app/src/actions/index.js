@@ -7,6 +7,7 @@ import authService from "../services/auth.service";
 import backupService from "../services/backup.service";
 
 import throttle from "../utils/throttle";
+import deviceService from "../services/device.service";
 
 // notes
 export function addNote (note, updateCount) {
@@ -217,12 +218,16 @@ export function getFullCount (date, period) {
 
 // auth
 export function googleSignIn() {
-    return function(dispatch) {
+    return function(dispatch, getState) {
         dispatch(triggerLoader());
 
         return authService.googleSignIn().then((user) => {
             dispatch(triggerLoader());
             
+            if (!getState().meta.nextVersionMigrated) {
+                dispatch(uploadBatchBackup())
+            }
+
             return dispatch({
                 type: "RECIVE_USER",
                 user
@@ -349,5 +354,18 @@ export function getBackupFile(token) {
             }
             dispatch(triggerLoader());
         });
+    }
+}
+
+// meta
+export function setNextVersionMigrationState(state) {
+    return function(dispatch) {
+        return deviceService.setNextVersionMigrationState(state)
+            .then(() => {
+                dispatch({
+                    type: "SET_NEXTVERSIONMIGRATION_STATE",
+                    state
+                })
+            })
     }
 }

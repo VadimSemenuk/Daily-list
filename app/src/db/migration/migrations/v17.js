@@ -47,13 +47,18 @@ export default {
                 CREATE TABLE IF NOT EXISTS MetaInfo
                 (   
                     deviceId TEXT,
-                    IsRateDialogShowed INTEGER
+                    IsRateDialogShowed INTEGER,
+                    nextVersionMigrated INTEGER
                 );
             `)
 
             await execureSQL(`
-                INSERT INTO MetaInfo (deviceId, IsRateDialogShowed)
-                SELECT deviceId, 0 as IsRateDialogShowed FROM MetaInfo_OLD
+                INSERT INTO MetaInfo (deviceId, IsRateDialogShowed, nextVersionMigrated)
+                SELECT 
+                    deviceId, 
+                    0 as IsRateDialogShowed,
+                    0 as nextVersionMigrated
+                FROM MetaInfo_OLD
             `);
 
             await execureSQL(`DROP TABLE MetaInfo_OLD;`);

@@ -2,6 +2,24 @@ import executeSQL from '../utils/executeSQL';
 import config from '../config/config';
 
 class DeviceService {
+    setNextVersionMigrationState(state) {
+        return executeSQL(`UPDATE MetaInfo SET nextVersionMigrated = ?;`, [+state]);
+    }
+
+    async getMetaInfo() {
+        let select = await executeSQL(`SELECT deviceId, IsRateDialogShowed, nextVersionMigrated FROM MetaInfo;`);
+        if (select.rows) {
+            let metaInfo = select.rows.item(0);
+            return {
+                deviceId: metaInfo.deviceId,
+                IsRateDialogShowed: Boolean(metaInfo.IsRateDialogShowed),
+                nextVersionMigrated: Boolean(metaInfo.nextVersionMigrated)
+            }
+        } else {
+            return {}
+        }
+    }
+    
     async getDeviceId() {
         let select = await executeSQL(`SELECT deviceId FROM MetaInfo;`);
         if (select.rows && select.rows.length && select.rows.item(0)) {

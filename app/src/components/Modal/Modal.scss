@@ -25,4 +25,10 @@
     .modal-inner {
         padding: 11px 16px;
     }
+
+    .action-buttons-wrapper {
+        display: flex;
+        padding-top: 10px;
+        justify-content: flex-end;
+    }
 }

@@ -24,6 +24,16 @@ a {
 
 
 
+// text
+h3 {
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+
+
 // LAYOUT
 #root {
     height: 100%;    
@@ -107,6 +117,7 @@ button,
             display: inline-block;
             background: transparent;
             color: #222;
+            font-weight: 600;
         }
 
         &.block {
@@ -224,6 +235,8 @@ select {
     color: #868383;
 }
 
-.ReactModal__Body--open #root {
-    // filter: blur(1px);
+
+
+button.google-in {
+    background: #db4437;
 }

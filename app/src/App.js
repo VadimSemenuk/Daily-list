@@ -76,21 +76,29 @@ export default class App extends Component {
     render() {
         return (
             this.state.appReady ?
-            <Provider store={store}>
-                <I18nextProvider i18n={i18n}>
-                    <Root />
-                </I18nextProvider>
-            </Provider>
+            (
+                <Provider store={store}>
+                    <I18nextProvider i18n={i18n}>
+                        <Root />
+                    </I18nextProvider>
+                </Provider>
+            )
             :
-            this.state.settings ?
-            <div className="init-loader-container">
-                <BeatLoader
-                    color={this.state.settings.theme.header}
-                    loading={true} 
-                />
-            </div>
-            :
-            <div>Loading settings</div>
+            (
+                this.state.settings ?
+                (
+                    <div className="init-loader-container">
+                        <BeatLoader
+                            color={this.state.settings.theme.header}
+                            loading={true} 
+                        />
+                    </div>
+                )
+                :
+                (
+                    <div>Loading settings</div>
+                )
+            )
         );
     }
 }

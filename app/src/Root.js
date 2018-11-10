@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {HashRouter, Route, Redirect} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import {translate} from "react-i18next";
 
 import * as AppActions from './actions'; 
 
@@ -17,14 +18,22 @@ import About from './pages/About/About';
 import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
 
+import authService from "./services/auth.service";
+
+import GoogleImg from './assets/img/google.svg';
+
 class Root extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { }
+        this.state = {
+            nextVersionMigrationModal: false
+        }
     }
 
     componentDidMount() {
+        this.nextVersionMigration();
+
         this.setKeyoardEvents();
 
         Modal.init();    
@@ -45,7 +54,31 @@ class Root extends Component {
         });
     }
        
+    async nextVersionMigration() {
+        if (!this.props.meta.nextVersionMigrated) {
+            if (this.props.user.id || 1) {
+                await authService.googleSignOut();
+                this.setState({
+                    nextVersionMigrationModal: true
+                })
+            }
+        }
+    }
+
+    discardNextVersionMigration = () => {
+        this.props.setNextVersionMigrationState(true);
+        this.closeDialog();
+    }
+
+    closeDialog = () => {
+        this.setState({
+            nextVersionMigrationModal: false
+        });
+    }
+
     render() {
+        let {t} = this.props;
+
         return (
             <HashRouter>
                 <div className="app-wrapper">
@@ -102,6 +135,24 @@ class Root extends Component {
                         component={About} 
                     />                                              
                     <Loader />
+
+                    <Modal 
+                        isOpen={this.state.nextVersionMigrationModal} 
+                        onRequestClose={this.closeDialog}
+                    >
+                        <h3>{t("re-enter-request-title")}</h3>
+                        <p>{t("re-enter-request-description")}</p>
+                        <button
+                            className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
+                            type="button"
+                            onClick={this.props.googleSignIn}
+                        ><img src={GoogleImg} />{t("google-sign-in")}</button>
+
+                        <div className="action-buttons-wrapper">
+                            <button className="text clear" onClick={this.discardNextVersionMigration}>{t("re-enter-discard-button")}</button>
+                            <button className="text clear" onClick={this.closeDialog}>{t("re-enter-later-button")}</button>
+                        </div>
+                    </Modal>
                 </div>
             </HashRouter>
         );
@@ -111,7 +162,9 @@ class Root extends Component {
 function mapStateToProps(state, props) {
     return {
         settings: state.settings,
-        password: state.password
+        password: state.password,
+        user: state.user,
+        meta: state.meta     
     }
 }
 
@@ -119,4 +172,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null)(Root);
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps, null)(Root));

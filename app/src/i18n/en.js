@@ -122,5 +122,10 @@ export default {
     "specify-btn": "Select",
 
     // note-item
-    "attached-image": "Attached image"
+    "attached-image": "Attached image",
+    
+    "re-enter-request-title": "Please log in again to complete the update",
+    "re-enter-request-description": "The application will save your backups. This is necessary for further normal operation. Backup data will not be overwritten",
+    "re-enter-later-button": "Later",
+    "re-enter-discard-button": "Not show anymore",
 } 
