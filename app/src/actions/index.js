@@ -339,21 +339,8 @@ export function restoreBackup() {
         return backupService.restoreNotesBackup(token)
             .then((isUpdated) => {
                 dispatch(triggerLoader());
-                // isUpdated && window.location.reload(true);
+                isUpdated && window.location.reload(true);
             });
-    }
-}
-
-export function getBackupFile(token) {
-    return function(dispatch) {
-        dispatch(triggerLoader());
-
-        return backupService.getBackupFile(token).then((backupFile) => {
-            if (backupFile) {
-                dispatch(setToken({...token, backupFile: backupFile}));
-            }
-            dispatch(triggerLoader());
-        });
     }
 }
 
