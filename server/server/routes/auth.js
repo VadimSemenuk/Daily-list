@@ -36,6 +36,7 @@ module.exports = function (authRep) {
 		if (!ticket) {
 			res.status(500);
 			res.end();
+			return;
 		}
 
 		const payload = ticket.getPayload();

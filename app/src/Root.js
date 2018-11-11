@@ -61,6 +61,8 @@ class Root extends Component {
                 this.setState({
                     nextVersionMigrationModal: true
                 })
+            } else {
+                this.props.setNextVersionMigrationState(true);
             }
         }
     }
