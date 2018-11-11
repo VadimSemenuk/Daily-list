@@ -55,7 +55,7 @@ class AuthService {
                 }
             })            
             .catch((err) => console.warn(err));
-        if (!accessToken) {
+        if (!user) {
             window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));            
             return {};
         }
