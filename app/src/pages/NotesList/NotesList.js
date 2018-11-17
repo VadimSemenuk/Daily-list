@@ -297,9 +297,8 @@ function sort (data, settings) {
     let notesCompareFn = getNotesCompareFn();
 
     return data.map((list) => {
-        list.items.sort((a, b) => {
-            return notesCompareFn(a, b);
-        });
+        list.items.sort((a, b) => notesCompareFn(a, b));
+        list.items.sort((a, b) => b.priority - a.priority);
         return list;
     })
 

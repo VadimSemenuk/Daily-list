@@ -120,6 +120,11 @@ export default {
     "update-all": "Абнавіць усе",
     "update-shadow": "Абнавіць толькі не закранутыя",
     "specify-btn": "Пазначыць",
+    "priority": "Прыярытэт",
+    "priority-very-high": "Вельмі высокі",
+    "priority-high": "Высокі",
+    "priority-medium": "Сярэдні",
+    "priority-low": "Нізкі",
 
     // note-item
     "attached-image": "Прымацаванаы малюнак",

@@ -5,47 +5,12 @@ import notificationService from "./notification.service";
 
 window.e = executeSQL;
 
-let tags = [
-    'transparent',
-    '#00213C',
-    '#c5282f',
-    '#62A178',
-    '#3498DB',
-    '#BF0FB9',
-    '#9A6B00',
-    '#9CECC5',
-    '#e2dd2d',
-    '#e23494',
-    '#7e17dc',
-    '#333',
-    "#bfbfbf"
-];
-
-let repeatOptions = [
-    {
-        val: "no-repeat",
-        translateId: "repeat-type-no-repeat"
-    },
-    {
-        val: "day",
-        translateId: "repeat-type-day"
-    },
-    {
-        val: "week",
-        translateId: "repeat-type-week"
-    },
-    {
-        val: "any",
-        translateId: "repeat-type-any"
-    }
-];
-
 class NotesService {
     async getDayNotes(date) {
         let currentDate = date.valueOf();
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
-            t.dynamicFields, t.finished, t.forkFrom,
+            t.dynamicFields, t.finished, t.forkFrom, t.priority,
             CASE t.added WHEN ? THEN 0 ELSE 1 END as isShadow,
             ? as added
             FROM Tasks t
@@ -130,9 +95,9 @@ class NotesService {
 
         let insert = await executeSQL(
             `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, isSynced, isLastActionSynced, repeatType,
-                dynamicFields, finished, added, forkFrom)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -151,7 +116,8 @@ class NotesService {
                 JSON.stringify(note.dynamicFields),
                 Number(note.finished),
                 isShadow ? -1 : note.added.valueOf(),
-                note.forkFrom
+                note.forkFrom,
+                note.priority
             ]
         ).catch((err) => console.warn(err));
 
@@ -228,7 +194,7 @@ class NotesService {
         await executeSQL(
             `UPDATE Tasks
             SET title = ?, added = ?, startTime = ?, endTime = ?, startTimeCheckSum = ?, endTimeCheckSum = ?, notificate = ?, tag = ?, 
-                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0
+                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0, priority = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -243,6 +209,7 @@ class NotesService {
                 nextNote.lastActionTime,
                 nextNote.repeatType,
                 JSON.stringify(nextNote.dynamicFields),
+                nextNote.priority,
                 nextNote.key
             ]
         ).catch((err) => console.log('Error: ', err));
@@ -372,7 +339,7 @@ class NotesService {
 
         let select = await executeSQL(`
             SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced,
-                t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, tr.repeatValues
+                t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, tr.repeatValues, t.priority
 			FROM (
 				SELECT t.id, GROUP_CONCAT(rep.value, ',') as repeatValues
             	FROM Tasks t
@@ -403,7 +370,7 @@ class NotesService {
         }
 
         let valuesString = notes.reduce((accumulator) => {
-            return `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            return `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         }, "");
         valuesString = valuesString.slice(2);
 
@@ -428,14 +395,15 @@ class NotesService {
                 note.dynamicFields,
                 note.finished,
                 note.added,
-                note.forkFrom
+                note.forkFrom,
+                note.priority
             ]
         }, []);
 
         let insert = await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
-                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom)
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
             VALUES
             ${valuesString};
         `, values).catch((err) => console.warn(err));
@@ -481,16 +449,50 @@ class NotesService {
         }
     }
 
+    tags = [
+        'transparent',
+        '#00213C',
+        '#c5282f',
+        '#62A178',
+        '#3498DB',
+        '#BF0FB9',
+        '#9A6B00',
+        '#9CECC5',
+        '#e2dd2d',
+        '#e23494',
+        '#7e17dc',
+        '#333',
+        "#bfbfbf"
+    ];
+    
+    repeatOptions = [
+        { val: "no-repeat", translateId: "repeat-type-no-repeat" },
+        { val: "day", translateId: "repeat-type-day" },
+        { val: "week", translateId: "repeat-type-week" },
+        { val: "any", translateId: "repeat-type-any" }
+    ];
+    
+    priorityOptions = [
+        { val: 4, translateId: "priority-very-high" },
+        { val: 3, translateId: "priority-high" },
+        { val: 2, translateId: "priority-medium" },
+        { val: 1, translateId: "priority-low" },    
+    ];
+
     getTags() {
-        return [...tags];
+        return [...this.tags];
     }
 
     getTagByIndex(index) {
-        return tags[index];
+        return this.tags[index];
     }
 
     getRepeatTypeOptions() {
-        return [...repeatOptions]
+        return [...this.repeatOptions]
+    }
+
+    getPriorityOptions() {
+        return [...this.priorityOptions]
     }
 }
 

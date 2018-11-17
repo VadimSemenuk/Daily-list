@@ -120,6 +120,11 @@ export default {
     "update-all": "Update all",
     "update-shadow": "Update only not touched",
     "specify-btn": "Select",
+    "priority": "Priority",
+    "priority-very-high": "Very high",
+    "priority-high": "High",
+    "priority-medium": "Medium",
+    "priority-low": "Low",
 
     // note-item
     "attached-image": "Attached image",

@@ -54,7 +54,7 @@ export let ListItem = (props) => (
 
 export let ValueListItem = (props) => (
     <button 
-        className={`list-item trigger-list-item ${props.triggerValue ? " active" : ""}  ${props.className}`}
+        className={`list-item trigger-list-item${props.triggerValue ? " active" : ""}  ${props.className}`}
         onClick={props.onClick}                                
     >
         <span className="list-item-text">{props.text}</span>

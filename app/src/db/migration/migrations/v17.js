@@ -8,7 +8,8 @@ export default {
 
     async run() {
         await addUUID();
-        await addIsRatedField();
+        await addMetaTable();
+        await alterTasksTable();
 
         let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
         if (!token.id) {
@@ -40,7 +41,7 @@ export default {
             `, updateValues);
         }
 
-        async function addIsRatedField () {
+        async function addMetaTable () {
             await execureSQL(`ALTER TABLE MetaInfo RENAME TO MetaInfo_OLD;`);
 
             await execureSQL(`
@@ -62,6 +63,84 @@ export default {
             `);
 
             await execureSQL(`DROP TABLE MetaInfo_OLD;`);
+        }
+
+        async function alterTasksTable () {
+            let msNow = +new Date(); 
+            await execureSQL(`ALTER TABLE Tasks RENAME TO Tasks_OLD;`);
+            await execureSQL(`                           
+                CREATE TABLE IF NOT EXISTS Tasks
+                (
+                    id INTEGER PRIMARY KEY,
+                    uuid TEXT,
+                    title TEXT,
+                    added INTEGER,
+                    finished INTEGER,
+                    dynamicFields TEXT,
+                    startTime INTEGER,
+                    endTime INTEGER,
+                    startTimeCheckSum, 
+                    endTimeCheckSum,
+                    notificate INTEGER,
+                    tag TEXT,
+                    isSynced INTEGER,
+                    isLastActionSynced INTEGER,
+                    lastAction TEXT,
+                    lastActionTime INTEGER,
+                    userId INTEGER,
+                    repeatType INTEGER,
+                    forkFrom INTEGER,
+                    priority INTEGER,
+                    UNIQUE (uuid) ON CONFLICT REPLACE
+                );
+            `);
+
+            await execureSQL(`
+                INSERT INTO Tasks (
+                    id, 
+                    title, 
+                    added,
+                    finished,
+                    dynamicFields,
+                    startTime, 
+                    endTime, 
+                    startTimeCheckSum, 
+                    endTimeCheckSum,
+                    notificate, 
+                    tag, 
+                    isSynced,
+                    isLastActionSynced,
+                    lastAction,
+                    lastActionTime,
+                    userId,
+                    repeatType,
+                    forkFrom,
+                    priority
+                ) 
+                SELECT
+                    id, 
+                    title, 
+                    added,
+                    finished,
+                    dynamicFields,
+                    startTime, 
+                    endTime, 
+                    startTimeCheckSum, 
+                    endTimeCheckSum,
+                    notificate, 
+                    tag, 
+                    isSynced,
+                    isLastActionSynced,
+                    lastAction,
+                    lastActionTime,
+                    userId,
+                    repeatType,
+                    forkFrom,
+                    2 as priority
+                FROM Tasks_OLD;
+            `);
+
+            await execureSQL(`DROP TABLE Tasks_OLD;`);
         }
     }
 }

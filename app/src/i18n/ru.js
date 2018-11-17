@@ -120,6 +120,11 @@ export default {
     "update-all": "Обновить все",
     "update-shadow": "Обновить только не затронутые",
     "specify-btn": "Указать",
+    "priority": "Приоритет",
+    "priority-very-high": "Очень высокий",
+    "priority-high": "Высокий",
+    "priority-medium": "Средний",
+    "priority-low": "Низкий",
 
     // note-item
     "attached-image": "Прикрепленное изображение",

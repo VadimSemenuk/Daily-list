@@ -7,13 +7,14 @@ import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
-import {ModalListItem, ButtonListItem} from "../../components/ListItem/ListItem";
+import {ModalListItem, ButtonListItem, ValueListItem} from "../../components/ListItem/ListItem";
 import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/RemovableTextCheckBox';
 import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
+import Radio from '../../components/Radio/Radio';
 
 import notesService from '../../services/notes.service';
 
@@ -40,11 +41,13 @@ class Add extends Component {
             finished: false,
             repeatType: "no-repeat",
             repeatDates: [moment(this.props.date).valueOf()],
+            priority: 2,
 
             calendar: false,
             pictureModal: false,
             prevNote: null,
-            editRepeatableDialog: false
+            editRepeatableDialog: false,
+            addAdditioanlsViewHidden: false
         }
 
         this.tags = notesService.getTags();
@@ -198,6 +201,8 @@ class Add extends Component {
 
     render() {
         let {t} = this.props;
+        let priorityOptions = notesService.getPriorityOptions();
+        let selectedPriorityOption = priorityOptions.find((a) => a.val === this.state.priority);
 
         return (
             <div className="page-wrapper">
@@ -327,9 +332,16 @@ class Add extends Component {
                         </div>
                     </div>
                     <div 
-                        className="add-additionals-wrapper hide-with-active-keyboard" 
+                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}`}
                         style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
                     >
+                        <div 
+                            className="toggle-icon-wrapper"
+                            onClick={() => this.setState({addAdditioanlsViewHidden: !this.state.addAdditioanlsViewHidden})}
+                        >
+                            <div className="line"></div>
+                        </div>
+
                         <TimeSet
                             notificate={this.state.notificate}
                             startTime={this.state.startTime}
@@ -341,6 +353,29 @@ class Add extends Component {
                             mode={this.props.match.path === "/edit" ? "edit" : "add"}
                             onStateChange={(time) => this.setState({...time})} 
                         />
+
+                        <ModalListItem
+                            className="tiny priority-select"
+                            text={t("priority")} 
+                            value={t(selectedPriorityOption.translateId)}
+                            listItem={ValueListItem}
+                        >
+                            <div className="radio-group">
+                                {
+                                    priorityOptions.map((setting, i) => (
+                                        <Radio
+                                            key={i}
+                                            name="repeat-type"
+                                            checked={this.state.priority === setting.val}
+                                            value={setting.val}
+                                            onChange={(val) => this.setState({priority: +val})}
+                                            text={t(setting.translateId)}
+                                        />
+                                    ))
+                                }
+                            </div>
+                        </ModalListItem>
+
                         <ColorPicker 
                             onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}
                             value={this.state.tag}
