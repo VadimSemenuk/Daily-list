@@ -12,7 +12,8 @@ class NotificationService {
             let notificationConfig = {
                 title: note.title || 'Уведомление о заметке',
                 text: this.getMessgae(note),
-                id
+                id,
+                sound: true
             }
 
             switch(note.repeatType) {

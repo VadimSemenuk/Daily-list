@@ -21,12 +21,6 @@ class SettingsBackup extends Component {
         super(props);  
     }
 
-    componentDidMount() {
-        if (this.props.user.id) {
-            this.props.getBackupFile(this.props.user);
-        }
-    }
-
     render () {
         let {t} = this.props;
         
@@ -80,14 +74,14 @@ class SettingsBackup extends Component {
                                 ><img src={ExportImg} />{t("create-backup")}</button>
 
                                 <button 
-                                    className={`text block img-text-button${(this.props.loader || !this.props.user.backupFile.id) ? " disabled" : ""}`} 
+                                    className={`text block img-text-button${(this.props.loader || !this.props.user.backup.lastBackupTime) ? " disabled" : ""}`} 
                                     type="button"
                                     onClick={() => this.props.restoreBackup()}
                                 ><img src={ImportImg} />{t("restore-backup")}</button>
                             </div>
                             {
-                                this.props.user.backupFile.id &&
-                                <div className="backup-file-date">{t("copy")} {moment(this.props.user.backupFile.modifiedTime).format('LLL')}</div>
+                                this.props.user.backup.lastBackupTime &&
+                                <div className="backup-file-date">{t("copy")} {moment(this.props.user.backup.lastBackupTime).format('LLL')}</div>
                             }
                         </div>
                     }

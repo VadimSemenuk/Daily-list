@@ -55,7 +55,11 @@
         height: 178px;  
         padding: 0 10px;         
         background: #fafafa;
-        border-top: 1px solid #e7e7e7;
+        border: 1px solid #e7e7e7;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        border-bottom: 0;
+        margin: 0 -1px;
 
         &.hidden {
             display: none;

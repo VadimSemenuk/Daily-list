@@ -226,6 +226,7 @@ export function googleSignIn() {
             
             if (!getState().meta.nextVersionMigrated) {
                 dispatch(uploadBatchBackup());
+                dispatch(setNextVersionMigrationState(true));
             }
 
             return dispatch({

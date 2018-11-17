@@ -1,6 +1,6 @@
 export default {
     appId: "com.dailylist.vadimsemenyk",
-    apiURL: "http://localhost:3001/api",
+    apiURL: "http://192.168.100.2:3001/api",
     // apiURL: "http://52.14.213.196/api",
     LSTokenKey: "com.dailylist.vadimsemenyk.token",
     defaultLang: "en",

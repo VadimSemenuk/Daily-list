@@ -11,10 +11,10 @@ class AuthService {
 
         if (!window.cordova) {
             let token = {
-                id: googleUser.userId,
-                email: googleUser.email,
-                name: googleUser.displayName,
-                picture: googleUser.imageUrl,
+                id: 1,
+                email: "vadim54787@gmail.com",
+                name: "Vadim",
+                picture: "",
                 token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNTQxOTY5OTkzfQ.HPgRP7wjr-cN8d-U6PKsA-8r4ehuFgyBmOpE3hSYrEY",
                 backup: {
                     lastBackupTime: null,
@@ -25,6 +25,8 @@ class AuthService {
             }
 
             this.setToken(token);
+
+            return 
         }
 
         let googleUser = await new Promise((resolve, reject) => {
@@ -42,9 +44,17 @@ class AuthService {
             return {};
         }
 
-        let user = await fetch("/auth/sign-in-google", {
+        console.log(googleUser);
+        console.log(JSON.stringify({
+            idToken: googleUser.idToken
+        }));
+
+        let user = await fetch(`${config.apiURL}/auth/sign-in-google`, {
             method: "POST",
             credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 idToken: googleUser.idToken
             })
