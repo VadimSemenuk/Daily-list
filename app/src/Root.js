@@ -33,10 +33,9 @@ class Root extends Component {
 
     componentDidMount() {
         this.nextVersionMigration();
-
         this.setKeyoardEvents();
-
-        Modal.init();    
+        Modal.init();  
+        this.backupNotes();
     }
 
     setKeyoardEvents() {
@@ -76,6 +75,17 @@ class Root extends Component {
         this.setState({
             nextVersionMigrationModal: false
         });
+    }
+
+    backupNotes = () => {
+        if (
+            this.props.meta.nextVersionMigrated && 
+            this.props.user.id && 
+            this.props.user.settings.autoBackup &&
+            navigator.connection.type !== window.Connection.NONE
+        ) {
+            this.props.uploadBatchBackup();
+        }   
     }
 
     render() {
