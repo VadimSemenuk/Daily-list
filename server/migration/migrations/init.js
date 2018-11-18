@@ -20,7 +20,8 @@ module.exports.up = async (db) => {
         (
             uuid VARCHAR UNIQUE,
             note JSON,
-            userId INTEGER references Users(id)
+            userId INTEGER references Users(id),
+            datetime timestamp with time zone
         )
 
         CREATE TABLE LoadLogs 

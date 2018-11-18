@@ -249,13 +249,27 @@ module.exports = class {
 
     backup(note, userId) {
         return this.db.query(`
-            INSERT INTO NotesBackups (uuid, note, userId)
-            VALUES ($uuid, $note, $userId);
+            INSERT INTO NotesBackups (uuid, note, userId, datetime)
+            VALUES ($uuid, $note, $userId, $datetime);
         `, {
             uuid: note.uuid,
             note: JSON.stringify(note),
-            userId: userId
+            userId: userId,
+            datetime: new Date()
         })
+    }
+
+    async backupBatch(notes, userId) {
+        if (!notes || !notes.length) {
+            return; 
+        }
+        let date = new Date();
+        let values = notes.map((note) => {
+            return [note.uuid, note, userId, date];
+        });
+        let sql = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, values);
+
+        return this.db.query(sql);
     }
 
     updateBackup(note) {
@@ -279,15 +293,15 @@ module.exports = class {
         return select.rows;
     }
 
-    async backupBatch(notes, userId) {
-        if (!notes || !notes.length) {
-            return; 
-        }
-        let values = notes.map((note, i) => {
-            return [note.uuid, note, userId];
-        });
-        let sql = format(`INSERT INTO NotesBackups (uuid, note, userId) VALUES %L`, values);
+    async getUserLastBackupTime(userId) {
+        let select = await this.db.query(`
+            SELECT datetime
+            FROM NotesBackups
+            WHERE userId = $userId
+            ORDER BY datetime
+            Limit 1
+        `, {userId});
 
-        return this.db.query(sql);
+        return select.rows[0] ? select.rows[0].datetime : null;
     }
 };

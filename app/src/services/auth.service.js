@@ -26,7 +26,7 @@ class AuthService {
 
             this.setToken(token);
 
-            return 
+            return token;
         }
 
         let googleUser = await new Promise((resolve, reject) => {

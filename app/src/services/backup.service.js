@@ -1,11 +1,9 @@
 import i18next from 'i18next';
+import moment from 'moment';
 
-import filesService from "./files.service";
-import authService from "./auth.service";
 import notesService from "./notes.service";
 
 import config from "../config/config";
-import moment from 'moment';
 
 class BackupService {
     async restoreNotesBackup(token) {
@@ -85,8 +83,7 @@ class BackupService {
                 "Authorization": token.token
             },
             body: JSON.stringify({
-                note,
-                date: moment()
+                note
             })
         })
             .then((res) => {
@@ -100,6 +97,31 @@ class BackupService {
             });
 
         return isBackuped;
+    }
+
+    async getUserLastBackupTime(token) {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            return
+        }
+
+        let time = await fetch(`${config.apiURL}/notes/backup/user-last-backup-time`, {
+            method: "GET",
+            credentials: "same-origin",
+            headers: {
+                "Authorization": token.token
+            },
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    return res.json();
+                }
+            })            
+            .catch((err) => {
+                console.warn(err)
+                return null;
+            });
+
+        return time;
     }
 }
 

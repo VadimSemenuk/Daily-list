@@ -21,6 +21,10 @@ class SettingsBackup extends Component {
         super(props);  
     }
 
+    componentDidMount() {
+        this.props.updateLastBackupTime();
+    }
+
     render () {
         let {t} = this.props;
         

@@ -36,7 +36,7 @@ module.exports = function (notesRep) {
         res.end();
     });
 
-    router.post("/apply-local-changes", passport.authenticate("jwt", {session: false}), async (req, res, next) => {
+    router.post("/apply-local-changes",  async (req, res, next) => {
         await notesRep.applyLocalChanges(req.body.notSynkedLocalNotes, req.body.deviceId, req.user);
         res.end();
     })
@@ -47,6 +47,19 @@ module.exports = function (notesRep) {
 
     router.post('/backup', (req, res, next) => {
         notesRep.backup(req.body.note, 1)
+            .then((insert) => {
+                let inserted = insert ? Boolean(insert.rowCount) : false;
+                res.send(inserted); 
+            })
+            .catch((err) => {
+                console.warn(err);
+                res.status(500);
+                res.end();
+            })
+    });
+
+    router.post('/backup/batch', (req, res, next) => {
+        notesRep.backupBatch(req.body.notes, 1)
             .then((insert) => {
                 let inserted = insert ? Boolean(insert.rowCount) : false;
                 res.send(inserted); 
@@ -83,11 +96,10 @@ module.exports = function (notesRep) {
             })
     });
 
-    router.post('/backup/batch', (req, res, next) => {
-        notesRep.backupBatch(req.body.notes, 1)
-            .then((insert) => {
-                let inserted = insert ? Boolean(insert.rowCount) : false;
-                res.send(inserted); 
+    router.get('/backup/user-last-backup-time', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+        notesRep.getUserLastBackupTime(req.user)
+            .then((time) => {
+                res.send(time); 
             })
             .catch((err) => {
                 console.warn(err);

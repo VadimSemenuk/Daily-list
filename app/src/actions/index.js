@@ -345,6 +345,30 @@ export function restoreBackup() {
     }
 }
 
+export function updateLastBackupTime() {
+    return function(dispatch, getState) {
+        dispatch(triggerLoader());
+
+        let token = getState().user;
+
+        return backupService.getUserLastBackupTime(token)
+            .then((time) => {
+                dispatch(triggerLoader());
+                if (!time) {
+                    return;
+                }
+                let nextToken = { 
+                    ...token, 
+                    backup: {
+                        ...token.backup,
+                        lastBackupTime: moment(time).valueOf()
+                    }  
+                };
+                dispatch(setToken(nextToken));
+            });
+    }
+}
+
 // meta
 export function setNextVersionMigrationState(state) {
     return function(dispatch) {
