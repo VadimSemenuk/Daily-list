@@ -44,11 +44,6 @@ class AuthService {
             return {};
         }
 
-        console.log(googleUser);
-        console.log(JSON.stringify({
-            idToken: googleUser.idToken
-        }));
-
         let user = await fetch(`${config.apiURL}/auth/sign-in-google`, {
             method: "POST",
             credentials: "same-origin",

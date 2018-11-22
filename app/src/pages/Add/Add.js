@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import Textarea from "react-textarea-autosize";
 import {translate} from "react-i18next";
 import moment from "moment";
 
@@ -9,6 +8,7 @@ import * as AppActions from '../../actions';
 
 import {ModalListItem, ButtonListItem, ValueListItem} from "../../components/ListItem/ListItem";
 import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/RemovableTextCheckBox';
+import RemovableTextArea from '../../components/RemovableTextArea/RemovableTextArea';
 import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
@@ -236,16 +236,16 @@ class Add extends Component {
                                     return null
                                 } else if (a.type === "text") {
                                     return (
-                                        <Textarea
-                                            type="text"
+                                        <RemovableTextArea
                                             placeholder={t("input-placeholder-text")}
                                             key={i} 
-                                            onChange={(e) => {
-                                                let dynamicFields = this.state.dynamicFields.slice()
-                                                dynamicFields[i].value = e.target.value;
-                                                this.setState({dynamicFields})
-                                            }}
                                             value={a.value}
+                                            onChange={(value) => {
+                                                let dynamicFields = this.state.dynamicFields.slice();
+                                                dynamicFields[i].value = value;
+                                                this.setState({dynamicFields});
+                                            }}
+                                            onListItemRemove={() => this.onDynamicItemRemove(i)}
                                         />
                                     )
                                 } else if (a.type === "listItem") {
@@ -255,12 +255,12 @@ class Add extends Component {
                                             onListItemRemove={(inputRef) => this.onDynamicItemRemove(i, inputRef)}
                                             onTextChange={(text) => {
                                                 let dynamicFields = this.state.dynamicFields.slice();
-                                                dynamicFields[i] = {...dynamicFields[i], value: text}                                          
+                                                dynamicFields[i] = {...dynamicFields[i], value: text};                                        
                                                 this.setState({dynamicFields});
                                             }}
                                             onValueChange={(value) => {
                                                 let dynamicFields = this.state.dynamicFields.slice();
-                                                dynamicFields[i] = {...dynamicFields[i], checked: value}                                            
+                                                dynamicFields[i] = {...dynamicFields[i], checked: value};                                         
                                                 this.setState({dynamicFields});
                                             }}
                                             onEnterPress={() => this.onEnterPress(i)}

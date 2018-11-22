@@ -64,13 +64,15 @@
         position: relative;
         transition: 100ms ease all;
         top: 0;
+        overflow: hidden;
 
         &.hidden {
             display: none;
         }
 
         &.hidden-triggered {
-            top: 193px; 
+            height: 20px;
+            flex-basis: 20px;
         }
 
         .color-picker-list-wrapper {

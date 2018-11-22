@@ -437,6 +437,13 @@ class NotesService {
             VALUES
             ${rdValuesString};
         `, rdValues).catch((err) => console.warn(err));
+
+
+
+        // notificationService.clear(addedNote.repeatType === "any" ? addedNote.repeatDates : [addedNote.key]);
+        // if (addedNote.notificate) {
+        //     notificationService.set(addedNote.key, addedNote);
+        // };
     }
 
     calculateTimeCheckSum (note) {
