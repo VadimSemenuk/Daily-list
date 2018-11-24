@@ -10,7 +10,7 @@ export default class RemovableTextArea extends PureComponent {
 
     render () {
         return (
-            <div className="removable-textarea-wrapper">
+            <div className={`removable-textarea-wrapper ${this.props.className || ""}`}>
                 <Textarea
                     className="textarea"
                     type="text"

@@ -266,7 +266,7 @@ class NotesService {
         ).catch((err) => console.warn(err));
         notificationService.clear(nextNote.repeatType === "any" ? nextNote.repeatDates : [nextNote.key]);
 
-        return nextNote
+        return nextNote;
     }
 
     async setNoteRepeat(note) {

@@ -18,7 +18,7 @@ export default class RemovableTextCheckBox extends PureComponent {
     render () {
         return (
             <div 
-                className="removable-text-checkbox-wrapper"
+                className={`removable-text-checkbox-wrapper ${this.props.className || ""}`}
                 ref={(a) => this.ref = a}
             >
                 <CheckBox 

@@ -5,7 +5,7 @@ import "./RemovableImage.scss";
 import RemoveImage from "../../assets/img/remove.png";
 
 export default (props) => (
-    <div className="attached-image-wrapper">
+    <div className={`attached-image-wrapper ${props.className}`}>
         <img 
             onClick={props.onClick}
             className="attached-image" 

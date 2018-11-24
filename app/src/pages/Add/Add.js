@@ -47,10 +47,11 @@ class Add extends Component {
             pictureModal: false,
             prevNote: null,
             editRepeatableDialog: false,
-            addAdditioanlsViewHidden: false
-        }
+            addAdditioanlsViewHidden: false,
+            tags: notesService.getTags()
+        };
 
-        this.tags = notesService.getTags();
+        this.activeInputIndex = -1;
     }
 
     async componentDidMount() {
@@ -68,26 +69,69 @@ class Add extends Component {
     }
 
     addInput = () => {
+        let field = {
+            type: "text",
+            value: ""
+        };
+        let nextDynamicFields;
+
+        if (this.activeInputIndex !== -1) {
+            nextDynamicFields = [...this.state.dynamicFields.slice(0, this.activeInputIndex), field, ...this.state.dynamicFields.slice(this.activeInputIndex)];
+        } else {
+            nextDynamicFields = [...this.state.dynamicFields, field]
+        }
+
         this.setState({
-            dynamicFields: [...this.state.dynamicFields, {
-                type: "text",
-                value: ""
-            }]
-        }, () => this.scrollToBottom())
+            dynamicFields: nextDynamicFields
+        }, () => {
+            let inputToFocus = null;
+            if (this.activeInputIndex) {
+                let inputs = document.querySelectorAll(".add-content-item");
+                inputToFocus = inputs[this.activeInputIndex + 1] && inputs[this.activeInputIndex + 1].querySelector("textarea");
+                this.activeInputIndex = -1;
+            } else {
+                let inputs = document.querySelectorAll(".removable-textarea-wrapper textarea");
+                if (inputs[inputs.length - 1]) {
+                    inputToFocus = inputs[inputs.length - 1];
+                }
+            }
+
+            inputToFocus && inputToFocus.focus();
+
+            this.scrollToBottom();
+        })
     }
 
     addListItem = () => {
+        let field = {
+            type: "listItem",
+            value: "",
+            checked: false
+        };
+        let nextDynamicFields;
+
+        if (this.activeInputIndex !== -1) {
+            nextDynamicFields = [...this.state.dynamicFields.slice(0, this.activeInputIndex), field, ...this.state.dynamicFields.slice(this.activeInputIndex)];
+        } else {
+            nextDynamicFields = [...this.state.dynamicFields, field]
+        }
+
         this.setState({
-            dynamicFields: [...this.state.dynamicFields,  {
-                type: "listItem",
-                value: "",
-                checked: false
-            }]
+            dynamicFields: nextDynamicFields
         }, () => {
-            let inputs = document.querySelectorAll(".removable-text-checkbox-wrapper input");
-            if (inputs[inputs.length - 1]) {
-                inputs[inputs.length - 1].focus();
+            let inputToFocus = null;
+            if (this.activeInputIndex) {
+                let inputs = document.querySelectorAll(".add-content-item");
+                inputToFocus = inputs[this.activeInputIndex + 1] && inputs[this.activeInputIndex + 1].querySelector("input");
+                this.activeInputIndex = -1;
+            } else {
+                let inputs = document.querySelectorAll(".removable-text-checkbox-wrapper input");
+                if (inputs[inputs.length - 1]) {
+                    inputToFocus = inputs[inputs.length - 1];
+                }
             }
+
+            inputToFocus && inputToFocus.focus();
             this.scrollToBottom();
         })
     }
@@ -129,15 +173,27 @@ class Add extends Component {
     }
 
     addSnapshootItem = (url) => {
+        let field = {
+            type: "snapshot",
+            uri: url
+        };
+        let nextDynamicFields;
+
+        if (this.activeInputIndex !== -1) {
+            nextDynamicFields = [...this.state.dynamicFields.slice(0, this.activeInputIndex), field, ...this.state.dynamicFields.slice(this.activeInputIndex)];
+        } else {
+            nextDynamicFields = [...this.state.dynamicFields, field]
+        }
+
         this.setState({
-            dynamicFields: [...this.state.dynamicFields,  {
-                type: "snapshot",
-                uri: url
-            }]
+            dynamicFields: nextDynamicFields
         }, () => this.scrollToBottom())
     }
 
     addCameraShot = async (sourceType) => {
+        this.addSnapshootItem("fff");
+        return 
+
         window.navigator.camera.getPicture(
             (a) => {
                 if (a) {
@@ -199,6 +255,14 @@ class Add extends Component {
         })
     }
 
+    catchFocusedInput = () => {
+        let activeElement = document.activeElement.closest(".add-content-item");
+
+        let nodes = Array.prototype.slice.call(document.querySelector(".add-content-wrapper").children);
+        let index = nodes.indexOf(activeElement);
+        this.activeInputIndex = index;
+    }
+
     render() {
         let {t} = this.props;
         let priorityOptions = notesService.getPriorityOptions();
@@ -224,7 +288,7 @@ class Add extends Component {
                 <div className="add-wrapper page-content">
                     <div className="add-content-wrapper">
                         <input
-                            className="title"
+                            className="title add-content-item"
                             type="text" 
                             placeholder={t("input-placeholder-title")}
                             value={this.state.title}
@@ -237,8 +301,9 @@ class Add extends Component {
                                 } else if (a.type === "text") {
                                     return (
                                         <RemovableTextArea
+                                            key={i}
+                                            className="add-content-item"
                                             placeholder={t("input-placeholder-text")}
-                                            key={i} 
                                             value={a.value}
                                             onChange={(value) => {
                                                 let dynamicFields = this.state.dynamicFields.slice();
@@ -252,6 +317,7 @@ class Add extends Component {
                                     return (
                                         <RemovableTextCheckBox 
                                             key={i} 
+                                            className="add-content-item"
                                             onListItemRemove={(inputRef) => this.onDynamicItemRemove(i, inputRef)}
                                             onTextChange={(text) => {
                                                 let dynamicFields = this.state.dynamicFields.slice();
@@ -272,6 +338,7 @@ class Add extends Component {
                                     return (
                                         <RemovableImage 
                                             key={i}
+                                            className="add-content-item"
                                             src={a.uri}
                                             onClick={() => this.showImage(i)}
                                             onRemove={() => this.onDynamicItemRemove(i)}
@@ -282,14 +349,20 @@ class Add extends Component {
                             })
                         }
                         <div className="add-actions-wrapper">
-                            <button onClick={this.addListItem}>
+                            <button
+                                onTouchStart={this.catchFocusedInput}
+                                onClick={this.addListItem}
+                            >
                                 <img
                                     src={AddGeryImg} 
                                     alt="tf"                                                                
                                 />   
                                 <span>{t("list-item-btn")}</span>     
                             </button>  
-                            <button onClick={this.addInput}>
+                            <button 
+                                onTouchStart={this.catchFocusedInput}                                
+                                onClick={this.addInput}
+                            >
                                 <img 
                                     src={AddGeryImg} 
                                     alt="lf"                                
@@ -301,8 +374,8 @@ class Add extends Component {
                                 ref={(r) => this.photoModal = r}
                                 listItem={(props) => (
                                     <button 
-                                        onClick={props.onClick}
                                         className="camera-button"
+                                        onTouchStart={this.catchFocusedInput}
                                     >
                                         <img 
                                             src={CameraImg} 
@@ -379,7 +452,7 @@ class Add extends Component {
                         <ColorPicker 
                             onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}
                             value={this.state.tag}
-                            colors={this.tags}
+                            colors={this.state.tags}
                         />
                     </div>
                 </div>
