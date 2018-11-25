@@ -101,11 +101,13 @@ class Add extends Component {
     }
 
     addInput = async () => {
+        console.log(1);
         let field = {
             type: "text",
             value: ""
         };
         await this.addField(field, this.activeInputIndex);
+        console.log(2);
 
         this.focusNext("textarea", ".removable-textarea-wrapper textarea", this.activeInputIndex);
         this.activeInputIndex = -1;
@@ -154,7 +156,8 @@ class Add extends Component {
         }
 
         this.setState({
-            dynamicFields: [...this.state.dynamicFields.slice(0, i), null, ...this.state.dynamicFields.slice(i + 1)] 
+            // dynamicFields: [...this.state.dynamicFields.slice(0, i), null, ...this.state.dynamicFields.slice(i + 1)] 
+            dynamicFields: [...this.state.dynamicFields.slice(0, i), ...this.state.dynamicFields.slice(i + 1)] 
         })
     }
 
@@ -169,8 +172,8 @@ class Add extends Component {
     }
 
     addCameraShot = async (sourceType) => {
-        this.addSnapshootItem("fff");
-        return 
+        // this.addSnapshootItem("fff");
+        // return 
 
         window.navigator.camera.getPicture(
             (a) => {
@@ -239,6 +242,10 @@ class Add extends Component {
         let nodes = Array.prototype.slice.call(document.querySelector(".add-content-wrapper").children);
         let index = nodes.indexOf(activeElement);
         this.activeInputIndex = index;
+
+        console.log(document.activeElement);
+        console.log(activeElement);
+        console.log(index)
     }
 
     render() {
