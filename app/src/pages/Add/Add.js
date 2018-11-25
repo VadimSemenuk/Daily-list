@@ -68,90 +68,76 @@ class Add extends Component {
         }
     }
 
-    addInput = () => {
+    addField(field, index) {
+        let nextDynamicFields;
+
+        if (index !== -1) {
+            nextDynamicFields = [...this.state.dynamicFields.slice(0, index), field, ...this.state.dynamicFields.slice(index)];
+        } else {
+            nextDynamicFields = [...this.state.dynamicFields, field]
+        }
+
+        return new Promise((resolve) => {
+            this.setState({
+                dynamicFields: nextDynamicFields
+            }, resolve)
+        });
+    }
+
+    focusNext(elementToFocusSelector, elementToFocusWrapperSelector, index) {
+        let inputToFocus = null;
+        if (index) {
+            let inputs = document.querySelectorAll(".add-content-item");
+            inputToFocus = inputs[index + 1] && inputs[index + 1].querySelector(elementToFocusSelector);
+            this.activeInputIndex = -1;
+        } else {
+            let inputs = document.querySelectorAll(elementToFocusWrapperSelector);
+            if (inputs[inputs.length - 1]) {
+                inputToFocus = inputs[inputs.length - 1];
+            }
+        }
+
+        inputToFocus && inputToFocus.focus();
+    }
+
+    addInput = async () => {
         let field = {
             type: "text",
             value: ""
         };
-        let nextDynamicFields;
+        await this.addField(field, this.activeInputIndex);
 
-        if (this.activeInputIndex !== -1) {
-            nextDynamicFields = [...this.state.dynamicFields.slice(0, this.activeInputIndex), field, ...this.state.dynamicFields.slice(this.activeInputIndex)];
-        } else {
-            nextDynamicFields = [...this.state.dynamicFields, field]
-        }
+        this.focusNext("textarea", ".removable-textarea-wrapper textarea", this.activeInputIndex);
+        this.activeInputIndex = -1;
 
-        this.setState({
-            dynamicFields: nextDynamicFields
-        }, () => {
-            let inputToFocus = null;
-            if (this.activeInputIndex) {
-                let inputs = document.querySelectorAll(".add-content-item");
-                inputToFocus = inputs[this.activeInputIndex + 1] && inputs[this.activeInputIndex + 1].querySelector("textarea");
-                this.activeInputIndex = -1;
-            } else {
-                let inputs = document.querySelectorAll(".removable-textarea-wrapper textarea");
-                if (inputs[inputs.length - 1]) {
-                    inputToFocus = inputs[inputs.length - 1];
-                }
-            }
-
-            inputToFocus && inputToFocus.focus();
-
-            this.scrollToBottom();
-        })
+        this.scrollToBottom();
     }
 
-    addListItem = () => {
+    addListItem = async () => {
         let field = {
             type: "listItem",
             value: "",
             checked: false
         };
-        let nextDynamicFields;
+        await this.addField(field, this.activeInputIndex);
 
-        if (this.activeInputIndex !== -1) {
-            nextDynamicFields = [...this.state.dynamicFields.slice(0, this.activeInputIndex), field, ...this.state.dynamicFields.slice(this.activeInputIndex)];
-        } else {
-            nextDynamicFields = [...this.state.dynamicFields, field]
-        }
+        this.focusNext("input", ".removable-text-checkbox-wrapper input", this.activeInputIndex);
+        this.activeInputIndex = -1;
 
-        this.setState({
-            dynamicFields: nextDynamicFields
-        }, () => {
-            let inputToFocus = null;
-            if (this.activeInputIndex) {
-                let inputs = document.querySelectorAll(".add-content-item");
-                inputToFocus = inputs[this.activeInputIndex + 1] && inputs[this.activeInputIndex + 1].querySelector("input");
-                this.activeInputIndex = -1;
-            } else {
-                let inputs = document.querySelectorAll(".removable-text-checkbox-wrapper input");
-                if (inputs[inputs.length - 1]) {
-                    inputToFocus = inputs[inputs.length - 1];
-                }
-            }
-
-            inputToFocus && inputToFocus.focus();
-            this.scrollToBottom();
-        })
+        this.scrollToBottom();
     }
 
-    onEnterPress = (i) => {
+    onEnterPress = async (i) => {
         let field = {
             type: "listItem",
             value: "",
             checked: false
         };
+        await this.addField(field, i + 1);
 
-        this.setState({
-            dynamicFields: [...this.state.dynamicFields.slice(0, i + 1), field, ...this.state.dynamicFields.slice(i + 1)]
-        }, () => {
-            let input = document.querySelector(".removable-text-checkbox-wrapper input:focus");
-            if (input) {
-                let next = input.parentElement.nextSibling.querySelector("input.content-input");
-                next.focus();
-            }
-        })
+        this.focusNext("input", ".removable-text-checkbox-wrapper input", i + 1);
+
+        this.scrollToBottom();
     }
 
     onDynamicItemRemove = (i, ref) => {
@@ -172,22 +158,14 @@ class Add extends Component {
         })
     }
 
-    addSnapshootItem = (url) => {
+    addSnapshootItem = async (url) => {
         let field = {
             type: "snapshot",
             uri: url
         };
-        let nextDynamicFields;
+        await this.addField(field, this.activeInputIndex);
 
-        if (this.activeInputIndex !== -1) {
-            nextDynamicFields = [...this.state.dynamicFields.slice(0, this.activeInputIndex), field, ...this.state.dynamicFields.slice(this.activeInputIndex)];
-        } else {
-            nextDynamicFields = [...this.state.dynamicFields, field]
-        }
-
-        this.setState({
-            dynamicFields: nextDynamicFields
-        }, () => this.scrollToBottom())
+        this.scrollToBottom();
     }
 
     addCameraShot = async (sourceType) => {
@@ -374,6 +352,7 @@ class Add extends Component {
                                 ref={(r) => this.photoModal = r}
                                 listItem={(props) => (
                                     <button 
+                                        onClick={props.onClick}
                                         className="camera-button"
                                         onTouchStart={this.catchFocusedInput}
                                     >
