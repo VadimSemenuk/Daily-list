@@ -149,6 +149,7 @@ class NotesList extends PureComponent {
         this.el = document.querySelector(".note-wrapper");
         this.el.style.position = "absolute";
         this.el.style.zIndex = "11";
+        this.el.style.width = "100px";
         this.lastElY = this.el.offsetTop;
     }
     lastY = null;
@@ -163,36 +164,34 @@ class NotesList extends PureComponent {
         // this.el.style.top = this.lastElY + "px";
         this.el.style.transform = `translate(0, ${this.lastElY + "px"})`;
 
-        let buf = [];
-        let container = document.querySelectorAll(".notes-list-item-wrapper > div")[1]
-        let elsDiff = Number.MAX_SAFE_INTEGER;
-        let minDiffIndex = 0;
+        let container = document.querySelectorAll(".notes-list-item-wrapper > div")[1];
         for (var i = 0; i < container.children.length; i++) {
             if (this.el.isSameNode(container.children[i])) {
                 continue;
             }
 
-            let elTop = container.children[i].offsetTop;
-            let elBot = container.children[i].offsetTop + container.children[i].clientHeight;
-
-            if (Math.abs((this.lastElY + 55) - elTop) < elsDiff) {
-                minDiffIndex = i;
-                elsDiff = Math.abs(this.lastElY - elTop);
+            let targetHalfPos = this.lastElY + (this.el.clientHeight / 2);
+            let curTop = container.children[i].offsetTop;
+            let curBot = container.children[i].offsetTop + container.children[i].clientHeight;
+            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {                
+                let curHalfPos = container.children[i].offsetTop + (container.children[i].clientHeight / 2);
+                if (targetHalfPos > curHalfPos) {
+                    for (var ii = 0; ii < container.children.length; ii++) {
+                        container.children[ii].style.marginBottom = "0px";   
+                        container.children[ii].style.marginTop = "0px";                    
+                    }
+                    container.children[i].style.marginBottom = this.el.clientHeight + "px";
+                }
+                if (targetHalfPos < curHalfPos) {
+                    for (var ii = 0; ii < container.children.length; ii++) {
+                        container.children[ii].style.marginBottom = "0px";   
+                        container.children[ii].style.marginTop = "0px";                    
+                    }
+                    container.children[i].style.marginTop = this.el.clientHeight + "px";
+                }
+                break;
             }
-            if (Math.abs((this.lastElY + 55) - elBot) < elsDiff) {
-                minDiffIndex = i;
-                elsDiff = Math.abs(this.lastElY - elTop);
-            }
-
-
-            buf.push([container.children[i].offsetTop, container.children[i].offsetTop + container.children[i].clientHeight]);
-            container.children[i].style.boxShadow = "none"; 
-            container.children[i].style.marginBottom = "0px";        
         }
-        console.log(minDiffIndex);
-        console.log(buf);
-        container.children[minDiffIndex].style.boxShadow = "0 0 4px 0 #000";
-        container.children[minDiffIndex].style.marginBottom = this.el.clientHeight + "px";
     }
 
     render() {
