@@ -51,26 +51,38 @@ class SortableList extends PureComponent {
             let targetHalfPos = this.lastElY + (this.el.clientHeight / 2);
             let curTop = container.children[i].offsetTop;
             let curBot = container.children[i].offsetTop + container.children[i].clientHeight;
-            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {                
+
+            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {    
                 let curHalfPos = container.children[i].offsetTop + (container.children[i].clientHeight / 2);
                 if (targetHalfPos > curHalfPos) {
-                    for (var ii = 0; ii < container.children.length; ii++) {
-                        container.children[ii].style.marginBottom = "0px";   
-                        container.children[ii].style.marginTop = "0px";                    
-                    }
+                    this.clearMargins(container);
                     container.children[i].style.marginBottom = this.el.clientHeight + "px";
                 }
                 if (targetHalfPos <= curHalfPos) {
-                    for (var ii = 0; ii < container.children.length; ii++) {
-                        container.children[ii].style.marginBottom = "0px";   
-                        container.children[ii].style.marginTop = "0px";                    
-                    }
+                    this.clearMargins(container);
                     container.children[i].style.marginTop = this.el.clientHeight + "px";
                 }
                 break;
             }
+
+            if (targetHalfPos < curTop && (!container.children[i - 1] || container.children[i - 1].isSameNode(this.el))) {
+                this.clearMargins(container);
+                container.children[i].style.marginTop = this.el.clientHeight + "px";
+            }
+
+            if (targetHalfPos > curBot && (!container.children[i + 1] || container.children[i + 1].isSameNode(this.el))) {
+                this.clearMargins(container);
+                container.children[i].style.marginTop = this.el.clientHeight + "px";
+            }
         }
-    }, 200);
+    }, 100);
+
+    clearMargins = (container) => {
+        for (var ii = 0; ii < container.children.length; ii++) {
+            container.children[ii].style.marginBottom = "0px";   
+            container.children[ii].style.marginTop = "0px";                    
+        }
+    }
 
     render() {
         return (
