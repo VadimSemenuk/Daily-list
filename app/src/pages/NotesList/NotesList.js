@@ -196,7 +196,8 @@ class NotesList extends PureComponent {
                                     className="notes-list-item-wrapper" 
                                     key={i}
                                 >
-                                    <SortableList 
+                                    <SortableList
+                                        index={i}
                                         notes={notes.items} 
                                         finSort={this.props.settings.sort.finSort}
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}

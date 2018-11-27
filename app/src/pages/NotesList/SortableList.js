@@ -9,6 +9,10 @@ class SortableList extends PureComponent {
         super(props);
     }
 
+    componentDidMount() {
+        this.items = document.querySelectorAll(".notes-list-item-wrapper > div > div")[this.props.index].children;
+    }
+
     onTouchStart = (e) => {
         this.el = e.target.closest(".note-scrollable-wrapper");
         this.lastElY = this.el.offsetTop;
@@ -16,6 +20,8 @@ class SortableList extends PureComponent {
         this.el.style.position = "absolute";
         this.el.style.zIndex = "11";
         this.el.style.width = "200px";
+
+        this.lastY = e.nativeEvent.touches[0].clientY;
     }
 
     onTouchEnd = (e) => {
@@ -25,73 +31,70 @@ class SortableList extends PureComponent {
 
         this.lastY = null;
         this.lastElY = 0;
+
+        this.clearMargins(this.items);
     }
 
     lastY = null;
     lastElY = 0;
     touchMove = (e) => {
-        if (this.lastY === null) {
-            this.lastY = e.nativeEvent.touches[0].clientY;
-        }
         let diff = e.nativeEvent.touches[0].clientY - this.lastY;
-        this.lastElY = this.lastElY + diff;
         this.lastY = e.nativeEvent.touches[0].clientY;
+        this.lastElY = this.lastElY + diff;
         this.el.style.top = this.lastElY + "px";
 
-        this.debouncedHandleTouchMove();
+        this.debouncedHandleTouchMove(this.items);
     }
 
-    debouncedHandleTouchMove = throttle(() => {
-        let container = document.querySelectorAll(".notes-list-item-wrapper > div > div")[1];
-        for (var i = 0; i < container.children.length; i++) {
-            if (this.el.isSameNode(container.children[i])) {
+    debouncedHandleTouchMove = throttle((items) => {
+        for (var i = 0; i < items.length; i++) {
+            if (this.el.isSameNode(items[i])) {
                 continue;
             }
 
             let targetHalfPos = this.lastElY + (this.el.clientHeight / 2);
-            let curTop = container.children[i].offsetTop;
-            let curBot = container.children[i].offsetTop + container.children[i].clientHeight;
+            let curTop = items[i].offsetTop;
+            let curBot = items[i].offsetTop + items[i].clientHeight;
 
             if (targetHalfPos >= curTop && targetHalfPos <= curBot) {    
-                let curHalfPos = container.children[i].offsetTop + (container.children[i].clientHeight / 2);
+                let curHalfPos = items[i].offsetTop + (items[i].clientHeight / 2);
                 if (targetHalfPos > curHalfPos) {
-                    this.clearMargins(container);
-                    container.children[i].style.marginBottom = this.el.clientHeight + "px";
+                    this.clearMargins(items);
+                    items[i].style.marginBottom = this.el.clientHeight + "px";
                 }
                 if (targetHalfPos <= curHalfPos) {
-                    this.clearMargins(container);
-                    container.children[i].style.marginTop = this.el.clientHeight + "px";
+                    this.clearMargins(items);
+                    items[i].style.marginTop = this.el.clientHeight + "px";
                 }
                 break;
             }
 
-            if (targetHalfPos < curTop && (!container.children[i - 1] || container.children[i - 1].isSameNode(this.el))) {
-                this.clearMargins(container);
-                container.children[i].style.marginTop = this.el.clientHeight + "px";
+            if (targetHalfPos < curTop && (!items[i - 1] || items[i - 1].isSameNode(this.el))) {
+                this.clearMargins(items);
+                items[i].style.marginTop = this.el.clientHeight + "px";
+                break;
             }
 
-            if (targetHalfPos > curBot && (!container.children[i + 1] || container.children[i + 1].isSameNode(this.el))) {
-                this.clearMargins(container);
-                container.children[i].style.marginTop = this.el.clientHeight + "px";
+            if (targetHalfPos > curBot && (!items[i + 1] || items[i + 1].isSameNode(this.el))) {
+                this.clearMargins(items);
+                items[i].style.marginTop = this.el.clientHeight + "px";
+                break;
             }
         }
     }, 100);
 
-    clearMargins = (container) => {
-        for (var ii = 0; ii < container.children.length; ii++) {
-            container.children[ii].style.marginBottom = "0px";   
-            container.children[ii].style.marginTop = "0px";                    
+    clearMargins = (items) => {
+        for (var i = 0; i < items.length; i++) {
+            items[i].style.marginBottom = "0px";   
+            items[i].style.marginTop = "0px";                    
         }
     }
 
     render() {
         return (
-            <div
-                onTouchMove={this.touchMove}
-            >
+            <div onTouchMove={this.touchMove}>
                 <DayNotesList 
                     {...this.props}
-
                     onTouchStart={this.onTouchStart}
                     onTouchEnd={this.onTouchEnd}
                 />
