@@ -6,7 +6,8 @@ import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
-import RepeatImg from "../../../assets/img/two-circling-arrows.svg"
+import RepeatImg from "../../../assets/img/two-circling-arrows.svg";
+import DragHandle from "../../../assets/img/drag-handle.svg";
 
 import './ListItem.scss';
 
@@ -64,7 +65,7 @@ class Note extends PureComponent {
                     onTouchStart={this.onTouchStart}
                     onTouchEnd={this.onTouchEnd}
                 >
-                    <img src={MoreImg} alt="drag" />
+                    <img src={DragHandle} alt="drag" />
                 </button>
                 <div
                     className={`note-wrapper ${this.state.expanded && 'expanded'}`} 

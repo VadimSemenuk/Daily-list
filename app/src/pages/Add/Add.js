@@ -172,9 +172,6 @@ class Add extends Component {
     }
 
     addCameraShot = async (sourceType) => {
-        // this.addSnapshootItem("fff");
-        // return 
-
         window.navigator.camera.getPicture(
             (a) => {
                 if (a) {
