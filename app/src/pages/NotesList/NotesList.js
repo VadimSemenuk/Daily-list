@@ -19,6 +19,8 @@ import * as AppActions from '../../actions';
 import sliderChangeSide from "../../utils/sliderChangeSide";
 import deepCopyObject from "../../utils/DeepCopyObject";
 
+import throttle from "../../utils/throttle";
+
 import './NotesList.scss';
 
 class NotesList extends PureComponent {
@@ -145,13 +147,24 @@ class NotesList extends PureComponent {
         })
     }
 
-    componentDidMount() {
-        this.el = document.querySelector(".note-wrapper");
+    onTouchStart = (e) => {
+        this.el = e.target.closest(".note-scrollable-wrapper");
+        this.lastElY = this.el.offsetTop;
+        this.el.style.top = this.lastElY + "px";
         this.el.style.position = "absolute";
         this.el.style.zIndex = "11";
-        this.el.style.width = "100px";
-        this.lastElY = this.el.offsetTop;
+        this.el.style.width = "200px";
     }
+
+    onTouchEnd = (e) => {
+        this.el.style.position = "static";
+        this.el.style.width = "auto";
+        this.el.style.top = "0";
+
+        this.lastY = null;
+        this.lastElY = 0;
+    }
+
     lastY = null;
     lastElY = 0;
     touchMove = (e) => {
@@ -161,9 +174,12 @@ class NotesList extends PureComponent {
         let diff = e.nativeEvent.touches[0].clientY - this.lastY;
         this.lastElY = this.lastElY + diff;
         this.lastY = e.nativeEvent.touches[0].clientY;
-        // this.el.style.top = this.lastElY + "px";
-        this.el.style.transform = `translate(0, ${this.lastElY + "px"})`;
+        this.el.style.top = this.lastElY + "px";
 
+        this.debouncedHandleTouchMove();
+    }
+
+    debouncedHandleTouchMove = throttle(() => {
         let container = document.querySelectorAll(".notes-list-item-wrapper > div")[1];
         for (var i = 0; i < container.children.length; i++) {
             if (this.el.isSameNode(container.children[i])) {
@@ -182,7 +198,7 @@ class NotesList extends PureComponent {
                     }
                     container.children[i].style.marginBottom = this.el.clientHeight + "px";
                 }
-                if (targetHalfPos < curHalfPos) {
+                if (targetHalfPos <= curHalfPos) {
                     for (var ii = 0; ii < container.children.length; ii++) {
                         container.children[ii].style.marginBottom = "0px";   
                         container.children[ii].style.marginTop = "0px";                    
@@ -192,7 +208,7 @@ class NotesList extends PureComponent {
                 break;
             }
         }
-    }
+    }, 200);
 
     render() {
         let {t} = this.props;
@@ -252,7 +268,8 @@ class NotesList extends PureComponent {
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
 
-                                        top={this.state.top}
+                                        onTouchStart={this.onTouchStart}
+                                        onTouchEnd={this.onTouchEnd}
                                     />
                                 </div>
                             ))
