@@ -70,7 +70,7 @@ class SetitngsService {
             let result = select.rows.item(0);
 
             return {
-                ...result, 
+                ...result,
                 defaultNotification: Boolean(result.defaultNotification),
                 fastAdd: Boolean(result.fastAdd),
                 theme: themesService.getThemeById(result.theme),

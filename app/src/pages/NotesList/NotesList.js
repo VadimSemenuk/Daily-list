@@ -145,11 +145,63 @@ class NotesList extends PureComponent {
         })
     }
 
+    componentDidMount() {
+        this.el = document.querySelector(".note-wrapper");
+        this.el.style.position = "absolute";
+        this.el.style.zIndex = "11";
+        this.lastElY = this.el.offsetTop;
+    }
+    lastY = null;
+    lastElY = 0;
+    touchMove = (e) => {
+        if (this.lastY === null) {
+            this.lastY = e.nativeEvent.touches[0].clientY;
+        }
+        let diff = e.nativeEvent.touches[0].clientY - this.lastY;
+        this.lastElY = this.lastElY + diff;
+        this.lastY = e.nativeEvent.touches[0].clientY;
+        // this.el.style.top = this.lastElY + "px";
+        this.el.style.transform = `translate(0, ${this.lastElY + "px"})`;
+
+        let buf = [];
+        let container = document.querySelectorAll(".notes-list-item-wrapper > div")[1]
+        let elsDiff = Number.MAX_SAFE_INTEGER;
+        let minDiffIndex = 0;
+        for (var i = 0; i < container.children.length; i++) {
+            if (this.el.isSameNode(container.children[i])) {
+                continue;
+            }
+
+            let elTop = container.children[i].offsetTop;
+            let elBot = container.children[i].offsetTop + container.children[i].clientHeight;
+
+            if (Math.abs((this.lastElY + 55) - elTop) < elsDiff) {
+                minDiffIndex = i;
+                elsDiff = Math.abs(this.lastElY - elTop);
+            }
+            if (Math.abs((this.lastElY + 55) - elBot) < elsDiff) {
+                minDiffIndex = i;
+                elsDiff = Math.abs(this.lastElY - elTop);
+            }
+
+
+            buf.push([container.children[i].offsetTop, container.children[i].offsetTop + container.children[i].clientHeight]);
+            container.children[i].style.boxShadow = "none"; 
+            container.children[i].style.marginBottom = "0px";        
+        }
+        console.log(minDiffIndex);
+        console.log(buf);
+        container.children[minDiffIndex].style.boxShadow = "0 0 4px 0 #000";
+        container.children[minDiffIndex].style.marginBottom = this.el.clientHeight + "px";
+    }
+
     render() {
         let {t} = this.props;
 
         return (
-            <div className="page-wrapper">
+            <div
+                onTouchMove={this.touchMove} 
+                className="page-wrapper">
                 <Header
                     page="notes"
                     onCalendarRequest={this.triggerCalendar}
@@ -200,6 +252,8 @@ class NotesList extends PureComponent {
                                         finSort={this.props.settings.sort.finSort}
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+
+                                        top={this.state.top}
                                     />
                                 </div>
                             ))

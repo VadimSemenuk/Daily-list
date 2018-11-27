@@ -46,11 +46,15 @@ class Note extends PureComponent {
         window.PhotoViewer.show(e.target.src, this.props.itemData.title, {share: false});         
     }
 
+    onTouchStart = (e) => {
+    }
+
     render () {
         let {t} = this.props;
         
         return (
-            <div 
+            <div
+                onTouchStart={this.onTouchStart}
                 className={`note-wrapper ${this.state.expanded && 'expanded'}`} 
                 onClick={this.triggerExpanded}
             >

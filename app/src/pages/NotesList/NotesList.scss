@@ -16,7 +16,8 @@
         }
 
         .notes-list-item-wrapper {
-            overflow-y: auto;
+            // overflow-y: auto;
+            overflow: hidden;
         }
 
         .no-content {
