@@ -36,9 +36,17 @@ class SortableList extends PureComponent {
         this.el.classList.add("dragging");
 
         this.lastY = e.nativeEvent.touches[0].clientY;
+
+        if (this.el.nextSibling) {
+            this.el.nextSibling.style.marginTop = this.el.clientHeight + "px";
+            this.prevCheckedEl = this.el.nextSibling;
+        } else if (this.el.prevSibling) {
+            this.el.prevSibling.style.marginBottom = this.el.clientHeight + "px";
+            this.prevCheckedEl = this.el.prevSibling;
+        }
     }
 
-    onTouchEnd = (e) => {
+    onTouchEnd = () => {
         this.el.classList.remove("dragging");
         this.hadlePrevCheckedEl();
 
@@ -57,7 +65,8 @@ class SortableList extends PureComponent {
     }
 
     debouncedHandleTouchMove = throttle((items) => {
-        let a = performance.now();
+        // if touchend remove margins
+
         for (var i = 0; i < items.length; i++) {
             if (this.el.isSameNode(items[i])) {
                 continue;
@@ -93,8 +102,6 @@ class SortableList extends PureComponent {
                 break;
             }
         }
-        let b = performance.now();
-        window.perf.push(b - a);
     }, 100);
 
     hadlePrevCheckedEl = (item) => {
