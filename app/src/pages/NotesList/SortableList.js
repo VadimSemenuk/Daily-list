@@ -4,9 +4,25 @@ import DayNotesList from './DayNotesList';
 
 import throttle from "../../utils/throttle";
 
+function avg(arr) {
+    let sum = arr.reduce(function(a, b) { return a + b; });
+    let avg = sum / arr.length;
+	return avg;
+}
+window.avg = avg;
+
 class SortableList extends PureComponent {
     constructor(props) {
         super(props);
+
+        this.items = null;
+
+        this.lastY = 0;
+        this.lastElY = 0;
+        this.el = null;
+        this.prevCheckedEl = null;
+
+        window.perf = [];
     }
 
     componentDidMount() {
@@ -14,29 +30,23 @@ class SortableList extends PureComponent {
     }
 
     onTouchStart = (e) => {
-        this.el = e.target.closest(".note-scrollable-wrapper");
+        this.el = e.target.closest(".note-draggable-wrapper");
         this.lastElY = this.el.offsetTop;
         this.el.style.top = this.lastElY + "px";
-        this.el.style.position = "absolute";
-        this.el.style.zIndex = "11";
-        this.el.style.width = "200px";
+        this.el.classList.add("dragging");
 
         this.lastY = e.nativeEvent.touches[0].clientY;
     }
 
     onTouchEnd = (e) => {
-        this.el.style.position = "static";
-        this.el.style.width = "auto";
-        this.el.style.top = "0";
+        this.el.classList.remove("dragging");
+        this.hadlePrevCheckedEl();
 
-        this.lastY = null;
-        this.lastElY = 0;
-
-        this.clearMargins(this.items);
+        setTimeout(() => {
+            this.hadlePrevCheckedEl();
+        }, 100);
     }
 
-    lastY = null;
-    lastElY = 0;
     touchMove = (e) => {
         let diff = e.nativeEvent.touches[0].clientY - this.lastY;
         this.lastY = e.nativeEvent.touches[0].clientY;
@@ -47,47 +57,52 @@ class SortableList extends PureComponent {
     }
 
     debouncedHandleTouchMove = throttle((items) => {
+        let a = performance.now();
         for (var i = 0; i < items.length; i++) {
             if (this.el.isSameNode(items[i])) {
                 continue;
             }
 
-            let targetHalfPos = this.lastElY + (this.el.clientHeight / 2);
-            let curTop = items[i].offsetTop;
-            let curBot = items[i].offsetTop + items[i].clientHeight;
+            let item = items[i];
 
-            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {    
-                let curHalfPos = items[i].offsetTop + (items[i].clientHeight / 2);
+            let targetHalfPos = this.lastElY + (this.el.clientHeight / 2);
+            let curTop = item.offsetTop;
+            let curBot = item.offsetTop + item.clientHeight;
+
+            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {   
+                let curHalfPos = item.offsetTop + (item.clientHeight / 2);
+                this.hadlePrevCheckedEl(item);
                 if (targetHalfPos > curHalfPos) {
-                    this.clearMargins(items);
-                    items[i].style.marginBottom = this.el.clientHeight + "px";
+                    item.style.marginBottom = this.el.clientHeight + "px";
                 }
                 if (targetHalfPos <= curHalfPos) {
-                    this.clearMargins(items);
-                    items[i].style.marginTop = this.el.clientHeight + "px";
+                    item.style.marginTop = this.el.clientHeight + "px";
                 }
                 break;
             }
 
             if (targetHalfPos < curTop && (!items[i - 1] || items[i - 1].isSameNode(this.el))) {
-                this.clearMargins(items);
-                items[i].style.marginTop = this.el.clientHeight + "px";
+                this.hadlePrevCheckedEl(item);
+                item.style.marginTop = this.el.clientHeight + "px";
                 break;
             }
 
             if (targetHalfPos > curBot && (!items[i + 1] || items[i + 1].isSameNode(this.el))) {
-                this.clearMargins(items);
-                items[i].style.marginTop = this.el.clientHeight + "px";
+                this.hadlePrevCheckedEl(item);
+                item.style.marginBottom = this.el.clientHeight + "px";
                 break;
             }
         }
+        let b = performance.now();
+        window.perf.push(b - a);
     }, 100);
 
-    clearMargins = (items) => {
-        for (var i = 0; i < items.length; i++) {
-            items[i].style.marginBottom = "0px";   
-            items[i].style.marginTop = "0px";                    
+    hadlePrevCheckedEl = (item) => {
+        if (this.prevCheckedEl) {
+            this.prevCheckedEl.style.marginBottom = "0px";   
+            this.prevCheckedEl.style.marginTop = "0px"; 
         }
+        this.prevCheckedEl = item;
     }
 
     render() {
