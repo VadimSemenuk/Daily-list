@@ -21,6 +21,7 @@ class SortableList extends PureComponent {
         this.lastElY = 0;
         this.el = null;
         this.prevCheckedEl = null;
+        this.isDragging = false;
 
         window.perf = [];
     }
@@ -44,15 +45,14 @@ class SortableList extends PureComponent {
             this.el.prevSibling.style.marginBottom = this.el.clientHeight + "px";
             this.prevCheckedEl = this.el.prevSibling;
         }
+
+        this.isDragging = true;
     }
 
     onTouchEnd = () => {
+        this.isDragging = false;
         this.el.classList.remove("dragging");
         this.hadlePrevCheckedEl();
-
-        setTimeout(() => {
-            this.hadlePrevCheckedEl();
-        }, 100);
     }
 
     touchMove = (e) => {
@@ -65,8 +65,6 @@ class SortableList extends PureComponent {
     }
 
     debouncedHandleTouchMove = throttle((items) => {
-        // if touchend remove margins
-
         for (var i = 0; i < items.length; i++) {
             if (this.el.isSameNode(items[i])) {
                 continue;
@@ -101,6 +99,10 @@ class SortableList extends PureComponent {
                 item.style.marginBottom = this.el.clientHeight + "px";
                 break;
             }
+        }
+
+        if (!this.isDragging) {
+            this.hadlePrevCheckedEl();
         }
     }, 100);
 
