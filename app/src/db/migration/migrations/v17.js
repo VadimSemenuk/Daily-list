@@ -10,6 +10,7 @@ export default {
         await addUUID();
         await addMetaTable();
         await alterTasksTable();
+        await forkFromFieldToUUID();
 
         let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
         if (!token.id) {
@@ -37,7 +38,7 @@ export default {
             return execureSQL(`
                 WITH Tmp(id, uuid) AS (VALUES ${updateValuesStr})
 	
-                UPDATE Tasks SET uuid = (SELECT uuid FROM  Tmp WHERE Tasks.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
+                UPDATE Tasks SET uuid = (SELECT uuid FROM Tmp WHERE Tasks.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
             `, updateValues);
         }
 
@@ -141,6 +142,19 @@ export default {
             `);
 
             await execureSQL(`DROP TABLE Tasks_OLD;`);
+        }
+
+        async function forkFromFieldToUUID() {
+            await execureSQL(`
+                update Tasks as t
+                set forkFrom =
+                    (
+                        select (select uuid from Tasks ttt where tt.forkFrom = ttt.id ) original
+                        from Tasks tt
+                        where t.id = tt.id
+                    )
+                where forkFrom != -1
+            `);
         }
     }
 }
