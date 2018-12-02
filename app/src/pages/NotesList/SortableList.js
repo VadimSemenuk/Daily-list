@@ -22,8 +22,6 @@ class SortableList extends PureComponent {
         this.el = null;
         this.prevCheckedEl = null;
         this.isDragging = false;
-
-        window.perf = [];
     }
 
     componentDidMount() {
@@ -56,6 +54,10 @@ class SortableList extends PureComponent {
     }
 
     touchMove = (e) => {
+        if (!this.isDragging) {
+            return;
+        }
+
         let diff = e.nativeEvent.touches[0].clientY - this.lastY;
         this.lastY = e.nativeEvent.touches[0].clientY;
         this.lastElY = this.lastElY + diff;
@@ -76,7 +78,7 @@ class SortableList extends PureComponent {
             let curTop = item.offsetTop;
             let curBot = item.offsetTop + item.clientHeight;
 
-            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {   
+            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {  
                 let curHalfPos = item.offsetTop + (item.clientHeight / 2);
                 this.hadlePrevCheckedEl(item);
                 if (targetHalfPos > curHalfPos) {
@@ -88,13 +90,25 @@ class SortableList extends PureComponent {
                 break;
             }
 
-            if (targetHalfPos < curTop && (!items[i - 1] || items[i - 1].isSameNode(this.el))) {
+            if (
+                targetHalfPos < curTop && 
+                (
+                    !items[i - 1] || 
+                    (items[i - 1].isSameNode(this.el) && (i - 1) === 0)
+                )
+            ) {
                 this.hadlePrevCheckedEl(item);
                 item.style.marginTop = this.el.clientHeight + "px";
                 break;
             }
 
-            if (targetHalfPos > curBot && (!items[i + 1] || items[i + 1].isSameNode(this.el))) {
+            if (
+                targetHalfPos > curBot && 
+                (
+                    !items[i + 1] || 
+                    (items[i + 1].isSameNode(this.el) && (i + 1) === (items.length - 1))
+                )
+            ) {
                 this.hadlePrevCheckedEl(item);
                 item.style.marginBottom = this.el.clientHeight + "px";
                 break;

@@ -1,4 +1,4 @@
-.note-scrollable-wrapper {
+.note-draggable-wrapper {
     display: flex;
     align-items: center;
 
@@ -8,6 +8,11 @@
 
     & > .note-wrapper {
         flex-grow: 1;
+    }
+
+    &.dragging {
+        position: absolute;
+        z-index: 3;
     }
 }
 

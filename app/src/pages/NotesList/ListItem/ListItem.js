@@ -59,9 +59,9 @@ class Note extends PureComponent {
         let {t} = this.props;
         
         return (
-            <div className="note-scrollable-wrapper">
+            <div className="note-draggable-wrapper">
                 <button
-                    className="scroll-button"
+                    className="drag-button"
                     onTouchStart={this.onTouchStart}
                     onTouchEnd={this.onTouchEnd}
                 >
