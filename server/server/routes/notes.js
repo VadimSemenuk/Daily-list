@@ -46,7 +46,7 @@ module.exports = function (notesRep) {
     // backup
 
     router.post('/backup', (req, res, next) => {
-        notesRep.backup(req.body.note, 1)
+        notesRep.saveBackup(req.body.note, req.user || 1)
             .then((insert) => {
                 let inserted = insert ? Boolean(insert.rowCount) : false;
                 res.send(inserted); 
@@ -59,7 +59,7 @@ module.exports = function (notesRep) {
     });
 
     router.post('/backup/batch', (req, res, next) => {
-        notesRep.backupBatch(req.body.notes, 1)
+        notesRep.saveBackupBatch(req.body.notes, req.user || 1)
             .then((insert) => {
                 let inserted = insert ? Boolean(insert.rowCount) : false;
                 res.send(inserted); 
@@ -72,7 +72,7 @@ module.exports = function (notesRep) {
     });
 
     router.put('/backup', (req, res, next) => {
-        notesRep.updateBackup(req.body.note)
+        notesRep.updateBackup(req.body.note, req.body.removeForkNotes)
             .then((update) => {
                 let updated = update ? Boolean(update.rowCount) : false;
                 res.send(updated);  
@@ -96,8 +96,8 @@ module.exports = function (notesRep) {
             })
     });
 
-    router.get('/backup/user-last-backup-time', passport.authenticate('jwt', {session: false}), (req, res, next) => {
-        notesRep.getUserLastBackupTime(req.user)
+    router.get('/backup/user-last-backup-time', (req, res, next) => {
+        notesRep.getUserLastBackupTime(req.user || 1)
             .then((time) => {
                 res.send(time); 
             })

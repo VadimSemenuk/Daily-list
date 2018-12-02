@@ -247,7 +247,7 @@ module.exports = class {
 
     // backup 
 
-    backup(note, userId) {
+    saveBackup(note, userId) {
         return this.db.query(`
             INSERT INTO NotesBackups (uuid, note, userId, datetime)
             VALUES ($uuid, $note, $userId, $datetime);
@@ -259,7 +259,7 @@ module.exports = class {
         })
     }
 
-    async backupBatch(notes, userId) {
+    async saveBackupBatch(notes, userId) {
         if (!notes || !notes.length) {
             return; 
         }
@@ -268,11 +268,20 @@ module.exports = class {
             return [note.uuid, note, userId, date];
         });
         let sql = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, values);
-
         return this.db.query(sql);
     }
 
-    updateBackup(note) {
+    async updateBackup(note, removeForkNotes) {
+        if (note.repeatType !== "no-repeat" && note.forked) {
+            let sql = format(`DELETE FROM NotesBackups WHERE uuid NOT IN (%L)`, note.forked);
+            this.db.query(sql);
+        }
+
+        if (note.repeatType !== "no-repeat" && note.forked && removeForkNotes) {
+            let sql = format(`DELETE FROM NotesBackups WHERE uuid IN %L`, note.forked);
+            await this.db.query(sql);
+        }
+
         return this.db.query(`
             UPDATE NotesBackups 
             SET note = $note

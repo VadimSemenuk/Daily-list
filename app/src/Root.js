@@ -82,7 +82,7 @@ class Root extends Component {
             this.props.meta.nextVersionMigrated && 
             this.props.user.id && 
             this.props.user.settings.autoBackup &&
-            window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine
+            window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine
         ) {
             this.props.uploadBatchBackup();
         }   

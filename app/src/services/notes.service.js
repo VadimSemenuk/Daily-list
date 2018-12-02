@@ -338,16 +338,12 @@ class NotesService {
         }
 
         let select = await executeSQL(`
-            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced,
-                t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, tr.repeatValues, t.priority
-			FROM (
-				SELECT t.id, GROUP_CONCAT(rep.value, ',') as repeatValues
-            	FROM Tasks t
-                LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-                ${dataSelectWhereStatement}
-				GROUP BY t.id
-			) tr
-			LEFT JOIN Tasks t ON t.id = tr.id;
+            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, 
+                t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, 
+                (select GROUP_CONCAT(tt.uuid, ',') from Tasks tt where tt.forkFrom = t.id) as forked,
+                (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatValues
+            FROM Tasks t
+            ${dataSelectWhereStatement};
         `, dataSelectParams).catch((err) => {
             console.warn(err);
             return null;
@@ -358,7 +354,7 @@ class NotesService {
         }
 
         let res = [];
-        for (let i = 0; i < select.rows.length; i++ ){
+        for (let i = 0; i < select.rows.length; i++ ) {
             res.push(select.rows.item(i));
         }
         return res;

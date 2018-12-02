@@ -98,7 +98,8 @@ export default {
 
             await execureSQL(`
                 INSERT INTO Tasks (
-                    id, 
+                    id,
+                    uuid, 
                     title, 
                     added,
                     finished,
@@ -120,6 +121,7 @@ export default {
                 ) 
                 SELECT
                     id, 
+                    uuid,
                     title, 
                     added,
                     finished,

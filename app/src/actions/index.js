@@ -54,7 +54,7 @@ export function updateNote (note, updateCount) {
             updateCount && dispatch(getFullCount(note.added.valueOf()));
 
             let token = getState().user;
-            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));        
+            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, true));        
         })
         .catch((err) => {
             console.warn(err);
@@ -262,19 +262,19 @@ export function setToken(token) {
 }
 
 // backup
-export function uploadBackup(note, token) {
+export function uploadBackup(note, token, removeForkNotes) {
     return function(dispatch, getState) {
         if (!token) {
             token = getState().user;
         }
 
-        return debouncedUploadBackup(note, token, dispatch);
+        return debouncedUploadBackup(note, token, removeForkNotes, dispatch);
     }
 }
-let debouncedUploadBackup = throttle((note, token, dispatch) => {
+let debouncedUploadBackup = throttle((note, token, removeForkNotes, dispatch) => {
     return notesService.getNoteForBackup(note.key)
         .then((noteForBackup) => {
-            return backupService.uploadNoteBackup(noteForBackup[0], token);
+            return backupService.uploadNoteBackup(noteForBackup[0], token, removeForkNotes);
         })
         .then((isBackuped) => {
             if (!isBackuped) {

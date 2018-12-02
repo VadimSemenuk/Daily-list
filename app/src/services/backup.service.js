@@ -64,7 +64,7 @@ class BackupService {
         return isBackuped;        
     }
 
-    async uploadNoteBackup(note, token) {
+    async uploadNoteBackup(note, token, removeForkNotes) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
             window.plugins.toast.showLongBottom(i18next.t("internet-required"));
             return false;
@@ -83,7 +83,8 @@ class BackupService {
                 "Authorization": token.token
             },
             body: JSON.stringify({
-                note
+                note,
+                removeForkNotes
             })
         })
             .then((res) => {
