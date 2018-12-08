@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
-import i18n from "i18next";
-import moment from "moment";
 
 import * as AppActions from '../../actions';
 
@@ -27,31 +25,22 @@ class SettingsTheme extends Component {
         super(props);
 
         this.state = {
-            langChanged: false
+            themeSelectValue: this.props.settings.theme,
+            fontSizeSelectedValue: this.props.settings.fontSize,
+            languageSelectedValue: this.props.settings.lang
         }
     }
 
     onThemeSelect = (id) => {
         let theme = themesService.getThemeById(id);
-        if (window.cordova && window.cordova.platformId === 'android') {
-            window.StatusBar.backgroundColorByHexString(theme.statusBar);
-        }
-
-        if (id === -1) {
-            this.props.setSetting('theme', Object.assign({}, theme, { id: -1 }));
-        } else {
-            this.props.setSetting('theme', theme)
-        }
-
-        themesService.applyTheme(theme);
+        this.setState({themeSelectValue: theme});
     }
 
-    onRandomThemeModeTrigger = (e) => {
-        if (e) {
-            this.onThemeSelect(-1);
-        } else {
-            this.onThemeSelect(this.props.settings.theme.realId);
+    applyTheme(theme) {
+        if (window.cordova) {
+            window.StatusBar.backgroundColorByHexString(theme.statusBar);
         }
+        themesService.applyTheme(theme);
     }
 
     render () {
@@ -71,18 +60,31 @@ class SettingsTheme extends Component {
                             </div>
                         )}
                         listItem={ButtonListItem}
+                        actionItems={[
+                            {
+                                text: t("cancel"),
+                                onClick: () => this.setState({themeSelectValue: this.props.settings.theme})
+                            },
+                            {
+                                text: t("ok"),
+                                onClick: () => {
+                                    this.props.setSetting('theme', this.state.themeSelectValue);
+                                    this.applyTheme(this.state.themeSelectValue);
+                                }
+                            }
+                        ]}
                     >
                         <SwitchListItem 
                             text={t("random-theme")}  
-                            checked={this.props.settings.theme.id === -1}
-                            onChange={this.onRandomThemeModeTrigger}     
+                            checked={this.state.themeSelectValue.id === -1}
+                            onChange={(event) => this.onThemeSelect(event ? -1 : this.props.settings.theme.realId)}     
                         />
                         <ColorPicker
                             colors={themes}
                             field="header"
-                            value={this.props.settings.theme}
+                            value={this.state.themeSelectValue}
                             onSelect={(event) => this.onThemeSelect(event.color.id)}
-                            disabled={this.props.settings.theme.id === -1}
+                            disabled={this.state.themeSelectValue.id === -1}
                         />
                     </ModalListItem>
 
@@ -90,6 +92,19 @@ class SettingsTheme extends Component {
                         text={t("font-size")} 
                         value={this.props.settings.fontSize}
                         listItem={ValueListItem}
+                        actionItems={[
+                            {
+                                text: t("cancel"),
+                                onClick: () => this.setState({fontSizeSelectedValue: this.props.settings.fontSize})
+                            },
+                            {
+                                text: t("ok"),
+                                onClick: () => {
+                                    this.props.setSetting('fontSize', this.state.fontSizeSelectedValue);
+                                    document.querySelector("body").style.fontSize = this.state.fontSizeSelectedValue + "px"; 
+                                }
+                            }
+                        ]}
                     >
                         <div className="radio-group">
                             {
@@ -97,12 +112,9 @@ class SettingsTheme extends Component {
                                     <Radio 
                                         key={i}
                                         name="font-size"
-                                        checked={this.props.settings.fontSize === setting}
+                                        checked={this.state.fontSizeSelectedValue === setting}
                                         value={setting}
-                                        onChange={(value) => {
-                                            this.props.setSetting('fontSize', +value)
-                                            document.querySelector("body").style.fontSize = +value + "px";    
-                                        }}
+                                        onChange={(value) => this.setState({fontSizeSelectedValue: +value})}
                                         text={setting}
                                     />
                                 ))
@@ -113,13 +125,13 @@ class SettingsTheme extends Component {
                     <SwitchListItem 
                         text={t("fast-add")}  
                         checked={this.props.settings.fastAdd}
-                        onChange={(e) => this.props.setSetting('fastAdd', e)}     
+                        onChange={(e) => this.props.setSetting('fastAdd', e, "boolean")}     
                     />
 
                     <SwitchListItem 
                         text={t("show-mini-calendar")}  
                         checked={this.props.settings.showMiniCalendar}
-                        onChange={(e) => this.props.setSetting('showMiniCalendar', e)}     
+                        onChange={(e) => this.props.setSetting('showMiniCalendar', e, "boolean")}     
                     />
 
                     <SwitchListItem 
@@ -132,7 +144,19 @@ class SettingsTheme extends Component {
                         text={t("language")} 
                         value={t(activeLanguageSettings.translateId)}
                         listItem={ValueListItem}
-                        noExit={this.state.langChanged}
+                        actionItems={[
+                            {
+                                text: t("cancel"),
+                                onClick: () => this.setState({languageSelectedValue: this.props.settings.lang})
+                            },
+                            {
+                                text: t("ok"),
+                                onClick: () => {
+                                    this.props.setSetting('lang', this.state.languageSelectedValue);
+                                    window.location.reload(true);
+                                }
+                            }
+                        ]}
                     >
                         <div className="radio-group">
                             {
@@ -140,31 +164,14 @@ class SettingsTheme extends Component {
                                     <Radio 
                                         key={i}
                                         name="lang"
-                                        checked={this.props.settings.lang === setting.val}
+                                        checked={this.state.languageSelectedValue === setting.val}
                                         value={setting.val}
-                                        onChange={(value) => {
-                                            this.props.setSetting('lang', value);
-                                            i18n.changeLanguage(value);
-                                            moment.locale(value);
-                                            this.setState({
-                                                langChanged: true
-                                            })
-                                        }}
+                                        onChange={(value) => this.setState({languageSelectedValue: value})}
                                         text={t(setting.translateId)}
                                     />
                                 ))
                             }
                         </div>
-
-                        {   this.state.langChanged && 
-                            <div className="reload-app-note">
-                                {t("reload-app-note")} 
-                                <button 
-                                    className="text block"
-                                    onClick={() => window.location.reload(true)}
-                                >{t("reload")}</button>
-                            </div>
-                        }
                     </ModalListItem>
                 </div>
             </div>

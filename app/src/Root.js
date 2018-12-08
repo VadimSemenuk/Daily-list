@@ -151,6 +151,15 @@ class Root extends Component {
                     <Modal 
                         isOpen={this.state.nextVersionMigrationModal} 
                         onRequestClose={this.closeDialog}
+                        actionItems={[
+                            {
+                                text: t("re-enter-later-button")
+                            },
+                            {
+                                text: t("re-enter-discard-button"),
+                                onClick: this.discardNextVersionMigration
+                            }
+                        ]}
                     >
                         <h3>{t("re-enter-request-title")}</h3>
                         <p>{t("re-enter-request-description")}</p>
@@ -159,11 +168,6 @@ class Root extends Component {
                             type="button"
                             onClick={this.props.googleSignIn}
                         ><img src={GoogleImg} />{t("google-sign-in")}</button>
-
-                        <div className="action-buttons-wrapper">
-                            <button className="text clear" onClick={this.discardNextVersionMigration}>{t("re-enter-discard-button")}</button>
-                            <button className="text clear" onClick={this.closeDialog}>{t("re-enter-later-button")}</button>
-                        </div>
                     </Modal>
                 </div>
             </HashRouter>

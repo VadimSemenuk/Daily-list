@@ -79,6 +79,16 @@ class SettingsSort extends Component {
                         text={t("view-direction")} 
                         value={t(activeSortDirection.translateId)}
                         listItem={ValueListItem}
+                        actionItems={[
+                            {
+                                text: t("cancel"),
+                                onClick: () => this.setState({sortDirectionSelectedValue: activeSortDirection.val})
+                            },
+                            {
+                                text: t("ok"),
+                                onClick: () => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: this.state.sortDirectionSelectedValue}), null, this.props.renderNotes)
+                            }
+                        ]}
                     >
                         <div className="radio-group">
                             {
@@ -86,9 +96,9 @@ class SettingsSort extends Component {
                                     <Radio
                                         key={i}
                                         name="sort-direction"
-                                        checked={this.props.settings.sort.direction === setting.val}
+                                        checked={this.state.sortDirectionSelectedValue === setting.val}
                                         value={setting.val}
-                                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: +e}), null, this.props.renderNotes)}
+                                        onChange={(e) => this.setState({sortDirectionSelectedValue: +e})}
                                         text={t(setting.translateId)}
                                     />
                                 ))

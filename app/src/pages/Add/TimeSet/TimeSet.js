@@ -16,6 +16,10 @@ class TimeSet extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            repeatTypeSelected: this.props.repeatType
+        }
+
         this.removeNotificationFromDefault = false;
     }
 
@@ -157,6 +161,16 @@ class TimeSet extends Component {
                     text={t("repeat-type")} 
                     value={t(selectedRepeatTypeOption.translateId)}
                     listItem={ValueListItem}
+                    actionItems={[
+                        {
+                            text: t("cancel"),
+                            onClick: () => this.setState({repeatTypeSelected: selectedRepeatTypeOption.val})
+                        },
+                        {
+                            text: t("ok"),
+                            onClick: () => this.props.onStateChange({repeatType: this.state.repeatTypeSelected})
+                        }
+                    ]}
                 >
                     <div className="radio-group">
                         {
@@ -164,9 +178,9 @@ class TimeSet extends Component {
                                 <Radio
                                     key={i}
                                     name="repeat-type"
-                                    checked={this.props.repeatType === setting.val}
+                                    checked={this.state.repeatTypeSelected === setting.val}
                                     value={setting.val}
-                                    onChange={(e) => this.props.onStateChange({ repeatType: e })}
+                                    onChange={(e) => this.setState({repeatTypeSelected: e})}
                                     text={t(setting.translateId)}
                                 />
                             ))
@@ -174,7 +188,7 @@ class TimeSet extends Component {
                     </div>
 
                     {
-                        this.props.repeatType === "any" &&
+                        this.state.repeatTypeSelected === "any" &&
                         <Calendar 
                             mode="multiselect"
                             currentDate={this.props.currentDate}
