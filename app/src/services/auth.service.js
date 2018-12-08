@@ -6,7 +6,7 @@ class AuthService {
     googleSignIn = async () => {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
             window.plugins.toast.showLongBottom(i18next.t("internet-required"));
-            return {};
+            return null;
         }
 
         if (!window.cordova) {
@@ -39,9 +39,10 @@ class AuthService {
                 resolve,
                 reject
             );
-        }).catch((err) => console.warn(err));
+        });
+        // check error structure
         if (!googleUser) {
-            return {};
+            return null;
         }
 
         let user = await fetch(`${config.apiURL}/auth/sign-in-google`, {
@@ -59,10 +60,10 @@ class AuthService {
                     return res.json();
                 }
             })            
-            .catch((err) => console.warn(err));
+
         if (!user) {
             window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));            
-            return {};
+            return null;
         }
 
         let token = {

@@ -9,6 +9,7 @@ export default {
     "about": "About app",
     "default-notification": "Automatically set notification",
     "backup": "Backup",
+    "set-setting-error": "Failed to update setting. Reload app and try again",
   
     // view settings page
     "sort": "Sorting",
@@ -70,6 +71,10 @@ export default {
     "how-it-works-btn": "How it works",
     "how-it-works": "Application files are saved on your Google Drive. The application will have access only to the files created by it",
     "auto-backup": "Auto backup",
+    "error-sign-in": "Failed to sign in. Reload app and try again",
+    "error-sign-out": "Failed to sign out. Reload app and try again",
+    "error-backup-upload": "Failed to upload backup. At the time of the next loading of the application, the attempt will be repeated.",
+    "error-backup-restote": "Failed to restore backup. Try later",
 
     // common
     "save": "Save",
@@ -85,9 +90,9 @@ export default {
     "g-night": "Good night",
     "g-morning": "Good morning",
     "reload": "Перезапустить",
-    "error-repeat-common": "An error has occurred. Repeat later",
     "ok": "Ok",
     "cancel": "Cancel",
+    "close": "Close",
 
     // share
     "share-theme": "Diary",
@@ -127,6 +132,10 @@ export default {
     "priority-high": "High",
     "priority-medium": "Medium",
     "priority-low": "Low",
+    "error-note-add": "Failed to add a note. Reload app and try again",
+    "error-note-update": "Failed to update a note. Reload app and try again",
+    "error-note-delete": "Failed to delete a note. Reload app and try again",
+    "error-get-notes": "Failed to delete a note. Reload app and try again",
 
     // note-item
     "attached-image": "Attached image",
@@ -135,4 +144,9 @@ export default {
     "re-enter-request-description": "The application will save your backups. This is necessary for further normal operation. Backup data will not be overwritten",
     "re-enter-later-button": "Later",
     "re-enter-discard-button": "Not show anymore",
+
+    // error
+    "error-repeat-common": "An error has occurred. Repeat later",
+    "error-common": "",
+    "error-reload-app": "Reload app",
 } 

@@ -209,7 +209,7 @@ class NotesList extends PureComponent {
                     </ReactSwipe>
 
                     <Modal 
-                        isOpen={this.state.listItemDialogVisible ? true : false} 
+                        isOpen={this.state.listItemDialogVisible} 
                         onRequestClose={this.closeDialog}
                     >
                         {   (this.state.listItemDialogVisible && this.state.listItemDialogVisible.note.repeatType === "no-repeat") &&

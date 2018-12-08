@@ -60,13 +60,16 @@ class Note extends PureComponent {
         
         return (
             <div className="note-draggable-wrapper">
-                <button
-                    className="drag-button"
-                    onTouchStart={this.onTouchStart}
-                    onTouchEnd={this.onTouchEnd}
-                >
-                    <img src={DragHandle} alt="drag" />
-                </button>
+                {
+                    this.props.isDragSortActive &&
+                    <button
+                        className="drag-button"
+                        onTouchStart={this.onTouchStart}
+                        onTouchEnd={this.onTouchEnd}
+                    >
+                        <img src={DragHandle} alt="drag" />
+                    </button>
+                }
                 <div
                     className={`note-wrapper ${this.state.expanded && 'expanded'}`} 
                     onClick={this.triggerExpanded}

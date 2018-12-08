@@ -6,7 +6,6 @@ function date (state = init, action) {
     switch(action.type) {
         case 'SET_DATES_AND_UPDATE_NOTES':
         case 'UPDATE_DATES_AND_NOTES':
-        case 'UPDATE_WEEK_DATES_AND_NOTES':
         case 'SET_CURRENT_DATE':        
             return moment(action.date);
         default: 

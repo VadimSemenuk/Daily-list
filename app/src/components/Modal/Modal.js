@@ -46,7 +46,7 @@ export default class CustomModal extends Component {
     render () {
         return (
             <Modal 
-                isOpen={this.props.isOpen} 
+                isOpen={Boolean(this.props.isOpen)} 
                 onRequestClose={this.props.onRequestClose}
                 className={`modal ${this.props.className}`}
                 overlayClassName="modal-overlay"

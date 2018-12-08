@@ -24,7 +24,15 @@ export function addNote (note, updateCount) {
                 token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
             })
             .catch((err) => {
-                console.warn("ERROR", err);
+                dispatch(triggerErrorModal("error-note-add"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> addNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    }
+                });
             });
     }
 }
@@ -40,7 +48,7 @@ export function getNotesByDates (dates, period) {
                 })
             })
             .catch((err) => {
-                console.warn("ERROR", err);
+                console.warn(err);
             })
     }
 }
@@ -48,21 +56,29 @@ export function getNotesByDates (dates, period) {
 export function updateNote (note, updateCount) {
     return function(dispatch, getState) {
         return notesService.updateNote(note)
-        .then((nextNote) => {
-            return dispatch({
-                type: "UPDATE_NOTE",
-                note: nextNote
+            .then((nextNote) => {
+                return dispatch({
+                    type: "UPDATE_NOTE",
+                    note: nextNote
+                })
             })
-        })
-        .then(({note}) => {
-            updateCount && dispatch(getFullCount(note.added.valueOf()));
+            .then(({note}) => {
+                updateCount && dispatch(getFullCount(note.added.valueOf()));
 
-            let token = getState().user;
-            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, true));        
-        })
-        .catch((err) => {
-            console.warn(err);
-        });
+                let token = getState().user;
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, true));        
+            })
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-note-update"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> updateNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    }
+                });
+            });
     }
 }
 
@@ -80,7 +96,15 @@ export function updateNoteDynamicFields (note, state) {
                 token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote, token));
             })
             .catch((err) => {
-                console.warn(err);
+                dispatch(triggerErrorModal("error-note-update"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> updateNoteDynamicFields()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    }
+                });
             });
     }
 }
@@ -102,7 +126,15 @@ export function updateNoteDate (note, updateCount) {
             token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));            
         })
         .catch((err) => {
-            console.warn(err);
+            dispatch(triggerErrorModal("error-note-update"));
+            deviceService.logError(err, {
+                path: "action/index.js -> updateNoteDate()",
+                note: {
+                    ...note,
+                    title: !!note.title,
+                    dynamicFields: !!note.dynamicFields
+                }
+            });
         });
     }
 }
@@ -121,7 +153,15 @@ export function deleteNote (note, updateCount) {
                 token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
             })
             .catch((err) => {
-                console.warn(err);
+                dispatch(triggerErrorModal("error-note-delete"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> deleteNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    }
+                });
             });
     }
 }
@@ -142,46 +182,58 @@ export function setCurrentDate (date) {
 
 export function setDatesAndUpdateNotes (dates, dateIndex, period) {
     return function(dispatch) {
-        return notesService.getNotesByDates(dates, period).then((notes) => dispatch({
-            type: "SET_DATES_AND_UPDATE_NOTES",
-            date: dates[dateIndex],
-            notes
-        }));
+        return notesService.getNotesByDates(dates, period)
+            .then((notes) => dispatch({
+                type: "SET_DATES_AND_UPDATE_NOTES",
+                date: dates[dateIndex],
+                notes
+            }))
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-get-notes"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> setDatesAndUpdateNotes()",
+                    dates, dateIndex, period
+                });
+            });
     }
 }
 
 export function updateDatesAndNotes (date, preRenderDate, nextIndex) {
     return function(dispatch) {
-        return notesService.getDayNotes(preRenderDate).then((notes) => dispatch({
-            type: "UPDATE_DATES_AND_NOTES",
-            notes,
-            nextIndex,
-            date
-        }));
-    }
-}
-
-
-export function updateWeekDatesAndNotes (date, preRenderDate, nextIndex) {
-    return function(dispatch) {
-        return notesService.getWeekNotes(preRenderDate).then((notes) => dispatch({
-            type: "UPDATE_WEEK_DATES_AND_NOTES",
-            notes,
-            nextIndex,
-            date
-        }));
+        return notesService.getDayNotes(preRenderDate)
+            .then((notes) => dispatch({
+                type: "UPDATE_DATES_AND_NOTES",
+                notes,
+                nextIndex,
+                date
+            }))
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-get-notes"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> updateDatesAndNotes()",
+                    date, preRenderDate, nextIndex
+                });
+            });
     }
 }
 
 // settings
 export function setSetting (settingName, value, type, fn) {     
     return function(dispatch) {
-        return settingsService.setSetting(settingName, value, type).then(() => dispatch({
-            type: "SET_SETTING",
-            settingName,
-            value
-        }))
-        .then(() => fn && fn())
+        return settingsService.setSetting(settingName, value, type)
+            .then(() => dispatch({
+                type: "SET_SETTING",
+                settingName,
+                value
+            }))
+            .then(() => fn && fn())
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-get-notes"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> setSetting()",
+                    settingName, value, type
+                });
+            });
     }
 }
 
@@ -204,19 +256,33 @@ export function triggerLoader (loader, state) {
 // calendar 
 export function getCount (date, period) {    
     return function(dispatch) {
-        return calendarService.getCount(date, period).then((nextCount) => dispatch({
-            type: "GET_COUNT",
-            nextCount 
-        }));
+        return calendarService.getCount(date, period)
+            .then((nextCount) => dispatch({
+                type: "GET_COUNT",
+                nextCount 
+            }))
+            .catch((err) => {
+                deviceService.logError(err, {
+                    path: "action/index.js -> getCount()",
+                    date, period
+                });
+            });
     }
 }
 
 export function getFullCount (date, period) {    
     return function(dispatch) {
-        return calendarService.getFullCount(date, period).then((nextCount) => dispatch({
-            type: "GET_COUNT",
-            nextCount 
-        }));
+        return calendarService.getFullCount(date, period)
+            .then((nextCount) => dispatch({
+                type: "GET_COUNT",
+                nextCount 
+            }))
+            .catch((err) => {
+                deviceService.logError(err, {
+                    path: "action/index.js -> getFullCount()",
+                    date, period
+                });
+            });
     }
 }
 
@@ -225,19 +291,30 @@ export function googleSignIn() {
     return function(dispatch, getState) {
         dispatch(triggerLoader());
 
-        return authService.googleSignIn().then((user) => {
-            dispatch(triggerLoader());
-            
-            if (!getState().meta.nextVersionMigrated) {
-                dispatch(uploadBatchBackup());
-                dispatch(setNextVersionMigrationState(true));
-            }
+        return authService.googleSignIn()
+            .then((user) => {
+                if (!user) {
+                    throw new Error("Failed to login");
+                }
 
-            return dispatch({
-                type: "RECIVE_USER",
-                user
+                dispatch(triggerLoader());
+                
+                if (!getState().meta.nextVersionMigrated) {
+                    dispatch(uploadBatchBackup());
+                    dispatch(setNextVersionMigrationState(true));
+                }
+
+                return dispatch({
+                    type: "RECIVE_USER",
+                    user
+                })
             })
-        })
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-sign-in"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> googleSignIn()"
+                });
+            })
     }
 }
 
@@ -245,13 +322,20 @@ export function googleSignOut() {
     return function(dispatch) {
         dispatch(triggerLoader());
 
-        return authService.googleSignOut().then(() => {
-            dispatch(triggerLoader());
+        return authService.googleSignOut()
+            .then(() => {
+                dispatch(triggerLoader());
 
-            return dispatch({
-                type: "CLEAR_USER"
+                return dispatch({
+                    type: "CLEAR_USER"
+                })
             })
-        })
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-sign-out"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> googleSignOut()"
+                });
+            })
     }
 }
 
@@ -280,12 +364,7 @@ let debouncedUploadBackup = throttle((note, token, removeForkNotes, dispatch) =>
         .then((noteForBackup) => {
             return backupService.uploadNoteBackup(noteForBackup[0], token, removeForkNotes);
         })
-        .then((isBackuped) => {
-            if (!isBackuped) {
-                throw Error("not backuped");
-            }
-            return notesService.setNoteBackupState(note.key, true, true);
-        })
+        .then(() => notesService.setNoteBackupState(note.key, true, true))
         .then(() => {
             let nextToken = { 
                 ...token, 
@@ -297,8 +376,16 @@ let debouncedUploadBackup = throttle((note, token, removeForkNotes, dispatch) =>
             return dispatch(setToken(nextToken));
         })
         .catch((err) => {
-            console.warn(err);
-            return null
+            dispatch(triggerErrorModal("error-backup-upload"));
+            deviceService.logError(err, {
+                note: {
+                    ...note,
+                    title: !!note.title,
+                    dynamicFields: !!note.dynamicFields
+                },
+                removeForkNotes,
+                path: "action/index.js -> uploadBackup()"
+            });
         })
 }, 5000)
 
@@ -311,12 +398,7 @@ export function uploadBatchBackup() {
             .then((notes) => {
                 return backupService.uploadNotesBatchBackup(notes, token);
             })
-            .then((isBackuped) => {
-                if (!isBackuped) {
-                    throw Error("not backuped");
-                }
-                return notesService.setNoteBackupState(null, true, true);
-            })
+            .then(() => notesService.setNoteBackupState(null, true, true))
             .then(() => {
                 let nextToken = { 
                     ...token, 
@@ -330,7 +412,10 @@ export function uploadBatchBackup() {
             })
             .catch((err) => {
                 dispatch(triggerLoader());
-                console.warn(err);
+                // dispatch(triggerErrorModal("error-backup-upload"));
+                // deviceService.logError(err, {
+                    // path: "action/index.js -> uploadBatchBackup()"
+                // });
             })
     }
 }
@@ -343,9 +428,17 @@ export function restoreBackup() {
 
         return backupService.restoreNotesBackup(token)
             .then((isUpdated) => {
+                // TODO check empty
                 dispatch(triggerLoader());
                 isUpdated && window.location.reload(true);
-            });
+            })
+            .catch((err) => {
+                dispatch(triggerLoader());
+                dispatch(triggerErrorModal("error-backup-restote"));
+                deviceService.logError(err, {
+                    path: "action/index.js -> restoreBackup()"
+                });
+            })
     }
 }
 
@@ -369,7 +462,12 @@ export function updateLastBackupTime() {
                     }  
                 };
                 dispatch(setToken(nextToken));
-            });
+            })
+            .catch((err) => {
+                deviceService.logError(err, {
+                    path: "action/index.js -> updateLastBackupTime()"
+                });
+            })
     }
 }
 
@@ -383,5 +481,13 @@ export function setNextVersionMigrationState(state) {
                     state
                 })
             })
+    }
+}
+
+// error modal
+export function triggerErrorModal(message) {
+    return {
+        type: "TRIGGER_ERROR_MODAL",
+        message
     }
 }

@@ -21,12 +21,14 @@ class BackupService {
             }
         })
             .then((res) => {
+                // TODO check
                 if (res.status === 200) {
                     return res.json();
                 }
-            })            
-            .catch((err) => console.warn(err));
+            });
     
+        // TODO drop Tasks table
+
         return await notesService.restoreNotesBackup(notes);    
     }
 
@@ -39,7 +41,7 @@ class BackupService {
             return false;
         }
 
-        let isBackuped = await fetch(`${config.apiURL}/notes/backup/batch`, {
+        return fetch(`${config.apiURL}/notes/backup/batch`, {
             method: "POST",
             credentials: "same-origin",
             headers: {
@@ -51,17 +53,11 @@ class BackupService {
             })
         })
             .then((res) => {
+                // TODO test statuses
                 if (res.status === 200) {
-                    window.res = res;
                     return res.json();
                 }
-            })            
-            .catch((err) => {
-                console.warn(err)
-                return false;
-            });
-
-        return isBackuped;        
+            });    
     }
 
     async uploadNoteBackup(note, token, removeForkNotes) {
@@ -75,7 +71,7 @@ class BackupService {
             method = "PUT";
         }
 
-        let isBackuped = await fetch(`${config.apiURL}/notes/backup`, {
+        return fetch(`${config.apiURL}/notes/backup`, {
             method,
             credentials: "same-origin",
             headers: {
@@ -88,16 +84,11 @@ class BackupService {
             })
         })
             .then((res) => {
+                // TODO test statuses
                 if (res.status === 200) {
                     return res.json();
                 }
-            })            
-            .catch((err) => {
-                console.warn(err)
-                return false;
             });
-
-        return isBackuped;
     }
 
     async getUserLastBackupTime(token) {

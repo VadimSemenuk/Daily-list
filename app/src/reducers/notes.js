@@ -63,8 +63,7 @@ function notes (state = init, action) {
         case 'RECIVE_NOTES': {
             return action.notes.slice();
         }
-        case 'UPDATE_DATES_AND_NOTES':
-        case 'UPDATE_WEEK_DATES_AND_NOTES': {
+        case 'UPDATE_DATES_AND_NOTES': {
             return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
         }
         case 'RECIVE_NOTE': {

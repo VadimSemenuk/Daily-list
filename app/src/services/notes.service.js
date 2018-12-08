@@ -60,7 +60,6 @@ class NotesService {
 
     async getNotesByDates (dates) {
         let tasks = dates.map((a) => this.getDayNotes(a));
-        // throw new Error("message")
         return Promise.all(tasks);
     }
 
@@ -96,7 +95,7 @@ class NotesService {
         let isShadow = note.repeatType !== "no-repeat" && note.forkFrom === -1;
 
         let insert = await executeSQL(
-            `INSERT INTO Tasks
+            `INSERT INTO Tasks,
             (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, sortPriority)
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
@@ -122,7 +121,9 @@ class NotesService {
                 note.priority,
                 note.sortPriority
             ]
-        ).catch((err) => console.warn(err));
+        );
+
+        // handle if not saved
 
         return {
             ...note,
@@ -215,7 +216,7 @@ class NotesService {
                 nextNote.priority,
                 nextNote.key
             ]
-        ).catch((err) => console.log('Error: ', err));
+        );
 
         await this.setNoteRepeat(nextNote);
 
@@ -266,7 +267,7 @@ class NotesService {
                 nextNote.key,
                 nextNote.key
             ]
-        ).catch((err) => console.warn(err));
+        );
         notificationService.clear(nextNote.repeatType === "any" ? nextNote.repeatDates : [nextNote.key]);
 
         return nextNote;
@@ -277,7 +278,7 @@ class NotesService {
             return
         }
 
-        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]).catch((err) => console.warn(err));
+        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]);
 
         let repeatDates = note.repeatDates;
         if (note.repeatType === "week") {
@@ -300,7 +301,7 @@ class NotesService {
                     return `${accumulator}, (${note.key}, ${currentValue})`;
                 }, false)
             };`,
-        ).catch((err) => console.warn(err));
+        );
     }
 
     async getNoteRepeatDates(note) {
@@ -347,14 +348,9 @@ class NotesService {
                 (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatValues
             FROM Tasks t
             ${dataSelectWhereStatement};
-        `, dataSelectParams).catch((err) => {
-            console.warn(err);
-            return null;
-        });
+        `, dataSelectParams);
 
-        if (!select || !select.rows) {
-            return null
-        }
+        // TODO: test for empty select
 
         let res = [];
         for (let i = 0; i < select.rows.length; i++ ) {
@@ -399,13 +395,13 @@ class NotesService {
             ]
         }, []);
 
-        let insert = await executeSQL(
+        await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
             VALUES
             ${valuesString};
-        `, values).catch((err) => console.warn(err));
+        `, values)
 
 
         let rdValuesString = "";
@@ -434,7 +430,7 @@ class NotesService {
             (taskId, value)
             VALUES
             ${rdValuesString};
-        `, rdValues).catch((err) => console.warn(err));
+        `, rdValues);
 
 
 

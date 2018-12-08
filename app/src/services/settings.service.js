@@ -89,14 +89,10 @@ class SetitngsService {
             value = +value;
         }
 
-        try {
-            await executeSQL(
-                `UPDATE Settings 
-                SET ${item} = ?;`, [value]
-            );
-        } catch (err) {
-            console.log('Error: ', err);
-        }
+        return executeSQL(
+            `UPDATE Settings 
+            SET ${item} = ?;`, [value]
+        );
     }
 }
 

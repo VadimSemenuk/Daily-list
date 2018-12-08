@@ -37,7 +37,33 @@ class DeviceService {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({deviceId})        
-        }).catch((err) => console.warn(err))
+        }).catch((err) => console.warn(err));
+    }
+
+    async logError(err, additionalInto) {
+        // add debounce
+        // add device id
+        console.warn(err);
+
+        if (err.constructor && err.constructor.name === "SQLError") {
+            err = new Error(`code: ${err.code}; message: ${err.message}`);
+            err.name = "SQLError";
+        }
+        
+        let log = {
+            name: err.name,
+            message: err.message,
+            additionalInto
+        }
+
+        return fetch(`${config.apiURL}/log/error`, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(log)        
+        }).catch((err) => console.warn(err));
     }
 }
 

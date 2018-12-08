@@ -168,18 +168,33 @@ class Root extends Component {
                             onClick={this.props.googleSignIn}
                         ><img src={GoogleImg} />{t("google-sign-in")}</button>
                     </Modal>
+
+                    <Modal 
+                        isOpen={this.props.error} 
+                        onRequestClose={() => this.props.triggerErrorModal()}
+                        actionItems={[
+                            {
+                                text: t("close")
+                            },
+                            {
+                                text: t("error-reload-app"),
+                                onClick: () => window.location.reload(true)
+                            },
+                        ]}
+                    >{t(this.props.error.message)}</Modal>
                 </div>
             </HashRouter>
         );
     }
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {
         settings: state.settings,
         password: state.password,
         user: state.user,
-        meta: state.meta     
+        meta: state.meta,
+        error: state.error
     }
 }
 

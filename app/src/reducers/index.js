@@ -8,6 +8,7 @@ import loader from "./loader";
 import calendar from "./calendar";
 import user from "./user";
 import meta from "./meta";
+import error from "./error";
 
 let reducers = combineReducers({
     settings,
@@ -17,7 +18,8 @@ let reducers = combineReducers({
     loader,
     calendar,
     user,
-    meta
+    meta,
+    error
 });
 
 export default reducers;
