@@ -43,13 +43,13 @@ class Root extends Component {
             document.querySelector(".hide-with-active-keyboard").classList.add("hidden");
             setTimeout(function() {
                 document.activeElement.scrollIntoViewIfNeeded();
-            }, 100);
+            }, 200);
         });
         window.addEventListener('keyboardDidHide', () => {
             document.querySelector(".hide-with-active-keyboard").classList.remove("hidden"); 
             setTimeout(function() {
                 document.activeElement.scrollIntoViewIfNeeded();
-            }, 100);           
+            }, 200);           
         });
     }
        
@@ -68,7 +68,6 @@ class Root extends Component {
 
     discardNextVersionMigration = () => {
         this.props.setNextVersionMigrationState(true);
-        this.closeDialog();
     }
 
     closeDialog = () => {

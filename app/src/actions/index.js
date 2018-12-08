@@ -24,20 +24,24 @@ export function addNote (note, updateCount) {
                 token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
             })
             .catch((err) => {
-                console.warn(err);
+                console.warn("ERROR", err);
             });
     }
 }
 
 export function getNotesByDates (dates, period) {
     return function(dispatch) {
-        return notesService.getNotesByDates(dates, period).then((notes) => {
-            dispatch({
-                type: "RECIVE_NOTES",
-                dates,
-                notes
+        return notesService.getNotesByDates(dates, period)
+            .then((notes) => {
+                dispatch({
+                    type: "RECIVE_NOTES",
+                    dates,
+                    notes
+                })
             })
-        });
+            .catch((err) => {
+                console.warn("ERROR", err);
+            })
     }
 }
 

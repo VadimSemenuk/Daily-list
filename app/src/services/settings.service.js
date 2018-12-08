@@ -61,25 +61,21 @@ class SetitngsService {
     }
 
     async getSettings () {
-        try {
-            let select = await executeSQL(
-                `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar, notesShowInterval, lang, calendarNotesCounter
-                FROM Settings;`
-            );
+        let select = await executeSQL(
+            `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, showMiniCalendar, notesShowInterval, lang, calendarNotesCounter
+            FROM Settings;`
+        );
 
-            let result = select.rows.item(0);
+        let result = select.rows.item(0);
 
-            return {
-                ...result,
-                defaultNotification: Boolean(result.defaultNotification),
-                fastAdd: Boolean(result.fastAdd),
-                theme: themesService.getThemeById(result.theme),
-                sort: JSON.parse(result.sort),
-                showMiniCalendar: Boolean(result.showMiniCalendar),
-                calendarNotesCounter: Boolean(result.calendarNotesCounter)
-            }
-        } catch (err) {
-            console.log('Error: ', err);
+        return {
+            ...result,
+            defaultNotification: Boolean(result.defaultNotification),
+            fastAdd: Boolean(result.fastAdd),
+            theme: themesService.getThemeById(result.theme),
+            sort: JSON.parse(result.sort),
+            showMiniCalendar: Boolean(result.showMiniCalendar),
+            calendarNotesCounter: Boolean(result.calendarNotesCounter)
         }
     }
 

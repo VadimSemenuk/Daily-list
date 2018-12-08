@@ -16,9 +16,11 @@ import migration from './db/migration/migration';
 import settingsService from "./services/settings.service";
 import themesService from "./services/themes.service";
 import deviceService from "./services/device.service";
+import notesService from "./services/notes.service";
+import authService from "./services/auth.service";
 
-let store;
-let i18n;
+let store = null;
+let i18n = null;
 
 export default class App extends Component {
     constructor(props) {
@@ -26,33 +28,50 @@ export default class App extends Component {
 
         this.state = {
             appReady: false,
-            settings: null
+            loaderReady: false,
+            loaderColor: null
         }
     }
 
-    componentWillMount() {
-        this.initApp();
+    async componentWillMount() {
+        window.cordova && await new Promise((resolve) => document.addEventListener("deviceready", resolve, false));
+        store = await this.initApp()
+            .catch((err) => {
+                console.warn(err);
+                return null
+            });
+
+
+        if (store) {
+            this.setState({
+                appReady: true
+            });
+
+            deviceService.logLoad();
+        }
     }
 
     async initApp() {
-        if (window.cordova) {
-            await new Promise((resolve) => document.addEventListener("deviceready", resolve, false));
-        }
+        window.db = await this.initDb();   
 
-        await this.initDb();       
-        let settings = await this.initSettings();
-        store = await initStore(settings);
+        let settings = await settingsService.getSettings();
+        this.applyInitSettings(settings);
+        let password = !settings.password;
+        let date = moment().startOf("day");
+        let notes = await notesService.getNotesByDates(
+            [moment(date).add(-1, "day"), date, moment(date).add(1, "day")], 
+            settings.notesShowInterval
+        );
+        let meta = await deviceService.getMetaInfo();
+        let user = authService.getToken();
 
-        deviceService.logLoad();
-
-        this.setState({
-            appReady: true
-        });
+        return initStore({settings, password, notes, date, user, meta});
     }
 
     async initDb() {
         window.db = await DB();
-        await migration.run();       
+        await migration.run();
+        return window.db;       
     }
 
     async initSettings() {
@@ -65,9 +84,7 @@ export default class App extends Component {
 
     applyInitSettings(settings) {
         document.querySelector("body").style.fontSize = settings.fontSize + "px";
-        if (window.cordova && window.cordova.platformId === 'android') {
-            window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
-        }
+        window.cordova && window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
         themesService.applyTheme(settings.theme);
         moment.locale(settings.lang);
         i18n = lang.init(settings.lang);
