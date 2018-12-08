@@ -10,7 +10,7 @@ class NotesService {
         let currentDate = date.valueOf();
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
-            t.dynamicFields, t.finished, t.forkFrom, t.priority,
+            t.dynamicFields, t.finished, t.forkFrom, t.priority, t.sortPriority,
             CASE t.added WHEN ? THEN 0 ELSE 1 END as isShadow,
             ? as added
             FROM Tasks t
@@ -76,6 +76,7 @@ class NotesService {
             uuid: noteUUID,
             lastActionTime: actionTime,
             forkFrom: -1,
+            sortPriority: 1,
             ...timeCheckSums
         }
 
@@ -96,8 +97,8 @@ class NotesService {
         let insert = await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
-                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, sortPriority)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -117,7 +118,8 @@ class NotesService {
                 Number(note.finished),
                 isShadow ? -1 : note.added.valueOf(),
                 note.forkFrom,
-                note.priority
+                note.priority,
+                note.sortPriority
             ]
         ).catch((err) => console.warn(err));
 
@@ -405,7 +407,6 @@ class NotesService {
         `, values).catch((err) => console.warn(err));
 
 
-
         let rdValuesString = "";
         let rdValues = [];
         notes.forEach((note) => {
@@ -440,6 +441,19 @@ class NotesService {
         // if (addedNote.notificate) {
         //     notificationService.set(addedNote.key, addedNote);
         // };
+    }
+
+    async updateDaySortPriority(actionType, baseSortPriority, actionNote, notesToUpdate) {
+        let sortPriorityAction = null;
+        if (actionType === "up") {
+            sortPriorityAction = (a) => a + 1;
+        } else {
+            sortPriorityAction = (a) => a - 1;
+        }
+
+        await executeSQL(`
+            UPDATE
+        `);
     }
 
     calculateTimeCheckSum (note) {

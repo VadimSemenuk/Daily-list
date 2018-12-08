@@ -91,6 +91,7 @@ export class ModalListItem extends PureComponent {
                 onRequestClose={this.trigger}
                 innerClassName={this.props.innerClassName}
                 noExit={this.props.noExit}
+                actionItems={this.props.actionItems}
             >
                 {this.props.children}
             </Modal>

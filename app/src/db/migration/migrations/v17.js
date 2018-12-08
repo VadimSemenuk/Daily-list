@@ -92,6 +92,7 @@ export default {
                     repeatType INTEGER,
                     forkFrom INTEGER,
                     priority INTEGER,
+                    sortPriority INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
             `);
@@ -117,7 +118,8 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    priority
+                    priority,
+                    sortPriority
                 ) 
                 SELECT
                     id, 
@@ -139,7 +141,8 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    2 as priority
+                    2 as priority,
+                    1 as sortPriority
                 FROM Tasks_OLD;
             `);
 

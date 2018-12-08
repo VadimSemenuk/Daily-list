@@ -38,6 +38,11 @@ export default class CustomModal extends Component {
         Modal.setAppElement('#root');
     }
 
+    onActionButtonClick = (action) => {
+        this.props.onRequestClose();    
+        action && action();
+    }
+
     render () {
         return (
             <Modal 
@@ -50,7 +55,22 @@ export default class CustomModal extends Component {
                 shouldCloseOnEsc={false}
             >
                 <div className={`modal-inner ${this.props.innerClassName ? this.props.innerClassName : ""}`}>
-                    {this.props.children}                        
+                    {this.props.children}
+
+                    {
+                        this.props.actionItems &&
+                        <div className="action-buttons-wrapper">
+                            {
+                                this.props.actionItems.map((a, i) => (
+                                    <button 
+                                        key={i}
+                                        className="text clear" 
+                                        onClick={() => this.onActionButtonClick(a.onClick)}
+                                    >{a.text}</button>
+                                ))
+                            }
+                        </div>  
+                    }                     
                 </div>
             </Modal>
         )

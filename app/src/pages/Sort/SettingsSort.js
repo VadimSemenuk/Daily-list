@@ -18,6 +18,22 @@ let sortDirectionSettings = settingsService.getSortDirectionSettings();
 let notesShowIntervalSettings = settingsService.getNotesShowIntervalSettings();
 
 class SettingsSort extends Component {
+    constructor(props) {
+        super(props);
+
+        let sortTypeSelectedValue = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type).val;
+        let sortDirectionSelectedValue = sortDirectionSettings.find((a) => a.val === this.props.settings.sort.direction).val;
+
+        this.state = {
+            sortTypeSelectedValue,
+            sortDirectionSelectedValue
+        }
+    }
+
+    onModalAction(action) {
+
+    }
+
     render() {
         let {t} = this.props;
         let activeSortType = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type);
@@ -32,6 +48,16 @@ class SettingsSort extends Component {
                         text={t("sort")} 
                         value={t(activeSortType.translateId)}
                         listItem={ValueListItem}
+                        actionItems={[
+                            {
+                                text: t("cancel"),
+                                onClick: () => this.setState({sortTypeSelectedValue: activeSortType.val})
+                            },
+                            {
+                                text: t("ok"),
+                                onClick: () => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: this.state.sortTypeSelectedValue}), null, this.props.renderNotes)
+                            }
+                        ]}
                     >
                         <div className="radio-group">
                             {
@@ -39,9 +65,9 @@ class SettingsSort extends Component {
                                     <Radio 
                                         key={i}
                                         name="sort-type"
-                                        checked={this.props.settings.sort.type === setting.val}
+                                        checked={this.state.sortTypeSelectedValue === setting.val}
                                         value={setting.val}
-                                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: +e}), null, this.props.renderNotes)}
+                                        onChange={(e) => this.setState({sortTypeSelectedValue: +e})}
                                         text={t(setting.translateId)}
                                     />
                                 ))

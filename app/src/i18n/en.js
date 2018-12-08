@@ -86,6 +86,8 @@ export default {
     "g-morning": "Good morning",
     "reload": "Перезапустить",
     "error-repeat-common": "An error has occurred. Repeat later",
+    "ok": "Ok",
+    "cancel": "Cancel",
 
     // share
     "share-theme": "Diary",
