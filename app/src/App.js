@@ -28,7 +28,6 @@ export default class App extends Component {
 
         this.state = {
             appReady: false,
-            loaderReady: false,
             loaderColor: null
         }
     }
@@ -47,22 +46,26 @@ export default class App extends Component {
                 appReady: true
             });
 
-            deviceService.logLoad();
+            deviceService.logLoad(this.state.deviceId);
         }
     }
 
     async initApp() {
         window.db = await this.initDb();   
 
+        let meta = await deviceService.getMetaInfo();
         let settings = await settingsService.getSettings();
         this.applyInitSettings(settings);
+        this.setState({
+            loaderColor: settings.theme.header,
+            deviceId: meta.deviceId
+        });
         let password = !settings.password;
         let date = moment().startOf("day");
         let notes = await notesService.getNotesByDates(
             [moment(date).add(-1, "day"), date, moment(date).add(1, "day")], 
             settings.notesShowInterval
         );
-        let meta = await deviceService.getMetaInfo();
         let user = authService.getToken();
 
         return initStore({settings, password, notes, date, user, meta});
@@ -72,14 +75,6 @@ export default class App extends Component {
         window.db = await DB();
         await migration.run();
         return window.db;       
-    }
-
-    async initSettings() {
-        let settings = await settingsService.getSettings();
-        this.applyInitSettings(settings);
-        this.setState({settings});
-
-        return settings;
     }
 
     applyInitSettings(settings) {

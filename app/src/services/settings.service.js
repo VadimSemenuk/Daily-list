@@ -85,7 +85,7 @@ class SetitngsService {
             case("sort"): value = JSON.stringify(value); break;
             default: break;
         }
-        if (value === "boolean") {
+        if (type === "boolean") {
             value = +value;
         }
 

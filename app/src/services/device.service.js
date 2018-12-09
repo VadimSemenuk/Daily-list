@@ -27,9 +27,7 @@ class DeviceService {
         }
     }
 
-    async logLoad() {
-        let deviceId = await this.getDeviceId();
-
+    async logLoad(deviceId) {
         return fetch(`${config.apiURL}/log/load`, {
             method: "POST",
             credentials: "same-origin",
