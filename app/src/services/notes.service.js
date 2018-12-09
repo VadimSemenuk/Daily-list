@@ -95,7 +95,7 @@ class NotesService {
         let isShadow = note.repeatType !== "no-repeat" && note.forkFrom === -1;
 
         let insert = await executeSQL(
-            `INSERT INTO Tasks,
+            `INSERT INTO Tasks
             (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, sortPriority)
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
@@ -451,6 +451,63 @@ class NotesService {
         await executeSQL(`
             UPDATE
         `);
+    }
+
+    async getDeletedNotes() {
+        let select = await executeSQL(
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
+            t.dynamicFields, t.finished, t.forkFrom, t.priority, t.sortPriority, t.lastActionTime,
+            FROM Tasks t
+            WHERE t.lastAction = 'DELETE' AND t.forkFrom = -1;`
+        );
+
+        let notes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            let item = select.rows.item(i);
+
+            let nextItem = {
+                ...item,
+                dynamicFields: JSON.parse(item.dynamicFields),
+                startTime: ~item.startTime ? moment(item.startTime) : false,
+                endTime: ~item.endTime ? moment(item.endTime) : false,
+                added: moment(item.added),
+                finished: Boolean(item.finished),
+                notificate: Boolean(item.notificate),
+                isShadow: Boolean(item.isShadow),
+                isSynced: Boolean(item.isSynced),
+                isLastActionSynced: Boolean(item.isLastActionSynced),
+                lastActionTime: moment(item.lastActionTime)
+            };
+
+            notes.push(nextItem);
+        }
+
+        return notes;
+    }
+
+    async restoreNote(note) {
+        let actionTime = moment().valueOf();
+        let nextNote = {
+            ...note,
+            isShadow: note.added === -1
+        }
+
+        await executeSQL(
+            `UPDATE Tasks
+            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
+            WHERE id = ? OR forkFrom = ?;`,
+            [
+                "UPDATE",
+                actionTime,
+                nextNote.key,
+                nextNote.key
+            ]
+        );
+        if (nextNote.notificate) {
+            notificationService.set(nextNote.key, nextNote);
+        };
+
+        return nextNote;
     }
 
     calculateTimeCheckSum (note) {

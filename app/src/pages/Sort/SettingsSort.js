@@ -30,10 +30,6 @@ class SettingsSort extends Component {
         }
     }
 
-    onModalAction(action) {
-
-    }
-
     render() {
         let {t} = this.props;
         let activeSortType = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type);

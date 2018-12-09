@@ -7,6 +7,7 @@ export default {
     "remove-pass": "Remove password",
     "issues": "Bug fixing",
     "about": "About app",
+    "trash": "Trash",
     "default-notification": "Automatically set notification",
     "backup": "Backup",
     "set-setting-error": "Failed to update setting. Reload app and try again",

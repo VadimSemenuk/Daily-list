@@ -46,6 +46,10 @@ class Settings extends Component {
                         }}
                     />
                     <InsetListItem 
+                        text={t("trash")}
+                        onClick={() => this.props.history.push(`/trash`)}
+                    />
+                    <InsetListItem 
                         text={t("about")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/about`)}
                     />

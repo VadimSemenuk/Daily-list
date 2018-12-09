@@ -22,7 +22,9 @@ class SettingsBackup extends Component {
     }
 
     componentDidMount() {
-        this.props.updateLastBackupTime();
+        if (this.props.user.id !== undefined) {
+            this.props.updateLastBackupTime();
+        }
     }
 
     render () {
@@ -33,7 +35,7 @@ class SettingsBackup extends Component {
                 <Header title={t("backup")}/>
                 <div className="scroll page-content padding">
                     {
-                        !this.props.user.id &&
+                        this.props.user.id == undefined &&
                         <div className="not-logined-wrapper">
                             <TriggerListItem 
                                 text={t("how-it-works-btn")}
@@ -47,7 +49,7 @@ class SettingsBackup extends Component {
                         </div>
                     }
                     {
-                        this.props.user.id &&
+                        this.props.user.id !== undefined &&
                         <div className="logined-wrapper">
                             <div className="profile-wrapper">
                                 <div className="profile-img-wrapper clickable" style={{backgroundImage: `url(${this.props.user.picture})`}}></div>
