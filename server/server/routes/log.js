@@ -6,5 +6,10 @@ module.exports = function (logRep) {
         res.end(); 
     });
 
+    router.post('/error', (req, res, next) => {
+        logRep.logError(req.body);
+        res.end(); 
+    });
+
     return router
 }

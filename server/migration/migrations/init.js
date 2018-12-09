@@ -30,6 +30,14 @@ module.exports.up = async (db) => {
             deviceId VARCHAR,
             date timestamp with time zone
         )
+
+        CREATE TABLE ErrorLogs 
+        (
+            id SERIAL PRIMARY KEY,
+            deviceId VARCHAR,
+            date timestamp with time zone,
+            log JSON
+        )
     `)
 };
 

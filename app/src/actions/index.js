@@ -417,6 +417,7 @@ export function uploadBatchBackup() {
 
         return notesService.getNoteForBackup()
             .then((notes) => {
+                throw new Error("ee")
                 return backupService.uploadNotesBatchBackup(notes, token);
             })
             .then(() => notesService.setNoteBackupState(null, true, true))
@@ -433,12 +434,12 @@ export function uploadBatchBackup() {
             })
             .catch((err) => {
                 dispatch(triggerLoader());
-                // dispatch(triggerErrorModal("error-backup-upload"));
-                // let deviceId = getState().meta.deviceId;
-                // deviceService.logError(err, {
-                    // path: "action/index.js -> uploadBatchBackup()",
-                    // deviceIds
-                // });
+                dispatch(triggerErrorModal("error-backup-upload"));
+                let deviceId = getState().meta.deviceId;
+                deviceService.logError(err, {
+                    path: "action/index.js -> uploadBatchBackup()",
+                    deviceId
+                });
             })
     }
 }

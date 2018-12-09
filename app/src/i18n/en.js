@@ -72,7 +72,7 @@ export default {
     "auto-backup": "Auto backup",
     "error-sign-in": "Failed to sign in. Reload app and try again",
     "error-sign-out": "Failed to sign out. Reload app and try again",
-    "error-backup-upload": "Failed to upload backup. At the time of the next loading of the application, the attempt will be repeated.",
+    "error-backup-upload": "Failed to upload backup. The attempt will be repeated at the the next application loading.",
     "error-backup-restote": "Failed to restore backup. Try later",
 
     // common

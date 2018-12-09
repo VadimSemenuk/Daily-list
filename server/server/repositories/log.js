@@ -17,4 +17,20 @@ module.exports = class {
 
         return insert;
     }
+
+    async logError(log) {
+        let insert = await this.db.query(`
+            INSERT INTO ErrorLogs (deviceId, date, log) VALUES ($deviceId, $date, $log);
+        `, {
+            deviceId: log.additionalInto.deviceId,
+            date: new Date(),
+            log: JSON.stringify(log)
+        })
+        .catch((err) => {
+            console.log(err);
+            return false;
+        })
+
+        return insert;
+    }
 };
