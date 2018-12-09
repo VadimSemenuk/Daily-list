@@ -15,29 +15,20 @@ import './Trash.scss';
 class Trash extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            items: []
-        }
     }
 
     async componentDidMount() {
-        let items = await notesService.getDeletedNotes();
-        console.log(items);
-        this.setState({items});
+        this.props.getDeletedNotes();
     }
 
-    onItemActionsWindowRequest = () => {
+    onItemActionsWindowRequest = () => {}
 
-    }
+    onImageShowRequest = () => {}
 
-    onImageShowRequest = () => {
+    onItemDynaicFieldChange = () => {}
 
-    }
+    onRestore = (note) => this.props.restoreNote(note);
 
-    onItemDynaicFieldChange = () => {
-
-    }
 
     render() {
         let {t} = this.props;
@@ -47,13 +38,14 @@ class Trash extends Component {
                 <Header title={t("trash")} />
                 <div className="scroll page-content trash-list-page-content">
                     {
-                        this.state.items.map((a) => (
+                        this.props.trash.map((a) => (
                             <TrashListItem 
                                 key={a.key}
                                 itemData={a}
                                 onShowImage={this.onImageShowRequest}
                                 onDynaicFieldChange={this.onItemDynaicFieldChange}
                                 onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                onRestore={this.onRestore}
                             /> 
                         ))
                     }
@@ -67,6 +59,7 @@ class Trash extends Component {
 function mapStateToProps(state) {
     return {
         settings: state.settings,
+        trash: state.trash
     }
 }
 

@@ -12,6 +12,8 @@ class TrashListItem extends PureComponent {
         super(props);
     }
 
+    onRestore = () => this.props.onRestore(this.props.itemData);
+
     render () {
         let {t} = this.props;
         
@@ -19,7 +21,10 @@ class TrashListItem extends PureComponent {
             <div className="trash-list-item">
                 <div className="deleted-time">Deleted: {this.props.itemData.lastActionTime.format("MMM Do YYYY, HH:mm")}</div>
                 <Note {...this.props} />
-                <button className="restore-button">
+                <button 
+                    className="restore-button"
+                    onClick={this.onRestore}
+                >
                     <img src={RestoreImg} alt="restore" />
                 </button>
             </div>

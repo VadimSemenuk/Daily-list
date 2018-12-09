@@ -176,9 +176,62 @@ export function deleteNote (note, updateCount) {
     }
 }
 
+export function getDeletedNotes () {
+    return function(dispatch, getState) {
+        return notesService.getDeletedNotes()
+            .then((items) => dispatch({
+                type: "RECIVE_TRASH_NOTES",
+                items
+            }))
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-note-get-trash"));
+                let deviceId = getState().meta.deviceId;
+                deviceService.logError(err, {
+                    path: "action/index.js -> getDeletedNotes()",
+                    deviceId
+                });
+            });
+    }
+}
+
+export function restoreNote (note) {
+    return function(dispatch, getState) {
+        return notesService.restoreNote(note)
+            .then((note) => dispatch({
+                type: "RESTORE_NOTE",
+                note
+            }))
+            .then(({note}) => {
+                let date = getState().date;
+                dispatch(getFullCount(date.valueOf()));
+
+                let token = getState().user;
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
+            })
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-note-restore"));
+                let deviceId = getState().meta.deviceId;
+                deviceService.logError(err, {
+                    path: "action/index.js -> restoreNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    },
+                    deviceId
+                });
+            });
+    }
+}
+
 export function renderNotes () {
     return {
         type: "RENDER_NOTES"
+    }
+}
+
+export function refreshNotes () {
+    return function (dispatch, getState) {
     }
 }
 

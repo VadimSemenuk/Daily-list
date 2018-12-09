@@ -456,9 +456,10 @@ class NotesService {
     async getDeletedNotes() {
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
-            t.dynamicFields, t.finished, t.forkFrom, t.priority, t.sortPriority, t.lastActionTime,
+            t.dynamicFields, t.finished, t.forkFrom, t.priority, t.sortPriority, t.lastActionTime
             FROM Tasks t
-            WHERE t.lastAction = 'DELETE' AND t.forkFrom = -1;`
+            WHERE t.lastAction = 'DELETE' AND t.forkFrom = -1
+            LIMIT 100;`
         );
 
         let notes = [];
@@ -497,7 +498,7 @@ class NotesService {
             SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
             WHERE id = ? OR forkFrom = ?;`,
             [
-                "UPDATE",
+                "DELETE",
                 actionTime,
                 nextNote.key,
                 nextNote.key
