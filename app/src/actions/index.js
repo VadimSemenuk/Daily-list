@@ -417,7 +417,6 @@ export function uploadBatchBackup() {
 
         return notesService.getNoteForBackup()
             .then((notes) => {
-                throw new Error("ee")
                 return backupService.uploadNotesBatchBackup(notes, token);
             })
             .then(() => notesService.setNoteBackupState(null, true, true))
