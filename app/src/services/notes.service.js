@@ -498,7 +498,7 @@ class NotesService {
             SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
             WHERE id = ? OR forkFrom = ?;`,
             [
-                "DELETE",
+                "UPDATE",
                 actionTime,
                 nextNote.key,
                 nextNote.key
