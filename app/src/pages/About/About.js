@@ -104,27 +104,7 @@ class About extends Component {
                     <span className="list-items-block-header">{t("issues")}</span>
 
                     <TriggerListItem text={t("no-notification")}>
-                        <div className="issue-wrapper">
-                            {t("no-notification-a")}
-                            <button 
-                                onClick={this.openSettings}
-                                className="text block"
-                            >{t("move")}</button>
-                            <img 
-                                src={require("../../assets/img/issues/issue1.0-" + this.state.lang + ".jpg")}
-                                alt="issue"
-                            />
-                            {t("no-notification-b")}
-                            <img 
-                                src={require("../../assets/img/issues/issue1.1-" + this.state.lang + ".jpg")}
-                                alt="issue"                            
-                            />
-                            {t("no-notification-c")}                            
-                            <img 
-                                src={require("../../assets/img/issues/issue1.2-" + this.state.lang + ".jpg")}
-                                alt="issue"                            
-                            />
-                        </div>
+                        <div className="issue-wrapper">{t("no-notification-description")}</div>
                     </TriggerListItem>
                 </div>
             </div>

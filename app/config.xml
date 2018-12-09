@@ -34,7 +34,6 @@
     <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
     <plugin name="com-sarriaroman-photoviewer" spec="^1.1.18" />
     <plugin name="cordova-sqlite-storage" spec="^2.4.0" />
-    <plugin name="cordova-open-native-settings" spec="^1.5.1" />
     <plugin name="cordova-launch-review" spec="^3.1.1" />
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
     <plugin name="cordova-plugin-googleplus" spec="^5.3.2">

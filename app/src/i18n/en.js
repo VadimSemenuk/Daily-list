@@ -50,9 +50,8 @@ export default {
     "help": "Help",
     "previous-version": "Previous version",
     "no-notification": "Notifications don't comming",
-    "no-notification-a": "Move to app settings",
-    "no-notification-b": "Next move to notification settings",
-    "no-notification-c": "For permition 'Run in background' (name can be different) set to 'Allow'",
+    "no-notification-description": `Move to app settings in the system: Settings -> Apps -> Diary.
+        Make sure the application has permission to notify and work in the background`,
 
     // about page
     "app-name": "Diary",
