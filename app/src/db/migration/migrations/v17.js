@@ -7,10 +7,15 @@ export default {
     name: "1.7",
 
     async run() {
+        console.log("0");
         await addUUID();
+        console.log("1");
         await addMetaTable();
+        console.log("2");
         await alterTasksTable();
+        console.log("3");
         await forkFromFieldToUUID();
+        console.log("4");
 
         let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
         if (!token.id) {
@@ -24,9 +29,10 @@ export default {
             let select = await execureSQL(`SELECT id from Tasks WHERE uuid is null`);
             let updateValues = [];
             let updateValuesStr = "";
-            if (!select.rows) {
+            if (!select.rows || !select.rows.length) {
                 return
             }
+
             for (let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
                 updateValues.push(item.id);
@@ -151,12 +157,12 @@ export default {
 
         async function forkFromFieldToUUID() {
             await execureSQL(`
-                update Tasks as t
+                update Tasks
                 set forkFrom =
                     (
                         select (select uuid from Tasks ttt where tt.forkFrom = ttt.id ) original
                         from Tasks tt
-                        where t.id = tt.id
+                        where Tasks.id = tt.id
                     )
                 where forkFrom != -1
             `);
