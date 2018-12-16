@@ -283,9 +283,9 @@ export function updateDatesAndNotes (date, preRenderDate, nextIndex) {
 }
 
 // settings
-export function setSetting (settingName, value, type, fn) {     
+export function setSetting (settingName, value, fn) {     
     return function(dispatch, getState) {
-        return settingsService.setSetting(settingName, value, type)
+        return settingsService.setSetting(settingName, value)
             .then(() => dispatch({
                 type: "SET_SETTING",
                 settingName,
@@ -297,7 +297,7 @@ export function setSetting (settingName, value, type, fn) {
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> setSetting()",
-                    settingName, value, type, deviceId
+                    settingName, value, deviceId
                 });
             });
     }

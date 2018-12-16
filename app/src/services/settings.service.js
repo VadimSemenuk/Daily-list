@@ -79,14 +79,15 @@ class SetitngsService {
         }
     }
 
-    async setSetting (item, value, type) {
+    async setSetting (item, value) {
         switch(item) {
+            case("defaultNotification"): value = Number(value); break;
+            case("fastAdd"): value = +value; break;
             case("theme"): value = value.id; break;
             case("sort"): value = JSON.stringify(value); break;
+            case("showMiniCalendar"): value = Number(value); break;
+            case("calendarNotesCounter"): value = Number(value); break;
             default: break;
-        }
-        if (type === "boolean") {
-            value = +value;
         }
 
         return executeSQL(
