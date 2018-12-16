@@ -193,7 +193,7 @@ class NotesList extends PureComponent {
                                     <SortableList
                                         index={i}
                                         notes={notes.items} 
-                                        finSort={this.props.settings.sort.finSort}
+                                        finSort={this.props.settings.sortFinBehaviour === 1}
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                     />
@@ -299,8 +299,8 @@ function sort (data, settings) {
     })
 
     function getNotesCompareFn() {
-        if (settings.sort.type === 0) {
-            if (settings.sort.direction === 1) {
+        if (settings.sortType === 0) {
+            if (settings.sortDirection === 1) {
                 return (a, b) => {
                     return a.startTimeCheckSum - b.startTimeCheckSum;
                 }   
@@ -311,8 +311,8 @@ function sort (data, settings) {
             }    
         }
 
-        if (settings.sort.type === 1) {
-            if (settings.sort.direction === 1) {
+        if (settings.sortType === 1) {
+            if (settings.sortDirection === 1) {
                 return (a, b) => a.key - b.key   
             } else {
                 return (a, b) =>  b.key - a.key

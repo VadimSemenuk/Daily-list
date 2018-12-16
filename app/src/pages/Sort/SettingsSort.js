@@ -21,8 +21,8 @@ class SettingsSort extends Component {
     constructor(props) {
         super(props);
 
-        let sortTypeSelectedValue = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type).val;
-        let sortDirectionSelectedValue = sortDirectionSettings.find((a) => a.val === this.props.settings.sort.direction).val;
+        let sortTypeSelectedValue = sortTypeSettings.find((a) => a.val === this.props.settings.sortType).val;
+        let sortDirectionSelectedValue = sortDirectionSettings.find((a) => a.val === this.props.settings.sortDirection).val;
 
         this.state = {
             sortTypeSelectedValue,
@@ -32,8 +32,8 @@ class SettingsSort extends Component {
 
     render() {
         let {t} = this.props;
-        let activeSortType = sortTypeSettings.find((a) => a.val === this.props.settings.sort.type);
-        let activeSortDirection = sortDirectionSettings.find((a) => a.val === this.props.settings.sort.direction);    
+        let activeSortType = sortTypeSettings.find((a) => a.val === this.props.settings.sortType);
+        let activeSortDirection = sortDirectionSettings.find((a) => a.val === this.props.settings.sortDirection);    
         let activeNotesShowInterval = notesShowIntervalSettings.find((a) => a.val === this.props.settings.notesShowInterval);                
 
         return (
@@ -51,7 +51,7 @@ class SettingsSort extends Component {
                             },
                             {
                                 text: t("ok"),
-                                onClick: () => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {type: this.state.sortTypeSelectedValue}), this.props.renderNotes)
+                                onClick: () => this.props.setSetting("sortType", this.state.sortTypeSelectedValue, this.props.renderNotes)
                             }
                         ]}
                     >
@@ -82,7 +82,7 @@ class SettingsSort extends Component {
                             },
                             {
                                 text: t("ok"),
-                                onClick: () => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {direction: this.state.sortDirectionSelectedValue}), this.props.renderNotes)
+                                onClick: () => this.props.setSetting("sortDirection", this.state.sortDirectionSelectedValue, this.props.renderNotes)
                             }
                         ]}
                     >
@@ -105,7 +105,7 @@ class SettingsSort extends Component {
                     <SwitchListItem 
                         text={t("fin-sort")}  
                         checked={this.props.settings.sort.finSort}
-                        onChange={(e) => this.props.setSetting("sort", Object.assign(this.props.settings.sort, {finSort: e}), this.props.renderNotes)}     
+                        onChange={(e) => this.props.setSetting("sortFinBehaviour", +e, this.props.renderNotes)}     
                     />   
 
                     {

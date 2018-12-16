@@ -7,15 +7,11 @@ export default {
     name: "1.7",
 
     async run() {
-        console.log("0");
         await addUUID();
-        console.log("1");
         await addMetaTable();
-        console.log("2");
         await alterTasksTable();
-        console.log("3");
         await forkFromFieldToUUID();
-        console.log("4");
+        await alterSettingsTable();
 
         let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
         if (!token.id) {
@@ -73,7 +69,6 @@ export default {
         }
 
         async function alterTasksTable () {
-            let msNow = +new Date(); 
             await execureSQL(`ALTER TABLE Tasks RENAME TO Tasks_OLD;`);
             await execureSQL(`                           
                 CREATE TABLE IF NOT EXISTS Tasks
@@ -97,8 +92,8 @@ export default {
                     userId INTEGER,
                     repeatType INTEGER,
                     forkFrom INTEGER,
+
                     priority INTEGER,
-                    sortPriority INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
             `);
@@ -124,8 +119,8 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    priority,
-                    sortPriority
+
+                    priority
                 ) 
                 SELECT
                     id, 
@@ -147,8 +142,8 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    2 as priority,
-                    1 as sortPriority
+
+                    2 as priority
                 FROM Tasks_OLD;
             `);
 
@@ -166,6 +161,71 @@ export default {
                     )
                 where forkFrom != -1
             `);
+        }
+
+        async function alterSettingsTable () {
+            let select = await execureSQL(`SELECT sort FROM Settings;`);
+            let currentSortSettings = select.rows.item(0);
+            if (!currentSortSettings) {
+                currentSortSettings = {
+                    type: 1,
+                    direction: 1,
+                    finSort: 1
+                }
+            }
+
+            await execureSQL(`ALTER TABLE Settings RENAME TO Settings_OLD;`);
+            await execureSQL(`                           
+                CREATE TABLE IF NOT EXISTS Settings
+                (
+                    defaultNotification INTEGER,
+                    fastAdd INTEGER,
+                    theme INTEGER,
+                    password TEXT,    
+                    fontSize INTEGER,
+                    notesShowInterval INTEGER,
+                    lang TEXT,
+                    calendarNotesCounter INTEGER,
+                    
+                    calendarNotesCounterBehaviour INTEGER,
+                    sortType INTEGER,
+                    sortDirection INTEGER,
+                    sortFinBehaviour INTEGER
+                );
+            `);
+            await execureSQL(`
+                INSERT INTO Settings (
+                    defaultNotification,
+                    fastAdd,
+                    theme,
+                    password,    
+                    fontSize,
+                    notesShowInterval,
+                    lang,
+                    calendarNotesCounter,
+
+                    calendarNotesCounterBehaviour,
+                    sortType,
+                    sortDirection,
+                    sortFinBehaviour
+                ) 
+                SELECT 
+                    defaultNotification, 
+                    fastAdd,
+                    theme, 
+                    password, 
+                    fontSize, 
+                    notesShowInterval, 
+                    lang, 
+                    calendarNotesCounter,
+
+                    0 as calendarNotesCounterBehaviour,
+                    ? as sortType,
+                    ? as sortDirection,
+                    ? as sortFinBehaviour
+                FROM Settings_OLD;
+            `, [currentSortSettings.type, currentSortSettings.direction ,currentSortSettings.finSort]);
+            await execureSQL(`DROP TABLE Settings_OLD;`);
         }
     }
 }

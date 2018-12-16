@@ -62,7 +62,19 @@ class SetitngsService {
 
     async getSettings () {
         let select = await executeSQL(
-            `SELECT defaultNotification, sort, fastAdd, theme, password, fontSize, notesShowInterval, lang, calendarNotesCounter
+            `SELECT 
+                defaultNotification, 
+                fastAdd, 
+                theme, 
+                password, 
+                fontSize, 
+                notesShowInterval, 
+                lang, 
+                calendarNotesCounter,
+                calendarNotesCounterBehaviour,
+                sortType,
+                sortDirection,
+                sortFinBehaviour
             FROM Settings;`
         );
 
@@ -73,7 +85,6 @@ class SetitngsService {
             defaultNotification: Boolean(result.defaultNotification),
             fastAdd: Boolean(result.fastAdd),
             theme: themesService.getThemeById(result.theme),
-            sort: JSON.parse(result.sort),
             calendarNotesCounter: Boolean(result.calendarNotesCounter)
         }
     }
@@ -83,7 +94,6 @@ class SetitngsService {
             case("defaultNotification"): value = Number(value); break;
             case("fastAdd"): value = +value; break;
             case("theme"): value = value.id; break;
-            case("sort"): value = JSON.stringify(value); break;
             case("calendarNotesCounter"): value = Number(value); break;
             default: break;
         }

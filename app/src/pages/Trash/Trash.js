@@ -51,12 +51,15 @@ class Trash extends Component {
                             ))
                         }
                     </div>
-                    <div className="clean-trash-button-wrapper">
-                        <button 
-                            className="text block"
-                            onClick={this.props.cleanDeletedNotes}
-                        >{t("clean-trash")}</button>
-                    </div>
+                    {
+                        this.props.trash.length !== 0 &&
+                        <div className="clean-trash-button-wrapper">
+                            <button 
+                                className="text block"
+                                onClick={this.props.cleanDeletedNotes}
+                            >{t("clean-trash")}</button>
+                        </div>
+                    }
                 </div>
             </div>
         );
