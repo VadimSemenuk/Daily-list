@@ -129,12 +129,6 @@ class SettingsTheme extends Component {
                     />
 
                     <SwitchListItem 
-                        text={t("show-mini-calendar")}  
-                        checked={this.props.settings.showMiniCalendar}
-                        onChange={(e) => this.props.setSetting('showMiniCalendar', e)}     
-                    />
-
-                    <SwitchListItem 
                         text={t("show-notes-count")}  
                         checked={this.props.settings.calendarNotesCounter}
                         onChange={(e) => this.props.setSetting('calendarNotesCounter', e, this.props.getFullCount)}     
