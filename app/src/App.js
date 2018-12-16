@@ -97,11 +97,11 @@ export default class App extends Component {
             )
             :
             (
-                this.state.settings ?
+                this.state.loaderColor ?
                 (
                     <div className="init-loader-container">
                         <BeatLoader
-                            color={this.state.settings.theme.header}
+                            color={this.state.loaderColor}
                             loading={true} 
                         />
                     </div>
