@@ -1,3 +1,14 @@
 .trash-list-page-content {
     padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    .items-wrapper {
+        flex: 1;
+    }
+
+    .clean-trash-button-wrapper {
+        padding: 0 5px;
+    }
 }

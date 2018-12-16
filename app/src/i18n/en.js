@@ -149,4 +149,8 @@ export default {
     "error-repeat-common": "An error has occurred. Repeat later",
     "error-common": "",
     "error-reload-app": "Reload app",
+
+    // trash
+    "clean-trash": "Clean trash",
+    "clean-trash-error": "Failed to clean trash. Reload app and try again",
 } 

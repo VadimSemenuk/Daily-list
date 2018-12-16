@@ -511,6 +511,14 @@ class NotesService {
         return nextNote;
     }
 
+    async cleanDeletedNotes() {
+        let deleteAction = await executeSQL(
+            `DELETE FROM Tasks
+            WHERE lastAction = ?`,
+            ["DELETE"]
+        );
+    }
+
     calculateTimeCheckSum (note) {
         let startTimeCheckSum = note.startTime ? note.startTime.valueOf() - note.added : 0;
         let endTimeCheckSum = note.endTime ? note.endTime.valueOf() - note.added : 0;

@@ -36,19 +36,27 @@ class Trash extends Component {
         return (
             <div className="page-wrapper">
                 <Header title={t("trash")} />
-                <div className="scroll page-content trash-list-page-content">
-                    {
-                        this.props.trash.map((a) => (
-                            <TrashListItem 
-                                key={a.key}
-                                itemData={a}
-                                onShowImage={this.onImageShowRequest}
-                                onDynaicFieldChange={this.onItemDynaicFieldChange}
-                                onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                onRestore={this.onRestore}
-                            /> 
-                        ))
-                    }
+                <div className="page-content trash-list-page-content">
+                    <div className="scroll items-wrapper">
+                        {
+                            this.props.trash.map((a) => (
+                                <TrashListItem 
+                                    key={a.key}
+                                    itemData={a}
+                                    onShowImage={this.onImageShowRequest}
+                                    onDynaicFieldChange={this.onItemDynaicFieldChange}
+                                    onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                    onRestore={this.onRestore}
+                                /> 
+                            ))
+                        }
+                    </div>
+                    <div className="clean-trash-button-wrapper">
+                        <button 
+                            className="text block"
+                            onClick={this.props.cleanDeletedNotes}
+                        >{t("clean-trash")}</button>
+                    </div>
                 </div>
             </div>
         );

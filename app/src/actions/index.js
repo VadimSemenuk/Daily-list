@@ -1,3 +1,5 @@
+// TODO: move log to action, remove token param from backup action
+
 import moment from "moment";
 
 import notesService from "../services/notes.service";
@@ -224,14 +226,30 @@ export function restoreNote (note) {
     }
 }
 
-export function renderNotes () {
-    return {
-        type: "RENDER_NOTES"
+export function cleanDeletedNotes () {
+    return function(dispatch, getState) {
+        return notesService.cleanDeletedNotes()
+            .then(() => dispatch({
+                type: "CLEAN_TRASH",
+            }))
+            .then(() => {
+                // let token = getState().user;
+                // token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
+            })
+            .catch((err) => {
+                dispatch(triggerErrorModal("clean-trash-error"));
+                let deviceId = getState().meta.deviceId;
+                deviceService.logError(err, {
+                    path: "action/index.js -> cleanDeletedNotes()",
+                    deviceId
+                });
+            });
     }
 }
 
-export function refreshNotes () {
-    return function (dispatch, getState) {
+export function renderNotes () {
+    return {
+        type: "RENDER_NOTES"
     }
 }
 
