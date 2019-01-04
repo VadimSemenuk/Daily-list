@@ -33,7 +33,9 @@ class Password extends Component {
         };
     }
 
-	render () {	
+    onKeyPress = (e) => e.key === "Enter" && this.in()
+
+    render () {
         let {t} = this.props;
 
 		return (
@@ -46,6 +48,7 @@ class Password extends Component {
                             type="password"
                             placeholder={t("pass-in")}
                             onChange={(e) => this.setState({password: e.target.value})}
+                            onKeyPress={this.onKeyPress}
                         /> 
                         <button onClick={this.in}>
                             <img 
