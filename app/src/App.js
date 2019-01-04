@@ -51,7 +51,12 @@ export default class App extends Component {
     }
 
     async initApp() {
-        window.db = await this.initDb();   
+        await this.initDb()
+            .catch(err => {
+                deviceService.logError(err, {
+                    path: "App.js/initDb"
+                });
+            });
 
         let meta = await deviceService.getMetaInfo();
         let settings = await settingsService.getSettings();
@@ -72,9 +77,8 @@ export default class App extends Component {
     }
 
     async initDb() {
-        window.db = await DB();
+        window.com_mamindeveloper_dailylist_db = await DB();
         await migration.run();
-        return window.db;       
     }
 
     applyInitSettings(settings) {
