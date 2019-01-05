@@ -126,6 +126,9 @@ function notes (state = init, action) {
                 }
             })
         }
+        case "UPDATE_NOTES": {
+            return action.notes.slice();
+        }
         default: 
             return state;
     }

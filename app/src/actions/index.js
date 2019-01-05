@@ -204,6 +204,7 @@ export function restoreNote (note) {
             .then(({note}) => {
                 let date = getState().date;
                 dispatch(getFullCount(date.valueOf()));
+                dispatch(updateNotes());
 
                 let token = getState().user;
                 token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
@@ -256,6 +257,27 @@ export function setCurrentDate (date) {
     return {
         type: "SET_CURRENT_DATE",
         date
+    }
+}
+
+export function updateNotes() {
+    return function(dispatch, getState) {
+        let state = getState();
+        let dates = state.notes.map((n) => n.date);
+
+        return notesService.getNotesByDates(dates)
+            .then((notes) => dispatch({
+                type: "UPDATE_NOTES",
+                notes
+            }))
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-get-notes"));
+                let deviceId = getState().meta.deviceId;
+                deviceService.logError(err, {
+                    path: "action/index.js -> updateNotes()",
+                    dates, deviceId
+                });
+            });
     }
 }
 

@@ -23,7 +23,6 @@ class Trash extends Component {
 
     onRestore = (note) => this.props.restoreNote(note);
 
-
     render() {
         let {t} = this.props;
 
