@@ -1,7 +1,7 @@
 import execureSQL from "../../utils/executeSQL";
 import migrations from "./migrations";
 import {init} from "./migrations";
-import {addFakeListItemsData} from "../../utils/fakeData";
+// import {addFakeListItemsData} from "../../utils/fakeData";
 import deviceService from "../../services/device.service";
 
 class Migration {

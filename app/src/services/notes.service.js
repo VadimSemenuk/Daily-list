@@ -497,7 +497,7 @@ class NotesService {
     }
 
     async cleanDeletedNotes() {
-        let deleteAction = await executeSQL(
+        await executeSQL(
             `DELETE FROM Tasks
             WHERE lastAction = ?`,
             ["DELETE"]

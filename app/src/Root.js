@@ -171,7 +171,7 @@ class Root extends Component {
                             className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
                             type="button"
                             onClick={this.props.googleSignIn}
-                        ><img src={GoogleImg} />{t("google-sign-in")}</button>
+                        ><img src={GoogleImg} alt="google sign in"/>{t("google-sign-in")}</button>
                     </Modal>
 
                     <Modal 

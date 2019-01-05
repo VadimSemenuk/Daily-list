@@ -6,7 +6,6 @@ import ReactSwipe from 'react-swipe';
 import {translate} from "react-i18next";
 
 import FastAdd from '../../components/FastAdd/FastAdd';
-import DayNotesList from './DayNotesList';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';

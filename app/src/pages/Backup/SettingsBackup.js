@@ -17,10 +17,6 @@ import ImportImg from '../../assets/img/cloud-computing.svg';
 import LogoutImg from '../../assets/img/logout.svg';
 
 class SettingsBackup extends Component {
-	constructor(props) {
-        super(props);  
-    }
-
     componentDidMount() {
         if (this.props.user.id !== undefined) {
             this.props.updateLastBackupTime();
@@ -35,7 +31,7 @@ class SettingsBackup extends Component {
                 <Header title={t("backup")}/>
                 <div className="scroll page-content padding">
                     {
-                        this.props.user.id == undefined &&
+                        this.props.user.id === undefined &&
                         <div className="not-logined-wrapper">
                             <TriggerListItem 
                                 text={t("how-it-works-btn")}
@@ -45,7 +41,7 @@ class SettingsBackup extends Component {
                                 className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
                                 type="button"
                                 onClick={this.props.googleSignIn}
-                            ><img src={GoogleImg} />{t("google-sign-in")}</button>
+                            ><img src={GoogleImg} alt="google sign in" />{t("google-sign-in")}</button>
                         </div>
                     }
                     {
@@ -61,7 +57,7 @@ class SettingsBackup extends Component {
                                     className="log-out" 
                                     type="button"
                                     onClick={this.props.googleSignOut}
-                                ><img src={LogoutImg}/></button>
+                                ><img src={LogoutImg} alt="logout"/></button>
                             </div>
                             
                             <div className="backup-settings-wrapper">
@@ -77,13 +73,13 @@ class SettingsBackup extends Component {
                                     className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
                                     type="button"
                                     onClick={() => this.props.uploadBatchBackup()}
-                                ><img src={ExportImg} />{t("create-backup")}</button>
+                                ><img src={ExportImg} alt="export"/>{t("create-backup")}</button>
 
                                 <button 
                                     className={`text block img-text-button${(this.props.loader || !this.props.user.backup.lastBackupTime) ? " disabled" : ""}`} 
                                     type="button"
                                     onClick={() => this.props.restoreBackup()}
-                                ><img src={ImportImg} />{t("restore-backup")}</button>
+                                ><img src={ImportImg} alt="import" />{t("restore-backup")}</button>
                             </div>
                             {
                                 this.props.user.backup.lastBackupTime &&

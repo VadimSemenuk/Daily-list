@@ -8,15 +8,9 @@ import * as AppActions from '../../actions';
 import Header from '../../components/Header/Header';
 import TrashListItem from './TrashListItem/TrashListItem';
 
-import notesService from '../../services/notes.service';
-
 import './Trash.scss';
 
 class Trash extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     async componentDidMount() {
         this.props.getDeletedNotes();
     }
