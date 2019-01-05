@@ -15,16 +15,16 @@ class Migration {
 
     async getNewMigrations() {
         try {
-            let select = (await execureSQL(`SELECT name FROM migrations;`)).rows;
+            let select = (await execureSQL(`SELECT name FROM Migrations;`)).rows;
             let appliedMigrations = [];  
             for(let i = 0; i < select.length; i++) {
                 appliedMigrations.push(select.item(i));
-            };
+            }
             return migrations.filter((a) => !appliedMigrations.some((b) => a.name === b.name));
-        } catch (err) {      
+        } catch (err) {
             console.warn(err);  
             if (!(await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Migrations';`)).rows.length) {
-                return migrations
+                return migrations;
             }  
         }
     }
