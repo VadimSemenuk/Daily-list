@@ -28,7 +28,7 @@ class Note extends PureComponent {
     }
 
     onItemFinishChange = (v) => {
-        this.props.onDynaicFieldChange(this.props.itemData, {finished: v});
+        this.props.onDynaicFieldChange(this.props.itemData, {finished: v}, true);
     }
 
     onItemActionsWindowRequest = (e) => {

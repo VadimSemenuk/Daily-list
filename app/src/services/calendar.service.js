@@ -106,7 +106,7 @@ class CalendarService {
     async getFullCount(date, includeFinished) {
         let counts = await Promise.all([this.getCount(date, "week", includeFinished), this.getCount(date, "month", includeFinished)]);
 
-        return {...counts[0], ...counts[1]}
+        return {...counts[0], ...counts[1]};
     }
 }
 

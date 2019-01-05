@@ -86,7 +86,7 @@ export function updateNote (note, updateCount) {
     }
 }
 
-export function updateNoteDynamicFields (note, state) {
+export function updateNoteDynamicFields (note, state, updateCount) {
     return function(dispatch, getState) {
         return notesService.updateNoteDynamicFields(note, state)
             .then((nextNote) => {
@@ -96,7 +96,14 @@ export function updateNoteDynamicFields (note, state) {
                     inserted: note.isShadow && !nextNote.isShadow
                 });
 
-                let token = getState().user;
+                let state = getState();
+
+                updateCount
+                && state.settings.calendarNotesCounter
+                && !state.settings.calendarNotesCounterIncludeFinished
+                && dispatch(getFullCount(nextNote.added.valueOf()));
+
+                let token = state.user;
                 token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote, token));
             })
             .catch((err) => {
@@ -227,13 +234,16 @@ export function restoreNote (note) {
 
 export function cleanDeletedNotes () {
     return function(dispatch, getState) {
+        let state = getState();
+        let deletedNotesUUIDs = state.trash.map((n) => n.uuid);
+        debugger;
         return notesService.cleanDeletedNotes()
             .then(() => dispatch({
                 type: "CLEAN_TRASH",
             }))
             .then(() => {
-                // let token = getState().user;
-                // token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
+                let token = state.user;
+                token.settings && token.settings.autoBackup && dispatch(removeFromBackup(deletedNotesUUIDs, token));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("clean-trash-error"));
@@ -530,6 +540,25 @@ export function uploadBatchBackup() {
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> uploadBatchBackup()",
+                    deviceId
+                });
+            })
+    }
+}
+
+export function removeFromBackup(noteUUIDs) {
+    return function(dispatch, getState) {
+        dispatch(triggerLoader());
+        let token = getState().user;
+
+        return backupService.removeFromBackup(noteUUIDs, token)
+            .catch((err) => {
+                dispatch(triggerLoader());
+                dispatch(triggerErrorModal("error-backup-upload"));
+                let deviceId = getState().meta.deviceId;
+                deviceService.logError(err, {
+                    path: "action/index.js -> remvoeFromBackup()",
+                    noteUUIDs,
                     deviceId
                 });
             })

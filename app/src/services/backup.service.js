@@ -114,6 +114,10 @@ class BackupService {
 
         return time;
     }
+
+    async removeFromBackup(token) {
+        return false;
+    }
 }
 
 let backupService = new BackupService();
