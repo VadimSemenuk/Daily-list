@@ -24,6 +24,7 @@ export default {
     "notes-show-interval-week": "Week",
     "notes-show-interval-day": "Day",
     "show-notes-count": "Display counters on the calendar",
+    "show-notes-count-include-finished": "Include finished notes in calendar's counters",
     "reload-app-note": "Restart the app to apply changes",
   
     // interface page

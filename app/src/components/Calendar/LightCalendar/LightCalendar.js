@@ -32,6 +32,8 @@ class LightCalendar extends Component {
         this.prevPageIndex = 1;
 
         this.noSlideEventHandle = false;
+
+        this.dispatchedActionName = null;
     }
 
     async componentDidMount() {
@@ -61,7 +63,8 @@ class LightCalendar extends Component {
         let weeks = [...this.state.weeks.slice(0, nextIndex), this.generateWeekDates(nextDate), ...this.state.weeks.slice(nextIndex + 1)];
 
         if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(weeks[nextIndex][0], this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
-            this.props.getCount(weeks[nextIndex][0], this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "week");
+            this.dispatchedActionName = "GET_COUNT";
+            this.props.getCount(weeks[nextIndex][0], "week");
         }
 
         let monthName = this.getMonthName(weeks[index][0], weeks[index][6]);
@@ -91,7 +94,14 @@ class LightCalendar extends Component {
         this.props.onDateSet(moment(date));
     }
 
-    async componentWillReceiveProps(nextProps) {
+    async componentWillReceiveProps(nextProps, a) {
+        if (this.dispatchedActionName) {
+            if (this.dispatchedActionName === "GET_COUNT") {
+                this.dispatchedActionName = null;
+                return;
+            }
+        }
+
         let msSelectedWeekStartDate = moment(nextProps.currentDate).startOf('week').valueOf();
 
         if (msSelectedWeekStartDate === this.state.weeks[this.activePageIndex][0].valueOf()) {
@@ -132,7 +142,7 @@ class LightCalendar extends Component {
             }
 
             if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
-                this.props.getCount(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "week");
+                this.props.getCount(nextDate.valueOf(), "week");
             }
 
             let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            

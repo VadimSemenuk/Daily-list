@@ -338,9 +338,10 @@ export function triggerLoader (loader, state) {
 }
 
 // calendar 
-export function getCount (date, period) {    
+export function getCount (date, period) {
     return function(dispatch, getState) {
-        return calendarService.getCount(date, period)
+        let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
+        return calendarService.getCount(date, period, includeFinished)
             .then((nextCount) => dispatch({
                 type: "GET_COUNT",
                 nextCount 
@@ -355,9 +356,10 @@ export function getCount (date, period) {
     }
 }
 
-export function getFullCount (date, period) {    
+export function getFullCount (date) {
     return function(dispatch, getState) {
-        return calendarService.getFullCount(date, period)
+        let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
+        return calendarService.getFullCount(date, includeFinished)
             .then((nextCount) => dispatch({
                 type: "GET_COUNT",
                 nextCount 
@@ -366,7 +368,7 @@ export function getFullCount (date, period) {
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> getFullCount()",
-                    date, period, deviceId
+                    date, deviceId
                 });
             });
     }

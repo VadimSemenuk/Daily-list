@@ -165,7 +165,8 @@ export default {
 
         async function alterSettingsTable () {
             let select = await execureSQL(`SELECT sort FROM Settings;`);
-            let currentSortSettings = select.rows.item(0);
+            let selectItems = select.rows.item(0);
+            let currentSortSettings = (selectItems && selectItems.sort ) ? JSON.parse(selectItems.sort) : false;
             if (!currentSortSettings) {
                 currentSortSettings = {
                     type: 1,
@@ -187,7 +188,7 @@ export default {
                     lang TEXT,
                     calendarNotesCounter INTEGER,
                     
-                    calendarNotesCounterBehaviour INTEGER,
+                    calendarNotesCounterIncludeFinished INTEGER,
                     sortType INTEGER,
                     sortDirection INTEGER,
                     sortFinBehaviour INTEGER
@@ -204,7 +205,7 @@ export default {
                     lang,
                     calendarNotesCounter,
 
-                    calendarNotesCounterBehaviour,
+                    calendarNotesCounterIncludeFinished,
                     sortType,
                     sortDirection,
                     sortFinBehaviour
@@ -219,12 +220,12 @@ export default {
                     lang, 
                     calendarNotesCounter,
 
-                    0 as calendarNotesCounterBehaviour,
+                    0 as calendarNotesCounterIncludeFinished,
                     ? as sortType,
                     ? as sortDirection,
                     ? as sortFinBehaviour
                 FROM Settings_OLD;
-            `, [currentSortSettings.type, currentSortSettings.direction ,currentSortSettings.finSort]);
+            `, [currentSortSettings.type || 1, currentSortSettings.direction || 1, currentSortSettings.finSort || 1]);
             await execureSQL(`DROP TABLE Settings_OLD;`);
         }
     }

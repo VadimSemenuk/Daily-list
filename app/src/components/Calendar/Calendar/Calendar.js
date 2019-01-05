@@ -34,6 +34,8 @@ class Calendar extends Component {
         this.prevPageIndex = 1;
 
         this.noSlideEventHandle = false;
+
+        this.dispatchedActionName = null;
     }
 
     async componentDidMount() {
@@ -54,7 +56,8 @@ class Calendar extends Component {
         let monthes = [...this.state.monthes.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.monthes.slice(nextIndex + 1)];        
 
         if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
-            this.props.getCount(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
+            this.dispatchedActionName = "GET_COUNT";
+            this.props.getCount(currentMonthStartDate.valueOf(), "month");
         } 
 
         this.setState({
@@ -141,7 +144,14 @@ class Calendar extends Component {
         this.onSlideChange(action);
     }
 
-    async componentWillReceiveProps(nextProps) {     
+    async componentWillReceiveProps(nextProps) {
+        if (this.dispatchedActionName) {
+            if (this.dispatchedActionName === "GET_COUNT") {
+                this.dispatchedActionName = null;
+                return;
+            }
+        }
+
         let msSelectedDate = moment(nextProps.currentDate).startOf("day").valueOf();
         let currentMonthStartDate = moment(msSelectedDate).startOf("month");       
 
@@ -188,7 +198,7 @@ class Calendar extends Component {
             }        
 
             if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
-                this.props.getCount(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate, "month");
+                this.props.getCount(nextDate.valueOf(), "month");
             }
 
             this.setState({

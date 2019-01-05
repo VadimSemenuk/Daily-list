@@ -6,7 +6,7 @@ class CalendarService {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
-    async getCount(date, period, halfInterval = 25) {
+    async getCount(date, period, includeFinished, halfInterval = 5) {
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).startOf(period).add(halfInterval, period).valueOf();
 
@@ -46,22 +46,40 @@ class CalendarService {
                 repeatType = "week" AND
                 t.forkFrom = -1
 			GROUP BY rep.value;
-        `);      
+        `);
 
-        let selects = await Promise.all([
-            selectTask, 
-            selectRepeatableDayTask, 
-            selectRepeatableWeekTask
-        ]);
+        let tasks = [selectTask, selectRepeatableDayTask, selectRepeatableWeekTask];
+        if (!includeFinished) {
+            tasks.push(executeSQL(
+                `SELECT COUNT(*) as count, added FROM (
+                SELECT added FROM Tasks
+                    WHERE
+                        added >= ? AND added <= ? AND
+                        lastAction != 'DELETE' AND
+                        (repeatType = 'no-repeat' OR forkFrom != -1) AND finished = 1
+            )
+            GROUP BY added;`,
+                [intervalStartDate, intervalEndDate]
+            ));
+        }
+        let selects = await Promise.all(tasks);
 
         let select = selects[0];
         let selectRepeatableDay = selects[1];
-        let selectRepeatableWeek = selects[2];   
+        let selectRepeatableWeek = selects[2];
+        let selectFinished = selects[3];
 
         let count = {};
         for (let i = 0; i < select.rows.length; i++) {
             let countItem = select.rows.item(i);
-            count[countItem.added] = countItem.count
+            count[countItem.added] = countItem.count;
+        }
+
+        if (!includeFinished) {
+            for (let i = 0; i < selectFinished.rows.length; i++) {
+                let countItem = selectFinished.rows.item(i);
+                count[countItem.added] -= countItem.count;
+            }
         }
  
         let repeatable = {
@@ -85,8 +103,8 @@ class CalendarService {
         };
     }
 
-    async getFullCount(date) {
-        let counts = await Promise.all([this.getCount(date, "week"), this.getCount(date, "month")]);
+    async getFullCount(date, includeFinished) {
+        let counts = await Promise.all([this.getCount(date, "week", includeFinished), this.getCount(date, "month", includeFinished)]);
 
         return {...counts[0], ...counts[1]}
     }

@@ -97,7 +97,7 @@ class NotesService {
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -121,7 +121,7 @@ class NotesService {
             ]
         );
 
-        // handle if not saved
+        // TODO: handle if not saved
 
         return {
             ...note,

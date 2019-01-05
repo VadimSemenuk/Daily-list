@@ -104,7 +104,7 @@ class SettingsSort extends Component {
 
                     <SwitchListItem 
                         text={t("fin-sort")}  
-                        checked={this.props.settings.sort.finSort}
+                        checked={this.props.settings.sortFinBehaviour}
                         onChange={(e) => this.props.setSetting("sortFinBehaviour", +e, this.props.renderNotes)}     
                     />   
 
