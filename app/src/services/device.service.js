@@ -1,5 +1,6 @@
 import executeSQL from '../utils/executeSQL';
 import config from '../config/config';
+import throttle from "../utils/throttle";
 
 class DeviceService {
     setNextVersionMigrationState(state) {
@@ -38,9 +39,7 @@ class DeviceService {
         }).catch((err) => console.warn(err));
     }
 
-    async logError(err, additionalInto) {
-        // add debounce
-        // add device id
+    logError = throttle((err, additionalInto) => {
         console.warn(err);
 
         if (err.constructor && err.constructor.name === "SQLError") {
@@ -52,6 +51,11 @@ class DeviceService {
             name: err.name,
             message: err.message,
             additionalInto
+        };
+
+        // if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+        if (true) {
+            return executeSQL(`INSERT INTO ErrorLogs (date, message) VALUES (?, ?)`, [+new Date(), JSON.stringify(log)]);
         }
 
         return fetch(`${config.apiURL}/log/error`, {
@@ -62,6 +66,35 @@ class DeviceService {
             },
             body: JSON.stringify(log)        
         }).catch((err) => console.warn(err));
+    }, 5000);
+
+    async logSaved() {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+            return false;
+        }
+        let select = await executeSQL(`SELECT date, message FROM ErrorLogs`);
+
+        if (select && select.rows.length) {
+            let logs = [];
+            for (let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+                logs.push({
+                    date: new Date(item.date),
+                    message: JSON.parse(item.message)
+                });
+            }
+
+            await fetch(`${config.apiURL}/log/error`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(logs)
+            }).catch((err) => console.warn(err));
+
+            executeSQL(`DELETE FROM ErrorLogs`);
+        }
     }
 }
 

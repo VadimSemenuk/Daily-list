@@ -1,5 +1,3 @@
-// TODO: move log to action, remove token param from backup action
-
 import moment from "moment";
 
 import notesService from "../services/notes.service";

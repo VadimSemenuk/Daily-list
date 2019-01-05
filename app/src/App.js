@@ -35,19 +35,13 @@ export default class App extends Component {
     async componentWillMount() {
         window.cordova && await new Promise((resolve) => document.addEventListener("deviceready", resolve, false));
         store = await this.initApp()
-            .catch((err) => {
-                console.warn(err);
-                return null
-            });
 
+        this.setState({
+            appReady: true
+        });
 
-        if (store) {
-            this.setState({
-                appReady: true
-            });
-
-            deviceService.logLoad(this.state.deviceId);
-        }
+        deviceService.logLoad(this.state.deviceId);
+        deviceService.logSaved();
     }
 
     async initApp() {

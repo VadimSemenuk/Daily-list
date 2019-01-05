@@ -12,6 +12,7 @@ export default {
         await alterTasksTable();
         await forkFromFieldToUUID();
         await alterSettingsTable();
+        await addErrorsTable();
 
         let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
         if (!token.id) {
@@ -227,6 +228,16 @@ export default {
                 FROM Settings_OLD;
             `, [currentSortSettings.type || 1, currentSortSettings.direction || 1, currentSortSettings.finSort || 1]);
             await execureSQL(`DROP TABLE Settings_OLD;`);
+        }
+
+        async function addErrorsTable () {
+            await execureSQL(`
+                CREATE TABLE IF NOT EXISTS ErrorLogs
+                (
+                    date INTEGER,
+                    message TEXT
+                );
+            `);
         }
     }
 }

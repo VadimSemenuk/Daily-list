@@ -26,7 +26,7 @@ async function createTables () {
             added INTEGER,
             finished INTEGER DEFAULT 0                
         );`
-    )
+    );
     
     await execureSQL(
         `CREATE TABLE IF NOT EXISTS Settings
@@ -40,7 +40,7 @@ async function createTables () {
             finishedSort INTEGER DEFAULT 1,
             autoBackup INTEGER DEFAULT 0
         );`
-    )
+    );
 }
 
 async function fillDb () {
@@ -48,7 +48,7 @@ async function fillDb () {
         `INSERT INTO Settings
         (defaultNotification, sort, fastAdd, colorTheme, fontSize, finishedSort, autoBackup)
         VALUES (1, 3, 0, 0, 14, 1, 0);`
-    )
+    );
 
     await addInitNote();
 }
