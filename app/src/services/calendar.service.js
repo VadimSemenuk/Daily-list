@@ -6,7 +6,7 @@ class CalendarService {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
-    async getCount(date, period, includeFinished, halfInterval = 5) {
+    async getCount(date, period, includeFinished, halfInterval = 1) {
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).startOf(period).add(halfInterval, period).valueOf();
 
@@ -78,10 +78,13 @@ class CalendarService {
         if (!includeFinished) {
             for (let i = 0; i < selectFinished.rows.length; i++) {
                 let countItem = selectFinished.rows.item(i);
+                if (!count[countItem.added]) {
+                    count[countItem.added] = 0;
+                }
                 count[countItem.added] -= countItem.count;
             }
         }
- 
+
         let repeatable = {
             day: 0,
             week: {},
