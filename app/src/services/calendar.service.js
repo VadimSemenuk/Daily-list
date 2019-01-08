@@ -93,7 +93,7 @@ class CalendarService {
         repeatable.day = selectRepeatableDay.rows.item(0).count;
         for (let i = 0; i < selectRepeatableWeek.rows.length; i++) {
             let countItem = selectRepeatableWeek.rows.item(i);
-            repeatable.week[countItem.weekDay] = countItem.count
+            repeatable.week[countItem.weekDay] = countItem.count;
         }
 
         return {
