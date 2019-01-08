@@ -19,14 +19,12 @@ class BackupService {
                 "Authorization": token.token
             }
         })
-            .then((res) => {
-                // TODO check
-                if (res.status === 200) {
-                    return res.json();
-                }
-            });
-    
-        // TODO drop Tasks table
+            .then((res) => res.json());
+
+        if (!notes || !notes.length) {
+            window.plugins.toast.showLongBottom(i18next.t("error-no-backup"));
+            return false;
+        }
 
         return await notesService.restoreNotesBackup(notes);    
     }

@@ -573,13 +573,12 @@ export function restoreBackup() {
 
         return backupService.restoreNotesBackup(token)
             .then((isUpdated) => {
-                // TODO check empty
                 dispatch(triggerLoader());
                 isUpdated && window.location.reload(true);
             })
             .catch((err) => {
                 dispatch(triggerLoader());
-                dispatch(triggerErrorModal("error-backup-restote"));
+                dispatch(triggerErrorModal("error-backup-restore"));
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> restoreBackup()",

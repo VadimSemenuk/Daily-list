@@ -77,7 +77,7 @@ class NotesService {
             lastActionTime: actionTime,
             forkFrom: -1,
             ...timeCheckSums
-        }
+        };
 
         let addedNote = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(addedNote);
@@ -85,7 +85,7 @@ class NotesService {
         notificationService.clear(addedNote.repeatType === "any" ? addedNote.repeatDates : [addedNote.key]);
         if (addedNote.notificate) {
             notificationService.set(addedNote.key, addedNote);
-        };
+        }
 
         return addedNote;
     }
@@ -120,8 +120,6 @@ class NotesService {
                 note.priority,
             ]
         );
-
-        // TODO: handle if not saved
 
         return {
             ...note,
@@ -178,18 +176,14 @@ class NotesService {
             lastAction: "EDIT",
             lastActionTime: actionTime,
             isLastActionSynced: 0
-        }
+        };
         if (nextNote.prevNote.repeatType !== "no-repeat") {
             if (!nextNote.isShadow) {
                 nextNote.key = nextNote.forkFrom;
             }
             await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [nextNote.key]);
         }
-        if (nextNote.repeatType === "no-repeat") {
-            nextNote.isShadow = false;
-        } else {
-            nextNote.isShadow = true;
-        }
+        nextNote.isShadow = nextNote.repeatType !== "no-repeat";
         nextNote.forkFrom = -1;
         nextNote.finished = false;
 
@@ -221,7 +215,7 @@ class NotesService {
         notificationService.clear(nextNote.prevNote.repeatType === "any" ? nextNote.prevNote.repeatDates : [nextNote.key]);
         if (nextNote.notificate) {
             notificationService.set(nextNote.key, nextNote);
-        };
+        }
 
         return nextNote;
     }
@@ -241,14 +235,14 @@ class NotesService {
         notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
         if (note.notificate) {
             notificationService.set(note.key, note);
-        };
+        }
 
         return note;
     }
 
     async deleteNote(note) {
         let actionTime = moment().valueOf();
-        let nextNote = {...note}
+        let nextNote = {...note};
         if (nextNote.repeatType !== "no-repeat" && !nextNote.isShadow) {
             nextNote.isShadow = true;
             nextNote.key = nextNote.forkFrom;
@@ -348,7 +342,9 @@ class NotesService {
             ${dataSelectWhereStatement};
         `, dataSelectParams);
 
-        // TODO: test for empty select
+        if (!select.rows.length) {
+            throw new Error("Notes not found");
+        }
 
         let res = [];
         for (let i = 0; i < select.rows.length; i++ ) {
@@ -361,6 +357,9 @@ class NotesService {
         if (!notes || notes.length === 0) {
             return
         }
+
+        await executeSQL(`DELETE FROM Tasks;`);
+        await executeSQL(`DELETE FROM TasksRepeatValues;`);
 
         let valuesString = notes.reduce((accumulator) => {
             return `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -399,7 +398,7 @@ class NotesService {
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
             VALUES
             ${valuesString};
-        `, values)
+        `, values);
 
 
         let rdValuesString = "";
@@ -416,7 +415,7 @@ class NotesService {
                 rdValues.push(+rdValue);
                 rdValuesString +=  ", (?, ?)"
             });
-        })
+        });
         rdValuesString = rdValuesString.slice(2);
 
         if (rdValues.length === 0) {
@@ -430,12 +429,12 @@ class NotesService {
             ${rdValuesString};
         `, rdValues);
 
-
-
-        // notificationService.clear(addedNote.repeatType === "any" ? addedNote.repeatDates : [addedNote.key]);
-        // if (addedNote.notificate) {
-        //     notificationService.set(addedNote.key, addedNote);
-        // };
+        notes.forEach((note) => {
+            notificationService.clearAll();
+            if (note.notificate) {
+                notificationService.set(note.uuid, note);
+            }
+        });
     }
 
     async getDeletedNotes() {
