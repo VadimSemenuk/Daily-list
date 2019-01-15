@@ -55,7 +55,7 @@ export default {
                     IsRateDialogShowed INTEGER,
                     nextVersionMigrated INTEGER
                 );
-            `)
+            `);
 
             await execureSQL(`
                 INSERT INTO MetaInfo (deviceId, IsRateDialogShowed, nextVersionMigrated)
@@ -93,7 +93,7 @@ export default {
                     userId INTEGER,
                     repeatType INTEGER,
                     forkFrom INTEGER,
-
+                    sortWeight INTEGER DEFAULT 1,
                     priority INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
@@ -120,7 +120,7 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-
+                    sortWeight,
                     priority
                 ) 
                 SELECT
@@ -143,7 +143,7 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-
+                    1 as sortWeight,
                     2 as priority
                 FROM Tasks_OLD;
             `);

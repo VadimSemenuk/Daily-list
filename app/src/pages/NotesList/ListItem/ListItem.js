@@ -25,43 +25,43 @@ class Note extends PureComponent {
         let nextDynamicFields = [...this.props.itemData.dynamicFields.slice(0, i), nextDynamicField, ...this.props.itemData.dynamicFields.slice(i + 1)];
         
         this.props.onDynaicFieldChange(this.props.itemData, {dynamicFields: nextDynamicFields});
-    }
+    };
 
     onItemFinishChange = (v) => {
         this.props.onDynaicFieldChange(this.props.itemData, {finished: v}, true);
-    }
+    };
 
     onItemActionsWindowRequest = (e) => {
         e.stopPropagation();
 
         this.props.onItemActionsWindowRequest(this.props.itemData);
-    }
+    };
 
     triggerExpanded = () => {
         this.setState({expanded: !this.state.expanded})
-    }
+    };
 
     showImage = (e) => {
         e.stopPropagation();
         
         window.PhotoViewer.show(e.target.src, this.props.itemData.title, {share: false});         
-    }
+    };
 
     onTouchStart = (e) => {
         this.props.onTouchStart(e);
-    }
+    };
 
     onTouchEnd = (e) => {
-        this.props.onTouchEnd(e);
-    }
-
+        this.props.onTouchEnd(e, this.props.itemData);
+    };
+    // this.props.isDragSortActive &&
     render () {
         let {t} = this.props;
         
         return (
             <div className="note-draggable-wrapper">
                 {
-                    this.props.isDragSortActive &&
+                    true &&
                     <button
                         className="drag-button"
                         onTouchStart={this.onTouchStart}

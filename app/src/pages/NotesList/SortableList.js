@@ -1,8 +1,13 @@
 import React, {PureComponent} from 'react';
+import {connect} from "react-redux";
+
+import * as AppActions from '../../actions';
 
 import DayNotesList from './DayNotesList';
 
 import throttle from "../../utils/throttle";
+import {bindActionCreators} from "redux";
+import notesService from "../../services/notes.service";
 
 function avg(arr) {
     let sum = arr.reduce(function(a, b) { return a + b; });
@@ -22,6 +27,9 @@ class SortableList extends PureComponent {
         this.el = null;
         this.prevCheckedEl = null;
         this.isDragging = false;
+
+        this.dragStartElIndex = null;
+        this.lastElIndex = null;
     }
 
     componentDidMount() {
@@ -44,14 +52,50 @@ class SortableList extends PureComponent {
             this.prevCheckedEl = this.el.prevSibling;
         }
 
-        this.isDragging = true;
-    }
+        for (let i = 0; i < this.items.length; i++) {
+            if (this.items[i] == this.el) {
+                this.dragStartElIndex = i;
+                break;
+            }
+        }
 
-    onTouchEnd = () => {
+        this.isDragging = true;
+    };
+
+    onTouchEnd = (e, note) => {
+        if (this.lastElIndex > this.dragStartElIndex) {
+            this.lastElIndex -= 1;
+        }
+        console.log(this.lastElIndex);
+        console.log(this.dragStartElIndex);
+
+        let notesToUpdate = [];
+        let prevNote = null;
+        let notes = this.props.notes.filter((n, i) => i !== this.dragStartElIndex);
+        console.log(notes);
+        for (let i = 0; i < notes.length; i++) {
+            if (i < this.lastElIndex) {
+                notesToUpdate.push(notes[i]);
+            } else {
+                prevNote = notes[i];
+                break;
+            }
+        }
+        console.log(notesToUpdate)
+        let lowerNoteSortWeight = { key: prevNote.key, weight: prevNote.sortWeight };
+        let noteSortWeight = { key: note.key, weight: prevNote.sortWeight + 1 };
+        let higherNotesSortWeight = [];
+        if (notesToUpdate[notesToUpdate.length - 1].sortWeight <= noteSortWeight.weight) {
+            debugger;
+            higherNotesSortWeight = notesToUpdate.map((n) => ({ key: n.key, weight: n.sortWeight + 2 }));
+        }
+        this.props.onDragSort(lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight, note);
+
+        this.lastElIndex = null;
         this.isDragging = false;
         this.el.classList.remove("dragging");
         this.hadlePrevCheckedEl();
-    }
+    };
 
     touchMove = (e) => {
         if (!this.isDragging) {
@@ -64,7 +108,7 @@ class SortableList extends PureComponent {
         this.el.style.top = this.lastElY + "px";
 
         this.debouncedHandleTouchMove(this.items);
-    }
+    };
 
     debouncedHandleTouchMove = throttle((items) => {
         for (var i = 0; i < items.length; i++) {
@@ -82,9 +126,13 @@ class SortableList extends PureComponent {
                 let curHalfPos = item.offsetTop + (item.clientHeight / 2);
                 this.hadlePrevCheckedEl(item);
                 if (targetHalfPos > curHalfPos) {
+                    // this.lastElIndex = i + " bottom";
+                    this.lastElIndex = i + 1    ;
                     item.style.marginBottom = this.el.clientHeight + "px";
                 }
                 if (targetHalfPos <= curHalfPos) {
+                    // this.lastElIndex = i + " top";
+                    this.lastElIndex = i;
                     item.style.marginTop = this.el.clientHeight + "px";
                 }
                 break;
@@ -99,6 +147,7 @@ class SortableList extends PureComponent {
             ) {
                 this.hadlePrevCheckedEl(item);
                 item.style.marginTop = this.el.clientHeight + "px";
+                this.lastElIndex = "top";
                 break;
             }
 
@@ -111,6 +160,8 @@ class SortableList extends PureComponent {
             ) {
                 this.hadlePrevCheckedEl(item);
                 item.style.marginBottom = this.el.clientHeight + "px";
+                // this.lastElIndex = this.items.length - 1;
+                this.lastElIndex = "bottom";
                 break;
             }
         }
@@ -126,12 +177,12 @@ class SortableList extends PureComponent {
             this.prevCheckedEl.style.marginTop = "0px"; 
         }
         this.prevCheckedEl = item;
-    }
+    };
 
     render() {
         return (
             <div onTouchMove={this.touchMove}>
-                <DayNotesList 
+                <DayNotesList
                     {...this.props}
                     onTouchStart={this.onTouchStart}
                     onTouchEnd={this.onTouchEnd}
@@ -141,4 +192,15 @@ class SortableList extends PureComponent {
     }
 }
 
-export default SortableList;
+function mapStateToProps(state) {
+    return {
+        currentDate: state.date,
+        settings: state.settings
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(AppActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SortableList);

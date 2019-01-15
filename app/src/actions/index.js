@@ -511,7 +511,7 @@ let debouncedUploadBackup = throttle((note, token, removeForkNotes, dispatch, ge
                 deviceId
             });
         })
-}, 5000)
+}, 5000);
 
 export function uploadBatchBackup() {
     return function(dispatch, getState) {
@@ -637,5 +637,19 @@ export function triggerErrorModal(message) {
     return {
         type: "TRIGGER_ERROR_MODAL",
         message
+    }
+}
+
+// drag sort
+export function onDragSort (lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight, note) {
+    return function (dispatch, getState) {
+        notesService.updateSortWeight(lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight)
+            .then(() => {
+                note.sortWeight = noteSortWeight.weight;
+                return dispatch({
+                    type: "UPDATE_NOTE",
+                    note: note
+                })
+            });
     }
 }

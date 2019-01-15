@@ -15,7 +15,7 @@ class DayNotesList extends PureComponent {
             onTouchStart={this.props.onTouchStart}
             onTouchEnd={this.props.onTouchEnd}
         />  
-    )
+    );
     
     render() {
         let {t} = this.props;

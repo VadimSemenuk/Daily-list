@@ -10,7 +10,7 @@ class NotesService {
         let currentDate = date.valueOf();
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
-            t.dynamicFields, t.finished, t.forkFrom, t.priority,
+            t.dynamicFields, t.finished, t.forkFrom, t.priority, t.sortWeight,
             CASE t.added WHEN ? THEN 0 ELSE 1 END as isShadow,
             ? as added
             FROM Tasks t
@@ -46,7 +46,7 @@ class NotesService {
                 isShadow: Boolean(item.isShadow),
                 isSynced: Boolean(item.isSynced),
                 isLastActionSynced: Boolean(item.isLastActionSynced),
-            }
+            };
 
             unique[key] = nextItem;
         }
@@ -490,7 +490,7 @@ class NotesService {
         );
         if (nextNote.notificate) {
             notificationService.set(nextNote.key, nextNote);
-        };
+        }
 
         return nextNote;
     }
@@ -500,6 +500,21 @@ class NotesService {
             `DELETE FROM Tasks
             WHERE lastAction = 'DELETE'`,
         );
+    }
+
+    async updateSortWeight(lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight) {
+        const values = higherNotesSortWeight.reduce((acc, val) => [...acc, val.key, val.weight], []);
+        values.push(noteSortWeight.key);
+        values.push(noteSortWeight.weight);
+
+        const valuesPlaces = higherNotesSortWeight.reduce((acc) => [...acc, '(?, ?)'], []);
+        valuesPlaces.push('(?, ?)');
+
+        let sql = `
+            WITH Tmp (id, sortWeight) AS (VALUES ${valuesPlaces.join(", ")})
+            UPDATE Tasks SET sortWeight = (SELECT sortWeight FROM Tmp WHERE Tasks.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
+        `;
+        let update = await executeSQL(sql, values);
     }
 
     calculateTimeCheckSum (note) {
