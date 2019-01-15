@@ -7,7 +7,6 @@ import DayNotesList from './DayNotesList';
 
 import throttle from "../../utils/throttle";
 import {bindActionCreators} from "redux";
-import notesService from "../../services/notes.service";
 
 function avg(arr) {
     let sum = arr.reduce(function(a, b) { return a + b; });
@@ -53,8 +52,9 @@ class SortableList extends PureComponent {
         }
 
         for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i] == this.el) {
+            if (this.items[i] === this.el) {
                 this.dragStartElIndex = i;
+                this.lastElIndex = i;
                 break;
             }
         }
@@ -62,36 +62,29 @@ class SortableList extends PureComponent {
         this.isDragging = true;
     };
 
-    onTouchEnd = (e, note) => {
-        if (this.lastElIndex > this.dragStartElIndex) {
-            this.lastElIndex -= 1;
-        }
-        console.log(this.lastElIndex);
-        console.log(this.dragStartElIndex);
+    onTouchEnd = (e) => {
+        if (this.lastElIndex !== this.dragStartElIndex) {
+            console.log("lastElIndex", this.lastElIndex);
+            console.log("dragStartElIndex", this.dragStartElIndex);
 
-        let notesToUpdate = [];
-        let prevNote = null;
-        let notes = this.props.notes.filter((n, i) => i !== this.dragStartElIndex);
-        console.log(notes);
-        for (let i = 0; i < notes.length; i++) {
-            if (i < this.lastElIndex) {
-                notesToUpdate.push(notes[i]);
-            } else {
-                prevNote = notes[i];
-                break;
+            let noteSortWeight = this.props.notes[this.lastElIndex] ?
+                this.props.notes[this.lastElIndex].sortWeight + 1 : this.props.notes[this.dragStartElIndex].sortWeight;
+            let higherNotesSortWeight = [];
+            if (this.props.notes[this.lastElIndex - 1] && (this.props.notes[this.lastElIndex - 1].sortWeight <= noteSortWeight)) {
+                let diff = noteSortWeight - this.props.notes[this.lastElIndex - 1].sortWeight + 1;
+                for (let i = 0; i < this.lastElIndex; i++) {
+                    i !== this.dragStartElIndex && higherNotesSortWeight.push({ key: this.props.notes[i].key, weight: this.props.notes[i].sortWeight + diff });
+                }
             }
+
+            console.log("higherNotesSortWeight", higherNotesSortWeight);
+            console.log("noteSortWeight", noteSortWeight);
+            console.log("prevNoteSortWeight", this.props.notes[this.lastElIndex]);
+            this.props.onDragSort({ key: this.props.notes[this.dragStartElIndex].key, weight: noteSortWeight }, higherNotesSortWeight);
         }
-        console.log(notesToUpdate)
-        let lowerNoteSortWeight = { key: prevNote.key, weight: prevNote.sortWeight };
-        let noteSortWeight = { key: note.key, weight: prevNote.sortWeight + 1 };
-        let higherNotesSortWeight = [];
-        if (notesToUpdate[notesToUpdate.length - 1].sortWeight <= noteSortWeight.weight) {
-            debugger;
-            higherNotesSortWeight = notesToUpdate.map((n) => ({ key: n.key, weight: n.sortWeight + 2 }));
-        }
-        this.props.onDragSort(lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight, note);
 
         this.lastElIndex = null;
+        this.dragStartElIndex = null;
         this.isDragging = false;
         this.el.classList.remove("dragging");
         this.hadlePrevCheckedEl();
@@ -111,7 +104,7 @@ class SortableList extends PureComponent {
     };
 
     debouncedHandleTouchMove = throttle((items) => {
-        for (var i = 0; i < items.length; i++) {
+        for (let i = 0; i < items.length; i++) {
             if (this.el.isSameNode(items[i])) {
                 continue;
             }
@@ -124,15 +117,20 @@ class SortableList extends PureComponent {
 
             if (targetHalfPos >= curTop && targetHalfPos <= curBot) {  
                 let curHalfPos = item.offsetTop + (item.clientHeight / 2);
-                this.hadlePrevCheckedEl(item);
                 if (targetHalfPos > curHalfPos) {
-                    // this.lastElIndex = i + " bottom";
-                    this.lastElIndex = i + 1    ;
+                    if (this.lastElIndex === i + 1) {
+                        break;
+                    }
+                    this.lastElIndex = i + 1;
+                    this.hadlePrevCheckedEl(item);
                     item.style.marginBottom = this.el.clientHeight + "px";
                 }
                 if (targetHalfPos <= curHalfPos) {
-                    // this.lastElIndex = i + " top";
+                    if (this.lastElIndex === i) {
+                        break;
+                    }
                     this.lastElIndex = i;
+                    this.hadlePrevCheckedEl(item);
                     item.style.marginTop = this.el.clientHeight + "px";
                 }
                 break;
@@ -145,9 +143,12 @@ class SortableList extends PureComponent {
                     (items[i - 1].isSameNode(this.el) && (i - 1) === 0)
                 )
             ) {
+                if (this.lastElIndex === 0) {
+                    break;
+                }
+                this.lastElIndex = 0;
                 this.hadlePrevCheckedEl(item);
                 item.style.marginTop = this.el.clientHeight + "px";
-                this.lastElIndex = "top";
                 break;
             }
 
@@ -160,8 +161,7 @@ class SortableList extends PureComponent {
             ) {
                 this.hadlePrevCheckedEl(item);
                 item.style.marginBottom = this.el.clientHeight + "px";
-                // this.lastElIndex = this.items.length - 1;
-                this.lastElIndex = "bottom";
+                this.lastElIndex = i + 1;
                 break;
             }
         }

@@ -502,7 +502,7 @@ class NotesService {
         );
     }
 
-    async updateSortWeight(lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight) {
+    async updateSortWeight(noteSortWeight, higherNotesSortWeight) {
         const values = higherNotesSortWeight.reduce((acc, val) => [...acc, val.key, val.weight], []);
         values.push(noteSortWeight.key);
         values.push(noteSortWeight.weight);

@@ -641,15 +641,13 @@ export function triggerErrorModal(message) {
 }
 
 // drag sort
-export function onDragSort (lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight, note) {
-    return function (dispatch, getState) {
-        notesService.updateSortWeight(lowerNoteSortWeight, noteSortWeight, higherNotesSortWeight)
+export function onDragSort (noteSortWeight, higherNotesSortWeight) {
+    return function (dispatch) {
+        notesService.updateSortWeight(noteSortWeight, higherNotesSortWeight)
             .then(() => {
-                note.sortWeight = noteSortWeight.weight;
                 return dispatch({
-                    type: "UPDATE_NOTE",
-                    note: note
+                    type: "RENDER_NOTES",
                 })
-            });
+            })
     }
 }
