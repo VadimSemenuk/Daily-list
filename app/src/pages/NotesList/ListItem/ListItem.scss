@@ -16,6 +16,23 @@
         width: 100%;
         left: 0px;
     }
+
+    &.dragging-original {
+        .drag-button {
+            visibility: hidden;
+        }
+        .note-wrapper {
+            .tag {
+                visibility: hidden;
+            }
+            .note-content {
+                background: transparent;
+                & > * {
+                    visibility: hidden;
+                }
+            }
+        }
+    }
 }
 
 .note-wrapper {

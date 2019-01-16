@@ -34,24 +34,19 @@ class SortableList extends PureComponent {
     componentDidMount() {
         this.items = document.querySelectorAll(".notes-list-item-wrapper > div > div")[this.props.index].children;
         this.containerEl = document.querySelectorAll(".notes-list-item-wrapper")[this.props.index];
-        // document.addEventListener('touchmove', this.prevent, { passive: false });
+        this.childrenContainerEl = document.querySelectorAll(".notes-list-item-wrapper > div > div")[this.props.index];
     }
 
     onTouchStart = (e) => {
-        this.el = e.target.closest(".note-draggable-wrapper");
-        this.lastElY = this.el.offsetTop;
+        this.originalEl = e.target.closest(".note-draggable-wrapper");
+        this.el = this.originalEl.cloneNode(true);
+        this.childrenContainerEl.appendChild(this.el);
+        this.originalEl.classList.add("dragging-original");
+
+        this.lastElY = this.originalEl.offsetTop;
         this.el.style.top = this.lastElY + "px";
         this.el.classList.add("dragging");
-
         this.lastY = e.nativeEvent.touches[0].clientY;
-
-        if (this.el.nextSibling) {
-            this.el.nextSibling.style.marginTop = this.el.clientHeight + "px";
-            this.prevCheckedEl = this.el.nextSibling;
-        } else if (this.el.prevSibling) {
-            this.el.prevSibling.style.marginBottom = this.el.clientHeight + "px";
-            this.prevCheckedEl = this.el.prevSibling;
-        }
 
         for (let i = 0; i < this.items.length; i++) {
             if (this.items[i] === this.el) {
@@ -62,6 +57,8 @@ class SortableList extends PureComponent {
         }
 
         this.isDragging = true;
+
+        document.addEventListener('touchmove', this.prevent, { passive: false });
     };
 
     onTouchEnd = (e) => {
@@ -82,14 +79,18 @@ class SortableList extends PureComponent {
             console.log("higherNotesSortWeight", higherNotesSortWeight);
             console.log("noteSortWeight", noteSortWeight);
             console.log("prevNoteSortWeight", this.props.notes[this.lastElIndex]);
-            this.props.onDragSort({ key: this.props.notes[this.dragStartElIndex].key, weight: noteSortWeight }, higherNotesSortWeight);
+            // this.props.onDragSort({ key: this.props.notes[this.dragStartElIndex].key, weight: noteSortWeight }, higherNotesSortWeight);
         }
 
         this.lastElIndex = null;
         this.dragStartElIndex = null;
         this.isDragging = false;
         this.el.classList.remove("dragging");
-        this.hadlePrevCheckedEl();
+
+        document.removeEventListener('touchmove', this.prevent);
+
+        this.el.remove();
+        this.originalEl.classList.remove("dragging-original");
     };
 
     touchMove = (e) => {
@@ -97,13 +98,35 @@ class SortableList extends PureComponent {
             return;
         }
 
-        let diff = e.nativeEvent.touches[0].clientY - this.lastY;
-        this.lastY = e.nativeEvent.touches[0].clientY;
-        this.lastElY = this.lastElY + diff;
-        this.el.style.top = this.lastElY + "px";
+        if (this.lastElY >= this.containerEl.scrollTop) {
+            let diff = e.nativeEvent.touches[0].clientY - this.lastY;
+            this.lastY = e.nativeEvent.touches[0].clientY;
+            this.lastElY = this.lastElY + diff;
+            this.el.style.top = this.lastElY + "px";
 
-        this.debouncedHandleTouchMove(this.items);
+            this.debouncedHandleTouchMove(this.items);
+        }
+
+        clearTimeout(this.scrollHandleTimeout);
+        this.scrollHandleTimeout = null;
+        this.scrollHandle();
     };
+
+    scrollHandle = () => {
+        console.log(this.lastElY);
+        console.log(this.containerEl.scrollTop);
+        if (this.containerEl.scrollTop > 0 && this.lastElY < this.containerEl.scrollTop) {
+            this.containerEl.scrollTop = this.containerEl.scrollTop - 10;
+            this.lastElY = this.lastElY -10;
+            this.el.style.top = this.lastElY + "px";
+            if (!this.scrollHandleTimeout) {
+                this.scrollHandleTimeout = setTimeout(() => {
+                    this.scrollHandleTimeout = null;
+                    this.scrollHandle();
+                }, 2000);
+            }
+        }
+    }
 
     debouncedHandleTouchMove = throttle((items) => {
         for (let i = 0; i < items.length; i++) {
@@ -124,24 +147,22 @@ class SortableList extends PureComponent {
                         break;
                     }
                     this.lastElIndex = i + 1;
-                    this.hadlePrevCheckedEl(item);
-                    item.style.marginBottom = this.el.clientHeight + "px";
+                    this.childrenContainerEl.insertBefore(this.originalEl, item.nextSibling);
                 }
                 if (targetHalfPos <= curHalfPos) {
                     if (this.lastElIndex === i) {
                         break;
                     }
                     this.lastElIndex = i;
-                    this.hadlePrevCheckedEl(item);
-                    item.style.marginTop = this.el.clientHeight + "px";
+                    this.childrenContainerEl.insertBefore(this.originalEl, item);
                 }
                 break;
             }
 
             if (
-                targetHalfPos < curTop && 
+                targetHalfPos < curTop &&
                 (
-                    !items[i - 1] || 
+                    !items[i - 1] ||
                     (items[i - 1].isSameNode(this.el) && (i - 1) === 0)
                 )
             ) {
@@ -149,15 +170,14 @@ class SortableList extends PureComponent {
                     break;
                 }
                 this.lastElIndex = 0;
-                this.hadlePrevCheckedEl(item);
-                item.style.marginTop = this.el.clientHeight + "px";
+                this.childrenContainerEl.prepend(this.originalEl);
                 break;
             }
 
             if (
-                targetHalfPos > curBot && 
+                targetHalfPos > curBot &&
                 (
-                    !items[i + 1] || 
+                    !items[i + 1] ||
                     (items[i + 1].isSameNode(this.el) && (i + 1) === (items.length - 1))
                 )
             ) {
@@ -165,27 +185,14 @@ class SortableList extends PureComponent {
                     break;
                 }
                 this.lastElIndex = i + 1;
-                this.hadlePrevCheckedEl(item);
-                item.style.marginBottom = this.el.clientHeight + "px";
+                this.childrenContainerEl.append(this.originalEl);
                 break;
             }
         }
-
-        if (this.lastElY <= 10) {
-            console.log(this.containerEl.scrollTop);
-        }
-
-        if (!this.isDragging) {
-            this.hadlePrevCheckedEl();
-        }
     }, 100);
 
-    hadlePrevCheckedEl = (item) => {
-        if (this.prevCheckedEl) {
-            this.prevCheckedEl.style.marginBottom = "0px";   
-            this.prevCheckedEl.style.marginTop = "0px"; 
-        }
-        this.prevCheckedEl = item;
+    prevent = (e) => {
+        e.preventDefault();
     };
 
     render() {
