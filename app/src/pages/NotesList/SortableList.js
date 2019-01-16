@@ -33,6 +33,8 @@ class SortableList extends PureComponent {
 
     componentDidMount() {
         this.items = document.querySelectorAll(".notes-list-item-wrapper > div > div")[this.props.index].children;
+        this.containerEl = document.querySelectorAll(".notes-list-item-wrapper")[this.props.index];
+        // document.addEventListener('touchmove', this.prevent, { passive: false });
     }
 
     onTouchStart = (e) => {
@@ -159,11 +161,18 @@ class SortableList extends PureComponent {
                     (items[i + 1].isSameNode(this.el) && (i + 1) === (items.length - 1))
                 )
             ) {
+                if (this.lastElIndex === i + 1) {
+                    break;
+                }
+                this.lastElIndex = i + 1;
                 this.hadlePrevCheckedEl(item);
                 item.style.marginBottom = this.el.clientHeight + "px";
-                this.lastElIndex = i + 1;
                 break;
             }
+        }
+
+        if (this.lastElY <= 10) {
+            console.log(this.containerEl.scrollTop);
         }
 
         if (!this.isDragging) {

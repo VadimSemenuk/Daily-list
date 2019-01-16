@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
+import throttle from "../../../utils/throttle";
 
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
@@ -17,7 +18,9 @@ class Note extends PureComponent {
 
         this.state = {
             expanded: false
-        }
+        };
+
+        this.noteTouchTimeout = null;
     }
 
     onDynaicFieldChange = (i, v) => {
@@ -52,16 +55,42 @@ class Note extends PureComponent {
     };
 
     onTouchEnd = (e) => {
-        this.props.onTouchEnd(e, this.props.itemData);
+        this.props.onTouchEnd(e);
     };
-    // this.props.isDragSortActive &&
+
+    onNoteTouchStart = (e) => {
+        this.noteTouchTimeout = setTimeout(() => {
+            this.noteTouchTimeout = null;
+            this.props.onDragModeRequest();
+        }, 400);
+    };
+
+    onNoteTouchEnd = (e) => {
+        if (this.noteTouchTimeout) {
+            clearTimeout(this.noteTouchTimeout);
+            this.triggerExpanded();
+        }
+    };
+
+    onNoteTouchMove = throttle((e) => {
+        if (this.noteTouchTimeout) {
+            clearTimeout(this.noteTouchTimeout);
+            this.noteTouchTimeout = null;
+        }
+
+    }, 300);
+
+    empty = (e) => {
+        e.stopPropagation();
+    };
+
     render () {
         let {t} = this.props;
         
         return (
             <div className="note-draggable-wrapper">
                 {
-                    true &&
+                    (this.props.dragMode || true) &&
                     <button
                         className="drag-button"
                         onTouchStart={this.onTouchStart}
@@ -71,8 +100,10 @@ class Note extends PureComponent {
                     </button>
                 }
                 <div
-                    className={`note-wrapper ${this.state.expanded && 'expanded'}`} 
-                    onClick={this.triggerExpanded}
+                    className={`note-wrapper ${this.state.expanded && 'expanded'}`}
+                    onTouchStart={this.onNoteTouchStart}
+                    onTouchEnd={this.onNoteTouchEnd}
+                    onTouchMove={this.onNoteTouchMove}
                 >
                     <div
                         style={{backgroundColor: this.props.itemData.tag}} 
@@ -127,7 +158,9 @@ class Note extends PureComponent {
                                 } else if (a && a.type === "snapshot") {
                                     if (this.state.expanded) {
                                         return (
-                                            <img 
+                                            <img
+                                                onTouchStart={this.empty}
+                                                onTouchEnd={this.empty}
                                                 onClick={this.showImage}
                                                 key={i}
                                                 className="attached-image" 
@@ -146,7 +179,11 @@ class Note extends PureComponent {
                         }
                         
                         <div className="more-button">
-                            <button onClick={this.onItemActionsWindowRequest}>                             
+                            <button
+                                onTouchStart={this.empty}
+                                onTouchEnd={this.empty}
+                                onClick={this.onItemActionsWindowRequest}
+                            >
                                 <img
                                     src={MoreImg}
                                     alt="more"

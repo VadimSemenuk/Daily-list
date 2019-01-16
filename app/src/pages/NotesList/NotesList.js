@@ -32,8 +32,9 @@ class NotesList extends PureComponent {
             },
             copyBuffer: null,
             listItemDialogVisible: false,
-            calendar: false
-        }
+            calendar: false,
+            dragMode: false
+        };
 
         this.activePageIndex = 1;  
         this.prevPageIndex = 1;
@@ -89,7 +90,7 @@ class NotesList extends PureComponent {
             added: moment(this.props.currentDate),
             forkFrom: -1,
             isShadow: false
-        }))
+        }));
 
         await this.props.addNote(note, this.props.settings.calendarNotesCounter);
         
@@ -143,7 +144,18 @@ class NotesList extends PureComponent {
         this.setState({
             listItemDialogVisible: false
         })
-    }
+    };
+
+    onDragModeRequest = () => {
+        document.addEventListener('touchmove', this.prevent, { passive: false });
+        this.setState({
+            dragMode: true
+        });
+    };
+
+    prevent = (e) => {
+        e.preventDefault();
+    };
 
     render() {
         let {t} = this.props;
@@ -193,8 +205,10 @@ class NotesList extends PureComponent {
                                         index={i}
                                         notes={notes.items} 
                                         finSort={this.props.settings.sortFinBehaviour === 1}
+                                        dragMode={this.state.dragMode}
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                        onDragModeRequest={this.onDragModeRequest}
                                     />
                                 </div>
                             ))
