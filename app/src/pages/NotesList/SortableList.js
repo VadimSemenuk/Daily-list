@@ -63,8 +63,8 @@ class SortableList extends PureComponent {
 
     onTouchEnd = (e) => {
         if (this.lastElIndex !== this.dragStartElIndex) {
-            console.log("lastElIndex", this.lastElIndex);
-            console.log("dragStartElIndex", this.dragStartElIndex);
+            // console.log("lastElIndex", this.lastElIndex);
+            // console.log("dragStartElIndex", this.dragStartElIndex);
 
             let noteSortWeight = this.props.notes[this.lastElIndex] ?
                 this.props.notes[this.lastElIndex].sortWeight + 1 : this.props.notes[this.dragStartElIndex].sortWeight;
@@ -76,9 +76,9 @@ class SortableList extends PureComponent {
                 }
             }
 
-            console.log("higherNotesSortWeight", higherNotesSortWeight);
-            console.log("noteSortWeight", noteSortWeight);
-            console.log("prevNoteSortWeight", this.props.notes[this.lastElIndex]);
+            // console.log("higherNotesSortWeight", higherNotesSortWeight);
+            // console.log("noteSortWeight", noteSortWeight);
+            // console.log("prevNoteSortWeight", this.props.notes[this.lastElIndex]);
             // this.props.onDragSort({ key: this.props.notes[this.dragStartElIndex].key, weight: noteSortWeight }, higherNotesSortWeight);
         }
 
@@ -98,33 +98,30 @@ class SortableList extends PureComponent {
             return;
         }
 
-        if (this.lastElY >= this.containerEl.scrollTop) {
-            let diff = e.nativeEvent.touches[0].clientY - this.lastY;
-            this.lastY = e.nativeEvent.touches[0].clientY;
-            this.lastElY = this.lastElY + diff;
-            this.el.style.top = this.lastElY + "px";
+        let diff = e.nativeEvent.touches[0].clientY - this.lastY;
+        this.lastY = e.nativeEvent.touches[0].clientY;
+        this.lastElY = this.lastElY + diff;
+        this.el.style.top = this.lastElY + "px";
 
+        if ((this.containerEl.scrollTop) <= 0 || (Math.ceil(this.lastElY) > Math.ceil(this.containerEl.scrollTop))) {
             this.debouncedHandleTouchMove(this.items);
         }
 
-        clearTimeout(this.scrollHandleTimeout);
-        this.scrollHandleTimeout = null;
-        this.scrollHandle();
+        if (!this.scrollHandleTimeout) {
+            this.scrollHandle();
+        }
     };
 
     scrollHandle = () => {
-        console.log(this.lastElY);
-        console.log(this.containerEl.scrollTop);
-        if (this.containerEl.scrollTop > 0 && this.lastElY < this.containerEl.scrollTop) {
-            this.containerEl.scrollTop = this.containerEl.scrollTop - 10;
-            this.lastElY = this.lastElY -10;
+        let diff = 10;
+        if (this.containerEl.scrollTop > 0 && Math.ceil(this.lastElY) <= Math.ceil(this.containerEl.scrollTop)) {
+            this.lastElY = Math.ceil(this.lastElY - diff);
             this.el.style.top = this.lastElY + "px";
-            if (!this.scrollHandleTimeout) {
-                this.scrollHandleTimeout = setTimeout(() => {
-                    this.scrollHandleTimeout = null;
-                    this.scrollHandle();
-                }, 2000);
-            }
+            this.containerEl.scrollTop = Math.ceil(this.containerEl.scrollTop - diff);
+            this.scrollHandleTimeout = setTimeout(() => {
+                this.scrollHandleTimeout = null;
+                this.scrollHandle();
+            }, 20);
         }
     }
 
@@ -154,6 +151,7 @@ class SortableList extends PureComponent {
                         break;
                     }
                     this.lastElIndex = i;
+
                     this.childrenContainerEl.insertBefore(this.originalEl, item);
                 }
                 break;
