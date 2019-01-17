@@ -103,7 +103,7 @@ class SortableList extends PureComponent {
         this.lastElY = this.lastElY + diff;
         this.el.style.top = this.lastElY + "px";
 
-        if ((this.containerEl.scrollTop) <= 0 || (Math.ceil(this.lastElY) > Math.ceil(this.containerEl.scrollTop))) {
+        if ((this.containerEl.scrollTop) <= 0 || (Math.ceil(this.lastElY) >= Math.ceil(this.containerEl.scrollTop))) {
             this.debouncedHandleTouchMove(this.items);
         }
 
@@ -113,8 +113,14 @@ class SortableList extends PureComponent {
     };
 
     scrollHandle = () => {
-        let diff = 10;
-        if (this.containerEl.scrollTop > 0 && Math.ceil(this.lastElY) <= Math.ceil(this.containerEl.scrollTop)) {
+        let diff = Math.abs(Math.ceil(this.lastElY) - Math.ceil(this.containerEl.scrollTop));
+        if (diff < 3) {
+            diff = 3;
+        }
+        if (diff > 30) {
+            diff = 30;
+        }
+        if (this.containerEl.scrollTop > 0 && Math.ceil(this.lastElY) < Math.ceil(this.containerEl.scrollTop)) {
             this.lastElY = Math.ceil(this.lastElY - diff);
             this.el.style.top = this.lastElY + "px";
             this.containerEl.scrollTop = Math.ceil(this.containerEl.scrollTop - diff);
@@ -123,7 +129,7 @@ class SortableList extends PureComponent {
                 this.scrollHandle();
             }, 20);
         }
-    }
+    };
 
     debouncedHandleTouchMove = throttle((items) => {
         for (let i = 0; i < items.length; i++) {
