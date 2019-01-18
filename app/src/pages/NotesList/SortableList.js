@@ -11,7 +11,7 @@ import {bindActionCreators} from "redux";
 function avg(arr) {
     let sum = arr.reduce(function(a, b) { return a + b; });
     let avg = sum / arr.length;
-	return avg;
+    return avg;
 }
 window.avg = avg;
 
@@ -35,6 +35,8 @@ class SortableList extends PureComponent {
         this.items = document.querySelectorAll(".notes-list-item-wrapper > div > div")[this.props.index].children;
         this.containerEl = document.querySelectorAll(".notes-list-item-wrapper")[this.props.index];
         this.childrenContainerEl = document.querySelectorAll(".notes-list-item-wrapper > div > div")[this.props.index];
+
+        this.maxScrollTop = this.childrenContainerEl.clientHeight - this.containerEl.clientHeight;
     }
 
     onTouchStart = (e) => {
@@ -113,22 +115,48 @@ class SortableList extends PureComponent {
     };
 
     scrollHandle = () => {
-        let diff = Math.abs(Math.ceil(this.lastElY) - Math.ceil(this.containerEl.scrollTop));
-        if (diff < 3) {
-            diff = 3;
+        if (!this.isDragging) {
+            return;
         }
-        if (diff > 30) {
-            diff = 30;
+
+        let diff = null;
+        if (
+            (this.containerEl.scrollTop < this.maxScrollTop)
+            && Math.ceil(this.lastElY + this.el.clientHeight) > Math.ceil(this.containerEl.scrollTop + this.containerEl.clientHeight)
+        ) {
+            diff = -Math.abs(Math.ceil(this.lastElY + this.el.clientHeight) - Math.ceil(this.containerEl.scrollTop + this.containerEl.clientHeight));
+            if (diff > -3) {
+                diff = -3;
+            }
+            if (diff < -30) {
+                diff = -30;
+            }
         }
-        if (this.containerEl.scrollTop > 0 && Math.ceil(this.lastElY) < Math.ceil(this.containerEl.scrollTop)) {
-            this.lastElY = Math.ceil(this.lastElY - diff);
-            this.el.style.top = this.lastElY + "px";
-            this.containerEl.scrollTop = Math.ceil(this.containerEl.scrollTop - diff);
-            this.scrollHandleTimeout = setTimeout(() => {
-                this.scrollHandleTimeout = null;
-                this.scrollHandle();
-            }, 20);
+
+        if (
+            (this.containerEl.scrollTop > 0)
+            && Math.ceil(this.lastElY) < Math.ceil(this.containerEl.scrollTop)
+        ) {
+            diff = Math.abs(Math.ceil(this.lastElY) - Math.ceil(this.containerEl.scrollTop));
+            if (diff < 3) {
+                diff = 3;
+            }
+            if (diff > 30) {
+                diff = 30;
+            }
         }
+
+        if (diff === null) {
+            return
+        }
+
+        this.lastElY = Math.ceil(this.lastElY - diff);
+        this.el.style.top = this.lastElY + "px";
+        this.containerEl.scrollTop = Math.ceil(this.containerEl.scrollTop - diff);
+        this.scrollHandleTimeout = setTimeout(() => {
+            this.scrollHandleTimeout = null;
+            this.scrollHandle();
+        }, 20);
     };
 
     debouncedHandleTouchMove = throttle((items) => {
@@ -143,7 +171,7 @@ class SortableList extends PureComponent {
             let curTop = item.offsetTop;
             let curBot = item.offsetTop + item.clientHeight;
 
-            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {  
+            if (targetHalfPos >= curTop && targetHalfPos <= curBot) {
                 let curHalfPos = item.offsetTop + (item.clientHeight / 2);
                 if (targetHalfPos > curHalfPos) {
                     if (this.lastElIndex === i + 1) {
