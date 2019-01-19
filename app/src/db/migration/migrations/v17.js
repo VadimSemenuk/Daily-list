@@ -93,7 +93,6 @@ export default {
                     userId INTEGER,
                     repeatType INTEGER,
                     forkFrom INTEGER,
-                    sortWeight INTEGER DEFAULT 1,
                     priority INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
@@ -120,7 +119,6 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    sortWeight,
                     priority
                 ) 
                 SELECT

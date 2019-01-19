@@ -10,7 +10,7 @@ class NotesService {
         let currentDate = date.valueOf();
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
-            t.dynamicFields, t.finished, t.forkFrom, t.priority, t.sortWeight,
+            t.dynamicFields, t.finished, t.forkFrom, t.priority,
             CASE t.added WHEN ? THEN 0 ELSE 1 END as isShadow,
             ? as added
             FROM Tasks t
