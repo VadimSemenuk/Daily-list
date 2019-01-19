@@ -105,7 +105,11 @@ class SortableList extends PureComponent {
         this.lastElY = this.lastElY + diff;
         this.el.style.top = this.lastElY + "px";
 
-        if ((this.containerEl.scrollTop) <= 0 || (Math.ceil(this.lastElY) >= Math.ceil(this.containerEl.scrollTop))) {
+        if (
+            (this.containerEl.scrollTop <= 0)
+            || (Math.ceil(this.containerEl.scrollTop) >= this.maxScrollTop)
+            || (Math.ceil(this.lastElY + this.el.clientHeight) <= Math.ceil(this.containerEl.scrollTop + this.containerEl.clientHeight))
+            || (Math.ceil(this.lastElY) >= Math.ceil(this.containerEl.scrollTop))) {
             this.debouncedHandleTouchMove(this.items);
         }
 
@@ -120,8 +124,11 @@ class SortableList extends PureComponent {
         }
 
         let diff = null;
+        console.log(Math.ceil(this.containerEl.scrollTop));
+        console.log(Math.ceil(this.maxScrollTop));
+
         if (
-            (this.containerEl.scrollTop < this.maxScrollTop)
+            (Math.ceil(this.containerEl.scrollTop) < this.maxScrollTop)
             && Math.ceil(this.lastElY + this.el.clientHeight) > Math.ceil(this.containerEl.scrollTop + this.containerEl.clientHeight)
         ) {
             diff = -Math.abs(Math.ceil(this.lastElY + this.el.clientHeight) - Math.ceil(this.containerEl.scrollTop + this.containerEl.clientHeight));
@@ -131,6 +138,7 @@ class SortableList extends PureComponent {
             if (diff < -30) {
                 diff = -30;
             }
+            console.log(1);
         }
 
         if (
@@ -144,6 +152,7 @@ class SortableList extends PureComponent {
             if (diff > 30) {
                 diff = 30;
             }
+            console.log(2);
         }
 
         if (diff === null) {
@@ -185,7 +194,6 @@ class SortableList extends PureComponent {
                         break;
                     }
                     this.lastElIndex = i;
-
                     this.childrenContainerEl.insertBefore(this.originalEl, item);
                 }
                 break;
