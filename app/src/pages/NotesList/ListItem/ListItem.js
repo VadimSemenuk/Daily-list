@@ -90,7 +90,7 @@ class Note extends PureComponent {
         return (
             <div className="note-draggable-wrapper">
                 {
-                    (this.props.dragMode || true) &&
+                    (this.props.dragMode) &&
                     <button
                         className="drag-button"
                         onTouchStart={this.onTouchStart}

@@ -11,10 +11,10 @@
     }
 
     &.dragging {
-        position: absolute;
+        position: fixed;
         z-index: 3;
         width: 100%;
-        left: 0px;
+        left: 0;
     }
 
     &.dragging-original {
@@ -33,10 +33,21 @@
             }
         }
     }
+
+    &:first-of-type {
+        .note-wrapper {
+            margin-top: 10px;
+        }
+    }
+    &:last-of-type {
+        .note-wrapper {
+            margin-bottom: 10px;
+        }
+    }
 }
 
 .note-wrapper {
-    margin: 10px 5px;
+    margin: 5px;
     position: relative;
     overflow: hidden;
     border-radius: 6px;

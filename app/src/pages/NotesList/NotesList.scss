@@ -16,11 +16,12 @@
         }
 
         .notes-list-item-wrapper {
-            overflow-y: auto;
-            //overflow: hidden;
+            //overflow-y: auto;
+            overflow: hidden;
 
             & > div {
-                overflow: hidden;
+                overflow-y: auto;
+                height: 100%;
             }
         }
 
