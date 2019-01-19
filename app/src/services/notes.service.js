@@ -502,21 +502,6 @@ class NotesService {
         );
     }
 
-    async updateSortWeight(noteSortWeight, higherNotesSortWeight) {
-        const values = higherNotesSortWeight.reduce((acc, val) => [...acc, val.key, val.weight], []);
-        values.push(noteSortWeight.key);
-        values.push(noteSortWeight.weight);
-
-        const valuesPlaces = higherNotesSortWeight.reduce((acc) => [...acc, '(?, ?)'], []);
-        valuesPlaces.push('(?, ?)');
-
-        let sql = `
-            WITH Tmp (id, sortWeight) AS (VALUES ${valuesPlaces.join(", ")})
-            UPDATE Tasks SET sortWeight = (SELECT sortWeight FROM Tmp WHERE Tasks.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
-        `;
-        let update = await executeSQL(sql, values);
-    }
-
     calculateTimeCheckSum (note) {
         let startTimeCheckSum = note.startTime ? note.startTime.valueOf() - note.added : 0;
         let endTimeCheckSum = note.endTime ? note.endTime.valueOf() - note.added : 0;

@@ -639,15 +639,3 @@ export function triggerErrorModal(message) {
         message
     }
 }
-
-// drag sort
-export function onDragSort (noteSortWeight, higherNotesSortWeight) {
-    return function (dispatch) {
-        notesService.updateSortWeight(noteSortWeight, higherNotesSortWeight)
-            .then(() => {
-                return dispatch({
-                    type: "RENDER_NOTES",
-                })
-            })
-    }
-}
