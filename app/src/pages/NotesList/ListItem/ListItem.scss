@@ -1,53 +1,5 @@
-.note-draggable-wrapper {
-    display: flex;
-    align-items: center;
-
-    & > button {
-        flex-shrink: 0;
-    }
-
-    & > .note-wrapper {
-        flex-grow: 1;
-    }
-
-    &.dragging {
-        position: fixed;
-        z-index: 3;
-        width: 100%;
-        left: 0;
-    }
-
-    &.dragging-original {
-        .drag-button {
-            visibility: hidden;
-        }
-        .note-wrapper {
-            .tag {
-                visibility: hidden;
-            }
-            .note-content {
-                background: transparent;
-                & > * {
-                    visibility: hidden;
-                }
-            }
-        }
-    }
-
-    &:first-of-type {
-        .note-wrapper {
-            margin-top: 10px;
-        }
-    }
-    &:last-of-type {
-        .note-wrapper {
-            margin-bottom: 10px;
-        }
-    }
-}
-
 .note-wrapper {
-    margin: 5px;
+    margin: 10px 5px;
     position: relative;
     overflow: hidden;
     border-radius: 6px;

@@ -12,7 +12,6 @@ import Header from '../../components/Header/Header';
 import Modal from '../../components/Modal/Modal';
 import Fab from '../../components/Fab/Fab';
 import {ButtonListItem} from "../../components/ListItem/ListItem";
-import SortableList from "./SortableList";
 
 import * as AppActions from '../../actions'; 
 
@@ -20,6 +19,7 @@ import sliderChangeSide from "../../utils/sliderChangeSide";
 import deepCopyObject from "../../utils/DeepCopyObject";
 
 import './NotesList.scss';
+import DayNotesList from "./DayNotesList";
 
 class NotesList extends PureComponent {
     constructor(props) {
@@ -146,17 +146,6 @@ class NotesList extends PureComponent {
         })
     };
 
-    onDragModeRequest = () => {
-        document.addEventListener('touchmove', this.prevent, { passive: false });
-        this.setState({
-            dragMode: true
-        });
-    };
-
-    prevent = (e) => {
-        e.preventDefault();
-    };
-
     render() {
         let {t} = this.props;
 
@@ -201,14 +190,12 @@ class NotesList extends PureComponent {
                                     className="notes-list-item-wrapper" 
                                     key={i}
                                 >
-                                    <SortableList
+                                    <DayNotesList
                                         index={i}
                                         notes={notes.items} 
                                         finSort={this.props.settings.sortFinBehaviour === 1}
-                                        dragMode={this.state.dragMode}
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
-                                        onDragModeRequest={this.onDragModeRequest}
                                     />
                                 </div>
                             ))

@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
-import throttle from "../../../utils/throttle";
 
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
@@ -8,7 +7,6 @@ import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
 import RepeatImg from "../../../assets/img/two-circling-arrows.svg";
-import DragHandle from "../../../assets/img/drag-handle.svg";
 
 import './ListItem.scss';
 
@@ -19,8 +17,6 @@ class Note extends PureComponent {
         this.state = {
             expanded: false
         };
-
-        this.noteTouchTimeout = null;
     }
 
     onDynaicFieldChange = (i, v) => {
@@ -50,155 +46,101 @@ class Note extends PureComponent {
         window.PhotoViewer.show(e.target.src, this.props.itemData.title, {share: false});         
     };
 
-    onTouchStart = (e) => {
-        this.props.onTouchStart(e);
-    };
-
-    onTouchEnd = (e) => {
-        this.props.onTouchEnd(e);
-    };
-
-    onNoteTouchStart = (e) => {
-        this.noteTouchTimeout = setTimeout(() => {
-            this.noteTouchTimeout = null;
-            this.props.onDragModeRequest();
-        }, 400);
-    };
-
-    onNoteTouchEnd = (e) => {
-        if (this.noteTouchTimeout) {
-            clearTimeout(this.noteTouchTimeout);
-            this.triggerExpanded();
-        }
-    };
-
-    onNoteTouchMove = throttle((e) => {
-        if (this.noteTouchTimeout) {
-            clearTimeout(this.noteTouchTimeout);
-            this.noteTouchTimeout = null;
-        }
-
-    }, 300);
-
-    empty = (e) => {
-        e.stopPropagation();
-    };
-
     render () {
         let {t} = this.props;
         
         return (
-            <div className="note-draggable-wrapper">
-                {
-                    (this.props.dragMode) &&
-                    <button
-                        className="drag-button"
-                        onTouchStart={this.onTouchStart}
-                        onTouchEnd={this.onTouchEnd}
-                    >
-                        <img src={DragHandle} alt="drag" />
-                    </button>
-                }
+            <div
+                className={`note-wrapper ${this.state.expanded && 'expanded'}`}
+                onClick={this.triggerExpanded}
+            >
                 <div
-                    className={`note-wrapper ${this.state.expanded && 'expanded'}`}
-                    onTouchStart={this.onNoteTouchStart}
-                    onTouchEnd={this.onNoteTouchEnd}
-                    onTouchMove={this.onNoteTouchMove}
-                >
-                    <div
-                        style={{backgroundColor: this.props.itemData.tag}} 
-                        className="tag"
-                    ></div>
-                    <div className="note-content">
-                        <div className="note-header">
-                            {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>} 
-                            {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
-                            {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>} 
-                            {
-                                this.props.itemData.notificate &&
-                                <div className="notification-identifier-wrapper">
-                                    <img 
-                                        className="notification-identifier"
-                                        src={AlarmImg}
-                                        alt="notify"
-                                    />
-                                </div>
-                            }    
-                            {
-                                this.props.itemData.repeatType !== "no-repeat" &&
-                                <div className="repeat-identifier-wrapper">
-                                    <img 
-                                        className="repeat-identifier"
-                                        src={RepeatImg}
-                                        alt="repeat"
-                                    />
-                                </div>
-                            }                                   
-                        </div>
-                        {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
+                    style={{backgroundColor: this.props.itemData.tag}}
+                    className="tag"
+                ></div>
+                <div className="note-content">
+                    <div className="note-header">
+                        {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>}
+                        {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
+                        {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>}
                         {
-                            this.props.itemData.dynamicFields.map((a, i) => {
-                                if (a && a.type === "text") {
+                            this.props.itemData.notificate &&
+                            <div className="notification-identifier-wrapper">
+                                <img
+                                    className="notification-identifier"
+                                    src={AlarmImg}
+                                    alt="notify"
+                                />
+                            </div>
+                        }
+                        {
+                            this.props.itemData.repeatType !== "no-repeat" &&
+                            <div className="repeat-identifier-wrapper">
+                                <img
+                                    className="repeat-identifier"
+                                    src={RepeatImg}
+                                    alt="repeat"
+                                />
+                            </div>
+                        }
+                    </div>
+                    {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
+                    {
+                        this.props.itemData.dynamicFields.map((a, i) => {
+                            if (a && a.type === "text") {
+                                return (
+                                    <div
+                                        className="item-data-text"
+                                        key={i}
+                                    >{a.value}</div>
+                                )
+                            } else if (a && a.type === "listItem") {
+                                return (
+                                    <TextCheckBox
+                                        key={i}
+                                        id={i}
+                                        textValue={a.value}
+                                        checkBoxValue={a.checked}
+                                        onValueChange={this.onDynaicFieldChange}
+                                    />
+                                )
+                            } else if (a && a.type === "snapshot") {
+                                if (this.state.expanded) {
                                     return (
-                                        <div 
-                                            className="item-data-text" 
+                                        <img
+                                            onClick={this.showImage}
                                             key={i}
-                                        >{a.value}</div>
-                                    )
-                                } else if (a && a.type === "listItem") {
-                                    return (
-                                        <TextCheckBox 
-                                            key={i} 
-                                            id={i}
-                                            textValue={a.value}
-                                            checkBoxValue={a.checked}
-                                            onValueChange={this.onDynaicFieldChange}
+                                            className="attached-image"
+                                            src={a.uri}
+                                            alt="attachment"
                                         />
                                     )
-                                } else if (a && a.type === "snapshot") {
-                                    if (this.state.expanded) {
-                                        return (
-                                            <img
-                                                onTouchStart={this.empty}
-                                                onTouchEnd={this.empty}
-                                                onClick={this.showImage}
-                                                key={i}
-                                                className="attached-image" 
-                                                src={a.uri} 
-                                                alt="attachment" 
-                                            />
-                                        )
-                                    } else {
-                                        return (
-                                            <span key={i} className="attached-image-label">{t("attached-image")}</span>
-                                        )
-                                    }
+                                } else {
+                                    return (
+                                        <span key={i} className="attached-image-label">{t("attached-image")}</span>
+                                    )
                                 }
-                                return null
-                            })
-                        }
-                        
-                        <div className="more-button">
-                            <button
-                                onTouchStart={this.empty}
-                                onTouchEnd={this.empty}
-                                onClick={this.onItemActionsWindowRequest}
-                            >
-                                <img
-                                    src={MoreImg}
-                                    alt="more"
-                                />
-                            </button>
-                        </div>
-                        <div className="note-finish-checkbox">
-                            <CustomCheckBox
-                                checked={this.props.itemData.finished}
-                                onChange={this.onItemFinishChange}
+                            }
+                            return null
+                        })
+                    }
+
+                    <div className="more-button">
+                        <button onClick={this.onItemActionsWindowRequest}>
+                            <img
+                                src={MoreImg}
+                                alt="more"
                             />
-                        </div>
+                        </button>
+                    </div>
+                    <div className="note-finish-checkbox">
+                        <CustomCheckBox
+                            checked={this.props.itemData.finished}
+                            onChange={this.onItemFinishChange}
+                        />
                     </div>
                 </div>
-            </div>            
+            </div>
         )
     }
 }

@@ -11,12 +11,7 @@ class DayNotesList extends PureComponent {
             onShowImage={this.props.onImageShowRequest}
             onDynaicFieldChange={this.props.onItemDynaicFieldChange}
             onItemActionsWindowRequest={this.props.onItemActionsWindowRequest}
-
-            dragMode={this.props.dragMode}
-            onTouchStart={this.props.onTouchStart}
-            onTouchEnd={this.props.onTouchEnd}
-            onDragModeRequest={this.props.onDragModeRequest}
-        />  
+        />
     );
     
     render() {
