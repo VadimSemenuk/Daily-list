@@ -57,7 +57,7 @@ class Add extends Component {
     async componentDidMount() {
         if (this.props.match.path === "/edit") {
             let repeatDates = this.state.repeatDates;
-            if (this.props.location.state.note.repeatType === "any") {
+            if (this.props.location.state.note.repeatType === "any" || this.props.location.state.note.repeatType === "week") {
                 repeatDates = await notesService.getNoteRepeatDates(this.props.location.state.note);
             }
             this.setState({

@@ -26,7 +26,8 @@ export default {
     "show-notes-count": "Display counters on the calendar",
     "show-notes-count-include-finished": "Include finished notes in calendar's counters",
     "reload-app-note": "Restart the app to apply changes",
-  
+    "priority-sort": "Sort by priority",
+
     // interface page
     "theme": "Theme",
     "random-theme": "Random theme",
@@ -138,6 +139,13 @@ export default {
     "error-note-update": "Failed to update a note. Reload app and try again",
     "error-note-delete": "Failed to delete a note. Reload app and try again",
     "error-get-notes": "Failed to delete a note. Reload app and try again",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
 
     // note-item
     "attached-image": "Attached image",
@@ -149,7 +157,7 @@ export default {
 
     // error
     "error-repeat-common": "An error has occurred. Repeat later",
-    "error-common": "",
+    "error-common": "An error has occurred",
     "error-reload-app": "Reload app",
 
     // trash

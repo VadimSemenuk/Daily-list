@@ -273,7 +273,7 @@ class NotesService {
         await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]);
 
         let repeatDates = note.repeatDates;
-        if (note.repeatType === "week") {
+        if (note.repeatType === "_week") {
             repeatDates = [moment(note.added).isoWeekday()];
         } else if (note.repeatType === "day") {
             repeatDates = [note.added];
@@ -534,6 +534,16 @@ class NotesService {
         { val: "week", translateId: "repeat-type-week" },
         { val: "any", translateId: "repeat-type-any" }
     ];
+
+    weekRepeatOptions = [
+        { val: 1, translateId: "monday" },
+        { val: 2, translateId: "tuesday" },
+        { val: 3, translateId: "wednesday" },
+        { val: 4, translateId: "thursday" },
+        { val: 5, translateId: "friday" },
+        { val: 6, translateId: "saturday" },
+        { val: 7, translateId: "sunday" }
+    ];
     
     priorityOptions = [
         { val: 4, translateId: "priority-very-high" },
@@ -556,6 +566,10 @@ class NotesService {
 
     getPriorityOptions() {
         return [...this.priorityOptions]
+    }
+
+    getWeekRepeatOptions() {
+        return [...this.weekRepeatOptions]
     }
 }
 

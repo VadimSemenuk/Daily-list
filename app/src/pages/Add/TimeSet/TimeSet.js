@@ -11,14 +11,16 @@ import notesService from '../../../services/notes.service';
 import RemoveImg from '../../../assets/img/remove.png';
 
 import './TimeSet.scss';
+import TextCheckBox from "../../../components/TextCheckBox/TextCheckBox";
 
 class TimeSet extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            repeatTypeSelected: this.props.repeatType
-        }
+            repeatTypeSelected: this.props.repeatType,
+            weekRepeatDaySelected: this.props.weekRepeatDaySelected
+        };
 
         this.removeNotificationFromDefault = false;
     }
@@ -95,6 +97,8 @@ class TimeSet extends Component {
         let {t} = this.props;
         let repeatTypeOptions = notesService.getRepeatTypeOptions();
         let selectedRepeatTypeOption = repeatTypeOptions.find((a) => a.val === this.props.repeatType);
+        let weekRepeatOptions = notesService.getWeekRepeatOptions();
+        console.log(this.props.repeatDates)
         
         return (
             <div className="set-time-wrapper">
@@ -175,14 +179,37 @@ class TimeSet extends Component {
                     <div className="radio-group">
                         {
                             repeatTypeOptions.map((setting, i) => (
-                                <Radio
-                                    key={i}
-                                    name="repeat-type"
-                                    checked={this.state.repeatTypeSelected === setting.val}
-                                    value={setting.val}
-                                    onChange={(e) => this.setState({repeatTypeSelected: e})}
-                                    text={t(setting.translateId)}
-                                />
+                                <div key={i}>
+                                    <Radio
+                                        name="repeat-type"
+                                        checked={this.state.repeatTypeSelected === setting.val}
+                                        value={setting.val}
+                                        onChange={(e) => this.setState({repeatTypeSelected: e})}
+                                        text={t(setting.translateId)}
+                                    />
+
+                                    {
+                                        setting.val === "week" && this.state.repeatTypeSelected === setting.val &&
+                                        weekRepeatOptions.map((option, i) => (
+                                            <TextCheckBox
+                                                key={i}
+                                                id={option.val}
+                                                textValue={t(option.translateId)}
+                                                checkBoxValue={this.props.repeatDates.includes(option.val)}
+                                                onValueChange={(e) => {
+                                                    let nextRepeatDates = [];
+                                                    if (this.props.repeatDates.includes(e)) {
+                                                        nextRepeatDates = this.props.repeatDates.filter((a) => a !== e);
+                                                    } else {
+                                                        nextRepeatDates = [...this.props.repeatDates, e];
+                                                    }
+                                                    this.props.onStateChange({ repeatDates: nextRepeatDates });
+                                                }}
+                                                cross={false}
+                                            />
+                                        ))
+                                    }
+                                </div>
                             ))
                         }
                     </div>

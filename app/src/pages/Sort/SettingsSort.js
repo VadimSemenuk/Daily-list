@@ -68,6 +68,12 @@ class SettingsSort extends Component {
                                     />
                                 ))
                             }
+
+                            <SwitchListItem
+                                text={t("priority-sort")}
+                                checked={this.props.settings.sortIncludePriority}
+                                onChange={(e) => this.props.setSetting("sortIncludePriority", e, this.props.renderNotes)}
+                            />
                         </div>
                     </ModalListItem>
 

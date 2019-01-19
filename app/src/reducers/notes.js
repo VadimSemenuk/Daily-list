@@ -44,6 +44,15 @@ function reciveNote(state, note) {
             }
             break;
         }
+        case "week": {
+            fn = (list) => {
+                if (note.repeatDates.includes(list.date.isoWeekday())) {
+                    return assignFn(list)
+                }
+                return list
+            }
+            break;
+        }
         default: {
             fn = (list) => {
                 if (list.date.valueOf() === note.added.valueOf()) {

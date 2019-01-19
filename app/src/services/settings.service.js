@@ -86,7 +86,8 @@ class SetitngsService {
             fastAdd: Boolean(result.fastAdd),
             theme: themesService.getThemeById(result.theme),
             calendarNotesCounter: Boolean(result.calendarNotesCounter),
-            calendarNotesCounterIncludeFinished: Boolean(result.calendarNotesCounterIncludeFinished)
+            calendarNotesCounterIncludeFinished: Boolean(result.calendarNotesCounterIncludeFinished),
+            sortIncludePriority: Boolean(result.sortIncludePriority)
         }
     }
 
@@ -97,6 +98,7 @@ class SetitngsService {
             case("theme"): value = value.id; break;
             case("calendarNotesCounter"): value = Number(value); break;
             case("calendarNotesCounterIncludeFinished"): value = Number(value); break;
+            case("sortIncludePriority"): value = Number(value); break;
             default: break;
         }
 

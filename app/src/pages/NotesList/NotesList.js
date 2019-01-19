@@ -294,7 +294,9 @@ function sort (data, settings) {
 
     return data.map((list) => {
         list.items.sort((a, b) => notesCompareFn(a, b));
-        list.items.sort((a, b) => b.priority - a.priority);
+        if (settings.sortIncludePriority) {
+            list.items.sort((a, b) => b.priority - a.priority);
+        }
         return list;
     });
 

@@ -141,7 +141,6 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    1 as sortWeight,
                     2 as priority
                 FROM Tasks_OLD;
             `);
@@ -186,11 +185,11 @@ export default {
                     notesShowInterval INTEGER,
                     lang TEXT,
                     calendarNotesCounter INTEGER,
-                    
                     calendarNotesCounterIncludeFinished INTEGER,
                     sortType INTEGER,
                     sortDirection INTEGER,
-                    sortFinBehaviour INTEGER
+                    sortFinBehaviour INTEGER,
+                    sortIncludePriority INTEGER
                 );
             `);
             await execureSQL(`
@@ -203,11 +202,11 @@ export default {
                     notesShowInterval,
                     lang,
                     calendarNotesCounter,
-
                     calendarNotesCounterIncludeFinished,
                     sortType,
                     sortDirection,
-                    sortFinBehaviour
+                    sortFinBehaviour,
+                    sortIncludePriority
                 ) 
                 SELECT 
                     defaultNotification, 
@@ -218,13 +217,13 @@ export default {
                     notesShowInterval, 
                     lang, 
                     calendarNotesCounter,
-
                     0 as calendarNotesCounterIncludeFinished,
                     ? as sortType,
                     ? as sortDirection,
-                    ? as sortFinBehaviour
+                    ? as sortFinBehaviour,
+                    ? as sortIncludePriority
                 FROM Settings_OLD;
-            `, [currentSortSettings.type || 1, currentSortSettings.direction || 1, currentSortSettings.finSort || 1]);
+            `, [currentSortSettings.type || 1, currentSortSettings.direction || 1, currentSortSettings.finSort || 1, 1]);
             await execureSQL(`DROP TABLE Settings_OLD;`);
         }
 

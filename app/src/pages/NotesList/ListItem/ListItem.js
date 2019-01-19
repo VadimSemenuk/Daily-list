@@ -63,6 +63,7 @@ class Note extends PureComponent {
                         {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>}
                         {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
                         {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>}
+                        {this.props.itemData.priority === 1 && <span className="note-header-priority"></span>}
                         {
                             this.props.itemData.notificate &&
                             <div className="notification-identifier-wrapper">

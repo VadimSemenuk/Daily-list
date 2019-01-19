@@ -341,7 +341,7 @@ export function setSetting (settingName, value, fn) {
             }))
             .then(() => fn && fn())
             .catch((err) => {
-                dispatch(triggerErrorModal("error-get-notes"));
+                dispatch(triggerErrorModal("error-common"));
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> setSetting()",
