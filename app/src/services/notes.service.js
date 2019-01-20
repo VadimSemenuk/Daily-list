@@ -17,6 +17,7 @@ class NotesService {
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
                 t.lastAction != 'DELETE' AND
+                t.lastAction != 'CLEAR' AND
                 (
                     t.added = ? OR
                     (t.added = -1 AND t.repeatType = "day") OR
@@ -442,7 +443,9 @@ class NotesService {
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
             t.dynamicFields, t.finished, t.forkFrom, t.priority, t.lastActionTime
             FROM Tasks t
-            WHERE t.lastAction = 'DELETE' AND t.forkFrom = -1
+            WHERE t.lastAction = 'DELETE' AND
+            t.forkFrom = -1
+            ORDER BY t.lastActionTime
             LIMIT 100;`
         );
 
@@ -496,10 +499,18 @@ class NotesService {
     }
 
     async cleanDeletedNotes() {
-        return executeSQL(
-            `DELETE FROM Tasks
-            WHERE lastAction = 'DELETE'`,
-        );
+        return executeSQL(`
+            UPDATE Tasks
+            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = ?
+            WHERE lastAction = 'DELETE';
+        `, ['CLEAR', moment().valueOf(), 0]);
+    }
+
+    async removeClearedNotes() {
+        return executeSQL(`
+            DELETE FROM Tasks
+            WHERE lastAction = 'CLEAR'
+        `);
     }
 
     calculateTimeCheckSum (note) {

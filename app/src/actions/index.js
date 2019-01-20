@@ -552,6 +552,9 @@ export function removeFromBackup(noteUUIDs) {
         let token = getState().user;
 
         return backupService.removeFromBackup(noteUUIDs, token)
+            .then((isBackuped) => {
+                isBackuped && notesService.removeClearedNotes();
+            })
             .catch((err) => {
                 dispatch(triggerLoader());
                 dispatch(triggerErrorModal("error-backup-upload"));

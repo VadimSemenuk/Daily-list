@@ -16,6 +16,7 @@ class CalendarService {
                     WHERE
                         added >= ? AND added <= ? AND
                         lastAction != 'DELETE' AND
+                        lastAction != 'CLEAR' AND
                         repeatType = 'no-repeat'
                 UNION ALL
                 SELECT rep.value as added FROM Tasks t
@@ -23,6 +24,7 @@ class CalendarService {
                     WHERE
                         rep.value >= ? AND rep.value <= ? AND
                         lastAction != 'DELETE' AND
+                        lastAction != 'CLEAR' AND
                         t.repeatType = 'any' AND
                         t.forkFrom = -1
                 )
@@ -34,6 +36,7 @@ class CalendarService {
             `SELECT COUNT(*) as count, added FROM Tasks
             WHERE 
                 lastAction != 'DELETE' AND
+                lastAction != 'CLEAR' AND
                 repeatType = "day" AND
                 forkFrom = -1;
         `); 
@@ -43,6 +46,7 @@ class CalendarService {
 			LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
                 lastAction != 'DELETE' AND
+                lastAction != 'CLEAR' AND
                 repeatType = "week" AND
                 t.forkFrom = -1
 			GROUP BY rep.value;
@@ -56,6 +60,7 @@ class CalendarService {
                     WHERE
                         added >= ? AND added <= ? AND
                         lastAction != 'DELETE' AND
+                        lastAction != 'CLEAR' AND
                         (repeatType = 'no-repeat' OR forkFrom != -1) AND finished = 1
             )
             GROUP BY added;`,
