@@ -7,9 +7,11 @@ export default {
     "remove-pass": "Удалить пароль", 
     "issues": "Устранение неисправностей",
     "about": "О программе",
+    "trash": "Корзина",
     "default-notification": "Автоматически добавлять уведомление",
     "backup": "Резервное копирование",
-    
+    "set-setting-error": "Не удалось обновить настройку. Перезапустите программу и попробуйие снова",
+
     // view settings page
     "sort": "Сортировка",
     "time-sort": "По указанному времени",
@@ -22,8 +24,10 @@ export default {
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
     "show-notes-count": "Отображать счетчики на календаре",
+    "show-notes-count-include-finished": "Включать завершенные заметки в счетчик на календаре",
     "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
-    
+    "priority-sort": "Сортировать по приоритету",
+
     // interface page
     "theme": "Тема",
     "random-theme": "Случайная тема",
@@ -68,6 +72,12 @@ export default {
     "restore-local-backup": "Восстановить локальную копию",
     "how-it-works-btn": "Как это работает",
     "how-it-works": "Файлы приложения сохраняются на вашем Google Drive. Приложение будет иметь доступ только к созданным им файлам",
+    "auto-backup": "Выполнять резервное копирование автоматически",
+    "error-sign-in": "Не удалось войти в аккаунт",
+    "error-sign-out": "Не удалось выйти из аккаунта",
+    "error-backup-upload": "Не удалось загрузить резервную копию. Повторная попытка автоматически будет выполнена при следующем запуске приложения",
+    "error-backup-restore": "Не удалось восстаносить резервную копию",
+    "error-no-backup": "У вас нет резервных копий",
 
     // common
     "save": "Сохранить",
@@ -83,7 +93,9 @@ export default {
     "g-night": "Доброй ночи",
     "g-morning": "Доброе утро",
     "reload": "Перезапустить",
-    "error-repeat-common": "Произошла ошибка. Повторите позже",
+    "ok": "Ok",
+    "cancel": "Отменить",
+    "close": "Закрыть",
 
     // share
     "share-theme": "Ежедневник",
@@ -124,10 +136,33 @@ export default {
     "priority-high": "Высокий",
     "priority-medium": "Средний",
     "priority-low": "Низкий",
+    "error-note-add": "Не удалось добавить заметку",
+    "error-note-update": "Не удалось обновить заметку",
+    "error-note-delete": "Не удалось удалить заметку",
+    "error-get-notes": "Не удалось получить заметки",
+    "monday": "Понедельник",
+    "tuesday": "Вторник",
+    "wednesday": "Среда",
+    "thursday": "Четверг",
+    "friday": "Пятница",
+    "saturday": "Суббота",
+    "sunday": "Воскресенье",
 
     // note-item
     "attached-image": "Прикрепленное изображение",
 
+    // error
+    "error-repeat-common": "Произошла ошибка. Повторите позже",
+    "error-common": "Произошла ошибка",
+    "error-reload-app": "Перезапустите приложение",
+
+    // trash
+    "clean-trash": "Очистить корзину",
+    "clean-trash-error": "Не удалось очистить корзину",
+    "error-note-get-trash": "Не удалось получить удаленные заменки",
+    "error-note-restore": "Не удалось восстановить заметку",
+
+    // meta
     "re-enter-request-title": "Пожалуйста, войдите в аккаунт повторно для завершения обновления",
     "re-enter-request-description": "Приложение пересохранит Ваши резервные копии. Это необходимо для дальнейшей нормальной работы. Данные резервных копий перезаписаны не будут",
     "re-enter-later-button": "Позже",

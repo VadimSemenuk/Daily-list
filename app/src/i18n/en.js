@@ -10,7 +10,7 @@ export default {
     "trash": "Trash",
     "default-notification": "Automatically set notification",
     "backup": "Backup",
-    "set-setting-error": "Failed to update setting. Reload app and try again",
+    "set-setting-error": "Failed to update setting",
   
     // view settings page
     "sort": "Sorting",
@@ -73,8 +73,8 @@ export default {
     "how-it-works-btn": "How it works",
     "how-it-works": "Application files are saved on your Google Drive. The application will have access only to the files created by it",
     "auto-backup": "Auto backup",
-    "error-sign-in": "Failed to sign in. Reload app and try again",
-    "error-sign-out": "Failed to sign out. Reload app and try again",
+    "error-sign-in": "Failed to sign in",
+    "error-sign-out": "Failed to sign out",
     "error-backup-upload": "Failed to upload backup. The attempt will be repeated at the the next application loading.",
     "error-backup-restore": "Failed to restore backup. Try later",
     "error-no-backup": "You have no backups",
@@ -135,10 +135,10 @@ export default {
     "priority-high": "High",
     "priority-medium": "Medium",
     "priority-low": "Low",
-    "error-note-add": "Failed to add a note. Reload app and try again",
-    "error-note-update": "Failed to update a note. Reload app and try again",
-    "error-note-delete": "Failed to delete a note. Reload app and try again",
-    "error-get-notes": "Failed to delete a note. Reload app and try again",
+    "error-note-add": "Failed to add a note",
+    "error-note-update": "Failed to update a note",
+    "error-note-delete": "Failed to delete a note",
+    "error-get-notes": "Failed to get a notes",
     "monday": "Monday",
     "tuesday": "Tuesday",
     "wednesday": "Wednesday",
@@ -149,11 +149,6 @@ export default {
 
     // note-item
     "attached-image": "Attached image",
-    
-    "re-enter-request-title": "Please log in again to complete the update",
-    "re-enter-request-description": "The application will save your backups. This is necessary for further normal operation. Backup data will not be overwritten",
-    "re-enter-later-button": "Later",
-    "re-enter-discard-button": "Not show anymore",
 
     // error
     "error-repeat-common": "An error has occurred. Repeat later",
@@ -162,5 +157,13 @@ export default {
 
     // trash
     "clean-trash": "Clean trash",
-    "clean-trash-error": "Failed to clean trash. Reload app and try again",
-} 
+    "clean-trash-error": "Failed to clean trash",
+    "error-note-get-trash": "Failed to get deleted notes",
+    "error-note-restore": "Failed to restore note",
+
+    // meta
+    "re-enter-request-title": "Please log in again to complete the update",
+    "re-enter-request-description": "The application will save your backups. This is necessary for further normal operation. Backup data will not be overwritten",
+    "re-enter-later-button": "Later",
+    "re-enter-discard-button": "Not show anymore",
+}
