@@ -264,11 +264,31 @@ module.exports = class {
             return; 
         }
         let date = new Date();
-        let values = notes.map((note) => {
-            return [note.uuid, note, userId, date];
-        });
-        let sql = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, values);
-        return this.db.query(sql);
+        let valuesToInsert = notes
+            .notes((note) => !note.isSynced && note.lastAction !== 'CLEAR')
+            .map((note) => {
+                return [note.uuid, note, userId, date];
+            });
+        let valuesToUpdate = notes
+            .notes((note) => note.isSynced && note.lastAction !== 'CLEAR')
+            .map((note) => {
+                return [note.uuid, note, userId, date];
+            });
+        let valuesToDelete = notes
+            .notes((note) => note.isSynced && note.lastAction === 'CLEAR')
+            .reduce((acc, note) => {
+                return [...acc, note.uuid];
+            }, []);
+
+        let insertSQL = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, valuesToInsert);
+        await this.db.query(insertSQL);
+
+        // TODO: logic to update
+        // let updateSQL = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, valuesToUpdate);
+        // await this.db.query(updateSQL);
+
+        let deleteSQL = format(`DELETE FROM NotesBackups WHERE uuid IN (%L)`, valuesToDelete);
+        await this.db.query(deleteSQL);
     }
 
     async updateBackup(note, removeForkNotes) {

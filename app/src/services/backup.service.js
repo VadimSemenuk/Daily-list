@@ -113,7 +113,7 @@ class BackupService {
         return time;
     }
 
-    async removeFromBackup(token, noteUUIDs) {
+    async removeFromBackup(token, notes) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
             window.plugins.toast.showLongBottom(i18next.t("internet-required"));
             return false;
@@ -130,7 +130,7 @@ class BackupService {
                 "Authorization": token.token
             },
             body: JSON.stringify({
-                noteUUIDs
+                notes
             })
         })
             .then((res) => {

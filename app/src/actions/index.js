@@ -235,15 +235,14 @@ export function restoreNote (note) {
 export function cleanDeletedNotes () {
     return function(dispatch, getState) {
         let state = getState();
-        let deletedNotesUUIDs = state.trash.map((n) => n.uuid);
-        debugger;
+
         return notesService.cleanDeletedNotes()
             .then(() => dispatch({
                 type: "CLEAN_TRASH",
             }))
             .then(() => {
                 let token = state.user;
-                token.settings && token.settings.autoBackup && dispatch(removeFromBackup(deletedNotesUUIDs, token));
+                token.settings && token.settings.autoBackup && dispatch(removeFromBackup(state.trash));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("clean-trash-error"));
@@ -546,12 +545,13 @@ export function uploadBatchBackup() {
     }
 }
 
-export function removeFromBackup(noteUUIDs) {
+export function removeFromBackup(notes) {
     return function(dispatch, getState) {
         dispatch(triggerLoader());
         let token = getState().user;
 
-        return backupService.removeFromBackup(noteUUIDs, token)
+        // return backupService.removeFromBackup(noteUUIDs, token)
+        return backupService.uploadNotesBatchBackup(notes, token)
             .then((isBackuped) => {
                 isBackuped && notesService.removeClearedNotes();
             })
@@ -561,7 +561,7 @@ export function removeFromBackup(noteUUIDs) {
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> remvoeFromBackup()",
-                    noteUUIDs,
+                    notes,
                     deviceId
                 });
             })
