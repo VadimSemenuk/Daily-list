@@ -242,7 +242,7 @@ export function cleanDeletedNotes () {
             }))
             .then(() => {
                 let token = state.user;
-                token.settings && token.settings.autoBackup && dispatch(removeFromBackup(state.trash));
+                token.settings && token.settings.autoBackup && dispatch(uploadBatchBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("clean-trash-error"));
@@ -521,7 +521,12 @@ export function uploadBatchBackup() {
             .then((notes) => {
                 return backupService.uploadNotesBatchBackup(notes, token);
             })
-            .then(() => notesService.setNoteBackupState(null, true, true))
+            .then(() => {
+                return notesService.removeClearedNotes();
+            })
+            .then(() => {
+                return notesService.setNoteBackupState(null, true, true);
+            })
             .then(() => {
                 let nextToken = { 
                     ...token, 
@@ -539,29 +544,6 @@ export function uploadBatchBackup() {
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> uploadBatchBackup()",
-                    deviceId
-                });
-            })
-    }
-}
-
-export function removeFromBackup(notes) {
-    return function(dispatch, getState) {
-        dispatch(triggerLoader());
-        let token = getState().user;
-
-        // return backupService.removeFromBackup(noteUUIDs, token)
-        return backupService.uploadNotesBatchBackup(notes, token)
-            .then((isBackuped) => {
-                isBackuped && notesService.removeClearedNotes();
-            })
-            .catch((err) => {
-                dispatch(triggerLoader());
-                dispatch(triggerErrorModal("error-backup-upload"));
-                let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> remvoeFromBackup()",
-                    notes,
                     deviceId
                 });
             })

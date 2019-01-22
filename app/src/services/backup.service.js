@@ -50,7 +50,6 @@ class BackupService {
             })
         })
             .then((res) => {
-                // TODO test statuses
                 if (res.status === 200) {
                     return res.json();
                 }
@@ -111,34 +110,6 @@ class BackupService {
             });
 
         return time;
-    }
-
-    async removeFromBackup(token, notes) {
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
-            return false;
-        }
-        if (!notes || !notes.length) {
-            return false;
-        }
-
-        return fetch(`${config.apiURL}/notes/backup/batch`, {
-            method: "DELETE",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token.token
-            },
-            body: JSON.stringify({
-                notes
-            })
-        })
-            .then((res) => {
-                // TODO test statuses
-                if (res.status === 200) {
-                    return res.json();
-                }
-            });
     }
 }
 

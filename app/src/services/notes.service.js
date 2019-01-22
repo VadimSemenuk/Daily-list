@@ -319,7 +319,7 @@ class NotesService {
             whereStatement = " WHERE id = ?";
             params.push(noteId);
         } else {
-            whereStatement = " WHERE isSynced != 1 AND isLastActionSynced != 1";
+            whereStatement = " WHERE isLastActionSynced = 0";
         }
         return executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ?${whereStatement};`, params).catch(err => console.warn(err))
     }
@@ -331,7 +331,7 @@ class NotesService {
             dataSelectWhereStatement = " WHERE t.id = ?";
             dataSelectParams = [noteKey];
         } else {
-            dataSelectWhereStatement = " WHERE t.isLastActionSynced != 1";
+            dataSelectWhereStatement = " WHERE t.isLastActionSynced = 0";
         }
 
         let select = await executeSQL(`
@@ -342,10 +342,6 @@ class NotesService {
             FROM Tasks t
             ${dataSelectWhereStatement};
         `, dataSelectParams);
-
-        if (!select.rows.length) {
-            throw new Error("Notes not found");
-        }
 
         let res = [];
         for (let i = 0; i < select.rows.length; i++ ) {

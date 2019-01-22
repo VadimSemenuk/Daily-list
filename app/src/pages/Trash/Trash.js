@@ -45,7 +45,7 @@ class Trash extends Component {
                         }
                     </div>
                     {
-                        this.props.trash.length !== 0 &&
+                        // this.props.trash.length !== 0 &&
                         <div className="clean-trash-button-wrapper">
                             <button 
                                 className="text block"

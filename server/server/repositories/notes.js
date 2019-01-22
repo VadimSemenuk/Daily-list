@@ -1,4 +1,4 @@
-var format = require('pg-format');
+let format = require('pg-format');
 
 module.exports = class {
     constructor(db) {
@@ -265,30 +265,44 @@ module.exports = class {
         }
         let date = new Date();
         let valuesToInsert = notes
-            .notes((note) => !note.isSynced && note.lastAction !== 'CLEAR')
+            .filter((note) => !note.isSynced && note.lastAction !== 'CLEAR')
             .map((note) => {
                 return [note.uuid, note, userId, date];
             });
         let valuesToUpdate = notes
-            .notes((note) => note.isSynced && note.lastAction !== 'CLEAR')
+            .filter((note) => note.isSynced && note.lastAction !== 'CLEAR')
             .map((note) => {
                 return [note.uuid, note, userId, date];
             });
         let valuesToDelete = notes
-            .notes((note) => note.isSynced && note.lastAction === 'CLEAR')
+            .filter((note) => note.isSynced && note.lastAction === 'CLEAR')
             .reduce((acc, note) => {
                 return [...acc, note.uuid];
             }, []);
 
-        let insertSQL = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, valuesToInsert);
-        await this.db.query(insertSQL);
+        if (valuesToInsert.length) {
+            let insertSQL = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, valuesToInsert);
+            await this.db.query(insertSQL);
+        }
 
-        // TODO: logic to update
-        // let updateSQL = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, valuesToUpdate);
-        // await this.db.query(updateSQL);
+        if (valuesToUpdate.length) {
+            let updateSQL = format(`            
+                UPDATE NotesBackups as nb
+                SET
+                uuid = n.uuid,
+                    note = n.note,
+                    userId = n.userId::int,
+                    datetime = n.datetime::timestamp with time zone
+                FROM (VALUES %L) as n (uuid, note, userId, datetime)
+                WHERE nb.uuid = n.uuid;
+            `, valuesToUpdate);
+            await this.db.query(updateSQL);
+        }
 
-        let deleteSQL = format(`DELETE FROM NotesBackups WHERE uuid IN (%L)`, valuesToDelete);
-        await this.db.query(deleteSQL);
+        if (valuesToDelete.length) {
+            let deleteSQL = format(`DELETE FROM NotesBackups WHERE uuid IN (%L)`, valuesToDelete);
+            await this.db.query(deleteSQL);
+        }
     }
 
     async updateBackup(note, removeForkNotes) {
