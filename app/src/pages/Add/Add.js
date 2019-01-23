@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
-import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
@@ -40,7 +39,7 @@ class Add extends Component {
             added: this.props.date,
             finished: false,
             repeatType: "no-repeat",
-            repeatDates: [moment(this.props.date).valueOf()],
+            repeatDates: [],
             priority: 2,
 
             calendar: false,
@@ -101,19 +100,17 @@ class Add extends Component {
     }
 
     addInput = async () => {
-        console.log(1);
         let field = {
             type: "text",
             value: ""
         };
         await this.addField(field, this.activeInputIndex);
-        console.log(2);
 
         this.focusNext("textarea", ".removable-textarea-wrapper textarea", this.activeInputIndex);
         this.activeInputIndex = -1;
 
         this.scrollToBottom();
-    }
+    };
 
     addListItem = async () => {
         let field = {
@@ -127,7 +124,7 @@ class Add extends Component {
         this.activeInputIndex = -1;
 
         this.scrollToBottom();
-    }
+    };
 
     onEnterPress = async (i) => {
         let field = {
@@ -140,7 +137,7 @@ class Add extends Component {
         this.focusNext("input", ".removable-text-checkbox-wrapper input", i + 1);
 
         this.scrollToBottom();
-    }
+    };
 
     onDynamicItemRemove = (i, ref) => {
         if (ref) {
@@ -159,7 +156,7 @@ class Add extends Component {
             // dynamicFields: [...this.state.dynamicFields.slice(0, i), null, ...this.state.dynamicFields.slice(i + 1)] 
             dynamicFields: [...this.state.dynamicFields.slice(0, i), ...this.state.dynamicFields.slice(i + 1)] 
         })
-    }
+    };
 
     addSnapshootItem = async (url) => {
         let field = {
@@ -169,7 +166,7 @@ class Add extends Component {
         await this.addField(field, this.activeInputIndex);
 
         this.scrollToBottom();
-    }
+    };
 
     addCameraShot = async (sourceType) => {
         window.navigator.camera.getPicture(
@@ -191,7 +188,7 @@ class Add extends Component {
                 targetWidth: 3000
             }
         );
-    }
+    };
 
     getInputsValues = () => {
         let dynamicFields = this.state.dynamicFields.filter((a) => a !== null);
@@ -199,7 +196,7 @@ class Add extends Component {
             ...this.state, 
             dynamicFields
         }
-    }
+    };
 
     onSubmit = async () => {
         let note = this.getInputsValues();
@@ -211,7 +208,7 @@ class Add extends Component {
         }
 
         this.props.history.goBack();
-    }
+    };
 
     scrollToBottom() {
         let el = document.querySelector(".add-content-wrapper");
@@ -221,17 +218,17 @@ class Add extends Component {
     showImage = (i) => {
         let field = this.state.dynamicFields[i];
         window.PhotoViewer.show(field.uri, this.state.title, {share: false});         
-    }
+    };
 
     triggerCalendar = () => {
         this.setState({calendar: !this.state.calendar})
-    }
+    };
 
     onDateSelect = (date) => {
         this.setState({
             added: date
         })
-    }
+    };
 
     catchFocusedInput = () => {
         let activeElement = document.activeElement.closest(".add-content-item");
@@ -239,11 +236,7 @@ class Add extends Component {
         let nodes = Array.prototype.slice.call(document.querySelector(".add-content-wrapper").children);
         let index = nodes.indexOf(activeElement);
         this.activeInputIndex = index;
-
-        console.log(document.activeElement);
-        console.log(activeElement);
-        console.log(index)
-    }
+    };
 
     render() {
         let {t} = this.props;

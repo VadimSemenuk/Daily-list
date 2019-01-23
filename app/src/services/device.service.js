@@ -53,8 +53,7 @@ class DeviceService {
             additionalInto
         };
 
-        // if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-        if (true) {
+        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
             return executeSQL(`INSERT INTO ErrorLogs (date, message) VALUES (?, ?)`, [+new Date(), JSON.stringify(log)]);
         }
 
@@ -84,16 +83,22 @@ class DeviceService {
                 });
             }
 
-            await fetch(`${config.apiURL}/log/error`, {
+            let logged = await fetch(`${config.apiURL}/log/error`, {
                 method: "POST",
                 credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(logs)
-            }).catch((err) => console.warn(err));
+            })
+                .then((res) => {
+                    return res.status === 200;
+                })
+                .catch((err) => console.warn(err));
 
-            executeSQL(`DELETE FROM ErrorLogs`);
+            if (logged) {
+                executeSQL(`DELETE FROM ErrorLogs`);
+            }
         }
     }
 }

@@ -83,6 +83,8 @@ class NotesService {
         let addedNote = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(addedNote);
 
+        addedNote.notificate = true;
+        addedNote.startTime = moment();
         notificationService.clear(addedNote.repeatType === "any" ? addedNote.repeatDates : [addedNote.key]);
         if (addedNote.notificate) {
             notificationService.set(addedNote.key, addedNote);
@@ -267,34 +269,22 @@ class NotesService {
     }
 
     async setNoteRepeat(note) {
-        if (note.repeatType === "no-repeat") {
-            return
-        }
-
         await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]);
 
-        let repeatDates = note.repeatDates;
-        if (note.repeatType === "_week") {
-            repeatDates = [moment(note.added).isoWeekday()];
-        } else if (note.repeatType === "day") {
-            repeatDates = [note.added];
-        } else if (repeatDates.length && repeatDates.length === 0) {
+        if (note.repeatType === "no-repeat" || note.repeatDates.length === 0) {
             return
         }
 
-        await executeSQL(
-            `INSERT INTO TasksRepeatValues
+        let params = note.repeatDates.reduce((acc, value) => `${acc}, (?, ?)`, "");
+        params = params.slice(2);
+        let values = note.repeatDates.reduce((acc, value) => [...acc, note.key, value], []);
+
+        await executeSQL(`
+            INSERT INTO TasksRepeatValues
             (taskId, value)
             VALUES
-            ${
-                repeatDates.reduce((accumulator, currentValue) => {
-                    if (accumulator === false) {
-                        return `(${note.key}, ${currentValue})`;
-                    }
-                    return `${accumulator}, (${note.key}, ${currentValue})`;
-                }, false)
-            };`,
-        );
+            ${params};
+        `, values);
     }
 
     async getNoteRepeatDates(note) {

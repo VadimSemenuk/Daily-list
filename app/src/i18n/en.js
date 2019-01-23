@@ -146,6 +146,7 @@ export default {
     "friday": "Friday",
     "saturday": "Saturday",
     "sunday": "Sunday",
+    "error-notification-permission": "You have no permission to set notifications",
 
     // note-item
     "attached-image": "Attached image",

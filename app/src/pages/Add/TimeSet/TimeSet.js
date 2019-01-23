@@ -19,7 +19,7 @@ class TimeSet extends Component {
 
         this.state = {
             repeatTypeSelected: this.props.repeatType,
-            weekRepeatDaySelected: this.props.weekRepeatDaySelected
+            repeatDatesSelected: this.props.repeatDates
         };
 
         this.removeNotificationFromDefault = false;
@@ -42,7 +42,7 @@ class TimeSet extends Component {
             notificate,
             [state]: moment(date)                 
         })
-    }
+    };
 
     pickTime = (state) => {
         let date = this.props[state] || moment();
@@ -51,7 +51,7 @@ class TimeSet extends Component {
             type: 'time',         
             date: new Date(date.valueOf())
         }, (date) => this.onTimeSet(moment(date).startOf("minute").valueOf(), state));
-    }
+    };
 
     onNotificateChange = (notificate) => {
         if (!this.props.startTime) {
@@ -66,10 +66,10 @@ class TimeSet extends Component {
         this.props.onStateChange({
             notificate                   
         })
-    }
+    };
 
     reset = (field) => {
-        let notificate = this.props.notificate
+        let notificate = this.props.notificate;
 
         if (field === "startTime") {
             notificate = false;
@@ -79,27 +79,26 @@ class TimeSet extends Component {
             [field]: false,
             notificate                
         })
-    }
+    };
 
     onRepeatSet = (e) => {
         this.props.onStateChange({
             repeatType: e             
         })
-    }
+    };
 
     onRepeatDateSelect = (e) => {
         this.props.onStateChange({
             repeatType: e             
         })
-    }
+    };
 
     render() {  
         let {t} = this.props;
         let repeatTypeOptions = notesService.getRepeatTypeOptions();
         let selectedRepeatTypeOption = repeatTypeOptions.find((a) => a.val === this.props.repeatType);
         let weekRepeatOptions = notesService.getWeekRepeatOptions();
-        console.log(this.props.repeatDates)
-        
+
         return (
             <div className="set-time-wrapper">
                 <ListItem 
@@ -172,7 +171,10 @@ class TimeSet extends Component {
                         },
                         {
                             text: t("ok"),
-                            onClick: () => this.props.onStateChange({repeatType: this.state.repeatTypeSelected})
+                            onClick: () => this.props.onStateChange({
+                                repeatType: this.state.repeatTypeSelected,
+                                repeatDates: this.state.repeatDatesSelected
+                            })
                         }
                     ]}
                 >
@@ -184,7 +186,19 @@ class TimeSet extends Component {
                                         name="repeat-type"
                                         checked={this.state.repeatTypeSelected === setting.val}
                                         value={setting.val}
-                                        onChange={(e) => this.setState({repeatTypeSelected: e})}
+                                        onChange={(e) => {
+                                            let nextRepeatDates = [];
+                                            if (e === "any") {
+                                                nextRepeatDates = [moment(this.props.date).startOf("day").valueOf()];
+                                            }
+                                            if (e === "week") {
+                                                nextRepeatDates = [moment(this.props.date).isoWeekday()];
+                                            }
+                                            this.setState({
+                                                repeatTypeSelected: e,
+                                                repeatDatesSelected: nextRepeatDates
+                                            })
+                                        }}
                                         text={t(setting.translateId)}
                                     />
 
@@ -195,15 +209,17 @@ class TimeSet extends Component {
                                                 key={i}
                                                 id={option.val}
                                                 textValue={t(option.translateId)}
-                                                checkBoxValue={this.props.repeatDates.includes(option.val)}
+                                                checkBoxValue={this.state.repeatDatesSelected.includes(option.val)}
                                                 onValueChange={(e) => {
                                                     let nextRepeatDates = [];
-                                                    if (this.props.repeatDates.includes(e)) {
-                                                        nextRepeatDates = this.props.repeatDates.filter((a) => a !== e);
+                                                    if (this.state.repeatDatesSelected.includes(e)) {
+                                                        nextRepeatDates = this.state.repeatDatesSelected.filter((a) => a !== e);
                                                     } else {
-                                                        nextRepeatDates = [...this.props.repeatDates, e];
+                                                        nextRepeatDates = [...this.state.repeatDatesSelected, e];
                                                     }
-                                                    this.props.onStateChange({ repeatDates: nextRepeatDates });
+                                                    this.setState({
+                                                        repeatDatesSelected: nextRepeatDates
+                                                    });
                                                 }}
                                                 cross={false}
                                             />
@@ -219,9 +235,9 @@ class TimeSet extends Component {
                         <Calendar 
                             mode="multiselect"
                             currentDate={this.props.currentDate}
-                            msSelectedDates={this.props.repeatDates}
+                            msSelectedDates={this.state.repeatDatesSelected}
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
-                            onDatesSet={(e) => this.props.onStateChange({ repeatDates: e })}
+                            onDatesSet={(e) => this.setState({ repeatDatesSelected: e })}
                         />
                     }
                 </ModalListItem>
