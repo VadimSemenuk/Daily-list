@@ -62,6 +62,7 @@ h3 {
 }
 .page-content {
     background: #fff;
+    flex: 1 1;
 
     &.padding {
         padding: 10px;
@@ -182,6 +183,7 @@ textarea {
     width: 100%;
     box-sizing: border-box; 
     font-size: 1em;
+    background: transparent;
 
     &:focus {
         border-bottom: 1px solid #414040;	
@@ -240,4 +242,50 @@ select {
 
 button.google-in {
     background: #db4437;
+}
+
+
+
+.night-mode {
+    .page-content {
+        background: #383838;
+    }
+
+    .note-wrapper .note-content {
+        border: none;
+        background: #222;
+        color: #eee;
+
+        .more-button, .note-finish-checkbox {
+            filter: invert(1);
+        }
+    }
+
+    .theme-header-background {
+        background: #222;
+    }
+
+    input, textarea {
+        color: #eee;
+    }
+
+    ::placeholder {
+        color: #eee;
+    }
+
+    .list-item {
+        .list-item-text {
+            color: #eee;
+        }
+
+        .list-item-img {
+            filter: invert(1);
+        }
+    }
+}
+
+body {
+    .night-mode {
+        color: #eee;
+    }
 }
