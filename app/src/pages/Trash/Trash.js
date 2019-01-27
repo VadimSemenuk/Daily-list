@@ -32,6 +32,10 @@ class Trash extends Component {
                 <div className="page-content trash-list-page-content">
                     <div className="scroll items-wrapper">
                         {
+                            this.props.trash.length === 0 &&
+                            <div className="no-content">{t("no-content")}</div>
+                        }
+                        {
                             this.props.trash.map((a) => (
                                 <TrashListItem 
                                     key={a.key}

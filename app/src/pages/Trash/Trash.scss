@@ -11,4 +11,16 @@
     .clean-trash-button-wrapper {
         padding: 0 5px;
     }
+
+    .no-content {
+        text-align: center;
+        font-size: 1.1em;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        color: #cac7c7;
+        text-transform: uppercase;
+    }
 }

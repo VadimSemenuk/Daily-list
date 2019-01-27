@@ -1,26 +1,23 @@
 .trash-list-item {
     position: relative;
 
-    .restore-button {
+    .trash-list-item-header {
+        padding-left: 19px;
+        padding-right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         position: absolute;
-        top: 0;
-        z-index: 3;
-        right: 5px;
+        width: 100%;
+        z-index: 11;
+        box-sizing: border-box;
 
-        img {
-            width: 22px;
-            height: 22px;
+        .restore-button {
+            img {
+                width: 22px;
+                height: 22px;
+            }
         }
-    }
-
-    .note-draggable-wrapper {
-        margin-top: -27px;
-    }
-
-    .deleted-time {
-        position: relative;
-        z-index: 2;
-        padding: 5px 15px;
     }
 
     .more-button, .note-finish-checkbox {
@@ -28,6 +25,6 @@
     }
 
     .note-content {
-        padding-top: 30px;
-    }    
+        padding-top: 40px;
+    }
 }

@@ -12,14 +12,16 @@ class TrashListItem extends PureComponent {
     render () {
         return (
             <div className="trash-list-item">
-                <div className="deleted-time">Deleted: {this.props.itemData.lastActionTime.format("MMM Do YYYY, HH:mm")}</div>
+                <div className="trash-list-item-header">
+                    <div className="deleted-time">Deleted: {this.props.itemData.lastActionTime.format("MMM Do YYYY, HH:mm")}</div>
+                    <button
+                        className="restore-button"
+                        onClick={this.onRestore}
+                    >
+                        <img src={RestoreImg} alt="restore" />
+                    </button>
+                </div>
                 <Note {...this.props} />
-                <button 
-                    className="restore-button"
-                    onClick={this.onRestore}
-                >
-                    <img src={RestoreImg} alt="restore" />
-                </button>
             </div>
         )
     }
