@@ -2,27 +2,26 @@ import moment from "moment";
 import i18next from "i18next";
 
 class NotificationService {
-    set = async (id, note) => {
+    set = async (note) => {
         if (!window.cordova) {
-            // return;
+            return;
         }
 
-        // let hasPermission = await new Promise((resolve) => {
-        //     window.cordova.plugins.notification.local.hasPermission((granted) => {
-        //         if (!granted) {
-        //             window.cordova.plugins.notification.local.requestPermission(resolve);
-        //         }
-        //     });
-        // });
-        //
-        // if (!hasPermission) {
-        //     window.plugins.toast.showLongBottom(i18next.t("error-notification-permission"));
-        // }
+        let hasPermission = await new Promise((resolve) => {
+            window.cordova.plugins.notification.local.hasPermission((granted) => {
+                if (!granted) {
+                    window.cordova.plugins.notification.local.requestPermission(resolve);
+                }
+            });
+        });
+
+        if (!hasPermission) {
+            window.plugins.toast.showLongBottom(i18next.t("error-notification-permission"));
+        }
 
         let notificationConfig = {
             title: note.title || 'Уведомление о заметке',
             text: this.getMessgae(note),
-            id,
             sound: true
         };
 
@@ -31,6 +30,7 @@ class NotificationService {
                 let atDate = moment(note.added).hour(note.startTime.hour()).minute(note.startTime.minute());
                 atDate = new Date(atDate.valueOf());
                 notificationConfig.trigger = { at: atDate };
+                notificationConfig.id = note.key;
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
@@ -42,16 +42,16 @@ class NotificationService {
                     },
                     count: 999
                 };
+                notificationConfig.id = note.key;
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
             case "week": {
                 note.repeatDates.forEach((date) => {
-                    // window.cordova.plugins.notification.local.schedule(
-                    console.log(
+                    window.cordova.plugins.notification.local.schedule(
                         {
                             ...notificationConfig,
-                            id: `${date}_${note.uuid}`,
+                            id: `${date}_${note.key}`,
                             trigger: {
                                 every:
                                     {
@@ -68,12 +68,12 @@ class NotificationService {
             }
             case "any": {
                 note.repeatDates.forEach((date) => {
-                    let atDate = moment(date).hour(note.startTime.hour()).minute(note.startTime.minute());
+                    let atDate = moment(date).startOf("day").hour(note.startTime.hour()).minute(note.startTime.minute());
                     atDate = new Date(atDate.valueOf());
 
                     window.cordova.plugins.notification.local.schedule({
                         ...notificationConfig,
-                        id: date,
+                        id: `${date}_${note.key}`,
                         trigger: { at: atDate }
                     });
                 });
@@ -83,11 +83,18 @@ class NotificationService {
         }
     };
 
-    clear = (ids) => {
+    clear = (note) => {
         if (!window.cordova) {
             return;
         }
-        
+
+        // TODO: old remove for v16 note
+
+        let ids = [note.key];
+        if (note.repeatType === "any" || note.repeatType === "week") {
+            ids = note.repeatDates.map((date) => `${date}_${note.key}`);
+        }
+
         window.cordova.plugins.notification.local.cancel(ids);
     };
 

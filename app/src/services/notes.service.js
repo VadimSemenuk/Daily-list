@@ -12,7 +12,7 @@ class NotesService {
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
             t.dynamicFields, t.finished, t.forkFrom, t.priority,
             CASE t.added WHEN ? THEN 0 ELSE 1 END as isShadow,
-            ? as added
+            (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             WHERE
@@ -24,7 +24,7 @@ class NotesService {
                     (t.added = -1 AND t.repeatType = "week" AND rep.value = ?) OR
                     (t.added = -1 AND t.repeatType = "any" AND rep.value = ?)
                 );`,
-            [currentDate, currentDate, currentDate, date.isoWeekday(), currentDate]
+            [currentDate, currentDate, date.isoWeekday(), currentDate]
         );
 
         let unique = {};
@@ -41,12 +41,13 @@ class NotesService {
                 dynamicFields: JSON.parse(item.dynamicFields),
                 startTime: ~item.startTime ? moment(item.startTime) : false,
                 endTime: ~item.endTime ? moment(item.endTime) : false,
-                added: moment(item.added),
+                added: moment(currentDate),
                 finished: Boolean(item.finished),
                 notificate: Boolean(item.notificate),
                 isShadow: Boolean(item.isShadow),
                 isSynced: Boolean(item.isSynced),
                 isLastActionSynced: Boolean(item.isLastActionSynced),
+                repeatDates: item.repeatDates ? item.repeatDates.split(",") : [],
             };
 
             unique[key] = nextItem;
@@ -83,12 +84,8 @@ class NotesService {
         let addedNote = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(addedNote);
 
-        addedNote.notificate = true;
-        addedNote.startTime = moment();
-        notificationService.clear(addedNote.repeatType === "any" ? addedNote.repeatDates : [addedNote.key]);
-        if (addedNote.notificate) {
-            notificationService.set(addedNote.key, addedNote);
-        }
+        notificationService.clear(addedNote);
+        addedNote.notificate && notificationService.set(addedNote);
 
         return addedNote;
     }
@@ -183,6 +180,10 @@ class NotesService {
         if (nextNote.prevNote.repeatType !== "no-repeat") {
             if (!nextNote.isShadow) {
                 nextNote.key = nextNote.forkFrom;
+                let select = await executeSQL(`SELECT uuid FROM Tasks WHERE id = ?`, [nextNote.key]);
+                if (select.rows.length) {
+                    nextNote.key = select.rows.item(0).uuid;
+                }
             }
             await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [nextNote.key]);
         }
@@ -215,10 +216,8 @@ class NotesService {
 
         await this.setNoteRepeat(nextNote);
 
-        notificationService.clear(nextNote.prevNote.repeatType === "any" ? nextNote.prevNote.repeatDates : [nextNote.key]);
-        if (nextNote.notificate) {
-            notificationService.set(nextNote.key, nextNote);
-        }
+        notificationService.clear(nextNote);
+        nextNote.notificate && notificationService.set(nextNote);
 
         return nextNote;
     }
@@ -235,10 +234,8 @@ class NotesService {
             note.key
         ]);
 
-        notificationService.clear(note.repeatType === "any" ? note.repeatDates : [note.key]);
-        if (note.notificate) {
-            notificationService.set(note.key, note);
-        }
+        notificationService.clear(note);
+        note.notificate && notificationService.set(note);
 
         return note;
     }
@@ -263,7 +260,7 @@ class NotesService {
                 nextNote.key
             ]
         );
-        notificationService.clear(nextNote.repeatType === "any" ? nextNote.repeatDates : [nextNote.key]);
+        notificationService.clear(nextNote);
 
         return nextNote;
     }
@@ -419,7 +416,7 @@ class NotesService {
         notes.forEach((note) => {
             notificationService.clearAll();
             if (note.notificate) {
-                notificationService.set(note.uuid, note);
+                notificationService.set(note);
             }
         });
     }
@@ -493,6 +490,15 @@ class NotesService {
     }
 
     async removeClearedNotes() {
+        await executeSQL(`
+            DELETE FROM TasksRepeatValues
+            WHERE taskId IN (
+                SELECT taskId FROM TasksRepeatValues
+                LEFT JOIN Tasks ON TasksRepeatValues.taskId = Tasks.id
+                WHERE Tasks.lastAction = 'CLEAR'
+            )
+        `);
+
         return executeSQL(`
             DELETE FROM Tasks
             WHERE lastAction = 'CLEAR'
