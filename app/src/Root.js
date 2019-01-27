@@ -93,7 +93,7 @@ class Root extends Component {
 
         return (
             <HashRouter>
-                <div className="app-wrapper night-mode">
+                <div className="app-wrapper">
                     {
                         !this.props.password &&
                         <Redirect from="/" to="/password"/>           

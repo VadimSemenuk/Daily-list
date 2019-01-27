@@ -4,6 +4,23 @@
     overflow: hidden;
     border-radius: 6px;
 
+    .note-header-priority {
+        position: absolute;
+        top: 50%;
+        left: 7px;
+        z-index: 3;
+        height: 14px;
+        margin-top: -7px;
+
+        &.rotated {
+            transform: rotate(180deg);
+        }
+
+        + .note-content {
+            padding-left: 23px;
+        }
+    }
+
     .tag {
         position: absolute;
         top: 0;

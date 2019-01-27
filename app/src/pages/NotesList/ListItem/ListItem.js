@@ -7,6 +7,9 @@ import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
 import RepeatImg from "../../../assets/img/two-circling-arrows.svg";
+import DownArrowGreenImg from "../../../assets/img/down-arrow-green.svg";
+import DownArrowBlueImg from "../../../assets/img/down-arrow-blue.svg";
+import DownArrowRedImg from "../../../assets/img/down-arrow-red.svg";
 
 import './ListItem.scss';
 
@@ -58,12 +61,35 @@ class Note extends PureComponent {
                     style={{backgroundColor: this.props.itemData.tag}}
                     className="tag"
                 ></div>
+                {
+                    this.props.itemData.priority === 1 &&
+                    <img
+                        className="note-header-priority"
+                        src={DownArrowGreenImg}
+                        alt="low"
+                    />
+                }
+                {
+                    this.props.itemData.priority === 3 &&
+                    <img
+                        className="note-header-priority rotated"
+                        src={DownArrowBlueImg}
+                        alt="high"
+                    />
+                }
+                {
+                    this.props.itemData.priority === 4 &&
+                    <img
+                        className="note-header-priority rotated"
+                        src={DownArrowRedImg}
+                        alt="very high"
+                    />
+                }
                 <div className="note-content">
                     <div className="note-header">
                         {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>}
                         {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
                         {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>}
-                        {this.props.itemData.priority === 1 && <span className="note-header-priority"></span>}
                         {
                             this.props.itemData.notificate &&
                             <div className="notification-identifier-wrapper">
