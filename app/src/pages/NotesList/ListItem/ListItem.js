@@ -54,7 +54,7 @@ class Note extends PureComponent {
         
         return (
             <div
-                className={`note-wrapper ${this.state.expanded && 'expanded'}`}
+                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'}`}
                 onClick={this.triggerExpanded}
             >
                 <div
@@ -62,7 +62,7 @@ class Note extends PureComponent {
                     className="tag"
                 ></div>
                 {
-                    this.props.itemData.priority === 1 &&
+                    this.props.itemData.priority === 11 &&
                     <img
                         className="note-header-priority"
                         src={DownArrowGreenImg}
@@ -70,7 +70,7 @@ class Note extends PureComponent {
                     />
                 }
                 {
-                    this.props.itemData.priority === 3 &&
+                    this.props.itemData.priority === 13 &&
                     <img
                         className="note-header-priority rotated"
                         src={DownArrowBlueImg}
@@ -78,7 +78,7 @@ class Note extends PureComponent {
                     />
                 }
                 {
-                    this.props.itemData.priority === 4 &&
+                    this.props.itemData.priority === 14 &&
                     <img
                         className="note-header-priority rotated"
                         src={DownArrowRedImg}

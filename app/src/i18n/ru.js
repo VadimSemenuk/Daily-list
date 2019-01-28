@@ -23,9 +23,6 @@ export default {
     "notes-show-interval": "Отображать за период",
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
-    "show-notes-count": "Отображать счетчики на календаре",
-    "show-notes-count-include-finished": "Включать завершенные заметки в счетчик на календаре",
-    "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
     "priority-sort": "Сортировать по приоритету",
 
     // interface page
@@ -38,6 +35,10 @@ export default {
     "ru": "Руссский",
     "en": "English",
     "be": "Беларускі",
+    "show-notes-count": "Отображать счетчики на календаре",
+    "show-notes-count-include-finished": "Включать завершенные заметки в счетчик на календаре",
+    "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
+    "minimize-notes": "Сворачивать длинные заметки",
 
     // password page
     "password": "Пароль",

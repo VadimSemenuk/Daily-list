@@ -23,9 +23,6 @@ export default {
     "notes-show-interval": "Display for the period",
     "notes-show-interval-week": "Week",
     "notes-show-interval-day": "Day",
-    "show-notes-count": "Display counters on the calendar",
-    "show-notes-count-include-finished": "Include finished notes in calendar's counters",
-    "reload-app-note": "Restart the app to apply changes",
     "priority-sort": "Sort by priority",
 
     // interface page
@@ -38,6 +35,10 @@ export default {
     "ru": "Русский",
     "en": "English",
     "be": "Беларускі",
+    "show-notes-count": "Display counters on the calendar",
+    "show-notes-count-include-finished": "Include finished notes in calendar's counters",
+    "reload-app-note": "Restart the app to apply changes",
+    "minimize-notes": "Minimize long notes",
 
     // password page
     "password": "Password",

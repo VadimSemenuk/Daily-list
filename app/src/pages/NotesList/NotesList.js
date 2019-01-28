@@ -194,6 +194,7 @@ class NotesList extends PureComponent {
                                         index={i}
                                         notes={notes.items} 
                                         finSort={this.props.settings.sortFinBehaviour === 1}
+                                        settings={this.props.settings}
                                         onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                     />

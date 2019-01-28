@@ -74,7 +74,8 @@ class SetitngsService {
                 calendarNotesCounterIncludeFinished,
                 sortType,
                 sortDirection,
-                sortFinBehaviour
+                sortFinBehaviour,
+                minimizeNotes
             FROM Settings;`
         );
 
@@ -87,7 +88,8 @@ class SetitngsService {
             theme: themesService.getThemeById(result.theme),
             calendarNotesCounter: Boolean(result.calendarNotesCounter),
             calendarNotesCounterIncludeFinished: Boolean(result.calendarNotesCounterIncludeFinished),
-            sortIncludePriority: Boolean(result.sortIncludePriority)
+            sortIncludePriority: Boolean(result.sortIncludePriority),
+            minimizeNotes: Boolean(result.minimizeNotes)
         }
     }
 
@@ -99,6 +101,7 @@ class SetitngsService {
             case("calendarNotesCounter"): value = Number(value); break;
             case("calendarNotesCounterIncludeFinished"): value = Number(value); break;
             case("sortIncludePriority"): value = Number(value); break;
+            case("minimizeNotes"): value = Number(value); break;
             default: break;
         }
 
