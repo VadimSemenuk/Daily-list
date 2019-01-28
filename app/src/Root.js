@@ -69,13 +69,13 @@ class Root extends Component {
 
     discardNextVersionMigration = () => {
         this.props.setNextVersionMigrationState(true);
-    }
+    };
 
     closeDialog = () => {
         this.setState({
             nextVersionMigrationModal: false
         });
-    }
+    };
 
     backupNotes = () => {
         if (
@@ -86,7 +86,7 @@ class Root extends Component {
         ) {
             this.props.uploadBatchBackup();
         }   
-    }
+    };
 
     render() {
         let {t} = this.props;

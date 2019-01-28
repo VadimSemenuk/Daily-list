@@ -16,12 +16,13 @@ class Loader extends Component {
 
     render() {
         return (
-            this.props.loader && 
+            this.props.loader &&
             <div className="loader-wrapper">
-                <BeatLoader
-                    color={this.props.settings.theme.header}
-                    size={8}
-                />
+                <div className="loader">
+                    <BeatLoader
+                        color={this.props.settings.theme.header}
+                    />
+                </div>
             </div>
         );
     }
