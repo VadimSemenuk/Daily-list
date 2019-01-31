@@ -505,6 +505,37 @@ class NotesService {
         `);
     }
 
+    async moveNotFinishedToToday() {
+        // TODO: update repeatable notes
+        let msTodayDate = moment().startOf("day").valueOf();
+
+        let select = await executeSQL(`
+            SELECT repeatType, title, id as key, startTime
+            FROM Tasks
+            WHERE finished = 0 AND added != ? AND repeatType = 'no-repeat'
+        `, [
+            moment().startOf("day").valueOf(),
+        ]);
+
+        await executeSQL(`
+            UPDATE Tasks
+            SET
+                added = ?,
+                isLastActionSynced = 0
+            WHERE finished = 0 AND added != ? AND repeatType = 'no-repeat'
+        `, [
+            msTodayDate, msTodayDate
+        ]);
+
+        for (let i = 0; i < select.rows.length; i++) {
+            let noteToMove = select.rows.item(i);
+            if (noteToMove .notificate ) {
+                notificationService.clear(noteToMove);
+                notificationService.set(noteToMove);
+            }
+        }
+    }
+
     calculateTimeCheckSum (note) {
         let startTimeCheckSum = note.startTime ? note.startTime.valueOf() - note.added : 0;
         let endTimeCheckSum = note.endTime ? note.endTime.valueOf() - note.added : 0;
