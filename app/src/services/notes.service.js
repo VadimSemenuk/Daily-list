@@ -146,7 +146,7 @@ class NotesService {
             nextNote.forkFrom = note.key;
             nextNote = await this.insertNote(nextNote);
         } else {
-            let update = await executeSQL(
+            await executeSQL(
                 `UPDATE Tasks
                 SET 
                     dynamicFields = ?,
@@ -158,10 +158,7 @@ class NotesService {
                     Number(nextNote.finished),
                     nextNote.key
                 ]
-            ).catch((err) => console.warn(err));
-            if (!update) {
-                return
-            }
+            )
         }
 
         return nextNote;
@@ -308,7 +305,7 @@ class NotesService {
         } else {
             whereStatement = " WHERE isLastActionSynced = 0";
         }
-        return executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ?${whereStatement};`, params).catch(err => console.warn(err))
+        return executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ?${whereStatement};`, params);
     }
 
     async getNoteForBackup(noteKey) {
@@ -414,10 +411,9 @@ class NotesService {
         `, rdValues);
 
         notes.forEach((note) => {
+            // TODO: need a note id
             notificationService.clearAll();
-            if (note.notificate) {
-                notificationService.set(note);
-            }
+            note.notificate && notificationService.set(note);
         });
     }
 
@@ -474,9 +470,7 @@ class NotesService {
                 nextNote.key
             ]
         );
-        if (nextNote.notificate) {
-            notificationService.set(nextNote.key, nextNote);
-        }
+        nextNote.notificate && notificationService.set(nextNote);
 
         return nextNote;
     }

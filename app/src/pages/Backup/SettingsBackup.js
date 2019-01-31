@@ -38,7 +38,7 @@ class SettingsBackup extends Component {
                                 noBorder={true}    
                             >{t("how-it-works")}</TriggerListItem>
                             <button
-                                className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
+                                className="text block google-in img-text-button"
                                 type="button"
                                 onClick={this.props.googleSignIn}
                             ><img src={GoogleImg} alt="google sign in" />{t("google-sign-in")}</button>
@@ -70,13 +70,13 @@ class SettingsBackup extends Component {
                             
                             <div className="backup-actions-buttons-wrapper">
                                 <button 
-                                    className={`text block img-text-button${this.props.loader ? " disabled" : ""}`} 
+                                    className="text block img-text-button"
                                     type="button"
                                     onClick={() => this.props.uploadBatchBackup()}
                                 ><img src={ExportImg} alt="export"/>{t("create-backup")}</button>
 
                                 <button 
-                                    className={`text block img-text-button${(this.props.loader || !this.props.user.backup.lastBackupTime) ? " disabled" : ""}`} 
+                                    className={`text block img-text-button${!this.props.user.backup.lastBackupTime ? " disabled" : ""}`}
                                     type="button"
                                     onClick={() => this.props.restoreBackup()}
                                 ><img src={ImportImg} alt="import" />{t("restore-backup")}</button>

@@ -5,8 +5,7 @@ import config from "../config/config";
 class AuthService {
     googleSignIn = async () => {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
-            return null;
+            throw { text: i18next.t("internet-required") };
         }
 
         if (!window.cordova) {
@@ -22,7 +21,7 @@ class AuthService {
                 settings: {
                     autoBackup: false
                 }
-            }
+            };
 
             this.setToken(token);
 
@@ -42,7 +41,7 @@ class AuthService {
         });
         // check error structure
         if (!googleUser) {
-            return null;
+            throw new Error("user not found");
         }
 
         let user = await fetch(`${config.apiURL}/auth/sign-in-google`, {
@@ -59,11 +58,12 @@ class AuthService {
                 if (res.status === 200) {
                     return res.json();
                 }
-            })            
+            });
 
         if (!user) {
-            window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));            
-            return null;
+            // window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
+            // return null;
+            throw new Error("user not found");
         }
 
         let token = {
@@ -78,12 +78,12 @@ class AuthService {
             settings: {
                 autoBackup: false
             }
-        }
+        };
 
         this.setToken(token);
 
         return token;
-    }
+    };
 
     googleSignOut() {
         if (!window.cordova) {
@@ -92,8 +92,7 @@ class AuthService {
         return new Promise((resolve, reject) => window.plugins.googleplus.logout(() => {
             this.setToken({});
             resolve();
-        }, (err) => {
-            console.warn(err);
+        }, () => {
             resolve();
         }));
     }

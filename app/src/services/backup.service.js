@@ -7,8 +7,7 @@ import config from "../config/config";
 class BackupService {
     async restoreNotesBackup(token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
-            return false;
+            throw { text: i18next.t("internet-required") };
         }
 
         let notes = await fetch(`${config.apiURL}/notes/backup`, {
@@ -22,8 +21,7 @@ class BackupService {
             .then((res) => res.json());
 
         if (!notes || !notes.length) {
-            window.plugins.toast.showLongBottom(i18next.t("error-no-backup"));
-            return false;
+            throw { text: i18next.t("error-no-backup") };
         }
 
         return await notesService.restoreNotesBackup(notes);    
@@ -31,11 +29,10 @@ class BackupService {
 
     async uploadNotesBatchBackup(notes, token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
-            return false;
+            throw { text: i18next.t("internet-required") };
         }
         if (!notes || !notes.length) {
-            return false;
+            throw new Error("notes not provided");
         }
 
         return fetch(`${config.apiURL}/notes/backup/batch`, {
@@ -49,17 +46,15 @@ class BackupService {
                 notes
             })
         })
-            .then((res) => {
-                if (res.status === 200) {
-                    return res.json();
-                }
-            });    
     }
 
     async uploadNoteBackup(note, token, removeForkNotes) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            window.plugins.toast.showLongBottom(i18next.t("internet-required"));
-            return false;
+            throw { text: i18next.t("internet-required") };
+        }
+
+        if (!note) {
+            throw new Error("note not provided");
         }
 
         let method = "POST";
@@ -89,10 +84,10 @@ class BackupService {
 
     async getUserLastBackupTime(token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            return
+            return false;
         }
 
-        let time = await fetch(`${config.apiURL}/notes/backup/user-last-backup-time`, {
+        return await fetch(`${config.apiURL}/notes/backup/user-last-backup-time`, {
             method: "GET",
             credentials: "same-origin",
             headers: {
@@ -102,14 +97,10 @@ class BackupService {
             .then((res) => {
                 if (res.status === 200) {
                     return res.json();
+                } else {
+                    throw new Error("request failed: " + res.status);
                 }
-            })            
-            .catch((err) => {
-                console.warn(err)
-                return null;
             });
-
-        return time;
     }
 }
 
