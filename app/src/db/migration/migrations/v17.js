@@ -94,6 +94,7 @@ export default {
                     repeatType INTEGER,
                     forkFrom INTEGER,
                     priority INTEGER,
+                    repeatDate INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
             `);
@@ -119,7 +120,8 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    priority
+                    priority,
+                    repeatDate
                 ) 
                 SELECT
                     id, 
@@ -141,7 +143,8 @@ export default {
                     userId,
                     repeatType,
                     forkFrom,
-                    2 as priority
+                    2 as priority,
+                    CASE forkFrom WHEN -1 THEN -1 ELSE added END as repeatDate
                 FROM Tasks_OLD;
             `);
 
