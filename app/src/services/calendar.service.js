@@ -8,7 +8,9 @@ class CalendarService {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
-    async getCount(date, period, includeFinished, halfInterval = 1) {
+    async getCount(date, period, includeFinished, halfInterval = 20) {
+        let start = performance.now();
+
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
 
@@ -35,7 +37,7 @@ class CalendarService {
 
             if (!includeFinished && note.finished) {
                 if (note.repeatType !== "no-repeat") {
-                    dates[note.added] = (dates[note.added] !== undefined ? dates[note.added] - 1 : -1);
+                    dates[note.added] = (dates[note.added] || 0) -1;
                 }
                 continue;
             }
@@ -45,17 +47,17 @@ class CalendarService {
                     continue;
                 }
 
-                dates[note.added] = (dates[note.added] !== undefined ? dates[note.added] + 1 : 1);
+                dates[note.added] = (dates[note.added] || 0) + 1;
                 if (note.repeatDate !== -1 && note.repeatDate !== note.added) {
-                    dates[note.repeatDate] = (dates[note.repeatDate] !== undefined ? dates[note.repeatDate] - 1 : -1);
+                    dates[note.repeatDate] = (dates[note.repeatDate] || 0) - 1;
                 }
             } else {
                 if (note.repeatType === "week") {
-                    repeatableWeek[note.repeatValue] = (repeatableWeek[note.repeatValue] !== undefined ? repeatableWeek[note.repeatValue] + 1 : 1);
+                    repeatableWeek[note.repeatValue] = (repeatableWeek[note.repeatValue] || 0) + 1;
                 } else if (note.repeatType === "day") {
                     repeatableDay += 1;
                 } else if (note.repeatType === "any") {
-                    dates[note.repeatValue] = (dates[note.repeatValue] !== undefined ? dates[note.repeatValue] + 1 : 1);
+                    dates[note.repeatValue] = (dates[note.repeatValue] + 0) + 1;
                 }
             }
         }
@@ -65,6 +67,9 @@ class CalendarService {
             currentWeekDay = (currentWeekDay > 7 ? 1 : currentWeekDay + 1);
             dates[date] = (dates[date] || 0) + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
         }
+
+        let end = performance.now();
+        console.log(end - start);
 
         return {
             [period]: {
