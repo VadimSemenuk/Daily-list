@@ -70,9 +70,9 @@ export function updateNote (note, updateCount) {
     }
 }
 
-export function updateNoteDynamicFields (note, state) {
+export function updateNoteDynamicFields (note, updatedState) {
     return function(dispatch, getState) {
-        return notesService.updateNoteDynamicFields(note, state)
+        return notesService.updateNoteDynamicFields(note, updatedState)
             .then((nextNote) => {
                 dispatch({
                     type: "UPDATE_NOTE",
@@ -82,7 +82,7 @@ export function updateNoteDynamicFields (note, state) {
 
                 let state = getState();
 
-                state.finished !== undefined
+                updatedState.finished !== undefined
                 && state.settings.calendarNotesCounter
                 && !state.settings.calendarNotesCounterIncludeFinished
                 && dispatch(getFullCount(nextNote.added.valueOf()));

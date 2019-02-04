@@ -9,8 +9,6 @@ export default class WeekDatesRow extends PureComponent {
                         let msDate = date.valueOf();
                         let active = this.props.msSelectedDate === msDate;
                         let count = this.props.count[msDate] || 0;
-                        // console.log(this.props.count[msDate]);
-                        // console.log(new Date(msDate));
 
                         return (
                             <button 

@@ -57,16 +57,18 @@ class CalendarService {
                 } else if (note.repeatType === "day") {
                     repeatableDay += 1;
                 } else if (note.repeatType === "any") {
-                    dates[note.repeatValue] = (dates[note.repeatValue] + 0) + 1;
+                    dates[note.repeatValue] = (dates[note.repeatValue] || 0) + 1;
                 }
             }
         }
 
         let currentWeekDay = moment(date).startOf(period).subtract(halfInterval, period).isoWeekday();
+        console.log(currentWeekDay);
         for (let date = intervalStartDate; date < intervalEndDate; date += 86400000) {
-            currentWeekDay = (currentWeekDay > 7 ? 1 : currentWeekDay + 1);
             dates[date] = (dates[date] || 0) + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
+            currentWeekDay = (currentWeekDay === 7 ? 1 : currentWeekDay + 1);
         }
+        console.log(dates)
 
         let end = performance.now();
         console.log(end - start);
