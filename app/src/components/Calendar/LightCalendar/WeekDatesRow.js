@@ -8,13 +8,9 @@ export default class WeekDatesRow extends PureComponent {
                     this.props.week.map((date, i) => {
                         let msDate = date.valueOf();
                         let active = this.props.msSelectedDate === msDate;
-                        let count = 0; 
-                        if (this.props.calendarNotesCounter) {
-                            count = this.props.count[msDate] || 0;
-                            count += this.props.repeatable.day || 0; 
-                            count += this.props.repeatable.week[date.isoWeekday()] || 0;
-                            count += this.props.repeatable.any[msDate] || 0;
-                        }
+                        let count = this.props.count[msDate] || 0;
+                        // console.log(this.props.count[msDate]);
+                        // console.log(new Date(msDate));
 
                         return (
                             <button 

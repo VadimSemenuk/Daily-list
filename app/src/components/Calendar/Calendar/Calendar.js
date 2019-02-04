@@ -241,7 +241,6 @@ class Calendar extends Component {
                                         msSelectedDates={this.state.msSelectedDates}
                                         onSelect={this.onDateSet}
                                         count={this.props.calendar.count}
-                                        repeatable={this.props.calendar.repeatable}
                                         mode={this.state.mode}
                                         calendarNotesCounter={this.props.calendarNotesCounter}
                                     /> 

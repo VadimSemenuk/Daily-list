@@ -1,6 +1,8 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 
+window.moment = moment;
+
 class CalendarService {
     checkForCountUpdate(nextDate, intervalStartDate, intervalEndDate) {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
@@ -8,105 +10,67 @@ class CalendarService {
 
     async getCount(date, period, includeFinished, halfInterval = 1) {
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
-        let intervalEndDate = moment(date).startOf(period).add(halfInterval, period).valueOf();
+        let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
 
-        let selectTask = executeSQL(
-            `SELECT COUNT(*) as count, added FROM (
-                SELECT added FROM Tasks
-                    WHERE
-                        added >= ? AND added <= ? AND
-                        lastAction != 'DELETE' AND
-                        lastAction != 'CLEAR' AND
-                        repeatType = 'no-repeat'
-                UNION ALL
-                SELECT rep.value as added FROM Tasks t
-                    LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-                    WHERE
-                        rep.value >= ? AND rep.value <= ? AND
-                        lastAction != 'DELETE' AND
-                        lastAction != 'CLEAR' AND
-                        t.repeatType = 'any' AND
-                        t.forkFrom = -1
+        let select = await executeSQL(`
+            select t.added, t.repeatType, rep.value as repeatValue, t.finished, t.repeatDate
+            from Tasks t
+            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+            where 
+                lastAction != 'DELETE' 
+                AND lastAction != 'CLEAR' 
+                AND (
+                    (repeatType = 'no-repeat' OR forkFrom != -1 AND added >= ? AND added <= ?)
+                    OR (repeatType = 'any' AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
+                    OR (t.forkFrom = -1 AND repeatType != 'any')
                 )
-            GROUP BY added;`, 
-            [intervalStartDate, intervalEndDate, intervalStartDate, intervalEndDate]
-        );   
+        `, [intervalStartDate, intervalEndDate, intervalStartDate, intervalEndDate]);
 
-        let selectRepeatableDayTask = executeSQL(
-            `SELECT COUNT(*) as count, added FROM Tasks
-            WHERE 
-                lastAction != 'DELETE' AND
-                lastAction != 'CLEAR' AND
-                repeatType = "day" AND
-                forkFrom = -1;
-        `); 
+        let repeatableDay = 0;
+        let repeatableWeek = {};
+        let dates = {};
 
-        let selectRepeatableWeekTask = executeSQL(
-            `SELECT COUNT(*) as count, rep.value as weekDay FROM Tasks t
-			LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-            WHERE
-                lastAction != 'DELETE' AND
-                lastAction != 'CLEAR' AND
-                repeatType = "week" AND
-                t.forkFrom = -1
-			GROUP BY rep.value;
-        `);
-
-        let tasks = [selectTask, selectRepeatableDayTask, selectRepeatableWeekTask];
-        if (!includeFinished) {
-            tasks.push(executeSQL(
-                `SELECT COUNT(*) as count, added FROM (
-                SELECT added FROM Tasks
-                    WHERE
-                        added >= ? AND added <= ? AND
-                        lastAction != 'DELETE' AND
-                        lastAction != 'CLEAR' AND
-                        (repeatType = 'no-repeat' OR forkFrom != -1) AND finished = 1
-            )
-            GROUP BY added;`,
-                [intervalStartDate, intervalEndDate]
-            ));
-        }
-        let selects = await Promise.all(tasks);
-
-        let select = selects[0];
-        let selectRepeatableDay = selects[1];
-        let selectRepeatableWeek = selects[2];
-        let selectFinished = selects[3];
-
-        let count = {};
         for (let i = 0; i < select.rows.length; i++) {
-            let countItem = select.rows.item(i);
-            count[countItem.added] = countItem.count;
-        }
+            let note = select.rows.item(i);
 
-        if (!includeFinished) {
-            for (let i = 0; i < selectFinished.rows.length; i++) {
-                let countItem = selectFinished.rows.item(i);
-                if (!count[countItem.added]) {
-                    count[countItem.added] = 0;
+            if (!includeFinished && note.finished) {
+                if (note.repeatType !== "no-repeat") {
+                    dates[note.added] = (dates[note.added] !== undefined ? dates[note.added] - 1 : -1);
                 }
-                count[countItem.added] -= countItem.count;
+                continue;
+            }
+
+            if (note.added !== -1) {
+                if (note.repeatDate !== -1 && note.repeatDate === note.added) {
+                    continue;
+                }
+
+                dates[note.added] = (dates[note.added] !== undefined ? dates[note.added] + 1 : 1);
+                if (note.repeatDate !== -1 && note.repeatDate !== note.added) {
+                    dates[note.repeatDate] = (dates[note.repeatDate] !== undefined ? dates[note.repeatDate] - 1 : -1);
+                }
+            } else {
+                if (note.repeatType === "week") {
+                    repeatableWeek[note.repeatValue] = (repeatableWeek[note.repeatValue] !== undefined ? repeatableWeek[note.repeatValue] + 1 : 1);
+                } else if (note.repeatType === "day") {
+                    repeatableDay += 1;
+                } else if (note.repeatType === "any") {
+                    dates[note.repeatValue] = (dates[note.repeatValue] !== undefined ? dates[note.repeatValue] + 1 : 1);
+                }
             }
         }
 
-        let repeatable = {
-            day: 0,
-            week: {},
-            any: {}
-        };
-        repeatable.day = selectRepeatableDay.rows.item(0).count;
-        for (let i = 0; i < selectRepeatableWeek.rows.length; i++) {
-            let countItem = selectRepeatableWeek.rows.item(i);
-            repeatable.week[countItem.weekDay] = countItem.count;
+        let currentWeekDay = moment(date).startOf(period).subtract(halfInterval, period).isoWeekday();
+        for (let date = intervalStartDate; date < intervalEndDate; date += 86400000) {
+            currentWeekDay = (currentWeekDay > 7 ? 1 : currentWeekDay + 1);
+            dates[date] = (dates[date] || 0) + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
         }
 
         return {
             [period]: {
                 intervalStartDate,
                 intervalEndDate,
-                count,
-                repeatable
+                count: dates
             }
         };
     }

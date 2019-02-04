@@ -490,7 +490,7 @@ let debouncedUploadBackup = throttle((note, token, removeForkNotes, dispatch, ge
         });
 }, 5000);
 
-export function uploadBatchBackup() {
+export function uploadBatchBackup(inBackground) {
     return function(dispatch, getState) {
         dispatch(triggerLoader());
 
@@ -513,7 +513,7 @@ export function uploadBatchBackup() {
             })
             .catch((err) => {
                 dispatch(triggerLoader());
-                dispatch(triggerErrorModal("error-backup-upload", err.text));
+                !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.text));
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> uploadBatchBackup()",
