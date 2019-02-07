@@ -21,7 +21,7 @@ export function addNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-add"));
@@ -52,7 +52,7 @@ export function updateNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, true));        
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, true, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -90,7 +90,7 @@ export function updateNoteDynamicFields (note, updatedState) {
                 state.finished !== undefined && dispatch(renderNotes());
 
                 let token = state.user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote, token));
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -110,30 +110,31 @@ export function updateNoteDynamicFields (note, updatedState) {
 
 export function updateNoteDate (note, updateCount) {
     return function(dispatch, getState) {
-        return notesService.updateNoteDate(note).then((nextNote) => dispatch({
-            type: "UPDATE_NOTE",
-            note: nextNote
-        }))
-        .then(({note}) => {
-            updateCount && dispatch(getFullCount(note.added.valueOf()));
-            dispatch(renderNotes());
+        return notesService.updateNoteDate(note)
+            .then((nextNote) => dispatch({
+                type: "UPDATE_NOTE",
+                note: nextNote
+            }))
+            .then(({note}) => {
+                updateCount && dispatch(getFullCount(note.added.valueOf()));
+                dispatch(renderNotes());
 
-            let token = getState().user;
-            token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
-        })
-        .catch((err) => {
-            dispatch(triggerErrorModal("error-note-update"));
-            let deviceId = getState().meta.deviceId;            
-            deviceService.logError(err, {
-                path: "action/index.js -> updateNoteDate()",
-                note: {
-                    ...note,
-                    title: !!note.title,
-                    dynamicFields: !!note.dynamicFields
-                },
-                deviceId
+                let token = getState().user;
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
+            })
+            .catch((err) => {
+                dispatch(triggerErrorModal("error-note-update"));
+                let deviceId = getState().meta.deviceId;
+                deviceService.logError(err, {
+                    path: "action/index.js -> updateNoteDate()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    },
+                    deviceId
+                });
             });
-        });
     }
 }
 
@@ -148,7 +149,7 @@ export function deleteNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-delete"));
@@ -197,7 +198,7 @@ export function restoreNote (note) {
                 dispatch(updateNotes());
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token));
+                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-restore"));
@@ -406,7 +407,7 @@ export function googleSignIn() {
                 })
             })
             .catch((err) => {
-                dispatch(triggerErrorModal("error-sign-in", err.text));
+                dispatch(triggerErrorModal("error-sign-in", err.description));
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> googleSignIn()",
@@ -450,21 +451,67 @@ export function setToken(token) {
 }
 
 // backup
-export function uploadBackup(note, token, removeForkNotes) {
+export function uploadBackup(note, token, removeForkNotes, inBackground) {
     return function(dispatch, getState) {
         if (!token) {
             token = getState().user;
         }
 
-        return debouncedUploadBackup(note, token, removeForkNotes, dispatch, getState);
+        return debouncedUploadBackup(note, token, removeForkNotes, inBackground, dispatch, getState);
     }
 }
-let debouncedUploadBackup = throttle((note, token, removeForkNotes, dispatch, getState) => {
+let debouncedUploadBackup = throttle(async (note, token, removeForkNotes, inBackground, dispatch, getState) => {
+    try {
+        !inBackground && dispatch(triggerLoader());
 
-    return notesService.getNoteForBackup(note.key)
-        .then((noteForBackup) => backupService.uploadNoteBackup(noteForBackup[0], token, removeForkNotes))
-        .then(() => notesService.setNoteBackupState(note.key, true, true))
-        .then(() => {
+        let msBackupStartTime = moment.valueOf();
+        let noteForBackup = await notesService.getNoteForBackup(note.key);
+        if (!noteForBackup[0]) {
+            return
+        }
+        await backupService.uploadNoteBackup(noteForBackup[0], token, removeForkNotes);
+        await notesService.setNoteBackupState(note.key, true, true, msBackupStartTime);
+        let nextToken = {
+            ...token,
+            backup: {
+                ...token.backup,
+                lastBackupTime: moment().valueOf()
+            }
+        };
+        dispatch(setToken(nextToken));
+
+        !inBackground && dispatch(triggerLoader());
+    } catch(err) {
+        !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.description));
+        let deviceId = getState().meta.deviceId;
+        deviceService.logError(err, {
+            note: {
+                ...note,
+                title: !!note.title,
+                dynamicFields: !!note.dynamicFields
+            },
+            removeForkNotes,
+            path: "action/index.js -> uploadBackup()",
+            deviceId
+        });
+    }
+}, 500);
+
+export function uploadBatchBackup(inBackground) {
+    return async function(dispatch, getState) {
+        !inBackground && dispatch(triggerLoader());
+
+        let token = getState().user;
+
+        try {
+            let msBackupStartTime = moment.valueOf();
+            let notes = await notesService.getNoteForBackup();
+            if (!notes) {
+                return
+            }
+            await backupService.uploadNotesBatchBackup(notes, token);
+            await notesService.removeClearedNotes(msBackupStartTime);
+            await notesService.setNoteBackupState(null, true, true, msBackupStartTime);
             let nextToken = {
                 ...token,
                 backup: {
@@ -473,53 +520,17 @@ let debouncedUploadBackup = throttle((note, token, removeForkNotes, dispatch, ge
                 }
             };
             dispatch(setToken(nextToken));
-        })
-        .catch((err) => {
-            dispatch(triggerErrorModal("error-backup-upload", err.text));
+
+            !inBackground && dispatch(triggerLoader());
+        } catch(err) {
+            !inBackground && dispatch(triggerLoader());
+            !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.description));
             let deviceId = getState().meta.deviceId;
             deviceService.logError(err, {
-                note: {
-                    ...note,
-                    title: !!note.title,
-                    dynamicFields: !!note.dynamicFields
-                },
-                removeForkNotes,
-                path: "action/index.js -> uploadBackup()",
+                path: "action/index.js -> uploadBatchBackup()",
                 deviceId
             });
-        });
-}, 5000);
-
-export function uploadBatchBackup(inBackground) {
-    return function(dispatch, getState) {
-        dispatch(triggerLoader());
-
-        let token = getState().user;
-
-        return notesService.getNoteForBackup()
-            .then((notes) => backupService.uploadNotesBatchBackup(notes, token))
-            .then(() => notesService.removeClearedNotes())
-            .then(() => notesService.setNoteBackupState(null, true, true))
-            .then(() => {
-                let nextToken = {
-                    ...token,
-                    backup: {
-                        ...token.backup,
-                        lastBackupTime: moment().valueOf()
-                    }
-                };
-                dispatch(setToken(nextToken));
-                dispatch(triggerLoader());
-            })
-            .catch((err) => {
-                dispatch(triggerLoader());
-                !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.text));
-                let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> uploadBatchBackup()",
-                    deviceId
-                });
-            });
+        }
     }
 }
 
@@ -536,7 +547,7 @@ export function restoreBackup() {
             })
             .catch((err) => {
                 dispatch(triggerLoader());
-                dispatch(triggerErrorModal("error-backup-restore", err.text));
+                dispatch(triggerErrorModal("error-backup-restore", err.description));
                 let deviceId = getState().meta.deviceId;
                 deviceService.logError(err, {
                     path: "action/index.js -> restoreBackup()",

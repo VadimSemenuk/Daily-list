@@ -4,10 +4,12 @@ import notesService from "./notes.service";
 
 import config from "../config/config";
 
+import CustomError from "../common/CustomError";
+
 class BackupService {
     async restoreNotesBackup(token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            throw { text: i18next.t("internet-required") };
+            throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
         let notes = await fetch(`${config.apiURL}/notes/backup`, {
@@ -21,7 +23,7 @@ class BackupService {
             .then((res) => res.json());
 
         if (!notes || !notes.length) {
-            throw { text: i18next.t("error-no-backup") };
+            throw new CustomError("no backup available", i18next.t("error-no-backup"));
         }
 
         return await notesService.restoreNotesBackup(notes);    
@@ -29,10 +31,7 @@ class BackupService {
 
     async uploadNotesBatchBackup(notes, token) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            throw { text: i18next.t("internet-required") };
-        }
-        if (!notes || !notes.length) {
-            throw new Error("notes not provided");
+            throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
         return fetch(`${config.apiURL}/notes/backup/batch`, {
@@ -50,11 +49,7 @@ class BackupService {
 
     async uploadNoteBackup(note, token, removeForkNotes) {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            throw { text: i18next.t("internet-required") };
-        }
-
-        if (!note) {
-            throw new Error("note not provided");
+            throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
         let method = "POST";

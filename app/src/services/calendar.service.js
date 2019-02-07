@@ -9,8 +9,6 @@ class CalendarService {
     }
 
     async getCount(date, period, includeFinished, halfInterval = 20) {
-        let start = performance.now();
-
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
 
@@ -63,15 +61,10 @@ class CalendarService {
         }
 
         let currentWeekDay = moment(date).startOf(period).subtract(halfInterval, period).isoWeekday();
-        console.log(currentWeekDay);
         for (let date = intervalStartDate; date < intervalEndDate; date += 86400000) {
             dates[date] = (dates[date] || 0) + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
             currentWeekDay = (currentWeekDay === 7 ? 1 : currentWeekDay + 1);
         }
-        console.log(dates)
-
-        let end = performance.now();
-        console.log(end - start);
 
         return {
             [period]: {

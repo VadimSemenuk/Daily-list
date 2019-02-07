@@ -1,11 +1,12 @@
 import i18next from 'i18next';
 
 import config from "../config/config";
+import CustomError from "../common/CustomError";
 
 class AuthService {
     googleSignIn = async () => {
         if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            throw { text: i18next.t("internet-required") };
+            throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
         if (!window.cordova) {

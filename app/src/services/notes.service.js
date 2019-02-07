@@ -152,12 +152,17 @@ class NotesService {
                 SET 
                     dynamicFields = ?,
                     finished = ?,
-                    isLastActionSynced = 0
+                    isLastActionSynced = ?,
+                    lastAction = ?,
+                    lastActionTime = ?
                 WHERE id = ?;`,
                 [
                     JSON.stringify(nextNote.dynamicFields),
                     Number(nextNote.finished),
-                    nextNote.key
+                    nextNote.key,
+                    nextNote.isLastActionSynced,
+                    nextNote.lastAction,
+                    nextNote.lastActionTime
                 ]
             )
         }
@@ -222,21 +227,34 @@ class NotesService {
     }
 
     async updateNoteDate(note) {
+        let actionTime = moment().valueOf();
+        let nextNote = {
+            ...note,
+            lastAction: "EDIT",
+            lastActionTime: actionTime,
+            isLastActionSynced: 0
+        };
+
         await executeSQL(`
             UPDATE Tasks
             SET
                 added = ?,
-                isLastActionSynced = 0
+                isLastActionSynced = ?,
+                lastAction = ?,
+                lastActionTime = ?
             WHERE id = ?
         `, [
             note.added.valueOf(),
+            nextNote.isLastActionSynced,
+            nextNote.lastAction,
+            nextNote.lastActionTime,
             note.key
         ]);
 
         notificationService.clear(note);
         note.notificate && notificationService.set(note);
 
-        return note;
+        return nextNote;
     }
 
     async deleteNote(note) {
@@ -250,7 +268,10 @@ class NotesService {
 
         await executeSQL(
             `UPDATE Tasks
-            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
+            SET 
+                lastAction = ?, 
+                lastActionTime = ?, 
+                isLastActionSynced = 0
             WHERE id = ? OR forkFrom = ?;`,
             [
                 "DELETE",
@@ -298,7 +319,7 @@ class NotesService {
         return values;
     }
 
-    setNoteBackupState(noteId, isSynced, isLastActionSynced) {
+    setNoteBackupState(noteId, isSynced, isLastActionSynced, msBackupStartTime) {
         let whereStatement = "";
         let params = [+isSynced, +isLastActionSynced];
         if (noteId) {
@@ -307,9 +328,14 @@ class NotesService {
         } else {
             whereStatement = " WHERE isLastActionSynced = 0";
         }
+        if (msBackupStartTime !== undefined) {
+            whereStatement += " AND lastActionTime <= ?";
+            params.push(msBackupStartTime);
+        }
         return executeSQL(`UPDATE Tasks SET isSynced = ?, isLastActionSynced = ?${whereStatement};`, params);
     }
 
+    // TODO: check fields
     async getNoteForBackup(noteKey) {
         let dataSelectWhereStatement = "";
         let dataSelectParams = [];
@@ -322,7 +348,7 @@ class NotesService {
 
         let select = await executeSQL(`
             SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, 
-                t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, 
+                t.isSynced, t.isLastActionSynced, t.lastAction, t.lastActionTime, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, 
                 (select GROUP_CONCAT(tt.uuid, ',') from Tasks tt where tt.forkFrom = t.id) as forked,
                 (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatValues
             FROM Tasks t
@@ -344,9 +370,7 @@ class NotesService {
         await executeSQL(`DELETE FROM Tasks;`);
         await executeSQL(`DELETE FROM TasksRepeatValues;`);
 
-        let valuesString = notes.reduce((accumulator) => {
-            return `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        }, "");
+        let valuesString = notes.reduce((accumulator) => `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, "");
         valuesString = valuesString.slice(2);
 
         let values = notes.reduce((accumulator, note) => {
@@ -485,20 +509,28 @@ class NotesService {
         `, ['CLEAR', moment().valueOf(), 0]);
     }
 
-    async removeClearedNotes() {
+    async removeClearedNotes(msBackupStartTime) {
+        let params = [];
+        let whereStatement = "";
+        if (msBackupStartTime !== undefined) {
+            whereStatement += "lastActionTime <= ?";
+            params.push(msBackupStartTime);
+        }
+
+        // TODO: add cascade delete
         await executeSQL(`
             DELETE FROM TasksRepeatValues
             WHERE taskId IN (
                 SELECT taskId FROM TasksRepeatValues
                 LEFT JOIN Tasks ON TasksRepeatValues.taskId = Tasks.id
-                WHERE Tasks.lastAction = 'CLEAR'
-            )
-        `);
+                WHERE Tasks.lastAction = 'CLEAR' ${whereStatement ? "AND " + whereStatement : ""}
+            );
+        `, params);
 
         return executeSQL(`
             DELETE FROM Tasks
-            WHERE lastAction = 'CLEAR'
-        `);
+            WHERE lastAction = 'CLEAR' ${whereStatement ? "AND " + whereStatement : ""}
+        `, params);
     }
 
     async moveNotFinishedToToday() {
@@ -525,7 +557,7 @@ class NotesService {
 
         for (let i = 0; i < select.rows.length; i++) {
             let noteToMove = select.rows.item(i);
-            if (noteToMove .notificate ) {
+            if (noteToMove.notificate ) {
                 notificationService.clear(noteToMove);
                 notificationService.set(noteToMove);
             }
