@@ -148,6 +148,8 @@ export default {
     "friday": "Пятница",
     "saturday": "Суббота",
     "sunday": "Воскресенье",
+    "error-notification-permission": "У вас нет прав для добавления уведомления",
+    "night-mode": "Ночной режим",
 
     // note-item
     "attached-image": "Прикрепленное изображение",

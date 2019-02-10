@@ -8,14 +8,14 @@ import './ListItem.scss';
 import arrowRight from '../../assets/img/right-grey.svg';
 
 export let SwitchListItem = (props) => (
-    <div className={`list-item switch-list-item ${props.className} ${props.disabled ? "disabled" : ""}`}>
+    <div className={`list-item switch-list-item ${props.className || ""} ${props.disabled ? "disabled" : ""}`}>
         <span className="list-item-text">{props.text}</span>
         <Switch 
             checked={props.checked}
             onChange={props.onChange}
         />
     </div>
-)
+);
 
 export let InsetListItem = (props) => (
     <button 
@@ -29,7 +29,7 @@ export let InsetListItem = (props) => (
             alt="in"
         /> 
     </button>
-)
+);
 
 export let ButtonListItem = (props) => (
     <button 
@@ -40,7 +40,7 @@ export let ButtonListItem = (props) => (
         <span className="list-item-text">{props.text}</span>
         {props.ValElement && <props.ValElement />}
     </button>
-)
+);
 
 export let ListItem = (props) => (
     <div 
@@ -50,7 +50,7 @@ export let ListItem = (props) => (
         <span className="list-item-text">{props.text}</span>
         <props.ValElement />
     </div>
-)
+);
 
 export let ValueListItem = (props) => (
     <button 
@@ -60,7 +60,7 @@ export let ValueListItem = (props) => (
         <span className="list-item-text">{props.text}</span>
         <span className="list-item-value">{props.value}</span>        
     </button>
-)
+);
 
 export class ModalListItem extends PureComponent {
     constructor(props) {
@@ -75,7 +75,7 @@ export class ModalListItem extends PureComponent {
         this.setState({
             isModalActive: !this.state.isModalActive
         })
-    }
+    };
 
     render () {
         return ([
@@ -112,7 +112,7 @@ export class TriggerListItem extends PureComponent {
         this.setState({
             isActive: !this.state.isActive
         })
-    }
+    };
 
     render () {
         return ([

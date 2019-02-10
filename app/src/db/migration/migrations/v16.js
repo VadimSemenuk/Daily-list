@@ -48,14 +48,19 @@ export default {
                 type: 1,
                 direction: 1,
                 finSort: 1
-            }
-            let lang = navigator.globalization ? (await new Promise((resolve, reject) => navigator.globalization.getPreferredLanguage(resolve, reject))) : config.defaultLang;
-            if (lang) {
-                lang = lang.value || config.defaultLang;
-            }
+            };
+
+            let lang = navigator.language || navigator.userLanguage || config.defaultLang;
             if (lang.indexOf("-") !== -1) {
                 lang = lang.split("-")[0];
+                let availableLangs = ["en", "ru", "be"];
+                if (availableLangs.find((l) => l === lang.toLowerCase())) {
+                    lang = config.defaultLang;
+                }
+            } else {
+                lang = config.defaultLang;
             }
+
             await execureSQL(`
                 UPDATE Settings 
                 SET 
@@ -158,7 +163,7 @@ export default {
                 (   
                     deviceId TEXT
                 );
-            `)
+            `);
 
             await execureSQL(`
                 INSERT INTO MetaInfo (deviceId) VALUES( ? );

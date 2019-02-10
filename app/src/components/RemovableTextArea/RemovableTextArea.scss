@@ -1,23 +1,27 @@
 .removable-textarea-wrapper {
     position: relative;
+    padding-right: 30px;
 
     .textarea {
+        padding: 8px 5px;
+
         &:not(:focus) + button {
-            transition-delay: 10ms; 
+            transition-delay: 10ms;
             visibility: hidden;
         }
     }
 
     button {
+        width: 30px;
+        height: 36px;
         position: absolute;
         right: 0;
-        background: #fff;
-        opacity: 0.4;
         top: 0;
+        opacity: 0.4;
 
         img {
             width: 10px;
             height: 10px;
         }
-    } 
+    }
 }

@@ -37,6 +37,6 @@ let init = (lang) => {
   });
 
   return i18n;
-}
+};
 
 export default { init };

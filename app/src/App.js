@@ -34,7 +34,7 @@ export default class App extends Component {
 
     async componentWillMount() {
         window.cordova && await new Promise((resolve) => document.addEventListener("deviceready", resolve, false));
-        store = await this.initApp()
+        store = await this.initApp();
 
         this.setState({
             appReady: true
@@ -76,7 +76,6 @@ export default class App extends Component {
 
     applyInitSettings(settings) {
         document.querySelector("body").style.fontSize = settings.fontSize + "px";
-        window.cordova && window.StatusBar.backgroundColorByHexString(settings.theme.statusBar);
         themesService.applyTheme(settings.theme);
         moment.locale(settings.lang);
         i18n = lang.init(settings.lang);

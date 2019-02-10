@@ -33,10 +33,6 @@ class SettingsBackup extends Component {
                     {
                         this.props.user.id === undefined &&
                         <div className="not-logined-wrapper">
-                            <TriggerListItem 
-                                text={t("how-it-works-btn")}
-                                noBorder={true}    
-                            >{t("how-it-works")}</TriggerListItem>
                             <button
                                 className="text block google-in img-text-button"
                                 type="button"

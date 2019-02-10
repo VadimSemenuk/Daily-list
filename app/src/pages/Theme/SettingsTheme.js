@@ -34,14 +34,7 @@ class SettingsTheme extends Component {
     onThemeSelect = (id) => {
         let theme = themesService.getThemeById(id);
         this.setState({themeSelectValue: theme});
-    }
-
-    applyTheme(theme) {
-        if (window.cordova) {
-            window.StatusBar.backgroundColorByHexString(theme.statusBar);
-        }
-        themesService.applyTheme(theme);
-    }
+    };
 
     render () {
         let {t} = this.props;
@@ -55,9 +48,11 @@ class SettingsTheme extends Component {
                         text={t("theme")} 
                         style={{padding: "10px 0"}}
                         ValElement={() => (
-                            <div className="color-item-wrapper">
-                                <div className="color-item theme-header-background"></div>
-                            </div>
+                            this.state.themeSelectValue.id === -2 ?
+                                <span className="list-item-value">{t("night-mode")}</span> :
+                                <div className="color-item-wrapper">
+                                    <div className="color-item theme-header-background"></div>
+                                </div>
                         )}
                         listItem={ButtonListItem}
                         actionItems={[
@@ -69,22 +64,28 @@ class SettingsTheme extends Component {
                                 text: t("ok"),
                                 onClick: () => {
                                     this.props.setSetting('theme', this.state.themeSelectValue);
-                                    this.applyTheme(this.state.themeSelectValue);
+                                    themesService.applyTheme(this.state.themeSelectValue);
                                 }
                             }
                         ]}
                     >
+                        <SwitchListItem
+                            text={t("night-mode")}
+                            checked={this.state.themeSelectValue.id === -2}
+                            onChange={(event) => this.onThemeSelect(event ? -2 : 0)}
+                        />
                         <SwitchListItem 
                             text={t("random-theme")}  
                             checked={this.state.themeSelectValue.id === -1}
-                            onChange={(event) => this.onThemeSelect(event ? -1 : this.props.settings.theme.realId)}     
+                            disabled={this.state.themeSelectValue.id === -2}
+                            onChange={(event) => this.onThemeSelect(event ? -1 : this.state.themeSelectValue.realId)}
                         />
                         <ColorPicker
                             colors={themes}
                             field="header"
                             value={this.state.themeSelectValue}
+                            disabled={this.state.themeSelectValue.id === -1 || this.state.themeSelectValue.id === -2}
                             onSelect={(event) => this.onThemeSelect(event.color.id)}
-                            disabled={this.state.themeSelectValue.id === -1}
                         />
                     </ModalListItem>
 

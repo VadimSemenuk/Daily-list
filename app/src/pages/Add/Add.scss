@@ -18,7 +18,8 @@
 
         .add-actions-wrapper {
             display: flex;
-            padding: 10px 0;
+            padding-top: 30px;
+            padding-bottom: 10px;
 
             button {
                 flex: 1;
@@ -97,6 +98,14 @@
 
         .priority-select {
             border: none;
+        }
+
+        .color-item-wrapper {
+            &:first-child {
+                .color-item {
+                    border: 1px solid #9e9e9e;
+                }
+            }
         }
     }
 }

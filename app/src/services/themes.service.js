@@ -114,42 +114,56 @@ class ThemesService {
     ];
 
     getThemeById = (id) => {
+        if (id === -2) {
+            return {id: -2};
+        }
         if (id === -1) {
             let theme = this.themes[randomInteger(0, this.getThemesCount() - 1)];
-            return Object.assign({}, theme, {id: -1, realId: theme.id})
-        };
+            return Object.assign({}, theme, {id: -1, realId: theme.id});
+        }
         return this.themes.find((a) => a.id === id);
-    }
+    };
 
     getThemesList = () => [...this.themes];
 
-    getThemesCount = () => this.themes.length
+    getThemesCount = () => this.themes.length;
 
     applyTheme = (theme) => {
-        let styleEl = document.querySelector("style.theme-styles");
-        if (!styleEl) {
-            styleEl = document.createElement("style");
-            styleEl.classList.add("theme-styles");
-            document.querySelector("body").appendChild(styleEl);
-        }
+        if (theme.id === -2) {
+            let styleEl = document.querySelector("style.theme-styles");
+            if (styleEl) {
+                styleEl.remove();
+            }
+            window.cordova && window.StatusBar.backgroundColorByHexString("#222");
+            document.querySelector("body").classList.add("night-mode");
+        } else {
+            document.querySelector("body").classList.remove("night-mode");
+            window.cordova && window.StatusBar.backgroundColorByHexString(theme.statusBar);
+            let styleEl = document.querySelector("style.theme-styles");
+            if (!styleEl) {
+                styleEl = document.createElement("style");
+                styleEl.classList.add("theme-styles");
+                document.querySelector("body").appendChild(styleEl);
+            }
 
-        styleEl.innerHTML = `
-            .theme-header-background {
-                background: ${theme.header};
-            }
-            .theme-header-border {
-                border-color: ${theme.header};
-            }
-            .page-content {
-                background: ${theme.body}
-            }
-            .theme-contrasting-color {
-                color: ${theme.contrasting}
-            }
-            .button.text.block {
-                background: ${theme.header};
-            }
-        `
+            styleEl.innerHTML = `
+                .theme-header-background {
+                    background: ${theme.header};
+                }
+                .theme-header-border {
+                    border-color: ${theme.header};
+                }
+                .page-content {
+                    background: ${theme.body}
+                }
+                .theme-contrasting-color {
+                    color: ${theme.contrasting}
+                }
+                .button.text.block {
+                    background: ${theme.header};
+                }
+            `;
+        }
     }
 }
 

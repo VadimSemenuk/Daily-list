@@ -195,8 +195,7 @@ textarea {
 textarea {
     resize: none;
     border-bottom: none !important; 
-    min-height: 80px;
-    font-family: 'Roboto';   
+    font-family: 'Roboto';
 }
 select {
     font-family: 'Roboto'; 
@@ -245,10 +244,21 @@ button.google-in {
 }
 
 
-
+// night mode
 .night-mode {
+    color: #eee;
+
+    .theme-header-background {
+        background: #222;
+    }
+    .theme-header-border {
+        border-color: #222;
+    }
     .page-content {
         background: #383838;
+    }
+    .theme-contrasting-color {
+        color: #ce4747;
     }
 
     .note-wrapper .note-content {
@@ -256,13 +266,9 @@ button.google-in {
         background: #222;
         color: #eee;
 
-        .more-button, .note-finish-checkbox {
+        .note-finish-checkbox {
             filter: invert(1);
         }
-    }
-
-    .theme-header-background {
-        background: #222;
     }
 
     input, textarea {
@@ -274,6 +280,8 @@ button.google-in {
     }
 
     .list-item {
+        border-bottom: none;
+
         .list-item-text {
             color: #eee;
         }
@@ -282,10 +290,61 @@ button.google-in {
             filter: invert(1);
         }
     }
-}
 
-body {
-    .night-mode {
+    .radio-wrapper {
         color: #eee;
+
+        .radio {
+            border-color: #eee;
+
+            .radio-inner {
+                background: #eee;
+            }
+        }
+    }
+
+    .modal {
+        background: #5e5e5e;
+    }
+
+    button {
+        &.img-text-button {
+            img {
+                filter: none;
+            }
+        }
+        &.text:not(.clear) {
+            background: #5e5e5e;
+        }
+        &.pick {
+            filter: invert(1);
+        }
+        img {
+            filter: invert(1);
+        }
+    }
+
+    header {
+        button {
+            img {
+                filter: none;
+            }
+        }
+    }
+
+    .add-wrapper {
+        .add-additionals-wrapper {
+            background: #5e5e5e;
+
+            .set-time-wrapper {
+                border-bottom: none;
+            }
+        }
+    }
+
+    .color-item-wrapper.active {
+        .color-item.black-tick {
+            background-image: url("./assets/img/tick.svg");
+        }
     }
 }

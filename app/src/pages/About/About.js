@@ -5,7 +5,7 @@ import {translate} from "react-i18next";
 
 import * as AppActions from '../../actions';
 
-import Logo from '../../assets/img/logo.png';
+import Logo from '../../assets/img/logo.svg';
 
 import Header from '../../components/Header/Header';
 import {InsetListItem, TriggerListItem} from "../../components/ListItem/ListItem";

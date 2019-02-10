@@ -48,7 +48,7 @@ class Migration {
         }
 
         if (!isDbExist) {
-            await deviceService.setNextVersionMigrationState(true);
+            // await deviceService.setNextVersionMigrationState(true);
             // addFakeListItemsData();
         }
     }

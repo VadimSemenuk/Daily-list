@@ -2,8 +2,11 @@
     .app-logo {
         display: block;
         margin: 0 auto;
-        transition: 100ms ease all;
-    
+        transition: 100ms ease transform;
+        height: 200px;
+        margin-bottom: 30px;
+        margin-top: 10px;
+
         &:active {
             transform: scale(1.05);
         }

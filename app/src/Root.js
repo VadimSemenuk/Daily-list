@@ -54,10 +54,10 @@ class Root extends Component {
         });
     }
        
-    async nextVersionMigration() {
+    nextVersionMigration() {
         if (!this.props.meta.nextVersionMigrated) {
-            if (this.props.user.id || 1) {
-                await authService.googleSignOut();
+            if (this.props.user.id) {
+                authService.googleSignOut();
                 this.setState({
                     nextVersionMigrationModal: true
                 })
