@@ -13,7 +13,7 @@ class CalendarService {
         let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
 
         let select = await executeSQL(`
-            select t.added, t.repeatType, rep.value as repeatValue, t.finished, t.repeatDate
+            select t.added, t.repeatType, rep.value as repeatValue, t.finished
             from Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
             where 
@@ -41,14 +41,7 @@ class CalendarService {
             }
 
             if (note.added !== -1) {
-                if (note.repeatDate !== -1 && note.repeatDate === note.added) {
-                    continue;
-                }
-
                 dates[note.added] = (dates[note.added] || 0) + 1;
-                if (note.repeatDate !== -1 && note.repeatDate !== note.added) {
-                    dates[note.repeatDate] = (dates[note.repeatDate] || 0) - 1;
-                }
             } else {
                 if (note.repeatType === "week") {
                     repeatableWeek[note.repeatValue] = (repeatableWeek[note.repeatValue] || 0) + 1;

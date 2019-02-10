@@ -15,43 +15,19 @@ import './About.scss';
 class About extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            bazinga: false,
-            logoClicksCounter: 0,
-            lang: "en"
-        }
     }
 
-    componentDidMount() {
-        if (this.props.settings.lang === "ru") {
-            this.setState({
-                lang: "ru"
-            })
-        }
-    }
-
-    launthMarket = () => {
+    launchMarket = () => {
         if (navigator.connection.type === window.Connection.NONE) {
             window.plugins.toast.showLongBottom(this.props.t("internet-required"));       
             return 
         }
 
         window.LaunchReview.launch();
-    }
+    };
 
     openSettings() {
         window.cordova.plugins.settings.open(["application_details", true])
-    }
-
-    onLogoClick = () => {
-        let nextClickCount = this.state.logoClicksCounter + 1;
-        let bazinga = nextClickCount === 5;
-
-        this.setState({
-            logoClicksCounter: nextClickCount,
-            bazinga
-        })
     }
 
     render () {
@@ -61,22 +37,12 @@ class About extends Component {
             <div className="page-wrapper page-about">
                 <Header title={t("about")}/>
                 <div className="scroll page-content padding">
-                    {   this.state.bazinga &&
-                        <img 
-                            className="bazinga app-logo"
-                            src={require("../../assets/img/bazinga.jpg")}
-                            alt="bazinga"
-                        />
-                    }
-                    {
-                        !this.state.bazinga &&
-                        <img 
-                            className="app-logo"
-                            src={Logo}
-                            alt="app-logo"
-                            onClick={this.onLogoClick}
-                        />
-                    }
+                    <img
+                        className="app-logo"
+                        src={Logo}
+                        alt="app-logo"
+                        onClick={this.onLogoClick}
+                    />
                     <div className="text-center">
                         <strong>{t("app-name")}</strong>
                         <p>&#9400; 2017 Mamindeveloper</p>
@@ -84,7 +50,7 @@ class About extends Component {
                     </div> 
                     <InsetListItem 
                         text={t("star-app")}
-                        onClick={this.launthMarket}  
+                        onClick={this.launchMarket}
                     />
                     <TriggerListItem text={t("resources")}>
                         <div>
@@ -113,7 +79,7 @@ class About extends Component {
     }
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {
         settings: state.settings
     }

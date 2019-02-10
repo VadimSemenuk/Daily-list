@@ -34,12 +34,12 @@ class Root extends Component {
 
     componentDidMount() {
         this.nextVersionMigration();
-        this.setKeyoardEvents();
+        this.setKeyboardEvents();
         Modal.init();  
         this.backupNotes();
     }
 
-    setKeyoardEvents() {
+    setKeyboardEvents() {
         window.addEventListener('keyboardDidShow', () => {
             document.querySelector(".hide-with-active-keyboard").classList.add("hidden");
             setTimeout(function() {

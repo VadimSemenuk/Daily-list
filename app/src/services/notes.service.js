@@ -540,7 +540,7 @@ class NotesService {
         let select = await executeSQL(`
             SELECT repeatType, title, id as key, startTime
             FROM Tasks
-            WHERE finished = 0 AND added != ? AND repeatType = 'no-repeat'
+            WHERE finished = 0 AND added < ? AND repeatType = 'no-repeat'
         `, [
             moment().startOf("day").valueOf(),
         ]);
@@ -550,14 +550,14 @@ class NotesService {
             SET
                 added = ?,
                 isLastActionSynced = 0
-            WHERE finished = 0 AND added != ? AND repeatType = 'no-repeat'
+            WHERE finished = 0 AND added < ? AND repeatType = 'no-repeat'
         `, [
             msTodayDate, msTodayDate
         ]);
 
         for (let i = 0; i < select.rows.length; i++) {
             let noteToMove = select.rows.item(i);
-            if (noteToMove.notificate ) {
+            if (noteToMove.notificate) {
                 notificationService.clear(noteToMove);
                 notificationService.set(noteToMove);
             }
