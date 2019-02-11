@@ -99,11 +99,13 @@ class AuthService {
     }
 
     setToken(token) {
+        token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? token.backup.lastBackupTime.valueOf() : null;
         localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
     }
 
     getToken() {
-        return JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
+        let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
+        token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? moment(token.backup.lastBackupTime) : null;
     }
 
     resetToken() {

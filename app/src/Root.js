@@ -94,9 +94,8 @@ class Root extends Component {
     showNoBackupNotificationIfNeed = () => {
         if (
             this.props.user
-            && this.props.user.backup
-            && moment(this.props.user.backup.lastBackupTime).diff(this.props.meta.appInstalledDate, 'days') > 30
             && this.props.user.settings.autoBackup
+            && (this.props.user.backup.lastBackupTime || moment().startOf("day")).diff(this.props.meta.appInstalledDate, 'days') > 30
         ) {
             this.triggerNoBackupNotificationDialog();
         }

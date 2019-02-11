@@ -475,7 +475,7 @@ let debouncedUploadBackup = throttle(async (note, token, removeForkNotes, inBack
             ...token,
             backup: {
                 ...token.backup,
-                lastBackupTime: moment().valueOf()
+                lastBackupTime: moment()
             }
         };
         dispatch(setToken(nextToken));
@@ -516,7 +516,7 @@ export function uploadBatchBackup(inBackground) {
                 ...token,
                 backup: {
                     ...token.backup,
-                    lastBackupTime: moment().valueOf()
+                    lastBackupTime: moment()
                 }
             };
             dispatch(setToken(nextToken));
@@ -573,7 +573,7 @@ export function updateLastBackupTime() {
                     ...token, 
                     backup: {
                         ...token.backup,
-                        lastBackupTime: moment(time).valueOf()
+                        lastBackupTime: moment(time)
                     }  
                 };
                 dispatch(setToken(nextToken));

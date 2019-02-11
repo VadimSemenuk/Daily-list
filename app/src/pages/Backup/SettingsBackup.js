@@ -79,7 +79,7 @@ class SettingsBackup extends Component {
                             </div>
                             {
                                 this.props.user.backup.lastBackupTime &&
-                                <div className="backup-file-date">{t("copy")} {moment(this.props.user.backup.lastBackupTime).format('LLL')}</div>
+                                <div className="backup-file-date">{t("copy")} {this.props.user.backup.lastBackupTime.format('LLL')}</div>
                             }
                         </div>
                     }
