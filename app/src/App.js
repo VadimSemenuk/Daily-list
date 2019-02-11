@@ -64,8 +64,6 @@ export default class App extends Component {
         let notes = await notesService.getNotesByDates([moment(date).add(-1, "day"), date, moment(date).add(1, "day")]);
         let user = authService.getToken();
 
-        settings.moveToToday && await notesService.moveNotFinishedToToday();
-
         return initStore({settings, password, notes, date, user, meta});
     }
 

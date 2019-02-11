@@ -1,4 +1,5 @@
 import uuid from "uuid/v1";
+import moment from "moment";
 
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
@@ -52,19 +53,21 @@ export default {
                 CREATE TABLE IF NOT EXISTS MetaInfo
                 (   
                     deviceId TEXT,
-                    IsRateDialogShowed INTEGER,
-                    nextVersionMigrated INTEGER
+                    isRateDialogShowed INTEGER,
+                    nextVersionMigrated INTEGER,
+                    appInstalledDate INTEGER
                 );
             `);
 
             await execureSQL(`
-                INSERT INTO MetaInfo (deviceId, IsRateDialogShowed, nextVersionMigrated)
+                INSERT INTO MetaInfo (deviceId, isRateDialogShowed, nextVersionMigrated, appInstalledDate)
                 SELECT 
                     deviceId, 
-                    0 as IsRateDialogShowed,
-                    0 as nextVersionMigrated
+                    0 as isRateDialogShowed,
+                    0 as nextVersionMigrated,
+                    ? as appInstalledDate
                 FROM MetaInfo_OLD
-            `);
+            `, [moment().startOf("day").valueOf()]);
 
             await execureSQL(`DROP TABLE MetaInfo_OLD;`);
         }

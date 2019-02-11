@@ -36,7 +36,7 @@ class FastAdd extends Component {
         this.setState({
             fastAddInputValue: ""
         })
-    }
+    };
 
     render() {
         let {t} = this.props;
@@ -49,12 +49,15 @@ class FastAdd extends Component {
                     onChange={(e) => this.setState({fastAddInputValue: e.target.value})}
                     value={this.state.fastAddInputValue}
                 />
-                <button onClick={this.onFastAddSubmit}>
-                    <img
-                        src={addImg} 
-                        alt="add"
-                    />        
-                </button>  
+                {
+                    this.state.fastAddInputValue &&
+                    <button onClick={this.onFastAddSubmit}>
+                        <img
+                            src={addImg}
+                            alt="add"
+                        />
+                    </button>
+                }
             </div> 
         )
     }

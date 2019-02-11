@@ -1,5 +1,4 @@
 .fast-add-wrapper {
-    background: #fafafa;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -10,6 +9,10 @@
     }
 
     button {
-        flex-shrink: 0;    
+        flex-shrink: 0;
+
+        img {
+            width: 20px;
+        }
     }
 }

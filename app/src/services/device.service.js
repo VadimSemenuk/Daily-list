@@ -1,3 +1,5 @@
+import moment from "moment";
+
 import executeSQL from '../utils/executeSQL';
 import config from '../config/config';
 import throttle from "../utils/throttle";
@@ -8,13 +10,17 @@ class DeviceService {
     }
 
     async getMetaInfo() {
-        let select = await executeSQL(`SELECT deviceId, IsRateDialogShowed, nextVersionMigrated FROM MetaInfo;`);
+        let select = await executeSQL(`
+            SELECT deviceId, isRateDialogShowed, nextVersionMigrated, appInstalledDate
+            FROM MetaInfo;
+        `);
         if (select.rows) {
             let metaInfo = select.rows.item(0);
             return {
                 deviceId: metaInfo.deviceId,
-                IsRateDialogShowed: Boolean(metaInfo.IsRateDialogShowed),
-                nextVersionMigrated: Boolean(metaInfo.nextVersionMigrated)
+                isRateDialogShowed: Boolean(metaInfo.isRateDialogShowed),
+                nextVersionMigrated: Boolean(metaInfo.nextVersionMigrated),
+                appInstalledDate: moment(metaInfo.appInstalledDate)
             }
         } else {
             return {}

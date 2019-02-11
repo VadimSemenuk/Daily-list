@@ -15,7 +15,7 @@
         }
 
         &:not(:focus) + button {
-            transition-delay: 10ms; 
+            transition-delay: 10ms;
             visibility: hidden;
         }
     }

@@ -24,24 +24,24 @@ export default class CustomModal extends Component {
 
     setBackButtonEventHandler = () => {
         document.addEventListener("backbutton", this.onBackButtonClick, false);
-    }
+    };
 
     removeBackButtonEventHandler = () => {
         document.removeEventListener("backbutton", this.onBackButtonClick, false);        
-    }
+    };
 
     onBackButtonClick = (e) => {
         this.props.onRequestClose();
-    }
+    };
 
     static init = () => {
         Modal.setAppElement('#root');
-    }
+    };
 
     onActionButtonClick = (action) => {
         this.props.onRequestClose();    
         action && action();
-    }
+    };
 
     render () {
         return (

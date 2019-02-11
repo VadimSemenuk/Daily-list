@@ -3,6 +3,7 @@ import {HashRouter, Route, Redirect} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
+import moment from "moment";
 
 import * as AppActions from './actions'; 
 
@@ -28,7 +29,8 @@ class Root extends Component {
         super(props);
 
         this.state = {
-            nextVersionMigrationModal: false
+            nextVersionMigrationModal: false,
+            noBackupNotificationModal: false
         }
     }
 
@@ -37,6 +39,7 @@ class Root extends Component {
         this.setKeyboardEvents();
         Modal.init();  
         this.backupNotes();
+        this.showNoBackupNotificationIfNeed();
     }
 
     setKeyboardEvents() {
@@ -79,13 +82,30 @@ class Root extends Component {
 
     backupNotes = () => {
         if (
-            this.props.meta.nextVersionMigrated && 
-            this.props.user.id && 
-            this.props.user.settings.autoBackup &&
-            window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine
+            this.props.meta.nextVersionMigrated
+            && this.props.user.id
+            && this.props.user.settings.autoBackup
+            && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine
         ) {
             this.props.uploadBatchBackup(true);
         }   
+    };
+
+    showNoBackupNotificationIfNeed = () => {
+        if (
+            this.props.user
+            && this.props.user.backup
+            && moment(this.props.user.backup.lastBackupTime).diff(this.props.meta.appInstalledDate, 'days') > 30
+            && this.props.user.settings.autoBackup
+        ) {
+            this.triggerNoBackupNotificationDialog();
+        }
+    };
+
+    triggerNoBackupNotificationDialog = () => {
+        this.setState({
+            noBackupNotificationModal: !this.state.noBackupNotificationModal
+        })
     };
 
     render() {
@@ -176,7 +196,7 @@ class Root extends Component {
 
                     <Modal 
                         isOpen={this.props.error} 
-                        onRequestClose={() => this.props.triggerErrorModal()}
+                        onRequestClose={this.props.triggerErrorModal}
                         actionItems={[
                             {
                                 text: t("close")
@@ -187,6 +207,20 @@ class Root extends Component {
                             },
                         ]}
                     >{t(this.props.error.message)}</Modal>
+
+                    <Modal
+                        isOpen={this.state.noBackupNotificationModal}
+                        onRequestClose={this.triggerNoBackupNotificationDialog}
+                        actionItems={[
+                            {
+                                text: t("close")
+                            },
+                            {
+                                text: t("move-to-backup-page"),
+                                onClick: () => this.props.history.push(`${this.props.match.url}/backup`)
+                            },
+                        ]}
+                    >{t("no-backup-notification")}</Modal>
                 </div>
             </HashRouter>
         );
