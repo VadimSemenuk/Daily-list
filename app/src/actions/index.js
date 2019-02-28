@@ -21,7 +21,7 @@ export function addNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
+                token && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-add"));
@@ -52,7 +52,7 @@ export function updateNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, true, true));
+                token && token.settings.autoBackup && dispatch(uploadBackup(note, token, true, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -90,7 +90,7 @@ export function updateNoteDynamicFields (note, updatedState) {
                 state.finished !== undefined && dispatch(renderNotes());
 
                 let token = state.user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(nextNote, token, null, true));
+                token && token.settings.autoBackup && dispatch(uploadBackup(nextNote, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -120,7 +120,7 @@ export function updateNoteDate (note, updateCount) {
                 dispatch(renderNotes());
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
+                token && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -149,7 +149,7 @@ export function deleteNote (note, updateCount) {
                 updateCount && dispatch(getFullCount(note.added.valueOf()));
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
+                token && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-delete"));
@@ -198,7 +198,7 @@ export function restoreNote (note) {
                 dispatch(updateNotes());
 
                 let token = getState().user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
+                token && token.settings.autoBackup && dispatch(uploadBackup(note, token, null, true));
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-restore"));
@@ -226,7 +226,7 @@ export function cleanDeletedNotes () {
             }))
             .then(() => {
                 let token = state.user;
-                token.settings && token.settings.autoBackup && dispatch(uploadBatchBackup());
+                token && token.settings.autoBackup && dispatch(uploadBatchBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("clean-trash-error"));

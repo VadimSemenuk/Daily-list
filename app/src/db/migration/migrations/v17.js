@@ -16,7 +16,7 @@ export default {
         await addErrorsTable();
 
         let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
-        if (!token.id) {
+        if (!token || !token.id) {
             return
         }
         token.backup = {lastBackupTime: null};

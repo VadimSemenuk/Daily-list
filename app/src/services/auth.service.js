@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import moment from 'moment';
 
 import config from "../config/config";
 import CustomError from "../common/CustomError";
@@ -99,13 +100,25 @@ class AuthService {
     }
 
     setToken(token) {
-        token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? token.backup.lastBackupTime.valueOf() : null;
-        localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
+        let nextToken = null;
+        if (token) {
+            nextToken = {
+                ...token,
+                backup: {
+                    ...token.backup,
+                    lastBackupTime: token.backup.lastBackupTime !== null ? token.backup.lastBackupTime.valueOf() : null
+                }
+            };
+        }
+        localStorage.setItem(config.LSTokenKey, JSON.stringify(nextToken));
     }
 
     getToken() {
-        let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
-        token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? moment(token.backup.lastBackupTime) : null;
+        let token = JSON.parse(localStorage.getItem(config.LSTokenKey));
+        if (token !== null) {
+            token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? moment(token.backup.lastBackupTime) : null;
+        }
+        return token;
     }
 
     resetToken() {

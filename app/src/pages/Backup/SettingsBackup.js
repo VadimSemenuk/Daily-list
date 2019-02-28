@@ -2,14 +2,13 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
-import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
 import './SettingsBackup.scss';
 
 import Header from '../../components/Header/Header';
-import {TriggerListItem, SwitchListItem} from "../../components/ListItem/ListItem";
+import {SwitchListItem} from "../../components/ListItem/ListItem";
 
 import GoogleImg from '../../assets/img/google.svg';
 import ExportImg from '../../assets/img/upload-to-cloud.svg';
@@ -18,20 +17,20 @@ import LogoutImg from '../../assets/img/logout.svg';
 
 class SettingsBackup extends Component {
     componentDidMount() {
-        if (this.props.user.id !== undefined) {
+        if (this.props.user) {
             this.props.updateLastBackupTime();
         }
     }
 
     render () {
         let {t} = this.props;
-        
+
         return (
             <div className="page-wrapper backup-page-wrapper">
                 <Header title={t("backup")}/>
                 <div className="scroll page-content padding">
                     {
-                        this.props.user.id === undefined &&
+                        !this.props.user &&
                         <div className="not-logined-wrapper">
                             <button
                                 className="text block google-in img-text-button"
@@ -41,7 +40,7 @@ class SettingsBackup extends Component {
                         </div>
                     }
                     {
-                        this.props.user.id !== undefined &&
+                        this.props.user &&
                         <div className="logined-wrapper">
                             <div className="profile-wrapper">
                                 <div className="profile-img-wrapper clickable" style={{backgroundImage: `url(${this.props.user.picture})`}}></div>
@@ -59,7 +58,7 @@ class SettingsBackup extends Component {
                             <div className="backup-settings-wrapper">
                                 <SwitchListItem 
                                     text={t("auto-backup")}
-                                    checked={this.props.user.settings ? this.props.user.settings.autoBackup : false}
+                                    checked={this.props.user.settings.autoBackup}
                                     onChange={(e) => this.props.setToken({...this.props.user, settings: { ...this.props.user.settings, autoBackup: e }})}
                                 />
                             </div>

@@ -131,7 +131,7 @@ let Header = (props) => (
                         )
                     case 5: 
                         return ( 
-                            props.user.id && 
+                            props.user &&
                             <button 
                                 key={a}
                                 onClick={props.uploadBackup}

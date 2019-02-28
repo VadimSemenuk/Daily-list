@@ -13,10 +13,6 @@ import {InsetListItem, TriggerListItem} from "../../components/ListItem/ListItem
 import './About.scss';
 
 class About extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     launchMarket = () => {
         if (navigator.connection.type === window.Connection.NONE) {
             window.plugins.toast.showLongBottom(this.props.t("internet-required"));       

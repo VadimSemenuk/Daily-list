@@ -59,7 +59,7 @@ class Root extends Component {
        
     nextVersionMigration() {
         if (!this.props.meta.nextVersionMigrated) {
-            if (this.props.user.id) {
+            if (this.props.user && this.props.user.id) {
                 authService.googleSignOut();
                 this.setState({
                     nextVersionMigrationModal: true
@@ -83,7 +83,7 @@ class Root extends Component {
     backupNotes = () => {
         if (
             this.props.meta.nextVersionMigrated
-            && this.props.user.id
+            && this.props.user
             && this.props.user.settings.autoBackup
             && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine
         ) {
