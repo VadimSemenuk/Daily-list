@@ -20,7 +20,7 @@ class CalendarService {
                 lastAction != 'DELETE' 
                 AND lastAction != 'CLEAR' 
                 AND (
-                    (repeatType = 'no-repeat' OR forkFrom != -1 AND added >= ? AND added <= ?)
+                    (repeatType = 'no-repeat' AND added >= ? AND added <= ?)
                     OR (repeatType = 'any' AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
                     OR (t.forkFrom = -1 AND repeatType != 'any')
                 )
@@ -35,7 +35,7 @@ class CalendarService {
 
             if (!includeFinished && note.finished) {
                 if (note.repeatType !== "no-repeat") {
-                    dates[note.added] = (dates[note.added] || 0) -1;
+                    dates[note.added] = (dates[note.added] || 0) - 1;
                 }
                 continue;
             }

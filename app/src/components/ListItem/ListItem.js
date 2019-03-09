@@ -72,6 +72,10 @@ export class ModalListItem extends PureComponent {
     }
 
     trigger = () => {
+        if (!this.state.isModalActive && this.props.onModalWillOpen) {
+            this.props.onModalWillOpen();
+        }
+
         this.setState({
             isModalActive: !this.state.isModalActive
         })

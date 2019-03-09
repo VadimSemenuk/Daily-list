@@ -46,7 +46,7 @@ class NotesService {
                 isShadow: Boolean(item.added === -1),
                 isSynced: Boolean(item.isSynced),
                 isLastActionSynced: Boolean(item.isLastActionSynced),
-                repeatDates: item.repeatDates ? item.repeatDates.split(",") : [],
+                repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
             };
 
             notes.push(nextItem);
@@ -140,9 +140,7 @@ class NotesService {
 
         if (nextNote.isShadow) {
             let noteUUID = uuid();
-            let actionTime = moment().valueOf();
             nextNote.uuid = noteUUID;
-            nextNote.actionTime = actionTime;
             nextNote.forkFrom = note.key;
             nextNote.repeatDate = note.repeatDate === -1 ? note.added.valueOf() : note.repeatDate;
             nextNote = await this.insertNote(nextNote);
@@ -159,10 +157,10 @@ class NotesService {
                 [
                     JSON.stringify(nextNote.dynamicFields),
                     Number(nextNote.finished),
-                    nextNote.key,
                     nextNote.isLastActionSynced,
                     nextNote.lastAction,
-                    nextNote.lastActionTime
+                    nextNote.lastActionTime,
+                    nextNote.key
                 ]
             )
         }
@@ -170,7 +168,7 @@ class NotesService {
         return nextNote;
     }
 
-    async updateNote(note) {
+    async updateNote(note, prevNote) {
         let actionTime = moment().valueOf();
         let timeCheckSums = this.calculateTimeCheckSum(note);
         let nextNote = {
@@ -180,7 +178,7 @@ class NotesService {
             lastActionTime: actionTime,
             isLastActionSynced: 0
         };
-        if (nextNote.prevNote.repeatType !== "no-repeat") {
+        if (prevNote.repeatType !== "no-repeat") {
             if (!nextNote.isShadow) {
                 nextNote.key = nextNote.forkFrom;
                 let select = await executeSQL(`SELECT uuid FROM Tasks WHERE id = ?`, [nextNote.key]);
@@ -226,10 +224,11 @@ class NotesService {
         return nextNote;
     }
 
-    async updateNoteDate(note) {
+    async updateNoteDate(note, nextDate) {
         let actionTime = moment().valueOf();
         let nextNote = {
             ...note,
+            added: nextDate,
             lastAction: "EDIT",
             lastActionTime: actionTime,
             isLastActionSynced: 0

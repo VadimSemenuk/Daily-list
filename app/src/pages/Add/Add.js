@@ -20,6 +20,8 @@ import notesService from '../../services/notes.service';
 import CameraImg from '../../assets/img/photo-camera.svg';
 import AddGeryImg from '../../assets/img/add-grey.svg';
 
+import deepCopy from '../../utils/deepCopyObject'
+
 import './Add.scss';
 
 class Add extends Component {
@@ -44,7 +46,6 @@ class Add extends Component {
 
             calendar: false,
             pictureModal: false,
-            prevNote: null,
             editRepeatableDialog: false,
             addAdditioanlsViewHidden: false,
             tags: notesService.getTags()
@@ -55,16 +56,8 @@ class Add extends Component {
 
     async componentDidMount() {
         if (this.props.match.path === "/edit") {
-            let repeatDates = this.state.repeatDates;
-            if (this.props.location.state.note.repeatType === "any" || this.props.location.state.note.repeatType === "week") {
-                // TODO: get from note
-                repeatDates = await notesService.getNoteRepeatDates(this.props.location.state.note);
-            }
-            this.setState({
-                ...this.props.location.state.note, 
-                repeatDates,
-                prevNote: Object.assign({}, this.props.location.state.note)
-            });
+            this.setState({...this.props.location.state.note});
+            this.prevNote = deepCopy(this.props.location.state.note);
         }
     }
 
@@ -203,7 +196,7 @@ class Add extends Component {
         let note = this.getInputsValues();
 
         if (this.props.match.path === "/edit") {
-            await this.props.updateNote(note, this.props.settings.calendarNotesCounter);
+            await this.props.updateNote(note, this.prevNote, this.props.settings.calendarNotesCounter);
         } else {
             await this.props.addNote(note, this.props.settings.calendarNotesCounter);
         }

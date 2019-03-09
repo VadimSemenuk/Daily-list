@@ -16,7 +16,7 @@ import {ButtonListItem} from "../../components/ListItem/ListItem";
 import * as AppActions from '../../actions'; 
 
 import sliderChangeSide from "../../utils/sliderChangeSide";
-import deepCopyObject from "../../utils/DeepCopyObject";
+import deepCopyObject from "../../utils/deepCopyObject";
 
 import './NotesList.scss';
 import DayNotesList from "./DayNotesList";
@@ -57,19 +57,19 @@ class NotesList extends PureComponent {
                 nextIndex            
             )     
         }
-    }
+    };
 
     onItemActionsWindowRequest = (note) => {
         this.setState({
             listItemDialogVisible: { note }
         })
-    }
+    };
 
     closeDialog = () => {
         this.setState({
             listItemDialogVisible: false
         });
-    }
+    };
 
     onEditRequest = () => {
         this.closeDialog();  
@@ -77,12 +77,12 @@ class NotesList extends PureComponent {
             pathname: "/edit",
             state: { ...this.state.listItemDialogVisible }
         })             
-    }
+    };
 
     onListItemRemove = () => {
         this.props.deleteNote(this.state.listItemDialogVisible.note, this.props.settings.calendarNotesCounter);
         this.closeDialog();              
-    }
+    };
 
     pasteCopy = async () => {
         let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
@@ -97,14 +97,14 @@ class NotesList extends PureComponent {
         this.setState({
             copyBuffer: null
         });
-    }
+    };
 
     onCopyRequest = () => {
         this.setState({
             copyBuffer: this.state.listItemDialogVisible.note, 
             listItemDialogVisible: false
         });
-    }
+    };
 
     onImageShowRequest = (uri) => {
 		this.setState({
@@ -113,7 +113,7 @@ class NotesList extends PureComponent {
 				isVisible: true
 			}
 		})
-    }
+    };
 
     setDate = (date) => {
         let cur = moment(date).startOf("day");
@@ -127,20 +127,20 @@ class NotesList extends PureComponent {
         } else {
             this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesShowInterval);
         }
-    }
+    };
 
     triggerCalendar = () => {
-        this.setState({calendar: !this.state.calendar})
-    }
+        this.setState({calendar: !this.state.calendar});
+    };
 
     onTodaySelect = () => {
-        this.setDate(moment().startOf("day"))
-    }
+        this.setDate(moment().startOf("day"));
+    };
 
     onListItemMove = async () => {
         let nextDate = moment(this.props.currentDate).add(1, "day");
 
-        await this.props.updateNoteDate({...this.state.listItemDialogVisible.note, added: nextDate}, this.props.settings.calendarNotesCounter);
+        await this.props.updateNoteDate(this.state.listItemDialogVisible.note, nextDate, this.props.settings.calendarNotesCounter);
         this.setState({
             listItemDialogVisible: false
         })
@@ -195,7 +195,7 @@ class NotesList extends PureComponent {
                                         notes={notes.items} 
                                         finSort={this.props.settings.sortFinBehaviour === 1}
                                         settings={this.props.settings}
-                                        onItemDynaicFieldChange={this.props.updateNoteDynamicFields}
+                                        onItemDynamicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                     />
                                 </div>
@@ -261,7 +261,7 @@ class NotesList extends PureComponent {
 
             this.slideChanged = false;
         }
-    }
+    };
 
     onSliderChange = (e) => {
         this.slideChanged = true; 
@@ -323,3 +323,5 @@ function sort (data, settings) {
         }
     }
 }
+
+// 1. Сортировка

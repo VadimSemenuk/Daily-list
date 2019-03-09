@@ -79,11 +79,13 @@
         }
 
         .toggle-icon-wrapper {
-            padding: 10px;
+            padding: 20px;
             width: 30px;
             margin: 0 auto;
-            margin-bottom: -10px;
-            margin-top: -5px;
+            margin-bottom: -20px;
+            margin-top: -15px;
+            position: relative;
+            z-index: 1111;
     
             .line {
                 height: 4px;

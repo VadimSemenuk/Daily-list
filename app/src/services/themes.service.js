@@ -138,7 +138,7 @@ class ThemesService {
             document.querySelector("body").classList.add("night-mode");
         } else {
             document.querySelector("body").classList.remove("night-mode");
-            window.cordova && window.StatusBar.backgroundColorByHexString(theme.statusBar);
+            window.cordova && window.StatusBar.backgroundColorByHexString(theme.header);
             let styleEl = document.querySelector("style.theme-styles");
             if (!styleEl) {
                 styleEl = document.createElement("style");

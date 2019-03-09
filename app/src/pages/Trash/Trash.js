@@ -40,6 +40,7 @@ class Trash extends Component {
                                 <TrashListItem 
                                     key={a.key}
                                     itemData={a}
+                                    settings={this.props.settings}
                                     onShowImage={this.onImageShowRequest}
                                     onDynaicFieldChange={this.onItemDynaicFieldChange}
                                     onItemActionsWindowRequest={this.onItemActionsWindowRequest}

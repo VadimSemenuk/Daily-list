@@ -23,8 +23,13 @@ class Note extends PureComponent {
     }
 
     onDynaicFieldChange = (i, v) => {
-        let nextDynamicField = Object.assign({}, this.props.itemData.dynamicFields[i], { checked: v })
-        let nextDynamicFields = [...this.props.itemData.dynamicFields.slice(0, i), nextDynamicField, ...this.props.itemData.dynamicFields.slice(i + 1)];
+        let nextDynamicFields = [
+            ...this.props.itemData.dynamicFields.slice(0, i),
+            {
+                ...this.props.itemData.dynamicFields[i],
+                checked: v
+            },
+            ...this.props.itemData.dynamicFields.slice(i + 1)];
         
         this.props.onDynaicFieldChange(this.props.itemData, {dynamicFields: nextDynamicFields});
     };

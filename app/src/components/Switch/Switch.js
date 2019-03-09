@@ -9,7 +9,7 @@ class Switch extends PureComponent {
       return false;
     }
     this.props.onChange(!this.props.checked)
-  }
+  };
 
   render() {
     return (

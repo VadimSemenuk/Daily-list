@@ -39,13 +39,14 @@ export function addNote (note, updateCount) {
     }
 }
 
-export function updateNote (note, updateCount) {
+export function updateNote (note, prevNote, updateCount) {
     return function(dispatch, getState) {
-        return notesService.updateNote(note)
+        return notesService.updateNote(note, prevNote)
             .then((nextNote) => {
                 return dispatch({
                     type: "UPDATE_NOTE",
-                    note: nextNote
+                    note: nextNote,
+                    prevNote: prevNote
                 })
             })
             .then(({note}) => {
@@ -108,9 +109,9 @@ export function updateNoteDynamicFields (note, updatedState) {
     }
 }
 
-export function updateNoteDate (note, updateCount) {
+export function updateNoteDate (note, nextDate, updateCount) {
     return function(dispatch, getState) {
-        return notesService.updateNoteDate(note)
+        return notesService.updateNoteDate(note, nextDate)
             .then((nextNote) => dispatch({
                 type: "UPDATE_NOTE",
                 note: nextNote

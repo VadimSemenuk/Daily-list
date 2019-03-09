@@ -81,8 +81,8 @@ function notes (state = init, action) {
         case 'UPDATE_NOTE': {
             let startState = null;
 
-            if (action.note.prevNote) {
-                if (action.note.prevNote.repeatType === "no-repeat") {
+            if (action.prevNote) {
+                if (action.prevNote.repeatType === "no-repeat") {
                     startState = state.map((list) => {
                         return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
                     }); 

@@ -93,6 +93,15 @@ class TimeSet extends Component {
         })
     };
 
+    onRepeatTypeSelectModalWillOpen = () => {
+        this.setState({
+            repeatTypeSelected: this.props.repeatType,
+            repeatDatesSelected: this.props.repeatDates
+        });
+
+        console.log(this.props.repeatDates)
+    };
+
     render() {  
         let {t} = this.props;
         let repeatTypeOptions = notesService.getRepeatTypeOptions();
@@ -177,6 +186,7 @@ class TimeSet extends Component {
                             })
                         }
                     ]}
+                    onModalWillOpen={this.onRepeatTypeSelectModalWillOpen}
                 >
                     <div className="radio-group">
                         {

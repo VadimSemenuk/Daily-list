@@ -1,18 +1,21 @@
 .switch {
-    margin: 0 9px;
     position: relative;
     height: 18px;
     width: 18px;
+    padding: 10px;
+    margin: -10px;
+    margin-right: -1px;
 }
 .switch-asix {
     height: 6px;
+    width: 18px;
     border-radius: 3px;
     position: absolute;
-    left: 0;
-    right: 0;
     top: 50%;
+    left: 50%;
     margin-top: -3px;
-    z-index: 1;         
+    margin-left: -9px;
+    z-index: 1;
     background-color: #a5a4a4;
 }
 .switch-circle {

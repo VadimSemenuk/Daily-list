@@ -85,7 +85,7 @@ class Root extends Component {
             this.props.meta.nextVersionMigrated
             && this.props.user
             && this.props.user.settings.autoBackup
-            && window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine
+            && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)
         ) {
             this.props.uploadBatchBackup(true);
         }   
@@ -95,7 +95,7 @@ class Root extends Component {
         if (
             this.props.user
             && this.props.user.settings.autoBackup
-            && (this.props.user.backup.lastBackupTime || moment().startOf("day")).diff(this.props.meta.appInstalledDate, 'days') > 30
+            && ((this.props.user.backup.lastBackupTime || moment().startOf("day")).diff(this.props.meta.appInstalledDate, 'days') > 30)
         ) {
             this.triggerNoBackupNotificationDialog();
         }
