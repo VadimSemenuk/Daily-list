@@ -133,23 +133,22 @@ class Add extends Component {
         this.scrollToBottom();
     };
 
-    onDynamicItemRemove = (i, ref) => {
-        if (ref) {
-            let nextSibling = ref.nextSibling;
-            if (nextSibling.classList.contains("removable-text-checkbox-wrapper")) {
-                nextSibling.querySelector("input").focus();
-            } else {
-                let prevSibling = ref.previousSibling;
-                if (prevSibling.classList.contains("removable-text-checkbox-wrapper")) {
-                    prevSibling.querySelector("input").focus();
-                } 
-            }
-        }
+    onDynamicItemRemove = async (i) => {
+        await new Promise((resolve) => {
+            this.setState({
+                dynamicFields: [...this.state.dynamicFields.slice(0, i), ...this.state.dynamicFields.slice(i + 1)]
+            }, resolve);
+        });
 
-        this.setState({
-            // dynamicFields: [...this.state.dynamicFields.slice(0, i), null, ...this.state.dynamicFields.slice(i + 1)] 
-            dynamicFields: [...this.state.dynamicFields.slice(0, i), ...this.state.dynamicFields.slice(i + 1)] 
-        })
+        i = i + 1;
+
+        let nodes = Array.prototype.slice.call(document.querySelector(".add-content-wrapper").children);
+
+        if (nodes[i] && nodes[i].classList.contains("removable-text-checkbox-wrapper")) {
+            nodes[i].querySelector("input").focus();
+        } else if (nodes[i - 1] && nodes[i - 1].classList.contains("removable-text-checkbox-wrapper")) {
+            nodes[i - 1].querySelector("input").focus();
+        }
     };
 
     addSnapshootItem = async (url) => {
@@ -266,7 +265,7 @@ class Add extends Component {
                         {
                             this.state.dynamicFields.map((a, i) => {
                                 if (!a) {
-                                    return null
+                                    return null;
                                 } else if (a.type === "text") {
                                     return (
                                         <RemovableTextArea
@@ -287,7 +286,7 @@ class Add extends Component {
                                         <RemovableTextCheckBox 
                                             key={i} 
                                             className="add-content-item"
-                                            onListItemRemove={(inputRef) => this.onDynamicItemRemove(i, inputRef)}
+                                            onListItemRemove={(inputRef) => this.onDynamicItemRemove(i)}
                                             onTextChange={(text) => {
                                                 let dynamicFields = this.state.dynamicFields.slice();
                                                 dynamicFields[i] = {...dynamicFields[i], value: text};                                        

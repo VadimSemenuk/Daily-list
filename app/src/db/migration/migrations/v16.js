@@ -54,7 +54,7 @@ export default {
             if (lang.indexOf("-") !== -1) {
                 lang = lang.split("-")[0];
                 let availableLangs = ["en", "ru", "be"];
-                if (availableLangs.find((l) => l === lang.toLowerCase())) {
+                if (!availableLangs.find((l) => l === lang.toLowerCase())) {
                     lang = config.defaultLang;
                 }
             } else {
