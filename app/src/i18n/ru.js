@@ -164,6 +164,7 @@ export default {
     "clean-trash-error": "Не удалось очистить корзину",
     "error-note-get-trash": "Не удалось получить удаленные заменки",
     "error-note-restore": "Не удалось восстановить заметку",
+    "deleted-date": "Дата удаления",
 
     // meta
     "re-enter-request-title": "Пожалуйста, войдите в аккаунт повторно для завершения обновления",

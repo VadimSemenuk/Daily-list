@@ -196,7 +196,8 @@ export default {
                     sortDirection INTEGER,
                     sortFinBehaviour INTEGER,
                     sortIncludePriority INTEGER,
-                    minimizeNotes INTEGER
+                    minimizeNotes INTEGER,
+                    calendarMode INTEGER
                 );
             `);
             await execureSQL(`
@@ -214,7 +215,8 @@ export default {
                     sortDirection,
                     sortFinBehaviour,
                     sortIncludePriority,
-                    minimizeNotes
+                    minimizeNotes,
+                    calendarMode
                 ) 
                 SELECT 
                     defaultNotification, 
@@ -230,7 +232,8 @@ export default {
                     ? as sortDirection,
                     ? as sortFinBehaviour,
                     ? as sortIncludePriority,
-                    1 as minimizeNotes
+                    1 as minimizeNotes,
+                    1 as calendarMode
                 FROM Settings_OLD;
             `, [currentSortSettings.type || 1, currentSortSettings.direction || 1, currentSortSettings.finSort || 1, 1]);
             await execureSQL(`DROP TABLE Settings_OLD;`);

@@ -75,7 +75,8 @@ class SetitngsService {
                 sortType,
                 sortDirection,
                 sortFinBehaviour,
-                minimizeNotes
+                minimizeNotes,
+                calendarMode
             FROM Settings;`
         );
 

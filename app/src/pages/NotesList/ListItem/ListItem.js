@@ -45,7 +45,7 @@ class Note extends PureComponent {
     };
 
     triggerExpanded = () => {
-        this.setState({expanded: !this.state.expanded})
+        this.setState({expanded: !this.state.expanded});
     };
 
     showImage = (e) => {

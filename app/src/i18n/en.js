@@ -163,6 +163,7 @@ export default {
     "clean-trash-error": "Failed to clean trash",
     "error-note-get-trash": "Failed to get deleted notes",
     "error-note-restore": "Failed to restore note",
+    "deleted-date": "Deleted date",
 
     // meta
     "re-enter-request-title": "Please log in again to complete the update",

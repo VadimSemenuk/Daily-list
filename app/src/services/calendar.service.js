@@ -40,8 +40,10 @@ class CalendarService {
                 continue;
             }
 
-            if (note.added !== -1 && note.repeatType === "no-repeat") {
-                dates[note.added] = (dates[note.added] || 0) + 1;
+            if (note.added !== -1) {
+                if (note.repeatType === "no-repeat") {
+                    dates[note.added] = (dates[note.added] || 0) + 1;
+                }
             } else {
                 if (note.repeatType === "week") {
                     repeatableWeek[note.repeatValue] = (repeatableWeek[note.repeatValue] || 0) + 1;

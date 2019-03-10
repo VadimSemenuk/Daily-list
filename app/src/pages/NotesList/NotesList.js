@@ -32,7 +32,6 @@ class NotesList extends PureComponent {
             },
             copyBuffer: null,
             listItemDialogVisible: false,
-            calendar: false,
             dragMode: false
         };
 
@@ -130,7 +129,7 @@ class NotesList extends PureComponent {
     };
 
     triggerCalendar = () => {
-        this.setState({calendar: !this.state.calendar});
+        this.props.setSetting('calendarMode', this.props.settings.calendarMode === 1 ? 2 : 1);
     };
 
     onTodaySelect = () => {
@@ -158,7 +157,7 @@ class NotesList extends PureComponent {
                 />
                 <div className="notes-list-wrapper page-content">
                     {   
-                        !this.state.calendar && 
+                        this.props.settings.calendarMode === 1 &&
                         <LightCalendar
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
                             currentDate={this.props.currentDate}
@@ -166,7 +165,7 @@ class NotesList extends PureComponent {
                         />
                     }
                     {
-                        this.state.calendar &&
+                        this.props.settings.calendarMode === 2 &&
                         <Calendar 
                             currentDate={this.props.currentDate}
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
@@ -305,11 +304,23 @@ function sort (data, settings) {
         if (settings.sortType === 0) {
             if (settings.sortDirection === 1) {
                 return (a, b) => {
-                    return a.startTimeCheckSum - b.startTimeCheckSum;
-                }   
+                    let aDayTimeSum = a.startTime ?
+                        (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
+                        : 0;
+                    let bDayTimeSum = b.startTime ?
+                        (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
+                        : 0;
+                    return aDayTimeSum - bDayTimeSum;
+                }
             } else {
                 return (a, b) => {
-                    return b.startTimeCheckSum - a.startTimeCheckSum;
+                    let aDayTimeSum = a.startTime ?
+                        (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
+                        : 0;
+                    let bDayTimeSum = b.startTime ?
+                        (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
+                        : 0;
+                    return bDayTimeSum - aDayTimeSum;
                 } 
             }    
         }
@@ -323,5 +334,3 @@ function sort (data, settings) {
         }
     }
 }
-
-// 1. Сортировка
