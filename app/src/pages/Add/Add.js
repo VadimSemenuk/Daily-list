@@ -50,8 +50,6 @@ class Add extends Component {
             addAdditioanlsViewHidden: false,
             tags: notesService.getTags()
         };
-
-        this.activeInputIndex = -1;
     }
 
     async componentDidMount() {
@@ -62,13 +60,7 @@ class Add extends Component {
     }
 
     addField(field, index) {
-        let nextDynamicFields;
-
-        if (index !== -1) {
-            nextDynamicFields = [...this.state.dynamicFields.slice(0, index), field, ...this.state.dynamicFields.slice(index)];
-        } else {
-            nextDynamicFields = [...this.state.dynamicFields, field]
-        }
+        let nextDynamicFields = [...this.state.dynamicFields.slice(0, index), field, ...this.state.dynamicFields.slice(index)];
 
         return new Promise((resolve) => {
             this.setState({
@@ -77,20 +69,34 @@ class Add extends Component {
         });
     }
 
-    focusNext(elementToFocusSelector, elementToFocusWrapperSelector, index) {
-        let inputToFocus = null;
-        if (index) {
-            let inputs = document.querySelectorAll(".add-content-item");
-            inputToFocus = inputs[index + 1] && inputs[index + 1].querySelector(elementToFocusSelector);
-            this.activeInputIndex = -1;
-        } else {
-            let inputs = document.querySelectorAll(elementToFocusWrapperSelector);
-            if (inputs[inputs.length - 1]) {
-                inputToFocus = inputs[inputs.length - 1];
-            }
+    getDynamicFiledElements() {
+        return Array.prototype.slice.call(document.querySelectorAll(".dynamic-field"));
+    }
+
+    getFocusedFieldIndex() {
+        if (!document.activeElement) {
+            return null;
+        }
+        let focusedDynamicField = document.activeElement.closest(".dynamic-field");
+        if (!focusedDynamicField) {
+            return null;
         }
 
-        inputToFocus && inputToFocus.focus();
+        return this.getDynamicFiledElements().indexOf(focusedDynamicField);
+    }
+
+    focusDynamicField(index) {
+        let field = this.getDynamicFiledElements()[index];
+        if (field) {
+            if (field.querySelector("textarea")) {
+                field.querySelector("textarea").focus();
+                return true;
+            } else if (field.querySelector("input")) {
+                field.querySelector("input").focus();
+                return true;
+            }
+        }
+        return false;
     }
 
     addInput = async () => {
@@ -98,11 +104,10 @@ class Add extends Component {
             type: "text",
             value: ""
         };
-        await this.addField(field, this.activeInputIndex);
-
-        this.focusNext("textarea", ".removable-textarea-wrapper textarea", this.activeInputIndex);
-        this.activeInputIndex = -1;
-
+        let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.dynamicFields.length;
+        await this.addField(field, nextIndex);
+        this.focusDynamicField(nextIndex);
         this.scrollToBottom();
     };
 
@@ -112,24 +117,10 @@ class Add extends Component {
             value: "",
             checked: false
         };
-        await this.addField(field, this.activeInputIndex);
-
-        this.focusNext("input", ".removable-text-checkbox-wrapper input", this.activeInputIndex);
-        this.activeInputIndex = -1;
-
-        this.scrollToBottom();
-    };
-
-    onEnterPress = async (i) => {
-        let field = {
-            type: "listItem",
-            value: "",
-            checked: false
-        };
-        await this.addField(field, i + 1);
-
-        this.focusNext("input", ".removable-text-checkbox-wrapper input", i + 1);
-
+        let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.dynamicFields.length;
+        await this.addField(field, nextIndex);
+        this.focusDynamicField(nextIndex);
         this.scrollToBottom();
     };
 
@@ -139,15 +130,8 @@ class Add extends Component {
                 dynamicFields: [...this.state.dynamicFields.slice(0, i), ...this.state.dynamicFields.slice(i + 1)]
             }, resolve);
         });
-
-        i = i + 1;
-
-        let nodes = Array.prototype.slice.call(document.querySelector(".add-content-wrapper").children);
-
-        if (nodes[i] && nodes[i].classList.contains("removable-text-checkbox-wrapper")) {
-            nodes[i].querySelector("input").focus();
-        } else if (nodes[i - 1] && nodes[i - 1].classList.contains("removable-text-checkbox-wrapper")) {
-            nodes[i - 1].querySelector("input").focus();
+        if (!this.focusDynamicField(i)) {
+            this.focusDynamicField(i - 1);
         }
     };
 
@@ -157,7 +141,6 @@ class Add extends Component {
             uri: url
         };
         await this.addField(field, this.activeInputIndex);
-
         this.scrollToBottom();
     };
 
@@ -223,14 +206,6 @@ class Add extends Component {
         })
     };
 
-    catchFocusedInput = () => {
-        let activeElement = document.activeElement.closest(".add-content-item");
-
-        let nodes = Array.prototype.slice.call(document.querySelector(".add-content-wrapper").children);
-        let index = nodes.indexOf(activeElement);
-        this.activeInputIndex = index;
-    };
-
     render() {
         let {t} = this.props;
         let priorityOptions = notesService.getPriorityOptions();
@@ -270,7 +245,7 @@ class Add extends Component {
                                     return (
                                         <RemovableTextArea
                                             key={i}
-                                            className="add-content-item"
+                                            className="add-content-item dynamic-field"
                                             placeholder={t("input-placeholder-text")}
                                             value={a.value}
                                             onChange={(value) => {
@@ -285,7 +260,7 @@ class Add extends Component {
                                     return (
                                         <RemovableTextCheckBox 
                                             key={i} 
-                                            className="add-content-item"
+                                            className="add-content-item dynamic-field"
                                             onListItemRemove={(inputRef) => this.onDynamicItemRemove(i)}
                                             onTextChange={(text) => {
                                                 let dynamicFields = this.state.dynamicFields.slice();
@@ -297,7 +272,7 @@ class Add extends Component {
                                                 dynamicFields[i] = {...dynamicFields[i], checked: value};                                         
                                                 this.setState({dynamicFields});
                                             }}
-                                            onEnterPress={() => this.onEnterPress(i)}
+                                            onEnterPress={() => this.addListItem(i)}
                                             textValue={a.value} 
                                             value={a.checked}                                                                                                                       
                                         />
@@ -306,7 +281,7 @@ class Add extends Component {
                                     return (
                                         <RemovableImage 
                                             key={i}
-                                            className="add-content-item"
+                                            className="add-content-item dynamic-field"
                                             src={a.uri}
                                             onClick={() => this.showImage(i)}
                                             onRemove={() => this.onDynamicItemRemove(i)}
@@ -318,7 +293,6 @@ class Add extends Component {
                         }
                         <div className="add-actions-wrapper">
                             <button
-                                onTouchStart={this.catchFocusedInput}
                                 onClick={this.addListItem}
                             >
                                 <img
@@ -328,7 +302,6 @@ class Add extends Component {
                                 <span>{t("list-item-btn")}</span>     
                             </button>  
                             <button 
-                                onTouchStart={this.catchFocusedInput}                                
                                 onClick={this.addInput}
                             >
                                 <img 
@@ -344,7 +317,6 @@ class Add extends Component {
                                     <button 
                                         onClick={props.onClick}
                                         className="camera-button"
-                                        onTouchStart={this.catchFocusedInput}
                                     >
                                         <img 
                                             src={CameraImg} 
