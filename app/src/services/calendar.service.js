@@ -20,10 +20,10 @@ class CalendarService {
                 lastAction != 'DELETE' 
                 AND lastAction != 'CLEAR' 
                 AND (
-                    (repeatType = 'no-repeat' AND added >= ? AND added <= ?)
+                    (repeatType = 'no-repeat' OR forkFrom != -1 AND added >= ? AND added <= ?)
                     OR (repeatType = 'any' AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
                     OR (t.forkFrom = -1 AND repeatType != 'any')
-                )
+                );
         `, [intervalStartDate, intervalEndDate, intervalStartDate, intervalEndDate]);
 
         let repeatableDay = 0;
@@ -40,7 +40,7 @@ class CalendarService {
                 continue;
             }
 
-            if (note.added !== -1) {
+            if (note.added !== -1 && note.repeatType === "no-repeat") {
                 dates[note.added] = (dates[note.added] || 0) + 1;
             } else {
                 if (note.repeatType === "week") {
