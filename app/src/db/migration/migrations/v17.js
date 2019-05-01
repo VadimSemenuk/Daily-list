@@ -13,7 +13,8 @@ export default {
         await alterTasksTable();
         await forkFromFieldToUUID();
         await alterSettingsTable();
-        await addErrorsTable();
+        await addErrorsLogsTable();
+        await addLoadsLogsTable();
 
         let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
         if (!token || !token.id) {
@@ -54,17 +55,17 @@ export default {
                 (   
                     deviceId TEXT,
                     isRateDialogShowed INTEGER,
-                    nextVersionMigrated INTEGER,
+                    backupMigrated INTEGER,
                     appInstalledDate INTEGER
                 );
             `);
 
             await execureSQL(`
-                INSERT INTO MetaInfo (deviceId, isRateDialogShowed, nextVersionMigrated, appInstalledDate)
+                INSERT INTO MetaInfo (deviceId, isRateDialogShowed, backupMigrated, appInstalledDate)
                 SELECT 
                     deviceId, 
                     0 as isRateDialogShowed,
-                    0 as nextVersionMigrated,
+                    0 as backupMigrated,
                     ? as appInstalledDate
                 FROM MetaInfo_OLD
             `, [moment().startOf("day").valueOf()]);
@@ -239,12 +240,23 @@ export default {
             await execureSQL(`DROP TABLE Settings_OLD;`);
         }
 
-        async function addErrorsTable () {
+        async function addErrorsLogsTable () {
             await execureSQL(`
-                CREATE TABLE IF NOT EXISTS ErrorLogs
+                CREATE TABLE IF NOT EXISTS ErrorsLogs
                 (
                     date INTEGER,
-                    message TEXT
+                    message TEXT,
+                    deviceId TEXT
+                );
+            `);
+        }
+
+        async function addLoadsLogsTable () {
+            await execureSQL(`
+                CREATE TABLE IF NOT EXISTS LoadLogs
+                (
+                    date INTEGER,
+                    deviceId TEXT
                 );
             `);
         }

@@ -5,13 +5,13 @@ import config from '../config/config';
 import throttle from "../utils/throttle";
 
 class DeviceService {
-    setNextVersionMigrationState(state) {
-        return executeSQL(`UPDATE MetaInfo SET nextVersionMigrated = ?;`, [+state]);
+    setBackupMigrationState(state) {
+        return executeSQL(`UPDATE MetaInfo SET backupMigrated = ?;`, [+state]);
     }
 
     async getMetaInfo() {
         let select = await executeSQL(`
-            SELECT deviceId, isRateDialogShowed, nextVersionMigrated, appInstalledDate
+            SELECT deviceId, isRateDialogShowed, backupMigrated, appInstalledDate
             FROM MetaInfo;
         `);
         if (select.rows) {
@@ -19,33 +19,30 @@ class DeviceService {
             return {
                 deviceId: metaInfo.deviceId,
                 isRateDialogShowed: Boolean(metaInfo.isRateDialogShowed),
-                nextVersionMigrated: Boolean(metaInfo.nextVersionMigrated),
+                backupMigrated: Boolean(metaInfo.backupMigrated),
                 appInstalledDate: moment(metaInfo.appInstalledDate)
             }
         } else {
             return {}
         }
     }
-    
-    async getDeviceId() {
-        let select = await executeSQL(`SELECT deviceId FROM MetaInfo;`);
-        if (select.rows && select.rows.length && select.rows.item(0)) {
-            return select.rows.item(0).deviceId
+
+    async logLoad(deviceId) {
+        if (!deviceService.hasNetworkConnection()) {
+            return executeSQL(`INSERT INTO LoadLogs (date, deviceId) VALUES (?, ?, ?)`, [+new Date(), deviceId]);
+        } else {
+            return fetch(`${config.apiURL}/log/load`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({deviceId})
+            }).catch((err) => console.warn(err));
         }
     }
 
-    async logLoad(deviceId) {
-        return fetch(`${config.apiURL}/log/load`, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({deviceId})        
-        }).catch((err) => console.warn(err));
-    }
-
-    logError = throttle((err, additionalInto) => {
+    logError = throttle((err, deviceId, additionalInto) => {
         console.warn(err);
 
         if (err.constructor && err.constructor.name === "SQLError") {
@@ -56,28 +53,28 @@ class DeviceService {
         let log = {
             name: err.name,
             message: err.message,
-            additionalInto
+            additionalInto,
         };
 
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            return executeSQL(`INSERT INTO ErrorLogs (date, message) VALUES (?, ?)`, [+new Date(), JSON.stringify(log)]);
+        if (!deviceService.hasNetworkConnection()) {
+            return executeSQL(`INSERT INTO ErrorsLogs (date, message, deviceId) VALUES (?, ?, ?)`, [+new Date(), JSON.stringify(log), deviceId]);
+        } else {
+            return fetch(`${config.apiURL}/log/error`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({error: log, deviceId})
+            }).catch((err) => console.warn(err));
         }
-
-        return fetch(`${config.apiURL}/log/error`, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(log)        
-        }).catch((err) => console.warn(err));
     }, 5000);
 
-    async logSaved() {
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+    async uploadSavedErrorLogs() {
+        if (!deviceService.hasNetworkConnection()) {
             return false;
         }
-        let select = await executeSQL(`SELECT date, message FROM ErrorLogs`);
+        let select = await executeSQL(`SELECT date, message, deviceId FROM ErrorLogs`);
 
         if (select && select.rows.length) {
             let logs = [];
@@ -85,7 +82,8 @@ class DeviceService {
                 let item = select.rows.item(i);
                 logs.push({
                     date: new Date(item.date),
-                    message: JSON.parse(item.message)
+                    message: JSON.parse(item.message),
+                    deviceId: item.deviceId
                 });
             }
 
@@ -106,6 +104,45 @@ class DeviceService {
                 executeSQL(`DELETE FROM ErrorLogs`);
             }
         }
+    }
+
+    async uploadSavedLoadLogs() {
+        if (!deviceService.hasNetworkConnection()) {
+            return false;
+        }
+        let select = await executeSQL(`SELECT date, deviceId FROM LoadLogs`);
+
+        if (select && select.rows.length) {
+            let logs = [];
+            for (let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+                logs.push({
+                    date: new Date(item.date),
+                    deviceId: item.deviceId
+                });
+            }
+
+            let logged = await fetch(`${config.apiURL}/log/load`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(logs)
+            })
+                .then((res) => {
+                    return res.status === 200;
+                })
+                .catch((err) => console.warn(err));
+
+            if (logged) {
+                executeSQL(`DELETE FROM LoadLogs`);
+            }
+        }
+    }
+
+    hasNetworkConnection() {
+        return window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine;
     }
 }
 

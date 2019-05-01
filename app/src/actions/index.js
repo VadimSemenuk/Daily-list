@@ -396,11 +396,6 @@ export function googleSignIn() {
         return authService.googleSignIn()
             .then((user) => {
                 dispatch(triggerLoader());
-                
-                if (!getState().meta.nextVersionMigrated) {
-                    dispatch(uploadBatchBackup());
-                    dispatch(setNextVersionMigrationState(true));
-                }
 
                 return dispatch({
                     type: "RECIVE_USER",
@@ -558,44 +553,48 @@ export function restoreBackup() {
     }
 }
 
-export function updateLastBackupTime() {
-    return function(dispatch, getState) {
-        dispatch(triggerLoader());
+export function updateLastBackupTime(nextTime) {
+    return async function(dispatch, getState) {
+        try {
+            let token = getState().user;
 
-        let token = getState().user;
-
-        return backupService.getUserLastBackupTime(token)
-            .then((time) => {
+            if (!nextTime) {
                 dispatch(triggerLoader());
-                if (!time) {
-                    return;
-                }
-                let nextToken = { 
-                    ...token, 
+
+                nextTime = await backupService.getUserLastBackupTime(token);
+
+                dispatch(triggerLoader());
+            }
+
+            if (nextTime) {
+                let nextToken = {
+                    ...token,
                     backup: {
                         ...token.backup,
-                        lastBackupTime: moment(time)
-                    }  
+                        lastBackupTime: moment(nextTime)
+                    }
                 };
                 dispatch(setToken(nextToken));
-            })
-            .catch((err) => {
-                let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> updateLastBackupTime()",
-                    deviceId
-                });
-            })
+            }
+        } catch(err) {
+            dispatch(triggerLoader(null, false));
+
+            let deviceId = getState().meta.deviceId;
+            deviceService.logError(err, {
+                path: "action/index.js -> updateLastBackupTime()",
+                deviceId
+            });
+        }
     }
 }
 
 // meta
-export function setNextVersionMigrationState(state) {
+export function setBackupMigrationState(state) {
     return function(dispatch) {
-        return deviceService.setNextVersionMigrationState(state)
+        return deviceService.setBackupMigrationState(state)
             .then(() => {
                 dispatch({
-                    type: "SET_NEXTVERSIONMIGRATION_STATE",
+                    type: "SET_BACKUP_MIGRATION_STATE",
                     state
                 })
             })

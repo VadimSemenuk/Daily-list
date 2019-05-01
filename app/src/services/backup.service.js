@@ -5,6 +5,7 @@ import notesService from "./notes.service";
 import config from "../config/config";
 
 import CustomError from "../common/CustomError";
+import deviceService from "./device.service";
 
 class BackupService {
     async restoreNotesBackup(token) {
@@ -30,7 +31,7 @@ class BackupService {
     }
 
     async uploadNotesBatchBackup(notes, token) {
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+        if (!deviceService.hasNetworkConnection()) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 

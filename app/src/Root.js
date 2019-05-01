@@ -23,23 +23,28 @@ import Modal from "./components/Modal/Modal";
 import authService from "./services/auth.service";
 
 import GoogleImg from './assets/img/google.svg';
+import deviceService from "./services/device.service";
 
 class Root extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            nextVersionMigrationModal: false,
+            backupMigrationModal: false,
             noBackupNotificationModal: false
         }
     }
 
     componentDidMount() {
-        this.nextVersionMigration();
         this.setKeyboardEvents();
-        Modal.init();  
+        Modal.init();
         this.backupNotes();
-        this.showNoBackupNotificationIfNeed();
+
+        if (!this.props.meta.backupMigrated) {
+            this.backupMigrationNotification();
+        } else {
+            this.showNoBackupNotificationIfNeed();
+        }
     }
 
     setKeyboardEvents() {
@@ -57,35 +62,31 @@ class Root extends Component {
         });
     }
        
-    nextVersionMigration() {
-        if (!this.props.meta.nextVersionMigrated) {
-            if (this.props.user && this.props.user.id) {
-                authService.googleSignOut();
-                this.setState({
-                    nextVersionMigrationModal: true
-                })
-            } else {
-                this.props.setNextVersionMigrationState(true);
-            }
+    backupMigrationNotification() {
+        if (this.props.user && this.props.user.id) {
+            authService.googleSignOut();
         }
+        this.setState({
+            backupMigrationModal: true
+        });
     }
 
-    discardNextVersionMigration = () => {
-        this.props.setNextVersionMigrationState(true);
+    discardBackupMigrationModal = () => {
+        this.props.setBackupMigrationState(true);
     };
 
-    closeDialog = () => {
+    closeBackupMigrationModal = () => {
         this.setState({
-            nextVersionMigrationModal: false
+            backupMigrationModal: false
         });
     };
 
     backupNotes = () => {
         if (
-            this.props.meta.nextVersionMigrated
+            this.props.meta.backupMigrated
             && this.props.user
             && this.props.user.settings.autoBackup
-            && (window.cordova ? navigator.connection.type !== window.Connection.NONE : navigator.onLine)
+            && deviceService.hasNetworkConnection()
         ) {
             this.props.uploadBatchBackup(true);
         }   
@@ -172,19 +173,23 @@ class Root extends Component {
                     <Loader />
 
                     <Modal 
-                        isOpen={this.state.nextVersionMigrationModal} 
-                        onRequestClose={this.closeDialog}
+                        isOpen={this.state.backupMigrationModal}
+                        onRequestClose={this.closeBackupMigrationModal}
                         actionItems={[
                             {
-                                text: t("re-enter-later-button")
+                                text: t("move-to-backup-page"),
+                                onClick: () => this.props.history.push(`${this.props.match.url}/backup`)
+                            },
+                            {
+                                text: t("later")
                             },
                             {
                                 text: t("re-enter-discard-button"),
-                                onClick: this.discardNextVersionMigration
+                                onClick: this.discardBackupMigrationModal
                             }
                         ]}
                     >
-                        <h3>{t("re-enter-request-title")}</h3>
+                        <h3>{t("attention")}</h3>
                         <p>{t("re-enter-request-description")}</p>
                         <button
                             className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
