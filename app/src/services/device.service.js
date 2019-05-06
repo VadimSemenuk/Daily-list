@@ -1,8 +1,8 @@
 import moment from "moment";
 
 import executeSQL from '../utils/executeSQL';
-import config from '../config/config';
 import throttle from "../utils/throttle";
+import apiService from "./api.service";
 
 class DeviceService {
     setBackupMigrationState(state) {
@@ -31,14 +31,8 @@ class DeviceService {
         if (!deviceService.hasNetworkConnection()) {
             return executeSQL(`INSERT INTO LoadLogs (date, deviceId) VALUES (?, ?, ?)`, [+new Date(), deviceId]);
         } else {
-            return fetch(`${config.apiURL}/log/load`, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({deviceId})
-            }).catch((err) => console.warn(err));
+            apiService.post('log/load', {deviceId})
+                .catch((err) => console.log(err));
         }
     }
 
@@ -57,16 +51,10 @@ class DeviceService {
         };
 
         if (!deviceService.hasNetworkConnection()) {
-            return executeSQL(`INSERT INTO ErrorsLogs (date, message, deviceId) VALUES (?, ?, ?)`, [+new Date(), JSON.stringify(log), deviceId]);
+            return executeSQL(`INSERT INTO ErrorLogs (date, message, deviceId) VALUES (?, ?, ?)`, [+new Date(), JSON.stringify(log), deviceId]);
         } else {
-            return fetch(`${config.apiURL}/log/error`, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({error: log, deviceId})
-            }).catch((err) => console.warn(err));
+            apiService.post('log/error', {error: log, deviceId})
+                .catch((err) => console.log(err));
         }
     }, 5000);
 
@@ -87,18 +75,9 @@ class DeviceService {
                 });
             }
 
-            let logged = await fetch(`${config.apiURL}/log/error`, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(logs)
-            })
-                .then((res) => {
-                    return res.status === 200;
-                })
-                .catch((err) => console.warn(err));
+            let logged = await apiService.post('log/error', logs)
+                .then((res) => res.status === 200)
+                .catch((err) => console.log(err));
 
             if (logged) {
                 executeSQL(`DELETE FROM ErrorLogs`);
@@ -122,18 +101,9 @@ class DeviceService {
                 });
             }
 
-            let logged = await fetch(`${config.apiURL}/log/load`, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(logs)
-            })
-                .then((res) => {
-                    return res.status === 200;
-                })
-                .catch((err) => console.warn(err));
+            let logged = await apiService.post('log/load', logs)
+                .then((res) => res.status === 200)
+                .catch((err) => console.log(err));
 
             if (logged) {
                 executeSQL(`DELETE FROM LoadLogs`);

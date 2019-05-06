@@ -38,7 +38,7 @@ let languageSettings = [{
     val: "be"
 }];
 
-class SetitngsService {
+class SettingsService {
 
     getSortTypeSettings() {
         return [...sortTypeSettings]
@@ -113,6 +113,6 @@ class SetitngsService {
     }
 }
 
-let setitngsService = new SetitngsService();
+let settingsService = new SettingsService();
 
-export default setitngsService;
+export default settingsService;

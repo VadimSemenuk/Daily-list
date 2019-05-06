@@ -11,10 +11,11 @@ import Header from '../../components/Header/Header';
 import {InsetListItem, TriggerListItem} from "../../components/ListItem/ListItem";
 
 import './About.scss';
+import deviceService from "../../services/device.service";
 
 class About extends Component {
     launchMarket = () => {
-        if (navigator.connection.type === window.Connection.NONE) {
+        if (!deviceService.hasNetworkConnection()) {
             window.plugins.toast.showLongBottom(this.props.t("internet-required"));       
             return 
         }

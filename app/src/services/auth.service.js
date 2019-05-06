@@ -3,10 +3,14 @@ import moment from 'moment';
 
 import config from "../config/config";
 import CustomError from "../common/CustomError";
+import apiService from "./api.service";
+import deviceService from "./device.service";
 
 class AuthService {
+    token = null;
+
     googleSignIn = async () => {
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+        if (!deviceService.hasNetworkConnection()) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
@@ -41,21 +45,12 @@ class AuthService {
                 reject
             );
         });
-        // check error structure
+
         if (!googleUser) {
             throw new Error("user not found");
         }
 
-        let user = await fetch(`${config.apiURL}/auth/sign-in-google`, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                idToken: googleUser.idToken
-            })
-        })
+        let user = await apiService.post("auth/sign-in-google", {idToken: googleUser.idToken})
             .then((res) => {
                 if (res.status === 200) {
                     return res.json();
@@ -63,8 +58,6 @@ class AuthService {
             });
 
         if (!user) {
-            // window.plugins.toast.showLongBottom(i18next.t("error-repeat-common"));
-            // return null;
             throw new Error("user not found");
         }
 
@@ -111,18 +104,24 @@ class AuthService {
             };
         }
         localStorage.setItem(config.LSTokenKey, JSON.stringify(nextToken));
+        this.token = token;
     }
 
     getToken() {
-        let token = JSON.parse(localStorage.getItem(config.LSTokenKey));
-        if (token !== null) {
-            token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? moment(token.backup.lastBackupTime) : null;
+        if (this.token) {
+            return this.token
+        } else {
+            let token = JSON.parse(localStorage.getItem(config.LSTokenKey));
+            if (token !== null) {
+                token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? moment(token.backup.lastBackupTime) : null;
+            }
+            return token;
         }
-        return token;
     }
 
     resetToken() {
         localStorage.removeItem(config.LSTokenKey);
+        this.token = null;
     }
 }
 

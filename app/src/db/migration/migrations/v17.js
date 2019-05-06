@@ -242,7 +242,7 @@ export default {
 
         async function addErrorsLogsTable () {
             await execureSQL(`
-                CREATE TABLE IF NOT EXISTS ErrorsLogs
+                CREATE TABLE IF NOT EXISTS ErrorLogs
                 (
                     date INTEGER,
                     message TEXT,

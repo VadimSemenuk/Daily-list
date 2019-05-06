@@ -21,8 +21,6 @@ import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
 
 import authService from "./services/auth.service";
-
-import GoogleImg from './assets/img/google.svg';
 import deviceService from "./services/device.service";
 
 class Root extends Component {
@@ -181,9 +179,6 @@ class Root extends Component {
                                 onClick: () => this.props.history.push(`${this.props.match.url}/backup`)
                             },
                             {
-                                text: t("later")
-                            },
-                            {
                                 text: t("re-enter-discard-button"),
                                 onClick: this.discardBackupMigrationModal
                             }
@@ -191,11 +186,6 @@ class Root extends Component {
                     >
                         <h3>{t("attention")}</h3>
                         <p>{t("re-enter-request-description")}</p>
-                        <button
-                            className={`text block google-in img-text-button${this.props.loader ? " disabled" : ""}`} 
-                            type="button"
-                            onClick={this.props.googleSignIn}
-                        ><img src={GoogleImg} alt="google sign in"/>{t("google-sign-in")}</button>
                     </Modal>
 
                     <Modal 

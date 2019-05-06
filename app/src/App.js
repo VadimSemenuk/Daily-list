@@ -41,7 +41,7 @@ export default class App extends Component {
         });
 
         deviceService.logLoad(this.state.deviceId);
-        if (!deviceService.hasNetworkConnection()) {
+        if (deviceService.hasNetworkConnection()) {
             deviceService.uploadSavedErrorLogs();
             deviceService.uploadSavedLoadLogs();
         }

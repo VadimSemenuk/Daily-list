@@ -2,25 +2,17 @@ import i18next from 'i18next';
 
 import notesService from "./notes.service";
 
-import config from "../config/config";
-
 import CustomError from "../common/CustomError";
 import deviceService from "./device.service";
+import apiService from "./api.service";
 
 class BackupService {
     async restoreNotesBackup(token) {
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+        if (!deviceService.hasNetworkConnection) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
-        let notes = await fetch(`${config.apiURL}/notes/backup`, {
-            method: "GET",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token.token
-            }
-        })
+        let notes = await apiService.post('notes/backup')
             .then((res) => res.json());
 
         if (!notes || !notes.length) {
@@ -30,46 +22,25 @@ class BackupService {
         return await notesService.restoreNotesBackup(notes);    
     }
 
-    async uploadNotesBatchBackup(notes, token) {
+    async uploadNotesBatchBackup(notes) {
         if (!deviceService.hasNetworkConnection()) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
-        return fetch(`${config.apiURL}/notes/backup/batch`, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token.token
-            },
-            body: JSON.stringify({
-                notes
-            })
-        })
+        apiService.post('notes/backup/batch', {notes});
     }
 
     async uploadNoteBackup(note, token, removeForkNotes) {
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
+        if (!deviceService.hasNetworkConnection()) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
-        let method = "POST";
+        let method = "post";
         if (note.isSynced) {
-            method = "PUT";
+            method = "put";
         }
 
-        return fetch(`${config.apiURL}/notes/backup`, {
-            method,
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token.token
-            },
-            body: JSON.stringify({
-                note,
-                removeForkNotes
-            })
-        })
+        apiService[method]('notes/backup', {note, removeForkNotes})
             .then((res) => {
                 // TODO test statuses
                 if (res.status === 200) {
@@ -78,18 +49,12 @@ class BackupService {
             });
     }
 
-    async getUserLastBackupTime(token) {
-        if (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine) {
-            return false;
+    async getUserLastBackupTime() {
+        if (!deviceService.hasNetworkConnection()) {
+            return null;
         }
 
-        return await fetch(`${config.apiURL}/notes/backup/user-last-backup-time`, {
-            method: "GET",
-            credentials: "same-origin",
-            headers: {
-                "Authorization": token.token
-            },
-        })
+        return await apiService.get('notes/backup/user-last-backup-time')
             .then((res) => {
                 if (res.status === 200) {
                     return res.json();

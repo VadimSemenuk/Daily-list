@@ -1,19 +1,12 @@
-import config from "../config/config";
-import notesService from "./notes.service"; 
+import notesService from "./notes.service";
 import executeSQL from '../utils/executeSQL';
-import authService from "./auth.service";
+import apiService from "./api.service";
+import deviceService from "./device.service";
 
 class SynchronizationService {
     async getNewNotes(deviceId, userId) {
         let notSynkedLocalNotes = await this.getNotSyncedLocalNotes(userId);
-        let newNotes = await fetch(`${config.apiURL}/sync/new?deviceId=${deviceId}`, {
-            method: "GET",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            }
-        })
+        let newNotes = await apiService.get('sync/new', {deviceId})
             .then((res) => {
                 if (res.status === 200) {
                     return res.json();
@@ -54,18 +47,7 @@ class SynchronizationService {
             settedNoteUUIDs.push(newNote.uuid);
         }
 
-        await fetch(`${config.apiURL}/sync/confirm-local-addition`, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            },
-            body: JSON.stringify({
-                settedNoteUUIDs,
-                deviceId
-            })
-        })
+        await apiService.post('sync/confirm-local-addition', {settedNoteUUIDs, deviceId})
             .catch((err) => console.warn(err));
     }
 
@@ -101,18 +83,7 @@ class SynchronizationService {
     }
 
     async sendNewLocalNotes(notSynkedLocalNotes, deviceId, userId) {
-        await fetch(`${config.apiURL}/sync/apply-local-changes`, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()                
-            },
-            body: JSON.stringify({
-                deviceId,
-                notSynkedLocalNotes
-            })
-        })
+        await apiService.post('sync/apply-local-changes', {notSynkedLocalNotes, deviceId})
             .then((res) => this.resetNotSyncedLocalNotes(userId))
             .catch((err) => console.warn(err))
     }
@@ -127,7 +98,7 @@ class SynchronizationService {
     }
 
     async syncNote(action, note) {
-        if (true || (window.cordova ? navigator.connection.type === window.Connection.NONE : !navigator.onLine)) {
+        if (true || !deviceService.hasNetworkConnection()) {
             return false
         }
 
@@ -158,57 +129,41 @@ class SynchronizationService {
     }
 
     insertNote(note) {
-        return this.syncRequest("/notes", "POST", { 
-            note
-        })
+        return apiService.post('notes', {note});
     }
 
     updateNote(note) {
-        return this.syncRequest("/notes", "PUT", {
-            note
-        })
+        return apiService.put('notes', {note});
     }
 
+
     updateFinishedState(note) {
-        return this.syncRequest("/notes/finish-state", "POST", {
+        return apiService.post('notes/finish-state', {
             note: {
                 state: note.state,
-                uuid: note.uuid,
-                lastActionTime: note.lastActionTime
+                    uuid: note.uuid,
+                    lastActionTime: note.lastActionTime
             }
-        })
+        });
     }
 
     updateDynamicFields(note) {
-        return this.syncRequest("/notes/dynamic-fields", "POST", {
+        return apiService.post('notes/dynamic-fields', {
             note: {
                 dynamicFields: note.dynamicFields,
                 uuid: note.uuid,
                 lastActionTime: note.lastActionTime
             }
-        })
+        });
     }
 
     deleteNote(note) {
-        return this.syncRequest("/notes", "DELETE", {
+        return apiService.delete('notes', {
             note: {
                 uuid: note.uuid,
                 lastActionTime: note.lastActionTime
             }
-        })
-    }
-
-    syncRequest(path, method, body) {
-        return fetch(`${config.apiURL}${path}`, {
-            method,
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            },
-            body: JSON.stringify({...body, deviceId: window.DEVICE_IMEI})
-        })
-        .catch((err) => console.warn(err));
+        });
     }
 }
 

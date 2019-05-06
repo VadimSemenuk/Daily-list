@@ -178,9 +178,9 @@ class Add extends Component {
         let note = this.getInputsValues();
 
         if (this.props.match.path === "/edit") {
-            await this.props.updateNote(note, this.prevNote, this.props.settings.calendarNotesCounter);
+            await this.props.updateNote(note, this.prevNote);
         } else {
-            await this.props.addNote(note, this.props.settings.calendarNotesCounter);
+            await this.props.addNote(note);
         }
 
         this.props.history.goBack();
