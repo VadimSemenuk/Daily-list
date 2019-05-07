@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {HashRouter, Route, Redirect} from 'react-router-dom';
+import {HashRouter, Route, Redirect, withRouter} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
@@ -30,7 +30,7 @@ class Root extends Component {
         this.state = {
             backupMigrationModal: false,
             noBackupNotificationModal: false
-        }
+        };
     }
 
     componentDidMount() {
@@ -170,26 +170,28 @@ class Root extends Component {
                     />
                     <Loader />
 
-                    <Modal 
-                        isOpen={this.state.backupMigrationModal}
-                        onRequestClose={this.closeBackupMigrationModal}
-                        actionItems={[
-                            {
-                                text: t("move-to-backup-page"),
-                                onClick: () => this.props.history.push(`${this.props.match.url}/backup`)
-                            },
-                            {
-                                text: t("re-enter-discard-button"),
-                                onClick: this.discardBackupMigrationModal
-                            }
-                        ]}
-                    >
-                        <h3>{t("attention")}</h3>
-                        <p>{t("re-enter-request-description")}</p>
-                    </Modal>
+                    <Route render={props => (
+                        <Modal
+                            isOpen={this.state.backupMigrationModal}
+                            onRequestClose={this.closeBackupMigrationModal}
+                            actionItems={[
+                                {
+                                    text: t("move-to-backup-page"),
+                                    onClick: () => props.history.push(`/settings/backup`)
+                                },
+                                {
+                                    text: t("re-enter-discard-button"),
+                                    onClick: this.discardBackupMigrationModal
+                                }
+                            ]}
+                        >
+                            <h3>{t("attention")}</h3>
+                            <p>{t("re-enter-request-description")}</p>
+                        </Modal>
+                    )}/>
 
                     <Modal 
-                        isOpen={this.props.error} 
+                        isOpen={this.props.error}
                         onRequestClose={this.props.triggerErrorModal}
                         actionItems={[
                             {
@@ -202,19 +204,21 @@ class Root extends Component {
                         ]}
                     >{t(this.props.error.message)}</Modal>
 
-                    <Modal
-                        isOpen={this.state.noBackupNotificationModal}
-                        onRequestClose={this.triggerNoBackupNotificationDialog}
-                        actionItems={[
-                            {
-                                text: t("close")
-                            },
-                            {
-                                text: t("move-to-backup-page"),
-                                onClick: () => this.props.history.push(`${this.props.match.url}/backup`)
-                            },
-                        ]}
-                    >{t("no-backup-notification")}</Modal>
+                    <Route render={props => (
+                        <Modal
+                            isOpen={this.state.noBackupNotificationModal}
+                            onRequestClose={this.triggerNoBackupNotificationDialog}
+                            actionItems={[
+                                {
+                                    text: t("close")
+                                },
+                                {
+                                    text: t("move-to-backup-page"),
+                                    onClick: () => props.history.push(`/settings/backup`)
+                                },
+                            ]}
+                        >{t("no-backup-notification")}</Modal>
+                    )}/>
                 </div>
             </HashRouter>
         );

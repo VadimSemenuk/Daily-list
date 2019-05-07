@@ -20,7 +20,7 @@ let buttons = {
     "add": [2, 3],  
     "password": [],
     default: [2],                       
-}
+};
 
 let Header = (props) => (
     <header className="theme-header-background">
@@ -74,7 +74,7 @@ let Header = (props) => (
                                     alt="date"    
                                 />
                             </button>
-                        )
+                        );
                     case 1: 
                         if (props.settings.notesShowInterval === 0) {
                             return null
@@ -90,7 +90,7 @@ let Header = (props) => (
                                     alt="date"    
                                 />
                             </Link>                    
-                        )
+                        );
                     case 2:        
                         return (                                       
                             <button
@@ -103,7 +103,7 @@ let Header = (props) => (
                                     alt="date"    
                                 />
                             </button>
-                        )
+                        );
                     case 3:
                         return (
                             <button 
@@ -115,7 +115,7 @@ let Header = (props) => (
                                     alt="date"    
                                 />
                             </button>    
-                        )
+                        );
                     case 4:         
                         return (  
                             <Link
@@ -128,7 +128,7 @@ let Header = (props) => (
                                     alt="date"    
                                 />
                             </Link>
-                        )
+                        );
                     case 5: 
                         return ( 
                             props.user &&
@@ -141,14 +141,14 @@ let Header = (props) => (
                                     alt="backup"    
                                 />
                             </button>
-                        )
+                        );
                     default: return null
                     }
                 })
             }
         </div> 
     </header>
-)
+);
 
 function mapStateToProps(state) {
     return {      

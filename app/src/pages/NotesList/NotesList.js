@@ -142,7 +142,7 @@ class NotesList extends PureComponent {
         await this.props.updateNoteDate(this.state.listItemDialogVisible.note, nextDate);
         this.setState({
             listItemDialogVisible: false
-        })
+        });
     };
 
     render() {
