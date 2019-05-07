@@ -58,7 +58,7 @@ class NotesService {
         }
     }
 
-    async getNotesByDates (dates) {
+    async getNotesByDates(dates) {
         let tasks = dates.map((a) => this.getDayNotes(a));
         return Promise.all(tasks);
     }

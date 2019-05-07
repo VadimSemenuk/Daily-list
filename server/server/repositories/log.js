@@ -1,51 +1,42 @@
-var format = require('pg-format');
+let format = require('pg-format');
 
 module.exports = class {
     constructor(db) {
         this.db = db;
     }
 
-    async logLoad(deviceId) {
-        let insert = await this.db.query(`
-            INSERT INTO LoadLogs (deviceId, date) VALUES ($deviceId, $date);
-        `, {
-            deviceId,
-            date: new Date()
-        })
-        .catch((err) => {
-            console.log(err);
-            return false;
-        })
+    logLoad(log) {
+        if (Array.isArray(log)) {
+            let values = log.map((a) => [a.deviceId, new Date(a.date)]);
 
-        return insert;
+            let sql = format(`INSERT INTO LoadLogs (deviceId, date) VALUES %L`, values);
+            return this.db.query(sql);
+        } else {
+            return this.db.query(
+                `INSERT INTO LoadLogs (deviceId, date) VALUES ($deviceId, $date);`,
+                {
+                    deviceId: log.deviceId,
+                    date: new Date()
+                }
+            );
+        }
     }
 
-    async logError(log) {
+    logError(log) {
         if (Array.isArray(log)) {
-            let values = log.map((a) => {
-                return [a.message.additionalInto.deviceId, new Date(a.date), JSON.stringify(a.message)]
-            });
+            let values = log.map((a) => [a.deviceId, new Date(a.date), JSON.stringify(a.message)]);
 
             let sql = format(`INSERT INTO ErrorLogs (deviceId, date, log) VALUES %L`, values);
-            let insert = await this.db.query(sql)
-                .catch((err) => {
-                    console.log(err);
-                    return false;
-                });
-            return insert;
+            return this.db.query(sql);
         } else {
-            let insert = await this.db.query(`
-                INSERT INTO ErrorLogs (deviceId, date, log) VALUES ($deviceId, $date, $log);
-            `, {
-                    deviceId: log.additionalInto.deviceId,
+            return this.db.query(
+                `INSERT INTO ErrorLogs (deviceId, date, log) VALUES ($deviceId, $date, $log);`,
+                {
+                    deviceId: log.deviceId,
                     date: new Date(),
-                    log: JSON.stringify(log)
-                })
-                    .catch((err) => {
-                        console.log(err);
-                        return false;
-                    });
-            return insert;
+                    log: JSON.stringify(log.message)
+                }
+                );
         }
     }
 };

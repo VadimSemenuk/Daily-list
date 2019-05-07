@@ -18,6 +18,7 @@ import themesService from "./services/themes.service";
 import deviceService from "./services/device.service";
 import notesService from "./services/notes.service";
 import authService from "./services/auth.service";
+import logsService from "./services/logs.service";
 
 let store = null;
 let i18n = null;
@@ -40,17 +41,17 @@ export default class App extends Component {
             appReady: true
         });
 
-        deviceService.logLoad(this.state.deviceId);
+        logsService.logLoad(this.state.deviceId);
         if (deviceService.hasNetworkConnection()) {
-            deviceService.uploadSavedErrorLogs();
-            deviceService.uploadSavedLoadLogs();
+            logsService.uploadSavedErrorLogs();
+            logsService.uploadSavedLoadLogs();
         }
     }
 
     async initApp() {
         await this.initDb()
             .catch(err => {
-                deviceService.logError(err, {
+                logsService.logError(err, {
                     path: "App.js/initDb"
                 });
             });

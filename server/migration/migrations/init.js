@@ -22,14 +22,14 @@ module.exports.up = async (db) => {
             note JSON,
             userId INTEGER references Users(id),
             datetime timestamp with time zone
-        )
+        );
 
         CREATE TABLE LoadLogs 
         (
             id SERIAL PRIMARY KEY,
             deviceId VARCHAR,
             date timestamp with time zone
-        )
+        );
 
         CREATE TABLE ErrorLogs 
         (
@@ -37,7 +37,7 @@ module.exports.up = async (db) => {
             deviceId VARCHAR,
             date timestamp with time zone,
             log JSON
-        )
+        );
     `)
 };
 

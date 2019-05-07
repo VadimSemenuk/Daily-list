@@ -8,6 +8,7 @@ import backupService from "../services/backup.service";
 
 import throttle from "../utils/throttle";
 import deviceService from "../services/device.service";
+import logsService from "../services/logs.service";
 
 // notes
 export function addNote (note) {
@@ -26,15 +27,18 @@ export function addNote (note) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-add"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> addNote()",
-                    note: {
-                        ...note,
-                        title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> addNote()",
+                        note: {
+                            ...note,
+                            title: !!note.title,
+                            dynamicFields: !!note.dynamicFields
+                        }
                     },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -58,15 +62,18 @@ export function updateNote (note, prevNote) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> updateNote()",
-                    note: {
-                        ...note,
-                        title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> updateNote()",
+                        note: {
+                            ...note,
+                            title: !!note.title,
+                            dynamicFields: !!note.dynamicFields
+                        },
                     },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -95,15 +102,18 @@ export function updateNoteDynamicFields (note, updatedState) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> updateNoteDynamicFields()",
-                    note: {
-                        ...note,
-                        title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> updateNoteDynamicFields()",
+                        note: {
+                            ...note,
+                            title: !!note.title,
+                            dynamicFields: !!note.dynamicFields
+                        },
                     },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -126,15 +136,18 @@ export function updateNoteDate (note, nextDate) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> updateNoteDate()",
-                    note: {
-                        ...note,
-                        title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> updateNoteDate()",
+                        note: {
+                            ...note,
+                            title: !!note.title,
+                            dynamicFields: !!note.dynamicFields
+                        }
                     },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -155,15 +168,18 @@ export function deleteNote (note) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-delete"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> deleteNote()",
-                    note: {
-                        ...note,
-                        title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> deleteNote()",
+                        note: {
+                            ...note,
+                            title: !!note.title,
+                            dynamicFields: !!note.dynamicFields
+                        }
                     },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -178,10 +194,13 @@ export function getDeletedNotes () {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-get-trash"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> getDeletedNotes()",
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> getDeletedNotes()",
+                    },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -204,15 +223,18 @@ export function restoreNote (note) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-restore"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> restoreNote()",
-                    note: {
-                        ...note,
-                        title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> restoreNote()",
+                        note: {
+                            ...note,
+                            title: !!note.title,
+                            dynamicFields: !!note.dynamicFields
+                        },
                     },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -230,10 +252,13 @@ export function cleanDeletedNotes () {
             .catch((err) => {
                 dispatch(triggerErrorModal("clean-trash-error"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> cleanDeletedNotes()",
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> cleanDeletedNotes()",
+                    },
                     deviceId
-                });
+                );
             });
     }
 }
@@ -265,10 +290,14 @@ export function updateNotes() {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-get-notes"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> updateNotes()",
-                    dates, deviceId
-                });
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> updateNotes()",
+                        dates
+                    },
+                    deviceId
+                );
             });
     }
 }
@@ -284,10 +313,14 @@ export function setDatesAndUpdateNotes (dates, dateIndex, period) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-get-notes"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> setDatesAndUpdateNotes()",
-                    dates, dateIndex, period, deviceId
-                });
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> setDatesAndUpdateNotes()",
+                        dates, dateIndex, period
+                    },
+                    deviceId
+                );
             });
     }
 }
@@ -304,10 +337,13 @@ export function updateDatesAndNotes (date, preRenderDate, nextIndex) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-get-notes"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> updateDatesAndNotes()",
-                    date, preRenderDate, nextIndex, deviceId
-                });
+                logsService.logError(
+                    err, {
+                        path: "action/index.js -> updateDatesAndNotes()",
+                        date, preRenderDate, nextIndex
+                    },
+                    deviceId
+                );
             });
     }
 }
@@ -325,10 +361,14 @@ export function setSetting (settingName, value, fn) {
             .catch((err) => {
                 dispatch(triggerErrorModal("error-common"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> setSetting()",
-                    settingName, value, deviceId
-                });
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> setSetting()",
+                        settingName, value
+                    },
+                    deviceId
+                );
             });
     }
 }
@@ -359,10 +399,14 @@ export function getCount (date, period) {
             }))
             .catch((err) => {
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> getCount()",
-                    date, period, deviceId
-                });
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> getCount()",
+                        date, period
+                    },
+                    deviceId
+                );
             });
     }
 }
@@ -377,10 +421,14 @@ export function getFullCount (date) {
             }))
             .catch((err) => {
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> getFullCount()",
-                    date, deviceId
-                });
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> getFullCount()",
+                        date
+                    },
+                    deviceId
+                );
             });
     }
 }
@@ -404,10 +452,13 @@ export function googleSignIn() {
 
                 dispatch(triggerErrorModal("error-sign-in", err.description));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> googleSignIn()",
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> googleSignIn()",
+                    },
                     deviceId
-                });
+                );
             })
     }
 }
@@ -429,10 +480,13 @@ export function googleSignOut() {
 
                 dispatch(triggerErrorModal("error-sign-out"));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> googleSignOut()",
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> googleSignOut()",
+                    },
                     deviceId
-                });
+                );
             })
     }
 }
@@ -472,16 +526,19 @@ let debouncedUploadBackup = throttle(async (note, removeForkNotes, inBackground,
 
         !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.description));
         let deviceId = getState().meta.deviceId;
-        deviceService.logError(err, {
-            note: {
-                ...note,
-                title: !!note.title,
-                dynamicFields: !!note.dynamicFields
+        logsService.logError(
+            err,
+            {
+                note: {
+                    ...note,
+                    title: !!note.title,
+                    dynamicFields: !!note.dynamicFields
+                },
+                removeForkNotes,
+                path: "action/index.js -> uploadBackup()",
             },
-            removeForkNotes,
-            path: "action/index.js -> uploadBackup()",
             deviceId
-        });
+        );
     }
 }, 500);
 
@@ -505,7 +562,7 @@ export function uploadBatchBackup(inBackground) {
             !inBackground && dispatch(triggerLoader(false));
             !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.description));
             let deviceId = getState().meta.deviceId;
-            deviceService.logError(err, {
+            logsService.logError(err, {
                 path: "action/index.js -> uploadBatchBackup()",
                 deviceId
             });
@@ -528,10 +585,13 @@ export function restoreBackup() {
                 dispatch(triggerLoader(false));
                 dispatch(triggerErrorModal("error-backup-restore", err.description));
                 let deviceId = getState().meta.deviceId;
-                deviceService.logError(err, {
-                    path: "action/index.js -> restoreBackup()",
+                logsService.logError(
+                    err,
+                    {
+                        path: "action/index.js -> restoreBackup()",
+                    },
                     deviceId
-                });
+                );
             })
     }
 }
@@ -557,10 +617,13 @@ export function updateLastBackupTime(nextTime) {
             }
         } catch(err) {
             let deviceId = getState().meta.deviceId;
-            deviceService.logError(err, {
-                path: "action/index.js -> updateLastBackupTime()",
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateLastBackupTime()",
+                },
                 deviceId
-            });
+            );
         }
     }
 }

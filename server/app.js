@@ -24,7 +24,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-let noresRep = new (require("./server/repositories/notes.js"))(DB);
+let notesRep = new (require("./server/repositories/notes.js"))(DB);
 let logRep = new (require("./server/repositories/log.js"))(DB);
 let usersRep = new (require("./server/repositories/users"))(DB);
 let reportRep = new (require("./server/repositories/report"))(DB);
@@ -38,7 +38,7 @@ let auth = require('./server/routes/auth');
 app.use("/api/auth/", auth(usersRep));
 
 let notes = require('./server/routes/notes');
-app.use("/api/notes/", notes(noresRep));
+app.use("/api/notes/", notes(notesRep));
 
 let log = require('./server/routes/log');
 app.use("/api/log/", log(logRep));
