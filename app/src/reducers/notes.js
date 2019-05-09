@@ -1,6 +1,6 @@
 let init = [];
 
-function reciveSingleNote(state, note) {
+function receiveSingleNote(state, note) {
     let assignFn = (list) => ({
         date: list.date, 
         items: [...list.items, note] 
@@ -15,7 +15,7 @@ function reciveSingleNote(state, note) {
     return state.map(fn);    
 }
 
-function reciveNote(state, note) {
+function receiveNote(state, note) {
     delete note.prevNote;
 
     let assignFn = (list) => ({
@@ -41,7 +41,7 @@ function reciveNote(state, note) {
                     return assignFn(list)
                 }
                 return list
-            }
+            };
             break;
         }
         case "week": {
@@ -50,7 +50,7 @@ function reciveNote(state, note) {
                     return assignFn(list)
                 }
                 return list
-            }
+            };
             break;
         }
         default: {
@@ -59,7 +59,7 @@ function reciveNote(state, note) {
                     return assignFn(list)
                 }
                 return list
-            }
+            };
         }
     }
 
@@ -76,7 +76,7 @@ function notes (state = init, action) {
             return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
         }
         case 'RECEIVE_NOTE': {
-            return reciveNote(state, action.note);
+            return receiveNote(state, action.note);
         }
         case 'UPDATE_NOTE': {
             let startState = null;
@@ -85,7 +85,7 @@ function notes (state = init, action) {
                 if (action.prevNote.repeatType === "no-repeat") {
                     startState = state.map((list) => {
                         return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
-                    }); 
+                    });
                 } else {
                     startState = state.map((list) => {
                         return {...list, items: list.items.filter((note) => (
@@ -95,7 +95,7 @@ function notes (state = init, action) {
                     });
                 }
 
-                return reciveNote(startState, action.note);
+                return receiveNote(startState, action.note);
             } else {
                 if (action.inserted) {
                     let noteToFilterDate = action.note.added.valueOf();
@@ -112,7 +112,7 @@ function notes (state = init, action) {
                     }); 
                 }
 
-                return reciveSingleNote(startState, action.note);
+                return receiveSingleNote(startState, action.note);
             }
         }
         case 'DELETE_NOTE': {

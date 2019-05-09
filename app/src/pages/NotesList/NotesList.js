@@ -302,27 +302,20 @@ function sort (data, settings) {
 
     function getNotesCompareFn() {
         if (settings.sortType === 0) {
-            if (settings.sortDirection === 1) {
-                return (a, b) => {
-                    let aDayTimeSum = a.startTime ?
-                        (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
-                        : 0;
-                    let bDayTimeSum = b.startTime ?
-                        (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
-                        : 0;
+            return (a, b) => {
+                let aDayTimeSum = a.startTime ?
+                    (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
+                    : 0;
+                let bDayTimeSum = b.startTime ?
+                    (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
+                    : 0;
+
+                if (settings.sortDirection === 1) {
                     return aDayTimeSum - bDayTimeSum;
-                }
-            } else {
-                return (a, b) => {
-                    let aDayTimeSum = a.startTime ?
-                        (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
-                        : 0;
-                    let bDayTimeSum = b.startTime ?
-                        (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
-                        : 0;
+                } else {
                     return bDayTimeSum - aDayTimeSum;
-                } 
-            }    
+                }
+            };
         }
 
         if (settings.sortType === 1) {

@@ -9,7 +9,7 @@ class NotesService {
     async getDayNotes(date) {
         let currentDate = date.valueOf();
         let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, 
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
             t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.repeatDate,
             (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
             FROM Tasks t
@@ -64,7 +64,6 @@ class NotesService {
     }
 
     async addNote(note) {
-        let timeCheckSums = this.calculateTimeCheckSum(note);
         let noteToLocalInsert = {
             ...note,
             lastAction: "ADD",
@@ -75,7 +74,6 @@ class NotesService {
             lastActionTime: moment().valueOf(),
             forkFrom: -1,
             repeatDate: -1,
-            ...timeCheckSums
         };
 
         let addedNote = await this.insertNote(noteToLocalInsert);
@@ -92,7 +90,7 @@ class NotesService {
 
         let insert = await executeSQL(
             `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
+            (uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, repeatDate)
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
@@ -100,8 +98,6 @@ class NotesService {
                 note.title,
                 note.startTime ? note.startTime.valueOf() : -1,
                 note.endTime ? note.endTime.valueOf() : -1,
-                note.startTimeCheckSum,
-                note.endTimeCheckSum,
                 Number(note.notificate),
                 note.tag,
                 note.lastAction,
@@ -165,10 +161,8 @@ class NotesService {
     }
 
     async updateNote(note, prevNote) {
-        let timeCheckSums = this.calculateTimeCheckSum(note);
         let nextNote = {
             ...note,
-            ...timeCheckSums,
             lastAction: "EDIT",
             lastActionTime: moment().valueOf(),
             isLastActionSynced: 0
@@ -186,7 +180,7 @@ class NotesService {
 
         await executeSQL(
             `UPDATE Tasks
-            SET title = ?, added = ?, startTime = ?, endTime = ?, startTimeCheckSum = ?, endTimeCheckSum = ?, notificate = ?, tag = ?, 
+            SET title = ?, added = ?, startTime = ?, endTime = ?, notificate = ?, tag = ?, 
                 isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0, priority = ?
             WHERE id = ?;`,
             [
@@ -194,8 +188,6 @@ class NotesService {
                 nextNote.isShadow ? -1 : nextNote.added.valueOf(),
                 nextNote.startTime ? nextNote.startTime.valueOf() : -1,
                 nextNote.endTime ? nextNote.endTime.valueOf() : -1,
-                nextNote.startTimeCheckSum,
-                nextNote.endTimeCheckSum,
                 Number(nextNote.notificate),
                 nextNote.tag,
                 nextNote.lastAction,
@@ -336,7 +328,7 @@ class NotesService {
         }
 
         let select = await executeSQL(`
-            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, 
+            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
                 t.isSynced, t.isLastActionSynced, t.lastAction, t.lastActionTime, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, 
                 (select GROUP_CONCAT(tt.uuid, ',') from Tasks tt where tt.forkFrom = t.id) as forked,
                 (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatValues
@@ -359,7 +351,7 @@ class NotesService {
         await executeSQL(`DELETE FROM Tasks;`);
         await executeSQL(`DELETE FROM TasksRepeatValues;`);
 
-        let valuesString = notes.reduce((accumulator) => `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, "");
+        let valuesString = notes.reduce((accumulator) => `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, "");
         valuesString = valuesString.slice(2);
 
         let values = notes.reduce((accumulator, note) => {
@@ -371,8 +363,6 @@ class NotesService {
                 note.title,
                 note.startTime,
                 note.endTime,
-                note.startTimeCheckSum,
-                note.endTimeCheckSum,
                 note.notificate,
                 note.tag,
                 note.lastAction,
@@ -391,7 +381,7 @@ class NotesService {
 
         await executeSQL(
             `INSERT INTO Tasks
-            (id, uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
+            (id, uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
             VALUES
             ${valuesString};
@@ -434,7 +424,7 @@ class NotesService {
 
     async getDeletedNotes() {
         let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.startTimeCheckSum, t.endTimeCheckSum, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
+            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
             t.dynamicFields, t.finished, t.forkFrom, t.priority, t.lastActionTime
             FROM Tasks t
             WHERE t.lastAction = 'DELETE' AND
@@ -520,16 +510,6 @@ class NotesService {
             DELETE FROM Tasks
             WHERE lastAction = 'CLEAR' ${whereStatement ? "AND " + whereStatement : ""}
         `, params);
-    }
-
-    calculateTimeCheckSum (note) {
-        let startTimeCheckSum = note.startTime ? note.startTime.valueOf() - note.added : 0;
-        let endTimeCheckSum = note.endTime ? note.endTime.valueOf() - note.added : 0;
-
-        return {
-            startTimeCheckSum,
-            endTimeCheckSum
-        }
     }
 
     tags = [
