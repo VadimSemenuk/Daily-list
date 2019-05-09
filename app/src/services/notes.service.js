@@ -64,8 +64,6 @@ class NotesService {
     }
 
     async addNote(note) {
-        let noteUUID = uuid();
-        let actionTime = moment().valueOf();
         let timeCheckSums = this.calculateTimeCheckSum(note);
         let noteToLocalInsert = {
             ...note,
@@ -73,8 +71,8 @@ class NotesService {
             userId: 1,
             isLastActionSynced: 0,
             isSynced: 0,
-            uuid: noteUUID,
-            lastActionTime: actionTime,
+            uuid: uuid(),
+            lastActionTime: moment().valueOf(),
             forkFrom: -1,
             repeatDate: -1,
             ...timeCheckSums
@@ -129,19 +127,17 @@ class NotesService {
     }
 
     async updateNoteDynamicFields(note, fieldObj) {
-        let actionTime = moment().valueOf();
         let nextNote = {
             ...note,
             ...fieldObj,
             isLastActionSynced: 0,
             lastAction: "EDIT",
-            lastActionTime: actionTime,
+            lastActionTime: moment().valueOf(),
         };
 
         if (nextNote.isShadow) {
-            let noteUUID = uuid();
-            nextNote.uuid = noteUUID;
-            nextNote.forkFrom = note.key;
+            nextNote.uuid = uuid();
+            nextNote.forkFrom = note.uuid;
             nextNote.repeatDate = note.repeatDate === -1 ? note.added.valueOf() : note.repeatDate;
             nextNote = await this.insertNote(nextNote);
         } else {
@@ -169,22 +165,17 @@ class NotesService {
     }
 
     async updateNote(note, prevNote) {
-        let actionTime = moment().valueOf();
         let timeCheckSums = this.calculateTimeCheckSum(note);
         let nextNote = {
             ...note,
             ...timeCheckSums,
             lastAction: "EDIT",
-            lastActionTime: actionTime,
+            lastActionTime: moment().valueOf(),
             isLastActionSynced: 0
         };
         if (prevNote.repeatType !== "no-repeat") {
             if (!nextNote.isShadow) {
                 nextNote.key = nextNote.forkFrom;
-                let select = await executeSQL(`SELECT uuid FROM Tasks WHERE id = ?`, [nextNote.key]);
-                if (select.rows.length) {
-                    nextNote.key = select.rows.item(0).uuid;
-                }
             }
             await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [nextNote.key]);
         }
@@ -225,12 +216,11 @@ class NotesService {
     }
 
     async updateNoteDate(note, nextDate) {
-        let actionTime = moment().valueOf();
         let nextNote = {
             ...note,
             added: nextDate,
             lastAction: "EDIT",
-            lastActionTime: actionTime,
+            lastActionTime: moment().valueOf(),
             isLastActionSynced: 0
         };
 
@@ -291,7 +281,7 @@ class NotesService {
             return
         }
 
-        let params = note.repeatDates.reduce((acc, value) => `${acc}, (?, ?)`, "");
+        let params = note.repeatDates.reduce((acc) => `${acc}, (?, ?)`, "");
         params = params.slice(2);
         let values = note.repeatDates.reduce((acc, value) => [...acc, note.key, value], []);
 
@@ -369,13 +359,14 @@ class NotesService {
         await executeSQL(`DELETE FROM Tasks;`);
         await executeSQL(`DELETE FROM TasksRepeatValues;`);
 
-        let valuesString = notes.reduce((accumulator) => `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, "");
+        let valuesString = notes.reduce((accumulator) => `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, "");
         valuesString = valuesString.slice(2);
 
         let values = notes.reduce((accumulator, note) => {
             note = note.note;
             return [
-                ...accumulator, 
+                ...accumulator,
+                note.id,
                 note.uuid,
                 note.title,
                 note.startTime,
@@ -400,7 +391,7 @@ class NotesService {
 
         await executeSQL(
             `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
+            (id, uuid, title, startTime, endTime, startTimeCheckSum, endTimeCheckSum, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
             VALUES
             ${valuesString};
@@ -435,9 +426,8 @@ class NotesService {
             ${rdValuesString};
         `, rdValues);
 
+        notificationService.clearAll();
         notes.forEach((note) => {
-            // TODO: need a note id
-            notificationService.clearAll();
             note.notificate && notificationService.set(note);
         });
     }
@@ -478,19 +468,20 @@ class NotesService {
     }
 
     async restoreNote(note) {
-        let actionTime = moment().valueOf();
         let nextNote = {
             ...note,
-            isShadow: note.added === -1
-        }
+            isShadow: note.added === -1,
+            lastAction: "UPDATE",
+            lastActionTime: moment().valueOf()
+        };
 
         await executeSQL(
             `UPDATE Tasks
             SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
             WHERE id = ? OR forkFrom = ?;`,
             [
-                "UPDATE",
-                actionTime,
+                nextNote.lastAction,
+                nextNote.lastActionTime,
                 nextNote.key,
                 nextNote.key
             ]
@@ -516,7 +507,6 @@ class NotesService {
             params.push(msBackupStartTime);
         }
 
-        // TODO: add cascade delete
         await executeSQL(`
             DELETE FROM TasksRepeatValues
             WHERE taskId IN (

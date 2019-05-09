@@ -69,13 +69,13 @@ function reciveNote(state, note) {
 function notes (state = init, action) {
     switch(action.type) {
         case 'SET_DATES_AND_UPDATE_NOTES':
-        case 'RECIVE_NOTES': {
+        case 'RECEIVE_NOTES': {
             return action.notes.slice();
         }
         case 'UPDATE_DATES_AND_NOTES': {
             return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
         }
-        case 'RECIVE_NOTE': {
+        case 'RECEIVE_NOTE': {
             return reciveNote(state, action.note);
         }
         case 'UPDATE_NOTE': {
@@ -120,7 +120,7 @@ function notes (state = init, action) {
                 let nextList = list.items.filter((note) => (
                     (note.key !== action.note.key) &&
                     (note.forkFrom !== action.note.key)
-                ))
+                ));
                 return {
                     date: list.date, 
                     items: nextList

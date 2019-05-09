@@ -15,7 +15,7 @@ export function addNote (note) {
     return function(dispatch, getState) {
         return notesService.addNote(note)
             .then((nextNote) => dispatch({
-                type: "RECIVE_NOTE",
+                type: "RECEIVE_NOTE",
                 note: nextNote
             }))
             .then(({note}) => {
