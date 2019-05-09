@@ -11,7 +11,7 @@ export default {
         await addUUID();
         await addMetaTable();
         await alterTasksTable();
-        await forkFromFieldToUUID();
+        // await forkFromFieldToUUID();
         await alterSettingsTable();
         await addErrorsLogsTable();
         await addLoadsLogsTable();

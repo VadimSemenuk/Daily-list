@@ -21,7 +21,7 @@ class NotificationService {
 
         let notificationConfig = {
             title: note.title || 'Уведомление о заметке',
-            text: this.getMessgae(note),
+            text: this.getMessage(note),
             sound: true
         };
 
@@ -88,17 +88,29 @@ class NotificationService {
             return;
         }
 
-        // TODO: old remove for v16 note
-
         let ids = [note.key];
         if (note.repeatType === "any" || note.repeatType === "week") {
             ids = note.repeatDates.map((date) => `${date}_${note.key}`);
         }
 
         window.cordova.plugins.notification.local.cancel(ids);
+
+        if (note.repeatType === "any" || note.repeatType === "week") {
+            this.clearOldVersionNotes(note);
+        }
     };
 
-    getMessgae(data) {
+    clearOldVersionNotes(note) {
+        let ids = [note.key];
+
+        if (note.repeatType === "any") {
+            ids = note.repeatDates;
+        }
+
+        window.cordova.plugins.notification.local.cancel(ids);
+    }
+
+    getMessage(data) {
         let startTime = "", 
             endTime = "";
         if (data.startTime) {

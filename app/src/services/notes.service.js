@@ -79,7 +79,6 @@ class NotesService {
         let addedNote = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(addedNote);
 
-        notificationService.clear(addedNote);
         addedNote.notificate && notificationService.set(addedNote);
 
         return addedNote;
@@ -201,7 +200,7 @@ class NotesService {
 
         await this.setNoteRepeat(nextNote);
 
-        notificationService.clear(nextNote);
+        notificationService.clear({...prevNote, key: nextNote.key});
         nextNote.notificate && notificationService.set(nextNote);
 
         return nextNote;
