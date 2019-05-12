@@ -18,13 +18,19 @@ class ApiService {
             serializedQuery = this.serializeQuery(queryParams);
         }
 
+        let headers = {
+            "Content-Type": "application/json"
+        };
+
+        let user = authService.getToken();
+        if (user) {
+            headers["Authorization"] = user.token;
+        }
+
         return fetch(`${config.apiURL}/${path}${serializedQuery ? `?${serializedQuery}` : ''}`, {
             method: "GET",
             credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            }
+            headers: headers
         })
     }
 
@@ -33,13 +39,19 @@ class ApiService {
             body = JSON.stringify(body);
         }
 
+        let headers = {
+            "Content-Type": "application/json"
+        };
+
+        let user = authService.getToken();
+        if (user) {
+            headers["Authorization"] = user.token;
+        }
+
         return fetch(`${config.apiURL}/${path}`, {
             method: "POST",
             credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            },
+            headers: headers,
             body: body
         })
     }
@@ -49,13 +61,19 @@ class ApiService {
             body = JSON.stringify(body);
         }
 
+        let headers = {
+            "Content-Type": "application/json"
+        };
+
+        let user = authService.getToken();
+        if (user) {
+            headers["Authorization"] = user.token;
+        }
+
         return fetch(`${config.apiURL}/${path}`, {
             method: "PUT",
             credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            },
+            headers: headers,
             body: body
         })
     }
@@ -65,13 +83,19 @@ class ApiService {
             body = JSON.stringify(body);
         }
 
+        let headers = {
+            "Content-Type": "application/json"
+        };
+
+        let user = authService.getToken();
+        if (user) {
+            headers["Authorization"] = user.token;
+        }
+
         return fetch(`${config.apiURL}/${path}`, {
             method: "DELETE",
             credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authService.getToken()
-            },
+            headers: headers,
             body: body
         })
     }

@@ -39,7 +39,7 @@ module.exports = function (notesRep) {
     router.post("/apply-local-changes",  async (req, res, next) => {
         await notesRep.applyLocalChanges(req.body.notSynkedLocalNotes, req.body.deviceId, req.user);
         res.end();
-    })
+    });
 
 
 
@@ -49,25 +49,31 @@ module.exports = function (notesRep) {
         notesRep.saveBackup(req.body.note, req.user || 1)
             .then((insert) => {
                 let inserted = insert ? Boolean(insert.rowCount) : false;
-                res.send(inserted); 
+                if (inserted) {
+                    res.end();
+                } else {
+                    throw new Error("Not inserted");
+                }
             })
             .catch((err) => {
                 console.warn(err);
-                res.status(500);
-                res.end();
-            })
+                res.status(500).end();
+            });
     });
 
     router.post('/backup/batch', (req, res, next) => {
         notesRep.saveBackupBatch(req.body.notes, req.user || 1)
             .then((insert) => {
                 let inserted = insert ? Boolean(insert.rowCount) : false;
-                res.send(inserted); 
+                if (inserted) {
+                    res.end();
+                } else {
+                    throw new Error("Not inserted");
+                }
             })
             .catch((err) => {
                 console.warn(err);
-                res.status(500);
-                res.end();
+                res.status(500).end();
             })
     });
 
@@ -75,7 +81,11 @@ module.exports = function (notesRep) {
         notesRep.updateBackup(req.body.note, req.body.removeForkNotes)
             .then((update) => {
                 let updated = update ? Boolean(update.rowCount) : false;
-                res.send(updated);  
+                if (!updated) {
+                    res.end();
+                } else {
+                    throw new Error("Not updates");
+                }
             })
             .catch((err) => {
                 console.warn(err);
@@ -109,4 +119,4 @@ module.exports = function (notesRep) {
     });
 
     return router
-}
+};

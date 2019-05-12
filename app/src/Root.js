@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {HashRouter, Route, Redirect, withRouter} from 'react-router-dom';
+import {HashRouter, Route, Redirect} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";

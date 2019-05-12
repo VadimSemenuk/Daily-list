@@ -574,9 +574,7 @@ export function restoreBackup() {
     return function(dispatch, getState) {
         dispatch(triggerLoader(true));
 
-        let token = getState().user;
-
-        return backupService.restoreNotesBackup(token)
+        return backupService.restoreNotesBackup()
             .then((isUpdated) => {
                 dispatch(triggerLoader(false));
                 isUpdated && window.location.reload(true);

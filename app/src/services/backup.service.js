@@ -7,7 +7,7 @@ import deviceService from "./device.service";
 import apiService from "./api.service";
 
 class BackupService {
-    async restoreNotesBackup(token) {
+    async restoreNotesBackup() {
         if (!deviceService.hasNetworkConnection) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
@@ -27,7 +27,8 @@ class BackupService {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
-        apiService.post('notes/backup/batch', {notes});
+        apiService.post('notes/backup/batch', {notes})
+            .then((res) => res.status === 200);
     }
 
     async uploadNoteBackup(note, token, removeForkNotes) {
@@ -41,12 +42,7 @@ class BackupService {
         }
 
         apiService[method]('notes/backup', {note, removeForkNotes})
-            .then((res) => {
-                // TODO test statuses
-                if (res.status === 200) {
-                    return res.json();
-                }
-            });
+            .then((res) => res.status === 200);
     }
 
     async getUserLastBackupTime() {

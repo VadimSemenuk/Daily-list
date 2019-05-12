@@ -91,7 +91,7 @@ class NotesService {
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
                 isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, repeatDate)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -481,7 +481,7 @@ class NotesService {
     }
 
     async cleanDeletedNotes() {
-        return executeSQL(`
+        return executeSQL(`                               
             UPDATE Tasks
             SET lastAction = ?, lastActionTime = ?, isLastActionSynced = ?
             WHERE lastAction = 'DELETE';

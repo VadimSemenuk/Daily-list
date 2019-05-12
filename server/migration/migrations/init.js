@@ -16,7 +16,7 @@ module.exports.up = async (db) => {
             google_id VARCHAR
         );
 
-        CREATE TABLE NoteBackups
+        CREATE TABLE NotesBackups
         (
             uuid VARCHAR UNIQUE,
             note JSON,
