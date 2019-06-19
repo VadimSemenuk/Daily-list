@@ -31,29 +31,6 @@ class BackupService {
             .then((res) => res.status === 200);
     }
 
-    async uploadNotesBatchBackup(notes) {
-        if (!deviceService.hasNetworkConnection()) {
-            throw new CustomError("no internet connection", i18next.t("internet-required"));
-        }
-
-        apiService.post('notes/backup/batch', {notes})
-            .then((res) => res.status === 200);
-    }
-
-    async uploadNoteBackup(note, token, removeForkNotes) {
-        if (!deviceService.hasNetworkConnection()) {
-            throw new CustomError("no internet connection", i18next.t("internet-required"));
-        }
-
-        let method = "post";
-        if (note.isSynced) {
-            method = "put";
-        }
-
-        apiService[method]('notes/backup', {note, removeForkNotes})
-            .then((res) => res.status === 200);
-    }
-
     async getUserLastBackupTime() {
         if (!deviceService.hasNetworkConnection()) {
             return null;

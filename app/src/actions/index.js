@@ -6,7 +6,7 @@ import calendarService from "../services/calendar.service";
 import authService from "../services/auth.service";
 import backupService from "../services/backup.service";
 
-import {throttleAction, throttle} from "../utils/throttle";
+import {throttleAction} from "../utils/throttle";
 import deviceService from "../services/device.service";
 import logsService from "../services/logs.service";
 
