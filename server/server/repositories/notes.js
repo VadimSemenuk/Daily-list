@@ -245,23 +245,26 @@ module.exports = class {
 
 
 
-    // backup 
+    // backup
 
-    saveBackup(note, userId) {
-        return this.db.query(`
-            INSERT INTO NotesBackups (uuid, note, userId, datetime)
-            VALUES ($uuid, $note, $userId, $datetime);
-        `, {
-            uuid: note.uuid,
-            note: JSON.stringify(note),
-            userId: userId,
-            datetime: new Date()
-        })
+    async saveBackup(notes, userId) {
+        if (!notes || !notes.length) {
+            return;
+        }
+
+        this.db.query(`DELETE FROM NotesBackups;`);
+
+        let date = new Date();
+        let insertValues = notes.map((note) => [note.uuid, note, userId, date]);
+        let insertSQL = format(`INSERT INTO NotesBackups (uuid, note, userId, datetime) VALUES %L`, insertValues);
+        let insert = await this.db.query(insertSQL);
+
+        return insert;
     }
 
-    async saveBackupBatch(notes, userId) {
+    async saveBackupPart(notes, userId) {
         if (!notes || !notes.length) {
-            return; 
+            return;
         }
         let date = new Date();
         let valuesToInsert = notes
@@ -303,27 +306,6 @@ module.exports = class {
             let deleteSQL = format(`DELETE FROM NotesBackups WHERE uuid IN (%L)`, valuesToDelete);
             await this.db.query(deleteSQL);
         }
-    }
-
-    async updateBackup(note, removeForkNotes) {
-        if (note.repeatType !== "no-repeat" && note.forked) {
-            let sql = format(`DELETE FROM NotesBackups WHERE uuid NOT IN (%L)`, note.forked);
-            this.db.query(sql);
-        }
-
-        if (note.repeatType !== "no-repeat" && note.forked && removeForkNotes) {
-            let sql = format(`DELETE FROM NotesBackups WHERE uuid IN %L`, note.forked);
-            await this.db.query(sql);
-        }
-
-        return this.db.query(`
-            UPDATE NotesBackups 
-            SET note = $note
-            WHERE uuid = $uuid;
-        `, {
-            uuid: note.uuid,
-            note: JSON.stringify(note)            
-        });
     }
 
     async getUserBackups(userId) {

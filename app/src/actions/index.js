@@ -6,7 +6,7 @@ import calendarService from "../services/calendar.service";
 import authService from "../services/auth.service";
 import backupService from "../services/backup.service";
 
-import throttle from "../utils/throttle";
+import {throttleAction, throttle} from "../utils/throttle";
 import deviceService from "../services/device.service";
 import logsService from "../services/logs.service";
 
@@ -247,7 +247,7 @@ export function cleanDeletedNotes () {
             }))
             .then(() => {
                 let state = getState();
-                state.user && state.user.settings.autoBackup && dispatch(uploadBatchBackup());
+                state.user && state.user.settings.autoBackup && dispatch(uploadBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("clean-trash-error"));
@@ -502,82 +502,47 @@ export function setToken(token) {
 }
 
 // backup
-export function uploadBackup(note, removeForkNotes, inBackground) {
-    return function(dispatch, getState) {
-        return debouncedUploadBackup(note, removeForkNotes, inBackground, dispatch, getState);
-    }
-}
-let debouncedUploadBackup = throttle(async (note, removeForkNotes, inBackground, dispatch, getState) => {
-    try {
-        !inBackground && dispatch(triggerLoader(true));
-
-        let msBackupStartTime = moment.valueOf();
-        let noteForBackup = await notesService.getNoteForBackup(note.key);
-        if (!noteForBackup[0]) {
-            return
-        }
-        await backupService.uploadNoteBackup(noteForBackup[0], removeForkNotes);
-        await notesService.setNoteBackupState(note.key, true, true, msBackupStartTime);
-        dispatch(updateLastBackupTime(moment()));
-
-        !inBackground && dispatch(triggerLoader(false));
-    } catch(err) {
-        !inBackground && dispatch(triggerLoader(false));
-
-        !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.description));
-        let deviceId = getState().meta.deviceId;
-        logsService.logError(
-            err,
-            {
-                note: {
-                    ...note,
-                    title: !!note.title,
-                    dynamicFields: !!note.dynamicFields
-                },
-                removeForkNotes,
-                path: "action/index.js -> uploadBackup()",
-            },
-            deviceId
-        );
-    }
-}, 500);
-
-export function uploadBatchBackup(inBackground) {
+export let uploadBackup = throttleAction(function () {
     return async function(dispatch, getState) {
-        !inBackground && dispatch(triggerLoader(true));
-
         try {
-            let msBackupStartTime = moment.valueOf();
-            let notes = await notesService.getNoteForBackup();
-            if (!notes) {
-                return
+            dispatch(triggerLoader(true));
+
+            let msBackupStartTime = new Date();
+
+            let notes = await notesService.getNotesForBackup();
+            if (!notes || !notes.length) {
+                throw new Error("No notes to backup");
             }
-            await backupService.uploadNotesBatchBackup(notes);
-            await notesService.removeClearedNotes(msBackupStartTime);
+
+            await backupService.uploadNotesBackup(notes);
+
             await notesService.setNoteBackupState(null, true, true, msBackupStartTime);
+
+            dispatch(setBackupMigrationState(true));
+
             dispatch(updateLastBackupTime(moment()));
 
-            !inBackground && dispatch(triggerLoader(false));
+            dispatch(triggerLoader(false));
         } catch(err) {
-            !inBackground && dispatch(triggerLoader(false));
-            !inBackground && dispatch(triggerErrorModal("error-backup-upload", err.description));
+            dispatch(triggerLoader(false));
+            dispatch(triggerErrorModal("error-backup-upload", err.description));
             let deviceId = getState().meta.deviceId;
             logsService.logError(err, {
-                path: "action/index.js -> uploadBatchBackup()",
+                path: "action/index.js -> uploadBackup()",
                 deviceId
             });
         }
     }
-}
+}, 1000);
 
 export function restoreBackup() {
     return function(dispatch, getState) {
         dispatch(triggerLoader(true));
 
         return backupService.restoreNotesBackup()
-            .then((isUpdated) => {
+            .then(() => {
                 dispatch(triggerLoader(false));
-                isUpdated && window.location.reload(true);
+                window.location.reload(true);
             })
             .catch((err) => {
                 dispatch(triggerLoader(false));

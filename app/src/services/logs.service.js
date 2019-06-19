@@ -1,5 +1,4 @@
 import executeSQL from '../utils/executeSQL';
-import throttle from "../utils/throttle";
 import apiService from "./api.service";
 import deviceService from "./device.service";
 
@@ -39,7 +38,7 @@ class LogsService {
         }
     }
 
-    logError = throttle((err, additionalInto, deviceId) => {
+    logError(err, additionalInto, deviceId) {
         console.warn(err);
 
         if (err.constructor && err.constructor.name === "SQLError") {
@@ -59,7 +58,7 @@ class LogsService {
             apiService.post('log/error', {message: log, deviceId})
                 .catch((err) => console.log(err));
         }
-    }, 5000);
+    }
 
     async uploadSavedErrorLogs() {
         if (!deviceService.hasNetworkConnection()) {

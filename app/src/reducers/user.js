@@ -3,7 +3,7 @@ function user (state = {}, action) {
         case 'RECEIVE_USER':
             return action.user;
         case 'CLEAR_USER':
-            return {};
+            return null;
         default:        
             return state;
     }

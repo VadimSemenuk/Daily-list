@@ -8,11 +8,11 @@ import apiService from "./api.service";
 
 class BackupService {
     async restoreNotesBackup() {
-        if (!deviceService.hasNetworkConnection) {
+        if (!deviceService.hasNetworkConnection()) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
-        let notes = await apiService.post('notes/backup')
+        let notes = await apiService.get('notes/backup')
             .then((res) => res.json());
 
         if (!notes || !notes.length) {
@@ -20,6 +20,15 @@ class BackupService {
         }
 
         return await notesService.restoreNotesBackup(notes);    
+    }
+
+    async uploadNotesBackup(notes) {
+        if (!deviceService.hasNetworkConnection()) {
+            throw new CustomError("no internet connection", i18next.t("internet-required"));
+        }
+
+        return apiService.post('notes/backup', {notes})
+            .then((res) => res.status === 200);
     }
 
     async uploadNotesBatchBackup(notes) {

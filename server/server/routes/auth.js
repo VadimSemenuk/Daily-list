@@ -11,7 +11,7 @@ module.exports = function (authRep) {
     router.post('/sign-in', async (req, res, next) => {
         passport.authenticate('local', async (err, user) => {
 			if (user == false) {
-			
+				res.status(500).end();
 			} else {
 				const payload = {
 					id: user.id
@@ -30,12 +30,11 @@ module.exports = function (authRep) {
 		const ticket = await client.verifyIdToken({
 			idToken: req.body.idToken,
 		}).catch((err) => {
-			console.log(err);
-			return null;
-		})
+			res.status(500).end();
+			return;
+		});
 		if (!ticket) {
-			res.status(500);
-			res.end();
+			res.status(500).end();
 			return;
 		}
 
@@ -48,7 +47,8 @@ module.exports = function (authRep) {
 				password: null,
 				email: payload.email,
 				google_id: payload.sub,
-			}
+				LastBackupTime: null
+			};
 			 let userId = await authRep.createUser(user);
 			 user.id = userId;
 		}
@@ -58,10 +58,7 @@ module.exports = function (authRep) {
 		}, config.jwtSecret);
 
 		res.json({
-			id: user.id,
-			email: user.email,
-			name: user.name,
-			picture: user.picture,
+			...user,
 			token: `Bearer ${token}`
 		});
 	});

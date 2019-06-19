@@ -45,8 +45,8 @@ module.exports = function (notesRep) {
 
     // backup
 
-    router.post('/backup', (req, res, next) => {
-        notesRep.saveBackup(req.body.note, req.user || 1)
+    router.post('/backup', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+        notesRep.saveBackup(req.body.notes, req.user)
             .then((insert) => {
                 let inserted = insert ? Boolean(insert.rowCount) : false;
                 if (inserted) {
@@ -61,8 +61,8 @@ module.exports = function (notesRep) {
             });
     });
 
-    router.post('/backup/batch', (req, res, next) => {
-        notesRep.saveBackupBatch(req.body.notes, req.user || 1)
+    router.post('/backup/part', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+        notesRep.saveBackupPart(req.body.notes, req.user)
             .then((insert) => {
                 let inserted = insert ? Boolean(insert.rowCount) : false;
                 if (inserted) {
@@ -77,44 +77,25 @@ module.exports = function (notesRep) {
             })
     });
 
-    router.put('/backup', (req, res, next) => {
-        notesRep.updateBackup(req.body.note, req.body.removeForkNotes)
-            .then((update) => {
-                let updated = update ? Boolean(update.rowCount) : false;
-                if (!updated) {
-                    res.end();
-                } else {
-                    throw new Error("Not updates");
-                }
-            })
-            .catch((err) => {
-                console.warn(err);
-                res.status(500);
-                res.end();
-            })
-    });
-
-    router.get('/backup', (req, res, next) => {
-        notesRep.getUserBackups(1)
+    router.get('/backup', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+        notesRep.getUserBackups(req.user)
             .then((notes) => {
                 res.json(notes);  
             })
             .catch((err) => {
                 console.warn(err);
-                res.status(500);
-                res.end();
+                res.status(500).end();
             })
     });
 
-    router.get('/backup/user-last-backup-time', (req, res, next) => {
-        notesRep.getUserLastBackupTime(req.user || 1)
+    router.get('/backup/user-last-backup-time', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+        notesRep.getUserLastBackupTime(req.user)
             .then((time) => {
                 res.send(time); 
             })
             .catch((err) => {
                 console.warn(err);
-                res.status(500);
-                res.end();
+                res.status(500).end();
             })
     });
 

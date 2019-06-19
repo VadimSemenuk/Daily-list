@@ -342,6 +342,21 @@ class NotesService {
         return res;
     }
 
+    async getNotesForBackup() {
+        let select = await executeSQL(`
+            SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
+                t.isSynced, t.isLastActionSynced, t.lastAction, t.lastActionTime, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, 
+                (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatValues
+            FROM Tasks t
+        `);
+
+        let res = [];
+        for (let i = 0; i < select.rows.length; i++ ) {
+            res.push(select.rows.item(i));
+        }
+        return res;
+    }
+
     async restoreNotesBackup(notes) {
         if (!notes || notes.length === 0) {
             return
@@ -481,11 +496,13 @@ class NotesService {
     }
 
     async cleanDeletedNotes() {
-        return executeSQL(`                               
+        await executeSQL(`                               
             UPDATE Tasks
             SET lastAction = ?, lastActionTime = ?, isLastActionSynced = ?
             WHERE lastAction = 'DELETE';
         `, ['CLEAR', moment().valueOf(), 0]);
+
+        return this.removeClearedNotes();
     }
 
     async removeClearedNotes(msBackupStartTime) {

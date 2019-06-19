@@ -68,7 +68,7 @@ class AuthService {
             picture: googleUser.imageUrl,
             token: "Bearer " + user.token,
             backup: {
-                lastBackupTime: null,
+                lastBackupTime: user.lastBackupTime !== null ? moment(user.lastBackupTime) : null,
             },
             settings: {
                 autoBackup: false

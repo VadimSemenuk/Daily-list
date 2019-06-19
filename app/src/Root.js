@@ -86,7 +86,7 @@ class Root extends Component {
             && this.props.user.settings.autoBackup
             && deviceService.hasNetworkConnection()
         ) {
-            this.props.uploadBatchBackup(true);
+            this.props.uploadBackup(true);
         }   
     };
 

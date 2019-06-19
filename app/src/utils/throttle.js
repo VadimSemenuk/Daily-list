@@ -1,4 +1,4 @@
-export default function throttle(func, ms) {
+export function throttle(func, ms) {
     let isThrottled = false;
     let savedArgs;
     let savedThis;
@@ -24,4 +24,16 @@ export default function throttle(func, ms) {
     }
 
     return wrapper;
+}
+
+export function throttleAction(action, wait, options) {
+    const throttled = throttle(
+        (dispatch, getState, actionArgs) => dispatch(action(...actionArgs)),
+        wait,
+        options
+    );
+
+    const thunk = (...actionArgs) => (dispatch, getState) => throttled(dispatch, getState, actionArgs);
+
+    return thunk;
 }

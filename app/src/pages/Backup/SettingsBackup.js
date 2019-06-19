@@ -67,7 +67,7 @@ class SettingsBackup extends Component {
                                 <button 
                                     className="text block img-text-button"
                                     type="button"
-                                    onClick={() => this.props.uploadBatchBackup()}
+                                    onClick={() => this.props.uploadBackup()}
                                 ><img src={ExportImg} alt="export"/>{t("create-backup")}</button>
 
                                 <button 
