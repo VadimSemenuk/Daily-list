@@ -162,6 +162,7 @@ export default {
     "error-reload-app": "Перезапустите приложение",
 
     // trash
+    "remove-old": "Заметки будут удалены через 30 дней",
     "clean-trash": "Очистить корзину",
     "clean-trash-error": "Не удалось очистить корзину",
     "error-note-get-trash": "Не удалось получить удаленные заменки",

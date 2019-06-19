@@ -159,6 +159,7 @@ export default {
     "error-reload-app": "Reload app",
 
     // trash
+    "remove-old": "Notes will be removed after 30 days",
     "clean-trash": "Clean trash",
     "clean-trash-error": "Failed to clean trash",
     "error-note-get-trash": "Failed to get deleted notes",

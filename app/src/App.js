@@ -46,6 +46,8 @@ export default class App extends Component {
             logsService.uploadSavedErrorLogs();
             logsService.uploadSavedLoadLogs();
         }
+
+        notesService.cleanOldDeletedNotes();
     }
 
     async initApp() {

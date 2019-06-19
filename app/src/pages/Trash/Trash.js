@@ -30,6 +30,7 @@ class Trash extends Component {
             <div className="page-wrapper">
                 <Header title={t("trash")} />
                 <div className="page-content trash-list-page-content">
+                    {this.props.trash.length !== 0 && <div style={{color: "#aaa"}} className="text-center">{t("remove-old")}</div>}
                     <div className="scroll items-wrapper">
                         {
                             this.props.trash.length === 0 &&

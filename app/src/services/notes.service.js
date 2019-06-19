@@ -505,6 +505,16 @@ class NotesService {
         return this.removeClearedNotes();
     }
 
+    async cleanOldDeletedNotes() {
+        await executeSQL(`                               
+            UPDATE Tasks
+            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = ?
+            WHERE lastAction = 'DELETE' AND lastActionTime <= ?;
+        `, ['CLEAR', moment().valueOf(), 0, moment().subtract(30, "day").valueOf()]);
+
+        return this.removeClearedNotes();
+    }
+
     async removeClearedNotes(msBackupStartTime) {
         let params = [];
         let whereStatement = "";
