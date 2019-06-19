@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import {Provider} from "react-redux";
 import initStore from "./store";
-import {BeatLoader} from 'react-spinners';
 import {I18nextProvider} from "react-i18next";
 import moment from "moment";
 import 'moment/locale/ru';
@@ -20,28 +19,23 @@ import notesService from "./services/notes.service";
 import authService from "./services/auth.service";
 import logsService from "./services/logs.service";
 
-let store = null;
-let i18n = null;
-
 export default class App extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            appReady: false,
-            loaderColor: null
+            isAppReady: false
         }
+
+        this.store = null;
+        this.i18n = null;
     }
 
     async componentWillMount() {
         window.cordova && await new Promise((resolve) => document.addEventListener("deviceready", resolve));
-        store = await this.initApp();
+        await this.initApp();
 
-        this.setState({
-            appReady: true
-        });
-
-        logsService.logLoad(this.state.deviceId);
+        logsService.logLoad(this.store.deviceId);
         if (deviceService.hasNetworkConnection()) {
             logsService.uploadSavedErrorLogs();
             logsService.uploadSavedLoadLogs();
@@ -60,17 +54,18 @@ export default class App extends Component {
 
         let meta = await deviceService.getMetaInfo();
         let settings = await settingsService.getSettings();
-        this.applyInitSettings(settings);
-        this.setState({
-            loaderColor: settings.theme.header,
-            deviceId: meta.deviceId
-        });
         let password = !settings.password;
         let date = moment().startOf("day");
         let notes = await notesService.getNotesByDates([moment(date).add(-1, "day"), date, moment(date).add(1, "day")]);
         let user = authService.getToken();
 
-        return initStore({settings, password, notes, date, user, meta});
+        this.store = initStore({settings, password, notes, date, user, meta});
+
+        this.applyInitSettings(settings);
+
+        this.deviceId = meta.deviceId;
+
+        this.setState({isAppReady: true});
     }
 
     async initDb() {
@@ -82,35 +77,17 @@ export default class App extends Component {
         document.querySelector("body").style.fontSize = settings.fontSize + "px";
         themesService.applyTheme(settings.theme);
         moment.locale(settings.lang);
-        i18n = lang.init(settings.lang);
+        this.i18n = lang.init(settings.lang);
     }
 
     render() {
         return (
-            this.state.appReady ?
-            (
-                <Provider store={store}>
-                    <I18nextProvider i18n={i18n}>
-                        <Root />
-                    </I18nextProvider>
-                </Provider>
-            )
-            :
-            (
-                this.state.loaderColor ?
-                (
-                    <div className="init-loader-container">
-                        <BeatLoader
-                            color={this.state.loaderColor}
-                            loading={true} 
-                        />
-                    </div>
-                )
-                :
-                (
-                    <div>Loading settings</div>
-                )
-            )
+            this.state.isAppReady &&
+            <Provider store={this.store}>
+                <I18nextProvider i18n={this.i18n}>
+                    <Root />
+                </I18nextProvider>
+            </Provider>
         );
     }
 }
