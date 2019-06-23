@@ -27,10 +27,11 @@
     "cordova-plugin-ionic-keyboard": "^2.1.3",
     "cordova-plugin-local-notification": "file:custom_plugins/cordova-plugin-local-notifications",
     "cordova-plugin-network-information": "^2.0.1",
+    "cordova-plugin-splashscreen": "^5.0.2",
     "cordova-plugin-statusbar": "^2.4.2",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-x-toast": "^2.7.2",
-    "cordova-sqlite-storage": "^2.6.0",
+    "cordova-sqlite-storage": "^3.2.0",
     "css-loader": "1.0.0",
     "debounce": "^1.2.0",
     "dotenv": "6.0.0",
@@ -159,13 +160,14 @@
       "cordova-plugin-datetimepicker": {},
       "cordova-plugin-statusbar": {},
       "com-sarriaroman-photoviewer": {},
-      "cordova-sqlite-storage": {},
       "cordova-launch-review": {},
       "cordova-plugin-network-information": {},
       "cordova-plugin-local-notification": {},
       "cordova-plugin-googleplus": {
         "PLAY_SERVICES_VERSION": "11.8.0"
-      }
+      },
+      "cordova-sqlite-storage": {},
+      "cordova-plugin-splashscreen": {}
     }
   }
 }
