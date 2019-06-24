@@ -235,6 +235,17 @@ button.google-in {
 }
 
 
+
+.backup-migration-modal {
+    .action-buttons-wrapper button {
+        text-transform: none;
+        height: auto;
+        min-height: 42px;
+    }
+}
+
+
+
 // night mode
 .night-mode {
     color: #eee;

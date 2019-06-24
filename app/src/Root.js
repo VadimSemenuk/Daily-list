@@ -172,6 +172,7 @@ class Root extends Component {
 
                     <Route render={props => (
                         <Modal
+                            className="backup-migration-modal"
                             isOpen={this.state.backupMigrationModal}
                             onRequestClose={this.closeBackupMigrationModal}
                             actionItems={[

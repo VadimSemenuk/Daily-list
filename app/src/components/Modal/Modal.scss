@@ -31,6 +31,9 @@
         padding-top: 10px;
         justify-content: flex-end;
         margin-bottom: -10px;
-        text-transform: uppercase;
+
+        button {
+            text-transform: uppercase;
+        }
     }
 }
