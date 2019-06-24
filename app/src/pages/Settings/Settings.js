@@ -6,7 +6,7 @@ import {translate} from "react-i18next";
 import * as AppActions from '../../actions'; 
 
 import Header from '../../components/Header/Header';
-import {SwitchListItem, InsetListItem} from "../../components/ListItem/ListItem";
+import {InsetListItem} from "../../components/ListItem/ListItem";
 
 import './Settings.scss';
 
@@ -18,11 +18,6 @@ class Settings extends Component {
             <div className="page-wrapper">
                 <Header title={t("settings")} />
                 <div className="scroll page-content padding">
-                    <SwitchListItem 
-                        text={t("default-notification")}
-                        checked={this.props.settings.defaultNotification}
-                        onChange={(e) => this.props.setSetting('defaultNotification', e)}
-                    />
                     <InsetListItem 
                         text={t("view")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/sort`)}  

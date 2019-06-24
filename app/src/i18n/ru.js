@@ -49,6 +49,10 @@ export default {
     "min-symbols-password": "Введите минимум 4 символа",
     "new-password": "Введите новый пароль",
     "repeat-password": "Введите пароль повторно",
+    "password-reset-email": "Email для сброса пароля",
+    "reset-password-email-no-user": "Войдите что бы привязать email для сбросса пароля",
+    "reset-password": "Сбросить пароль",
+    "password-has-been-reset": "Новый пароль отправлен на email",
 
     //troubleshooting page
     "help": "Помощь",

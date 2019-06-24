@@ -8,6 +8,7 @@ import * as AppActions from '../../actions';
 import Header from "../../components/Header/Header";
 
 import './SettingsPassword.scss';
+import GoogleImg from "../../assets/img/google.svg";
 
 class SettingsPassword extends Component {
 	constructor(props) {
@@ -26,6 +27,8 @@ class SettingsPassword extends Component {
             window.plugins.toast.showLongBottom(this.props.t("no-space-password"));
         } else if (this.state.password0.length < 4) {
             window.plugins.toast.showLongBottom(this.props.t("min-symbols-password"));
+        } else if (!this.props.user) {
+            window.plugins.toast.showLongBottom(this.props.t("reset-password-email-no-user"));
         } else {
             return true;
         }
@@ -36,14 +39,14 @@ class SettingsPassword extends Component {
         if (this.validatePassword()) {
             this.props.setSetting('password', this.state.password0);
             this.props.history.goBack();
-        };
+        }
     }
 
     render () {
         let {t} = this.props;
 
         return (
-            <div className="page-wrapper">
+            <div className="page-wrapper settings-password-page-wrapper">
                 <Header title={t("password")} />
                 <div className="scroll page-content padding">
                     <input
@@ -55,8 +58,25 @@ class SettingsPassword extends Component {
                         type="password"
                         placeholder={t("repeat-password")}
                         onChange={(e) => this.setState({password1: e.target.value})}
-                    />                
-                    <button 
+                    />
+                    <div className="reset-password-wrapper">
+                        {
+                            this.props.user &&
+                            <div className="reset-password-email">{t("password-reset-email")}: <strong>{this.props.user.email}</strong></div>
+                        }
+                        {
+                            !this.props.user &&
+                            <div className="reset-password-email-no-user">
+                                <span>{t("reset-password-email-no-user")}</span>
+                                <button
+                                    className="text block google-in img-text-button"
+                                    type="button"
+                                    onClick={this.props.googleSignIn}
+                                ><img src={GoogleImg} alt="google sign in" />{t("google-sign-in")}</button>
+                            </div>
+                        }
+                    </div>
+                    <button
                         className="text block"
                         onClick={this.onPassSet}
                     >{t("save")}</button>       
@@ -68,7 +88,8 @@ class SettingsPassword extends Component {
 
 function mapStateToProps(state, props) {
     return {
-        settings: state.settings
+        settings: state.settings,
+        user: state.user
     }
 }
 

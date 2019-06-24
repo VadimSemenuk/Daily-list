@@ -136,7 +136,13 @@ class SettingsSort extends Component {
                                 }
                             </div>
                         </ModalListItem>   
-                    }      
+                    }
+
+                    <SwitchListItem
+                        text={t("default-notification")}
+                        checked={this.props.settings.defaultNotification}
+                        onChange={(e) => this.props.setSetting('defaultNotification', e)}
+                    />
                 </div>
             </div>
         );

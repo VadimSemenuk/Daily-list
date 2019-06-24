@@ -46,6 +46,9 @@ app.use("/api/log/", log(logRep));
 let telegram = require('./server/routes/telegram');
 app.use("/api/telegram/", telegram(reportRep));
 
+let localPassword = require('./server/routes/local-password');
+app.use("/api/local-password/", localPassword());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('*', express.static(path.join(__dirname, '/public/index.html')));
 

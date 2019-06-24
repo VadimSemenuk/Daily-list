@@ -1,16 +1,16 @@
 @import './Fonts.scss';
 
+html {
+    font-size: 14px;
+    font-family: "Roboto";
+    color: #222;
+}
 body,
 html {
     padding: 0;
     margin: 0;
     height: 100%;
     -webkit-user-select: none;
-}
-body {
-    font-family: "Roboto";
-    color: #222;
-    font-size: 14px;
 }
 button, input, textarea {
     font-family: inherit;   
@@ -91,7 +91,7 @@ button,
     padding: 0;
     margin: 0;
     text-decoration: none;
-    font-size: 1em;
+    font-size: 1rem;
 
     &:active {
         background: transparent;
@@ -108,7 +108,7 @@ button,
         margin: auto;
     }
 
-    &.text {        
+    &.text {
         width: auto;
         padding: 0 16px;
         color: #fff;
@@ -206,15 +206,6 @@ select {
     border-bottom: 1px solid #e0d9d9;
 }
 
-
-
-// INIT LOADER
-.init-loader-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
 
 
 .padding .list-items-block {

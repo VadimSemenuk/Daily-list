@@ -8,6 +8,8 @@ import {translate} from "react-i18next";
 import arrowRight from '../../assets/img/right-grey.svg';
 
 import './Password.scss';
+import deviceService from "../../services/device.service";
+import apiService from "../../services/api.service";
 
 class Password extends Component {
 	constructor(props) {
@@ -30,16 +32,28 @@ class Password extends Component {
         if (this.validatePassword()) {
             await this.props.setPasswordValid();
             this.props.history.replace("/");
-        };
+        }
     }
 
     onKeyPress = (e) => e.key === "Enter" && this.in()
+
+    resetPassword = () => {
+	    if (!deviceService.hasNetworkConnection()) {
+            window.plugins.toast.showLongBottom(this.props.t("internet-required"));
+            return
+        }
+
+	    let newPassword = Math.random().toString(36).slice(-8);
+        apiService.post("local-password/send-new", {lang: this.props.settings.lang, newPassword: newPassword});
+        window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset"));
+        this.props.setSetting('password', newPassword);
+    }
 
     render () {
         let {t} = this.props;
 
 		return (
-            <div class="page-wrapper">
+            <div className="page-wrapper">
                 <div className="password-wrapper">
                     <span className="greeting">{t(getGreeting())}</span>
 
@@ -57,7 +71,12 @@ class Password extends Component {
                                 alt="in"
                             />
                         </button>      
-                    </div> 
+                    </div>
+
+                    <button
+                        className="text clear reset-password"
+                        onClick={this.resetPassword}
+                    >{t("reset-password")}</button>
                 </div>
             </div>
 		);

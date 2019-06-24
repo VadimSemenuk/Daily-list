@@ -323,7 +323,7 @@ class Add extends Component {
 
                             <ModalListItem
                                 ref={(r) => this.photoModal = r}
-                                onTouchStart={this.saveFocusedElement}
+                                onTouchStart={this.saveFocusedElement}toggle-icon-wrapper
                                 listItem={(props) => (
                                     <button 
                                         onClick={props.onClick}
