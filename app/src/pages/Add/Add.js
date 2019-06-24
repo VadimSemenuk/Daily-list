@@ -73,14 +73,22 @@ class Add extends Component {
         return Array.prototype.slice.call(document.querySelectorAll(".dynamic-field"));
     }
 
+    saveFocusedElement = () => {
+        this.lastFocusedElement = document.activeElement;
+    }
+
     getFocusedFieldIndex() {
-        if (!document.activeElement) {
+        let focusedDynamicField;
+        let activeElement;
+        if (document.activeElement && document.activeElement.closest(".dynamic-field")) {
+            activeElement = document.activeElement;
+        } else if (this.lastFocusedElement && this.lastFocusedElement.closest(".dynamic-field")) {
+            activeElement = this.lastFocusedElement;
+        } else {
             return null;
         }
-        let focusedDynamicField = document.activeElement.closest(".dynamic-field");
-        if (!focusedDynamicField) {
-            return null;
-        }
+
+        focusedDynamicField = activeElement.closest(".dynamic-field");
 
         return this.getDynamicFiledElements().indexOf(focusedDynamicField);
     }
@@ -293,6 +301,7 @@ class Add extends Component {
                         }
                         <div className="add-actions-wrapper">
                             <button
+                                onTouchStart={this.saveFocusedElement}
                                 onClick={this.addListItem}
                             >
                                 <img
@@ -301,7 +310,8 @@ class Add extends Component {
                                 />   
                                 <span>{t("list-item-btn")}</span>     
                             </button>  
-                            <button 
+                            <button
+                                onTouchStart={this.saveFocusedElement}
                                 onClick={this.addInput}
                             >
                                 <img 
@@ -313,6 +323,7 @@ class Add extends Component {
 
                             <ModalListItem
                                 ref={(r) => this.photoModal = r}
+                                onTouchStart={this.saveFocusedElement}
                                 listItem={(props) => (
                                     <button 
                                         onClick={props.onClick}
