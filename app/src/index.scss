@@ -313,6 +313,9 @@ button.google-in {
         img {
             filter: invert(1);
         }
+        &.text {
+            color: #eee;
+        }
     }
 
     header {

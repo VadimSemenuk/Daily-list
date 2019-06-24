@@ -56,14 +56,14 @@ export default class App extends Component {
 
         let meta = await deviceService.getMetaInfo();
         let settings = await settingsService.getSettings();
+        this.applyInitSettings(settings);
+
         let password = !settings.password;
         let date = moment().startOf("day");
         let notes = await notesService.getNotesByDates([moment(date).add(-1, "day"), date, moment(date).add(1, "day")]);
         let user = authService.getToken();
 
         this.store = initStore({settings, password, notes, date, user, meta});
-
-        this.applyInitSettings(settings);
 
         this.deviceId = meta.deviceId;
 
