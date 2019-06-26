@@ -1,9 +1,11 @@
 .attached-image-wrapper {
     position: relative;
+    overflow: hidden;
 
     .attached-image {
         width: 100%;
         height: auto;
+        border-radius: 6px;
     }
 
     button {

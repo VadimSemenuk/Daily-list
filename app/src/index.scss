@@ -63,6 +63,7 @@ h3 {
 .page-content {
     background: #fff;
     flex: 1 1;
+    overflow: hidden;
 
     &.padding {
         padding: 10px;

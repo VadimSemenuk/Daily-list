@@ -148,7 +148,11 @@ class Add extends Component {
             type: "snapshot",
             uri: url
         };
-        await this.addField(field, this.activeInputIndex);
+
+        let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.dynamicFields.length;
+
+        await this.addField(field, nextIndex);
         this.scrollToBottom();
     };
 
@@ -323,9 +327,9 @@ class Add extends Component {
 
                             <ModalListItem
                                 ref={(r) => this.photoModal = r}
-                                onTouchStart={this.saveFocusedElement}toggle-icon-wrapper
                                 listItem={(props) => (
-                                    <button 
+                                    <button
+                                        onTouchStart={this.saveFocusedElement}
                                         onClick={props.onClick}
                                         className="camera-button"
                                     >
@@ -350,7 +354,7 @@ class Add extends Component {
                                     text={t("make-shot")}
                                     onClick={() => {
                                         this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA);
-                                        this.photoModal.trigger();                                        
+                                        this.photoModal.trigger();
                                     }}
                                 />
                             </ModalListItem>

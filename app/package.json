@@ -16,7 +16,7 @@
     "bfj": "6.1.1",
     "case-sensitive-paths-webpack-plugin": "2.1.2",
     "chalk": "2.4.1",
-    "com-sarriaroman-photoviewer": "^1.2.1",
+    "com-sarriaroman-photoviewer": "^1.2.2",
     "cordova-android": "^7.1.1",
     "cordova-launch-review": "^3.1.1",
     "cordova-plugin-badge": "^0.8.8",
@@ -159,7 +159,6 @@
       "cordova-plugin-camera": {},
       "cordova-plugin-datetimepicker": {},
       "cordova-plugin-statusbar": {},
-      "com-sarriaroman-photoviewer": {},
       "cordova-launch-review": {},
       "cordova-plugin-network-information": {},
       "cordova-plugin-local-notification": {},
@@ -167,7 +166,8 @@
         "PLAY_SERVICES_VERSION": "11.8.0"
       },
       "cordova-sqlite-storage": {},
-      "cordova-plugin-splashscreen": {}
+      "cordova-plugin-splashscreen": {},
+      "com-sarriaroman-photoviewer": {}
     }
   }
 }
