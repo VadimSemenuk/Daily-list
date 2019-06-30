@@ -1,11 +1,13 @@
 .attached-image-wrapper {
     position: relative;
     overflow: hidden;
+    border-radius: 6px;
+    margin-top: 5px;
 
     .attached-image {
         width: 100%;
         height: auto;
-        border-radius: 6px;
+        display: block;
     }
 
     button {

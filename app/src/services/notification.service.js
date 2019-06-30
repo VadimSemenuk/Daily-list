@@ -11,6 +11,8 @@ class NotificationService {
             window.cordova.plugins.notification.local.hasPermission((granted) => {
                 if (!granted) {
                     window.cordova.plugins.notification.local.requestPermission(resolve);
+                } else {
+                    resolve(true);
                 }
             });
         });
@@ -20,7 +22,7 @@ class NotificationService {
         }
 
         let notificationConfig = {
-            title: note.title || 'Уведомление о заметке',
+            title: note.title || i18next.t("default-notification-title"),
             text: this.getMessage(note),
             sound: true
         };

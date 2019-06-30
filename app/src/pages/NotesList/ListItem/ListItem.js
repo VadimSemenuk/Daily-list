@@ -59,7 +59,7 @@ class Note extends PureComponent {
         
         return (
             <div
-                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'}`}
+                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'}`}
                 onClick={this.triggerExpanded}
             >
                 <div
@@ -139,13 +139,15 @@ class Note extends PureComponent {
                             } else if (a && a.type === "snapshot") {
                                 if (this.state.expanded) {
                                     return (
-                                        <img
-                                            onClick={this.showImage}
-                                            key={i}
-                                            className="attached-image"
-                                            src={a.uri}
-                                            alt="attachment"
-                                        />
+                                        <div class="attached-image-wrapper">
+                                            <img
+                                                onClick={this.showImage}
+                                                key={i}
+                                                className="attached-image"
+                                                src={a.uri}
+                                                alt="attachment"
+                                            />
+                                        </div>
                                     )
                                 } else {
                                     return (

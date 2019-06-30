@@ -55,8 +55,8 @@ class TimeSet extends Component {
 
     onNotificateChange = (notificate) => {
         if (!this.props.startTime) {
-            window.plugins.toast.showLongBottom(this.props.t("set-time-first"));           
-            return        
+            window.plugins.toast.showLongBottom(this.props.t("set-time-first"));
+            return
         }
         
         if (this.props.settings.defaultNotification && !notificate) {

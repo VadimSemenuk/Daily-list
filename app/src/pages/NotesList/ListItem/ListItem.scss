@@ -103,17 +103,23 @@
         // item data
         .item-data-text {
             padding-top: 5px;
+            white-space: pre-wrap;
         }
 
-        .attached-image {
-            width: 100%;
-            height: auto;
-            margin-top: 5px;
+        .attached-image-wrapper {
             border-radius: 6px;
+            overflow: hidden;
+            margin-top: 5px;
+
+            .attached-image {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
         }
         .attached-image-label {
             margin-top: 5px;
-            display: block;        
+            display: block;
             font-weight: bold;
             font-size: 0.86em;
         }

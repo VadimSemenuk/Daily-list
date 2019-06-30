@@ -132,7 +132,7 @@ class NotesService {
 
         if (nextNote.isShadow) {
             nextNote.uuid = uuid();
-            nextNote.forkFrom = note.uuid;
+            nextNote.forkFrom = note.key;
             nextNote.repeatDate = note.repeatDate === -1 ? note.added.valueOf() : note.repeatDate;
             nextNote = await this.insertNote(nextNote);
         } else {

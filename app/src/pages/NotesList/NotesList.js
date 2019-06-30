@@ -253,7 +253,7 @@ class NotesList extends PureComponent {
                 listEls[i].scrollTop = 0
             }
 
-            let activeItemsEls = document.querySelectorAll(".note-wrapper.expanded");
+            let activeItemsEls = document.querySelectorAll(".note-wrapper.expanded:not(.force-expanded)");
             for (let i = 0; i < activeItemsEls.length; i++) {
                 activeItemsEls[i].classList.remove("expanded");
             }
