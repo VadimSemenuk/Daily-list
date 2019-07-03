@@ -15,8 +15,9 @@ export default {
     // view settings page
     "sort": "Сортировка",
     "time-sort": "По указанному времени",
-    "time-add-sort": "По времени добавления",  
-    "view-direction": "Порядок отображения",  
+    "time-add-sort": "По времени добавления",
+    "custom-sort": "Собственная сортировка",
+    "view-direction": "Порядок отображения",
     "view-direction-asc": "В прямом порядке",
     "view-direction-desc": "В обратном порядке",
     "fin-sort": "Перемещать завершенные вниз",

@@ -97,22 +97,30 @@ function notes (state = init, action) {
 
                 return receiveNote(startState, action.note);
             } else {
-                if (action.inserted) {
-                    let noteToFilterDate = action.note.added.valueOf();
+                let actions = action.notes ? action.notes : [action];
 
-                    startState = state.map((list) => {
-                        if (list.date.valueOf() === noteToFilterDate) {
-                            return {...list, items: list.items.filter((note) => note.key !== action.note.forkFrom)}
-                        }
-                        return list
-                    });
-                } else {
-                    startState = state.map((list) => {
-                        return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
-                    }); 
-                }
+                let nextState = state.slice();
 
-                return receiveSingleNote(startState, action.note);
+                actions.forEach((action) => {
+                    if (action.inserted) {
+                        let noteToFilterDate = action.note.added.valueOf();
+
+                        startState = nextState.map((list) => {
+                            if (list.date.valueOf() === noteToFilterDate) {
+                                return {...list, items: list.items.filter((note) => note.key !== action.note.forkFrom)}
+                            }
+                            return list
+                        });
+                    } else {
+                        startState = nextState.map((list) => {
+                            return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
+                        });
+                    }
+
+                    nextState = receiveSingleNote(startState, action.note);
+                })
+
+                return nextState;
             }
         }
         case 'DELETE_NOTE': {
@@ -137,6 +145,17 @@ function notes (state = init, action) {
         }
         case "UPDATE_NOTES": {
             return action.notes.slice();
+        }
+        case "UPDATE_MANUAL_SORT_INDEX": {
+            return state.map((list) => {
+                if (list.date.valueOf() === action.notes[0].added.valueOf()) {
+                    return {
+                        ...list,
+                        items: action.notes
+                    };
+                }
+                return list;
+            });
         }
         default: 
             return state;

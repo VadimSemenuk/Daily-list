@@ -97,6 +97,7 @@ export default {
                     forkFrom INTEGER,
                     priority INTEGER,
                     repeatDate INTEGER,
+                    manualOrderIndex INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
             `);
@@ -165,10 +166,10 @@ export default {
         async function alterSettingsTable () {
             let select = await execureSQL(`SELECT sort FROM Settings;`);
             let selectItems = select.rows.item(0);
-            let currentSortSettings = (selectItems && selectItems.sort ) ? JSON.parse(selectItems.sort) : false;
+            let currentSortSettings = (selectItems && selectItems.sort) ? JSON.parse(selectItems.sort) : false;
             if (!currentSortSettings) {
                 currentSortSettings = {
-                    type: 1,
+                    type: 2,
                     direction: 1,
                     finSort: 1
                 }
@@ -230,7 +231,7 @@ export default {
                     1 as minimizeNotes,
                     1 as calendarMode
                 FROM Settings_OLD;
-            `, [currentSortSettings.type || 1, currentSortSettings.direction || 1, currentSortSettings.finSort || 1, 1]);
+            `, [currentSortSettings.type, currentSortSettings.direction, currentSortSettings.finSort, 0]);
             await execureSQL(`DROP TABLE Settings_OLD;`);
         }
 

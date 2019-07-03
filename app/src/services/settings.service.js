@@ -7,6 +7,9 @@ let sortTypeSettings = [{
 }, {
     translateId: "time-add-sort",
     val: 1
+}, {
+    translateId: "custom-sort",
+    val: 2
 }];
 
 let sortDirectionSettings = [{
@@ -39,25 +42,24 @@ let languageSettings = [{
 }];
 
 class SettingsService {
-
     getSortTypeSettings() {
-        return [...sortTypeSettings]
+        return [...sortTypeSettings];
     }
 
     getSortDirectionSettings() {
-        return [...sortDirectionSettings]
+        return [...sortDirectionSettings];
     }
 
     getFontSizeSettings() {
-        return [...fontSizeSettings]
+        return [...fontSizeSettings];
     }
 
     getNotesShowIntervalSettings() {
-        return [...notesShowIntervalSettings]
+        return [...notesShowIntervalSettings];
     }
 
     getLanguageSettings() {
-        return [...languageSettings]
+        return [...languageSettings];
     }
 
     async getSettings () {
@@ -76,7 +78,8 @@ class SettingsService {
                 sortDirection,
                 sortFinBehaviour,
                 minimizeNotes,
-                calendarMode
+                calendarMode,
+                sortIncludePriority
             FROM Settings;`
         );
 
@@ -91,7 +94,7 @@ class SettingsService {
             calendarNotesCounterIncludeFinished: Boolean(result.calendarNotesCounterIncludeFinished),
             sortIncludePriority: Boolean(result.sortIncludePriority),
             minimizeNotes: Boolean(result.minimizeNotes)
-        }
+        };
     }
 
     async setSetting (item, value) {

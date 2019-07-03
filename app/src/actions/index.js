@@ -269,6 +269,23 @@ export function renderNotes () {
     }
 }
 
+export function updateNotesManualSortIndex(notes) {
+    return function (dispatch) {
+        dispatch({
+            type: "UPDATE_MANUAL_SORT_INDEX",
+            notes: notes
+        });
+
+        notesService.updateNotesManualSortIndex(notes)
+            .then((insertedNotes) => {
+                dispatch({
+                    type: "UPDATE_NOTE",
+                    notes: insertedNotes.map((insertedNote) => ({note: insertedNote, inserted: true}))
+                });
+            })
+    }
+}
+
 // date
 export function setCurrentDate (date) {
     return {

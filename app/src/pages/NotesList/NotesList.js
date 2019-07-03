@@ -32,12 +32,19 @@ class NotesList extends PureComponent {
             },
             copyBuffer: null,
             listItemDialogVisible: false,
-            dragMode: false
+            isDragSortMode: false,
+            isSwipeAvailable: true
         };
 
         this.activePageIndex = 1;  
         this.prevPageIndex = 1;
         this.slideChanged = false;
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (this.swipe && (nextState.isSwipeAvailable !== this.props.isSwipeAvailable)) {
+            this.swipe.disableScrolling(!nextState.isSwipeAvailable);
+        }
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
@@ -145,6 +152,17 @@ class NotesList extends PureComponent {
         });
     };
 
+    onDragSortModeTrigger = () => {
+        this.setState({
+            isDragSortMode: !this.state.isDragSortMode,
+            isSwipeAvailable: !this.state.isSwipeAvailable
+        })
+    }
+
+    onOrderChange = (order) => {
+        this.props.updateNotesManualSortIndex(order);
+    }
+
     render() {
         let {t} = this.props;
 
@@ -173,14 +191,20 @@ class NotesList extends PureComponent {
                             onCloseRequest={this.triggerCalendar}
                         />
                     }
-                    <ReactSwipe 
+                    <ReactSwipe
+                        ref={node => {
+                            if (node) {
+                                this.swipe = node.swipe;
+                            }
+                        }}
                         className="notes-list-swiper" 
                         swipeOptions={{
                             continuous: true,
                             startSlide: 1,
                             callback: this.onSliderChange,
-                            transitionEnd: this.onTransitionEnd 
-                        }} 
+                            transitionEnd: this.onTransitionEnd,
+                            disableScroll: !this.state.isSwipeAvailable,
+                        }}
                         key={this.props.notes.length}
                     >
                         {
@@ -192,8 +216,9 @@ class NotesList extends PureComponent {
                                     <DayNotesList
                                         index={i}
                                         notes={notes.items} 
-                                        finSort={this.props.settings.sortFinBehaviour === 1}
                                         settings={this.props.settings}
+                                        onDragSortModeTrigger={this.onDragSortModeTrigger}
+                                        onOrderChange={this.onOrderChange}
                                         onItemDynamicFieldChange={this.props.updateNoteDynamicFields}
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                     />
@@ -320,10 +345,29 @@ function sort (data, settings) {
 
         if (settings.sortType === 1) {
             if (settings.sortDirection === 1) {
-                return (a, b) => a.key - b.key   
+                return (a, b) => a.key - b.key
             } else {
                 return (a, b) =>  b.key - a.key
-            }                         
+            }
+        }
+
+        if (settings.sortType === 2) {
+            return (a, b) => {
+                let aManualOrderIndex = (a.manualOrderIndex !== undefined && a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
+                let bManualOrderIndex = (b.manualOrderIndex !== undefined && b.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
+                if (aManualOrderIndex === bManualOrderIndex) {
+                    if (settings.sortDirection === 1) {
+                        return a.key - b.key;
+                    } else {
+                        return b.key - a.key;
+                    }
+                }
+                if (settings.sortDirection === 1) {
+                    return aManualOrderIndex - bManualOrderIndex;
+                } else {
+                    return bManualOrderIndex - aManualOrderIndex;
+                }
+            }
         }
     }
 }

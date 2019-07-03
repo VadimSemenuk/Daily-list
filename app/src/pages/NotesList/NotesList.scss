@@ -16,7 +16,12 @@
         }
 
         .notes-list-item-wrapper {
-            overflow-y: auto;
+            //overflow-y: auto;
+            display: flex;
+            & > div {
+                flex: 1;
+                overflow-y: auto;
+            }
         }
 
         .no-content {
@@ -68,6 +73,18 @@
             padding: 0 16px;
             z-index: 2;
             position: relative;
+        }
+    }
+
+    .note-wrapper.sortable-chosen .note-content {
+        border-width: 2px;
+        border-color: #b4b4b4;
+    }
+
+    .note-wrapper.sortable-chosen.sortable-ghost {
+        opacity: 0.4;
+        .note-content {
+            border-width: 1px;
         }
     }
 }

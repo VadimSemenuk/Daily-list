@@ -10,7 +10,7 @@ class NotesService {
         let currentDate = date.valueOf();
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-            t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.repeatDate,
+            t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate,
             (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
             FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
@@ -73,7 +73,7 @@ class NotesService {
             uuid: uuid(),
             lastActionTime: moment().valueOf(),
             forkFrom: -1,
-            repeatDate: -1,
+            repeatDate: -1
         };
 
         let addedNote = await this.insertNote(noteToLocalInsert);
@@ -536,6 +536,31 @@ class NotesService {
             DELETE FROM Tasks
             WHERE lastAction = 'CLEAR' ${whereStatement ? "AND " + whereStatement : ""}
         `, params);
+    }
+
+    async updateNotesManualSortIndex(notes) {
+        let nextNotes = notes.slice();
+        let notesInserted = [];
+        for (let note of nextNotes) {
+            if (note.isShadow) {
+                note.uuid = uuid();
+                note.forkFrom = note.key;
+                note.repeatDate = note.repeatDate === -1 ? note.added.valueOf() : note.repeatDate;
+                note = await this.insertNote(note);
+                notesInserted.push(note);
+            }
+        }
+
+        const values = notes.reduce((acc, val) => [...acc, val.key, val.manualOrderIndex], []);
+        const valuesPlaces = notes.reduce((acc) => [...acc, '(?, ?)'], []).join(", ");
+
+        let sql = `
+            WITH Tmp (id, manualOrderIndex) AS (VALUES ${valuesPlaces})
+            UPDATE Tasks SET manualOrderIndex = (SELECT manualOrderIndex FROM Tmp WHERE Tasks.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
+        `;
+        await executeSQL(sql, values);
+
+        return notesInserted;
     }
 
     tags = [

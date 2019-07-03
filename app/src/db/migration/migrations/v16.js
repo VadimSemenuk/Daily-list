@@ -45,7 +45,7 @@ export default {
             `);
             await execureSQL(`DROP TABLE Settings_OLD;`);
             let sort = {
-                type: 1,
+                type: 2,
                 direction: 1,
                 finSort: 1
             };

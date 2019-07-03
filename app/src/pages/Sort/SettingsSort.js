@@ -23,10 +23,14 @@ class SettingsSort extends Component {
 
         let sortTypeSelectedValue = sortTypeSettings.find((a) => a.val === this.props.settings.sortType).val;
         let sortDirectionSelectedValue = sortDirectionSettings.find((a) => a.val === this.props.settings.sortDirection).val;
+        let isSortIncludePriorityEnabled = sortTypeSelectedValue !== 2;
 
         this.state = {
             sortTypeSelectedValue,
-            sortDirectionSelectedValue
+            sortDirectionSelectedValue,
+            sortIncludePriority: this.props.settings.sortIncludePriority,
+
+            isSortIncludePriorityEnabled: isSortIncludePriorityEnabled
         }
     }
 
@@ -47,11 +51,20 @@ class SettingsSort extends Component {
                         actionItems={[
                             {
                                 text: t("cancel"),
-                                onClick: () => this.setState({sortTypeSelectedValue: activeSortType.val})
+                                onClick: () => {
+                                    this.setState({
+                                        sortTypeSelectedValue: activeSortType.val,
+                                        sortIncludePriority: this.props.settings.sortIncludePriority,
+                                        isSortIncludePriorityEnabled: activeSortType.val !== 2
+                                    })
+                                }
                             },
                             {
                                 text: t("ok"),
-                                onClick: () => this.props.setSetting("sortType", this.state.sortTypeSelectedValue, this.props.renderNotes)
+                                onClick: () => {
+                                    this.props.setSetting("sortType", this.state.sortTypeSelectedValue);
+                                    this.props.setSetting("sortIncludePriority", this.state.sortIncludePriority, this.props.renderNotes);
+                                }
                             }
                         ]}
                     >
@@ -63,7 +76,18 @@ class SettingsSort extends Component {
                                         name="sort-type"
                                         checked={this.state.sortTypeSelectedValue === setting.val}
                                         value={setting.val}
-                                        onChange={(e) => this.setState({sortTypeSelectedValue: +e})}
+                                        onChange={(e) => {
+                                            let nextState = {
+                                                sortTypeSelectedValue: +e
+                                            }
+                                            if (nextState.sortTypeSelectedValue === 2) {
+                                                nextState.sortIncludePriority = false;
+                                                nextState.isSortIncludePriorityEnabled = false;
+                                            } else {
+                                                nextState.isSortIncludePriorityEnabled = true;
+                                            }
+                                            this.setState(nextState);
+                                        }}
                                         text={t(setting.translateId)}
                                     />
                                 ))
@@ -71,8 +95,9 @@ class SettingsSort extends Component {
 
                             <SwitchListItem
                                 text={t("priority-sort")}
-                                checked={this.props.settings.sortIncludePriority}
-                                onChange={(e) => this.props.setSetting("sortIncludePriority", e, this.props.renderNotes)}
+                                checked={this.state.sortIncludePriority}
+                                disabled={!this.state.isSortIncludePriorityEnabled}
+                                onChange={(e) => this.setState({sortIncludePriority: e})}
                             />
                         </div>
                     </ModalListItem>
