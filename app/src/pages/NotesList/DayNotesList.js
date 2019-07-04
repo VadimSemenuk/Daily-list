@@ -6,6 +6,22 @@ import ListItem from './ListItem/ListItem';
 import Sortable from 'react-sortablejs';
 
 class DayNotesList extends PureComponent {
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.sortable && (this.props.settings.sortType !== prevProps.settings.sortType)) {
+            this.sortable.option('disabled', this.props.settings.sortType !== 2);
+        }
+
+        if (this.sortable && (this.props.settings.sortFinBehaviour !== prevProps.settings.sortFinBehaviour)) {
+            this.sortable.option('draggable', this.props.settings.sortFinBehaviour === 1 ? ".not-finished" : ".note-wrapper");
+        }
+    }
+
+    setSortableRef = (node) => {
+        if (node) {
+            this.sortable = node.sortable;
+        }
+    }
+
     onOrderChange = (order) => {
         order = order.map((key) => +key);
         if (this.props.settings.sortDirection === 0) {
@@ -47,9 +63,9 @@ class DayNotesList extends PureComponent {
 
         let sortableOptions = {
             options: {
-                disabled: false,
-                delay: 500,
-                draggable: ".draggable",
+                disabled: this.props.settings.sortType !== 2,
+                delay: 400,
+                draggable: this.props.settings.sortFinBehaviour === 1 ? ".not-finished" : ".note-wrapper",
                 direction: 'vertical',
                 onStart: this.props.onDragSortModeTrigger,
                 onEnd: this.props.onDragSortModeTrigger
@@ -62,7 +78,7 @@ class DayNotesList extends PureComponent {
             let finished = this.props.notes.filter((a) => a.finished);
 
             return (
-                <Sortable {...sortableOptions}>
+                <Sortable ref={this.setSortableRef} {...sortableOptions}>
                     {
                         notFinished.map(this.renderItem)
                     }

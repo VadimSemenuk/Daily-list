@@ -60,7 +60,7 @@ class Note extends PureComponent {
         return (
             <div
                 data-id={this.props.itemData.key}
-                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'} ${!(this.props.itemData.finished && this.props.settings.sortFinBehaviour === 1) && 'draggable'}`}
+                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'} ${this.props.itemData.finished && 'finished'} ${!this.props.itemData.finished && 'not-finished'}`}
                 onClick={this.triggerExpanded}
             >
                 <div
@@ -92,7 +92,7 @@ class Note extends PureComponent {
                     />
                 }
                 <div className="note-content">
-                    <div style={{fontSize: 12, color: '#ccc'}}>Order: {this.props.itemData.manualOrderIndex}</div>
+                    <div style={{fontSize: 12, color: '#ccc', position: 'absolute', top: 3, left: 3}}>{this.props.itemData.manualOrderIndex}</div>
 
                     <div className="note-header">
                         {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>}
