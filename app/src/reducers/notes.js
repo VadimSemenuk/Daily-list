@@ -147,15 +147,24 @@ function notes (state = init, action) {
             return action.notes.slice();
         }
         case "UPDATE_MANUAL_SORT_INDEX": {
-            return state.map((list) => {
-                if (list.date.valueOf() === action.notes[0].added.valueOf()) {
-                    return {
-                        ...list,
+            if (action.notes[0].mode === 2) {
+                return [
+                    {
+                        ...state[0],
                         items: action.notes
-                    };
-                }
-                return list;
-            });
+                    }
+                ]
+            } else {
+                return state.map((list) => {
+                    if (list.date.valueOf() === action.notes[0].added.valueOf()) {
+                        return {
+                            ...list,
+                            items: action.notes
+                        };
+                    }
+                    return list;
+                });
+            }
         }
         default: 
             return state;

@@ -60,7 +60,7 @@ class NotesService {
             )
         }
 
-        let dateNotes = selects.map((select, i) => {
+        let dateNotes = selects.map((select, selectIndex) => {
             let notes = [];
             for(let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
@@ -70,7 +70,7 @@ class NotesService {
                     dynamicFields: JSON.parse(item.dynamicFields),
                     startTime: ~item.startTime ? moment(item.startTime) : false,
                     endTime: ~item.endTime ? moment(item.endTime) : false,
-                    added: moment(dates[i]),
+                    added: moment(dates[selectIndex]),
                     finished: Boolean(item.finished),
                     notificate: Boolean(item.notificate),
                     isShadow: Boolean(item.added === -1),
@@ -83,7 +83,7 @@ class NotesService {
             }
 
             return {
-                date: dates[i],
+                date: dates[selectIndex],
                 items: notes
             }
         });

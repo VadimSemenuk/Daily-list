@@ -356,29 +356,29 @@ function sort (data, settings) {
     });
 
     function getNotesCompareFn() {
-        if (settings.notesScreenMode === 2) {
-            if (settings.sortDirection === 1) {
-                return (a, b) => a.key - b.key
-            } else {
-                return (a, b) =>  b.key - a.key
-            }
-        }
-
         if (settings.sortType === 0) {
-            return (a, b) => {
-                let aDayTimeSum = a.startTime ?
-                    (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
-                    : 0;
-                let bDayTimeSum = b.startTime ?
-                    (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
-                    : 0;
+            if (settings.notesScreenMode === 1) {
+                return (a, b) => {
+                    let aDayTimeSum = a.startTime ?
+                        (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
+                        : 0;
+                    let bDayTimeSum = b.startTime ?
+                        (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
+                        : 0;
 
+                    if (settings.sortDirection === 1) {
+                        return aDayTimeSum - bDayTimeSum;
+                    } else {
+                        return bDayTimeSum - aDayTimeSum;
+                    }
+                };
+            } else {
                 if (settings.sortDirection === 1) {
-                    return aDayTimeSum - bDayTimeSum;
+                    return (a, b) => a.key - b.key
                 } else {
-                    return bDayTimeSum - aDayTimeSum;
+                    return (a, b) =>  b.key - a.key
                 }
-            };
+            }
         }
 
         if (settings.sortType === 1) {
