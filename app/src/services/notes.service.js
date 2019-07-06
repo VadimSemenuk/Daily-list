@@ -6,60 +6,97 @@ import notificationService from "./notification.service";
 window.e = executeSQL;
 
 class NotesService {
-    async getDayNotes(date) {
-        let currentDate = date.valueOf();
-        let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-            t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate,
-            (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
-            FROM Tasks t
-            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-            WHERE
-                t.lastAction != 'DELETE'
-                AND t.lastAction != 'CLEAR'
-                AND (
-                    t.added = ?
-                    OR (
-                        t.added = -1 AND NOT EXISTS (SELECT forkFrom FROM Tasks WHERE forkFrom = t.id AND repeatDate = ?)
-                        AND (
-                            t.repeatType = "day"
-                            OR (t.repeatType = "week" AND rep.value = ?)
-                            OR (t.repeatType = "any" AND rep.value = ?)
-                        )
-                    )
-                );`,
-            [currentDate, currentDate, date.isoWeekday(), currentDate]
-        );
+    async getNotes(mode, dates) {
+        let selects = null;
 
-        let notes = [];
-        for(let i = 0; i < select.rows.length; i++) {
-            let item = select.rows.item(i);
+        if (mode === 1) {
+            if (!Array.isArray(dates)) {
+                dates = [dates];
+            }
 
-            let nextItem = {
-                ...item,
-                dynamicFields: JSON.parse(item.dynamicFields),
-                startTime: ~item.startTime ? moment(item.startTime) : false,
-                endTime: ~item.endTime ? moment(item.endTime) : false,
-                added: moment(currentDate),
-                finished: Boolean(item.finished),
-                notificate: Boolean(item.notificate),
-                isShadow: Boolean(item.added === -1),
-                isSynced: Boolean(item.isSynced),
-                isLastActionSynced: Boolean(item.isLastActionSynced),
-                repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
-            };
-
-            notes.push(nextItem);
+            selects = await Promise.all(
+                dates.map((date) => {
+                    let currentDate = date.valueOf();
+                    return executeSQL(
+                        `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate,
+                        (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
+                        FROM Tasks t
+                        LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+                        WHERE
+                            t.lastAction != 'DELETE'
+                            AND t.lastAction != 'CLEAR'
+                            AND (
+                                t.added = ?
+                                OR (
+                                    t.added = -1 AND NOT EXISTS (SELECT forkFrom FROM Tasks WHERE forkFrom = t.id AND repeatDate = ?)
+                                    AND (
+                                        t.repeatType = "day"
+                                        OR (t.repeatType = "week" AND rep.value = ?)
+                                        OR (t.repeatType = "any" AND rep.value = ?)
+                                    )
+                                )
+                            )
+                            AND t.mode == 1;`,
+                        [currentDate, currentDate, date.isoWeekday(), currentDate]
+                    );
+                })
+            )
+        } else {
+            dates = [moment().startOf("day")];
+            selects = await Promise.all(
+                dates.map((date) => {
+                    return executeSQL(
+                        `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate
+                        FROM Tasks t
+                        WHERE
+                            t.mode == 2
+                            AND t.lastAction != 'DELETE'
+                            AND t.lastAction != 'CLEAR';`,
+                        []
+                    );
+                })
+            )
         }
 
-        return {
-            date: date,
-            items: notes
+        let dateNotes = selects.map((select, i) => {
+            let notes = [];
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+
+                let nextItem = {
+                    ...item,
+                    dynamicFields: JSON.parse(item.dynamicFields),
+                    startTime: ~item.startTime ? moment(item.startTime) : false,
+                    endTime: ~item.endTime ? moment(item.endTime) : false,
+                    added: moment(dates[i]),
+                    finished: Boolean(item.finished),
+                    notificate: Boolean(item.notificate),
+                    isShadow: Boolean(item.added === -1),
+                    isSynced: Boolean(item.isSynced),
+                    isLastActionSynced: Boolean(item.isLastActionSynced),
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
+                };
+
+                notes.push(nextItem);
+            }
+
+            return {
+                date: dates[i],
+                items: notes
+            }
+        });
+
+        if (mode === 1 && dateNotes.length === 1) {
+            return dateNotes[0];
         }
+
+        return dateNotes;
     }
 
     async getNotesByDates(dates) {
-        let tasks = dates.map((a) => this.getDayNotes(a));
+        let tasks = dates.map((a) => this.getNotes(a));
         return Promise.all(tasks);
     }
 
@@ -90,8 +127,8 @@ class NotesService {
         let insert = await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
-                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, repeatDate)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, repeatDate, mode)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -110,7 +147,8 @@ class NotesService {
                 isShadow ? -1 : note.added.valueOf(),
                 note.forkFrom,
                 note.priority,
-                note.repeatDate
+                note.repeatDate,
+                note.mode
             ]
         );
 
@@ -328,7 +366,7 @@ class NotesService {
 
         let select = await executeSQL(`
             SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                t.isSynced, t.isLastActionSynced, t.lastAction, t.lastActionTime, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, 
+                t.isSynced, t.isLastActionSynced, t.lastAction, t.lastActionTime, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.mode,
                 (select GROUP_CONCAT(tt.uuid, ',') from Tasks tt where tt.forkFrom = t.id) as forked,
                 (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatValues
             FROM Tasks t
@@ -345,7 +383,7 @@ class NotesService {
     async getNotesForBackup() {
         let select = await executeSQL(`
             SELECT t.id, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                t.isSynced, t.isLastActionSynced, t.lastAction, t.lastActionTime, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, 
+                t.isSynced, t.isLastActionSynced, t.lastAction, t.lastActionTime, t.repeatType, t.userId, t.added, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.mode,
                 (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatValues
             FROM Tasks t
         `);
@@ -365,7 +403,7 @@ class NotesService {
         await executeSQL(`DELETE FROM Tasks;`);
         await executeSQL(`DELETE FROM TasksRepeatValues;`);
 
-        let valuesString = notes.reduce((accumulator) => `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, "");
+        let valuesString = notes.reduce((accumulator) => `${accumulator}, (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, "");
         valuesString = valuesString.slice(2);
 
         let values = notes.reduce((accumulator, note) => {
@@ -389,14 +427,15 @@ class NotesService {
                 note.finished,
                 note.added,
                 note.forkFrom,
-                note.priority
+                note.priority,
+                note.mode
             ]
         }, []);
 
         await executeSQL(
             `INSERT INTO Tasks
             (id, uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
-                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority)
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, mode)
             VALUES
             ${valuesString};
         `, values);

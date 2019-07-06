@@ -16,8 +16,10 @@ import SettimgsImg from "../../assets/img/settings.svg";
 import ExportImg from '../../assets/img/upload-to-cloud.svg';
 
 let buttons = {
-    "notes": [5, 4, 0, 1],
-    "add": [2, 3],  
+    "daily-notes": [5, 4, 0, 1],
+    "notes": [5, 4, 1],
+    "daily-add": [2, 3],
+    "add": [2, 3],
     "password": [],
     default: [2],                       
 };
@@ -26,7 +28,7 @@ let Header = (props) => (
     <header className="theme-header-background">
         <div>
             {
-                props.page === "notes" &&
+                ["notes", "daily-notes"].includes(props.page) &&
                 <div 
                     onClick={props.onSelectToday}
                     className="current-date clickable"
@@ -39,8 +41,8 @@ let Header = (props) => (
                 props.title && <div className="page-title">{props.title}</div>
             }
             {
-                props.page === "add" && 
-                <div 
+                props.page === "daily-add" &&
+                <div
                     className="date-pick-view-wrapper" 
                     onClick={props.onCalendarRequest}
                 >
@@ -75,10 +77,7 @@ let Header = (props) => (
                                 />
                             </button>
                         );
-                    case 1: 
-                        if (props.settings.notesShowInterval === 0) {
-                            return null
-                        } 
+                    case 1:
                         return (
                             <Link
                                 key={a}                                
@@ -94,7 +93,7 @@ let Header = (props) => (
                     case 2:        
                         return (                                       
                             <button
-                                key={a}                                
+                                key={a}
                                 className="button" 
                                 onClick={props.history.goBack}
                             >

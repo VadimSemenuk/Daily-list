@@ -6,6 +6,7 @@ import Modal from "../../components/Modal/Modal";
 import './ListItem.scss';
 
 import arrowRight from '../../assets/img/right-grey.svg';
+import externalLink from "../../assets/img/external-link.svg";
 
 export let SwitchListItem = (props) => (
     <div className={`list-item switch-list-item ${props.className || ""} ${props.disabled ? "disabled" : ""}`}>
@@ -39,6 +40,14 @@ export let ButtonListItem = (props) => (
     >
         <span className="list-item-text">{props.text}</span>
         {props.ValElement && <props.ValElement />}
+        {
+            props.img &&
+            <img
+                className="list-item-img"
+                src={props.img}
+                alt="in"
+            />
+        }
     </button>
 );
 

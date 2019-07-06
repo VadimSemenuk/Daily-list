@@ -297,9 +297,13 @@ export function setCurrentDate (date) {
 export function updateNotes() {
     return function(dispatch, getState) {
         let state = getState();
-        let dates = state.notes.map((n) => n.date);
 
-        return notesService.getNotesByDates(dates)
+        let dates = null;
+        if (state.settings.notesScreenMode === 1) {
+            dates = state.notes.map((n) => n.date);
+        }
+
+        return notesService.getNotes(state.settings.notesScreenMode, dates)
             .then((notes) => dispatch({
                 type: "UPDATE_NOTES",
                 notes
@@ -319,9 +323,9 @@ export function updateNotes() {
     }
 }
 
-export function setDatesAndUpdateNotes (dates, dateIndex, period) {
+export function setDatesAndUpdateNotes (dates, dateIndex, notesScreenMode) {
     return function(dispatch, getState) {
-        return notesService.getNotesByDates(dates, period)
+        return notesService.getNotes(notesScreenMode, dates)
             .then((notes) => dispatch({
                 type: "SET_DATES_AND_UPDATE_NOTES",
                 date: dates[dateIndex],
@@ -334,7 +338,7 @@ export function setDatesAndUpdateNotes (dates, dateIndex, period) {
                     err,
                     {
                         path: "action/index.js -> setDatesAndUpdateNotes()",
-                        dates, dateIndex, period
+                        dates, dateIndex
                     },
                     deviceId
                 );
@@ -342,9 +346,9 @@ export function setDatesAndUpdateNotes (dates, dateIndex, period) {
     }
 }
 
-export function updateDatesAndNotes (date, preRenderDate, nextIndex) {
+export function updateDatesAndNotes (date, preRenderDate, nextIndex, notesScreenMode) {
     return function(dispatch, getState) {
-        return notesService.getDayNotes(preRenderDate)
+        return notesService.getNotes(notesScreenMode, preRenderDate)
             .then((notes) => dispatch({
                 type: "UPDATE_DATES_AND_NOTES",
                 notes,

@@ -98,6 +98,7 @@ export default {
                     priority INTEGER,
                     repeatDate INTEGER,
                     manualOrderIndex INTEGER,
+                    mode INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
             `);
@@ -122,7 +123,8 @@ export default {
                     repeatType,
                     forkFrom,
                     priority,
-                    repeatDate
+                    repeatDate,
+                    mode
                 ) 
                 SELECT
                     id, 
@@ -143,7 +145,8 @@ export default {
                     repeatType,
                     forkFrom,
                     2 as priority,
-                    CASE forkFrom WHEN -1 THEN -1 ELSE added END as repeatDate
+                    CASE forkFrom WHEN -1 THEN -1 ELSE added END as repeatDate,
+                    1 as mode
                 FROM Tasks_OLD;
             `);
 
@@ -193,7 +196,8 @@ export default {
                     sortFinBehaviour INTEGER,
                     sortIncludePriority INTEGER,
                     minimizeNotes INTEGER,
-                    calendarMode INTEGER
+                    calendarMode INTEGER,
+                    notesScreenMode INTEGER
                 );
             `);
             await execureSQL(`
@@ -212,7 +216,8 @@ export default {
                     sortFinBehaviour,
                     sortIncludePriority,
                     minimizeNotes,
-                    calendarMode
+                    calendarMode,
+                    notesScreenMode
                 ) 
                 SELECT 
                     defaultNotification, 
@@ -229,7 +234,8 @@ export default {
                     ? as sortFinBehaviour,
                     ? as sortIncludePriority,
                     1 as minimizeNotes,
-                    1 as calendarMode
+                    1 as calendarMode,
+                    1 as notesScreenMode
                 FROM Settings_OLD;
             `, [currentSortSettings.type, currentSortSettings.direction, currentSortSettings.finSort, 0]);
             await execureSQL(`DROP TABLE Settings_OLD;`);

@@ -11,6 +11,8 @@ export default {
     "default-notification": "Автоматически добавлять уведомление",
     "backup": "Резервное копирование",
     "set-setting-error": "Не удалось обновить настройку. Перезапустите программу и попробуйие снова",
+    "show-daily-notes-screen": "Показать панель \"Eжедневник\"",
+    "show-notes-screen": "Показать панель \"Заметки\"",
 
     // view settings page
     "sort": "Сортировка",

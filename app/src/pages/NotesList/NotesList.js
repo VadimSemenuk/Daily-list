@@ -53,15 +53,17 @@ class NotesList extends PureComponent {
             this.props.updateDatesAndNotes(
                 nextDate,
                 moment(nextDate).add(-1, "day"),
-                nextIndex
-            )
+                nextIndex,
+                this.props.settings.notesScreenMode
+            );
         } else {   
             let nextDate = moment(this.props.currentDate).add(1, "day");
             this.props.updateDatesAndNotes(
                 nextDate,
                 moment(nextDate).add(1, "day"),
-                nextIndex            
-            )     
+                nextIndex,
+                this.props.settings.notesScreenMode
+            );
         }
     };
 
@@ -122,16 +124,20 @@ class NotesList extends PureComponent {
     };
 
     setDate = (date) => {
+        if (this.props.settings.notesScreenMode === 2) {
+            return;
+        }
+
         let cur = moment(date).startOf("day");
         let prev = moment(cur).add(-1, "day");
         let next = moment(cur).add(1, "day");
 
         if (this.activePageIndex === 2) {
-            this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesShowInterval);
+            this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesScreenMode);
         } else if (this.activePageIndex === 0) {
-            this.props.setDatesAndUpdateNotes([cur, next, prev], 0, this.props.settings.notesShowInterval);
+            this.props.setDatesAndUpdateNotes([cur, next, prev], 0, this.props.settings.notesScreenMode);
         } else {
-            this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesShowInterval);
+            this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesScreenMode);
         }
     };
 
@@ -169,13 +175,13 @@ class NotesList extends PureComponent {
         return (
             <div className="page-wrapper">
                 <Header
-                    page="notes"
+                    page={(this.props.settings.notesScreenMode === 1) ? "daily-notes" : "notes"}
                     onCalendarRequest={this.triggerCalendar}
                     onSelectToday={this.onTodaySelect}
                 />
                 <div className="notes-list-wrapper page-content">
                     {   
-                        this.props.settings.calendarMode === 1 &&
+                        (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 1) &&
                         <LightCalendar
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
                             currentDate={this.props.currentDate}
@@ -183,7 +189,7 @@ class NotesList extends PureComponent {
                         />
                     }
                     {
-                        this.props.settings.calendarMode === 2 &&
+                        (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 2) &&
                         <Calendar 
                             currentDate={this.props.currentDate}
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
@@ -191,31 +197,17 @@ class NotesList extends PureComponent {
                             onCloseRequest={this.triggerCalendar}
                         />
                     }
-                    <ReactSwipe
-                        ref={node => {
-                            if (node) {
-                                this.swipe = node.swipe;
-                            }
-                        }}
-                        className="notes-list-swiper" 
-                        swipeOptions={{
-                            continuous: true,
-                            startSlide: 1,
-                            callback: this.onSliderChange,
-                            transitionEnd: this.onTransitionEnd,
-                            disableScroll: !this.state.isSwipeAvailable,
-                        }}
-                        key={this.props.notes.length}
-                    >
-                        {
-                            this.props.notes.map((notes, i) => (
-                                <div 
-                                    className="notes-list-item-wrapper" 
-                                    key={i}
+                    {
+                        this.props.settings.notesScreenMode === 2 &&
+                        <div className="notes-list-swiper">
+                            <div>
+                                <div
+                                    className="notes-list-item-wrapper"
+                                    style={{width: '100%'}}
                                 >
                                     <DayNotesList
-                                        index={i}
-                                        notes={notes.items} 
+                                        index={0}
+                                        notes={this.props.notes[0].items}
                                         settings={this.props.settings}
                                         onDragSortModeTrigger={this.onDragSortModeTrigger}
                                         onOrderChange={this.onOrderChange}
@@ -223,15 +215,53 @@ class NotesList extends PureComponent {
                                         onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                     />
                                 </div>
-                            ))
-                        }
-                    </ReactSwipe>
+                            </div>
+                        </div>
+                    }
+                    {
+                        this.props.settings.notesScreenMode === 1 &&
+                        <ReactSwipe
+                            ref={node => {
+                                if (node) {
+                                    this.swipe = node.swipe;
+                                }
+                            }}
+                            className="notes-list-swiper"
+                            swipeOptions={{
+                                continuous: true,
+                                startSlide: 1,
+                                callback: this.onSliderChange,
+                                transitionEnd: this.onTransitionEnd,
+                                disableScroll: !this.state.isSwipeAvailable,
+                            }}
+                            key={this.props.notes.length}
+                        >
+                            {
+                                this.props.notes.map((notes, i) => (
+                                    <div
+                                        className="notes-list-item-wrapper"
+                                        key={i}
+                                    >
+                                        <DayNotesList
+                                            index={i}
+                                            notes={notes.items}
+                                            settings={this.props.settings}
+                                            onDragSortModeTrigger={this.onDragSortModeTrigger}
+                                            onOrderChange={this.onOrderChange}
+                                            onItemDynamicFieldChange={this.props.updateNoteDynamicFields}
+                                            onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                        />
+                                    </div>
+                                ))
+                            }
+                        </ReactSwipe>
+                    }
 
                     <Modal 
                         isOpen={this.state.listItemDialogVisible} 
                         onRequestClose={this.closeDialog}
                     >
-                        {   (this.state.listItemDialogVisible && this.state.listItemDialogVisible.note.repeatType === "no-repeat") &&
+                        {   (this.state.listItemDialogVisible && (this.state.listItemDialogVisible.note.repeatType === "no-repeat") && (this.props.settings.notesScreenMode === 1)) &&
                             <ButtonListItem
                                 className="no-border"
                                 text={t("move-tomorrow")}
@@ -326,6 +356,14 @@ function sort (data, settings) {
     });
 
     function getNotesCompareFn() {
+        if (settings.notesScreenMode === 2) {
+            if (settings.sortDirection === 1) {
+                return (a, b) => a.key - b.key
+            } else {
+                return (a, b) =>  b.key - a.key
+            }
+        }
+
         if (settings.sortType === 0) {
             return (a, b) => {
                 let aDayTimeSum = a.startTime ?

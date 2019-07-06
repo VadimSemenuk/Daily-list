@@ -60,7 +60,10 @@ export default class App extends Component {
 
         let password = !settings.password;
         let date = moment().startOf("day");
-        let notes = await notesService.getNotesByDates([moment(date).add(-1, "day"), date, moment(date).add(1, "day")]);
+        let notes = await notesService.getNotes(
+            settings.notesScreenMode,
+            settings.notesScreenMode === 1 ? [moment(date).add(-1, "day"), date, moment(date).add(1, "day")] : null
+        );
         let user = authService.getToken();
 
         this.store = initStore({settings, password, notes, date, user, meta});

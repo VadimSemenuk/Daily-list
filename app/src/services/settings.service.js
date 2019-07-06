@@ -71,7 +71,7 @@ class SettingsService {
                 password, 
                 fontSize, 
                 notesShowInterval, 
-                lang, 
+                lang,
                 calendarNotesCounter,
                 calendarNotesCounterIncludeFinished,
                 sortType,
@@ -79,7 +79,8 @@ class SettingsService {
                 sortFinBehaviour,
                 minimizeNotes,
                 calendarMode,
-                sortIncludePriority
+                sortIncludePriority,
+                notesScreenMode
             FROM Settings;`
         );
 

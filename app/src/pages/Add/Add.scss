@@ -73,6 +73,11 @@
             flex-basis: 18px;
         }
 
+        &.minified {
+            height: 52px;
+            flex-basis: 52px;
+        }
+
         .color-picker-list-wrapper {
             margin-top: 0px;
         }

@@ -43,6 +43,7 @@ class Add extends Component {
             repeatType: "no-repeat",
             repeatDates: [],
             priority: 2,
+            mode: this.props.settings.notesScreenMode,
 
             calendar: false,
             pictureModal: false,
@@ -226,7 +227,7 @@ class Add extends Component {
         return (
             <div className="page-wrapper">
                 <Header
-                    page="add"
+                    page={(this.props.settings.notesScreenMode === 1) ? "daily-add" : "add"}
                     onSubmit={this.onSubmit}
                     onCalendarRequest={this.triggerCalendar}
                     currentDate={this.state.added}
@@ -361,49 +362,58 @@ class Add extends Component {
                         </div>
                     </div>
                     <div 
-                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}`}
+                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === 1 ? "" : " minified"}`}
                         style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
                     >
-                        <div 
-                            className="toggle-icon-wrapper"
-                            onClick={() => this.setState({addAdditioanlsViewHidden: !this.state.addAdditioanlsViewHidden})}
-                        >
-                            <div className="line"></div>
-                        </div>
-
-                        <TimeSet
-                            notificate={this.state.notificate}
-                            startTime={this.state.startTime}
-                            endTime={this.state.endTime}
-                            settings={this.props.settings}
-                            repeatType={this.state.repeatType}
-                            currentDate={this.state.added}
-                            repeatDates={this.state.repeatDates}
-                            mode={this.props.match.path === "/edit" ? "edit" : "add"}
-                            onStateChange={(time) => this.setState({...time})} 
-                        />
-
-                        <ModalListItem
-                            className="tiny priority-select"
-                            text={t("priority")} 
-                            value={t(selectedPriorityOption.translateId)}
-                            listItem={ValueListItem}
-                        >
-                            <div className="radio-group">
-                                {
-                                    priorityOptions.map((setting, i) => (
-                                        <Radio
-                                            key={i}
-                                            name="repeat-type"
-                                            checked={this.state.priority === setting.val}
-                                            value={setting.val}
-                                            onChange={(val) => this.setState({priority: +val})}
-                                            text={t(setting.translateId)}
-                                        />
-                                    ))
-                                }
+                        {
+                            (this.props.settings.notesScreenMode === 1) &&
+                            <div
+                                className="toggle-icon-wrapper"
+                                onClick={() => this.setState({addAdditioanlsViewHidden: !this.state.addAdditioanlsViewHidden})}
+                            >
+                                <div className="line"></div>
                             </div>
-                        </ModalListItem>
+                        }
+
+                        {
+                            (this.props.settings.notesScreenMode === 1) &&
+                            <TimeSet
+                                notificate={this.state.notificate}
+                                startTime={this.state.startTime}
+                                endTime={this.state.endTime}
+                                settings={this.props.settings}
+                                repeatType={this.state.repeatType}
+                                currentDate={this.state.added}
+                                repeatDates={this.state.repeatDates}
+                                mode={this.props.match.path === "/edit" ? "edit" : "add"}
+                                onStateChange={(time) => this.setState({...time})}
+                            />
+                        }
+
+                        {
+                            (this.props.settings.notesScreenMode === 1) &&
+                            <ModalListItem
+                                className="tiny priority-select"
+                                text={t("priority")}
+                                value={t(selectedPriorityOption.translateId)}
+                                listItem={ValueListItem}
+                            >
+                                <div className="radio-group">
+                                    {
+                                        priorityOptions.map((setting, i) => (
+                                            <Radio
+                                                key={i}
+                                                name="repeat-type"
+                                                checked={this.state.priority === setting.val}
+                                                value={setting.val}
+                                                onChange={(val) => this.setState({priority: +val})}
+                                                text={t(setting.translateId)}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                            </ModalListItem>
+                        }
 
                         <ColorPicker 
                             onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}

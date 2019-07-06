@@ -13,17 +13,18 @@ class CalendarService {
         let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
 
         let select = await executeSQL(`
-            select t.added, t.repeatType, rep.value as repeatValue, t.finished
-            from Tasks t
+            SELECT t.added, t.repeatType, rep.value as repeatValue, t.finished
+            FROM Tasks t
             LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-            where 
+            WHERE
                 lastAction != 'DELETE' 
                 AND lastAction != 'CLEAR' 
                 AND (
                     (repeatType = 'no-repeat' OR forkFrom != -1 AND added >= ? AND added <= ?)
                     OR (repeatType = 'any' AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
                     OR (t.forkFrom = -1 AND repeatType != 'any')
-                );
+                )
+                AND mode = 1;
         `, [intervalStartDate, intervalEndDate, intervalStartDate, intervalEndDate]);
 
         let repeatableDay = 0;
