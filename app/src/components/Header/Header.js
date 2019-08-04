@@ -14,10 +14,11 @@ import LeftArrowImg from "../../assets/img/left-arrow.svg";
 import CheckedImg from "../../assets/img/checked.svg";
 import SettimgsImg from "../../assets/img/settings.svg";
 import ExportImg from '../../assets/img/upload-to-cloud.svg';
+import SearchImg from "../../assets/img/search.svg";
 
 let buttons = {
-    "daily-notes": [5, 4, 0, 1],
-    "notes": [5, 4, 1],
+    "daily-notes": [6, 5, 4, 0, 1],
+    "notes": [6, 5, 4, 1],
     "daily-add": [2, 3],
     "add": [2, 3],
     "password": [],
@@ -95,7 +96,7 @@ let Header = (props) => (
                             <button
                                 key={a}
                                 className="button" 
-                                onClick={props.history.goBack}
+                                onClick={props.onBack ? props.onBack : props.history.goBack}
                             >
                                 <img 
                                     src={LeftArrowImg}
@@ -138,6 +139,18 @@ let Header = (props) => (
                                 <img 
                                     src={ExportImg}
                                     alt="backup"    
+                                />
+                            </button>
+                        );
+                    case 6:
+                        return (
+                            <button
+                                key={a}
+                                onClick={props.onSearchMode}
+                            >
+                                <img
+                                    src={SearchImg}
+                                    alt="search"
                                 />
                             </button>
                         );

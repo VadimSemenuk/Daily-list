@@ -22,7 +22,7 @@ class Note extends PureComponent {
         };
     }
 
-    onDynaicFieldChange = (i, v) => {
+    onDynamicFieldChange = (i, v) => {
         let nextDynamicFields = [
             ...this.props.itemData.dynamicFields.slice(0, i),
             {
@@ -31,11 +31,11 @@ class Note extends PureComponent {
             },
             ...this.props.itemData.dynamicFields.slice(i + 1)];
         
-        this.props.onDynaicFieldChange(this.props.itemData, {dynamicFields: nextDynamicFields});
+        this.props.onDynamicFieldChange(this.props.itemData, {dynamicFields: nextDynamicFields});
     };
 
     onItemFinishChange = (v) => {
-        this.props.onDynaicFieldChange(this.props.itemData, {finished: v});
+        this.props.onDynamicFieldChange(this.props.itemData, {finished: v});
     };
 
     onItemActionsWindowRequest = (e) => {
@@ -136,7 +136,7 @@ class Note extends PureComponent {
                                         id={i}
                                         textValue={a.value}
                                         checkBoxValue={a.checked}
-                                        onValueChange={this.onDynaicFieldChange}
+                                        onValueChange={this.onDynamicFieldChange}
                                     />
                                 )
                             } else if (a && a.type === "snapshot") {

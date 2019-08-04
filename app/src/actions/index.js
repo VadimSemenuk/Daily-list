@@ -632,3 +632,24 @@ export function triggerErrorModal(message) {
         message
     }
 }
+
+// search
+export function searchNotes(search, repeatType) {
+    return function (dispatch, getState) {
+        let state = getState();
+
+        return notesService.searchNotes(state.settings.notesScreenMode, search, repeatType)
+            .then((notes) => {
+                dispatch({
+                    type: "RECEIVE_SEARCH_NOTES",
+                    notes
+                })
+            })
+    }
+}
+
+export function resetSearch() {
+    return {
+        type: "RESET_SEARCH_NOTES",
+    }
+}

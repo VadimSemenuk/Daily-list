@@ -183,5 +183,11 @@ export default {
     "move-to-backup-page": "Перейти к настройкам резервного копирования",
 
     // notification
-    "default-notification-title": "Уведомление о заметке"
+    "default-notification-title": "Уведомление о заметке",
+
+    // search
+    "no-search-content": "Ничего не найдено",
+    "search-placeholder": "Поиск",
+    "show-repeat-notes": "повторяющиеся",
+    "show-no-repeat-notes": "неповторяющиеся",
 }

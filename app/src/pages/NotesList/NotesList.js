@@ -13,27 +13,28 @@ import Modal from '../../components/Modal/Modal';
 import Fab from '../../components/Fab/Fab';
 import {ButtonListItem} from "../../components/ListItem/ListItem";
 
+import DayNotesList from "./DayNotesList";
+import SearchNotesList from "./SearchNotesList";
+
 import * as AppActions from '../../actions'; 
 
 import sliderChangeSide from "../../utils/sliderChangeSide";
 import deepCopyObject from "../../utils/deepCopyObject";
 
 import './NotesList.scss';
-import DayNotesList from "./DayNotesList";
 
 class NotesList extends PureComponent {
     constructor(props) {
         super(props);
 
         this.state = {
-            imageViewer: {
-				uri: '',
-				isVisible: false
-            },
             copyBuffer: null,
             listItemDialogVisible: false,
             isDragSortMode: false,
-            isSwipeAvailable: true
+            isSwipeAvailable: true,
+            searchMode: false,
+            searchRepeatType: "no-repeat",
+            searchText: ""
         };
 
         this.activePageIndex = 1;  
@@ -114,15 +115,6 @@ class NotesList extends PureComponent {
         });
     };
 
-    onImageShowRequest = (uri) => {
-		this.setState({
-			imageViewer: {
-				uri,
-				isVisible: true
-			}
-		})
-    };
-
     setDate = (date) => {
         if (this.props.settings.notesScreenMode === 2) {
             return;
@@ -169,19 +161,44 @@ class NotesList extends PureComponent {
         this.props.updateNotesManualSortIndex(order);
     }
 
+    triggerSearchMode = () => {
+        this.setState({searchMode: !this.state.searchMode});
+
+        if (!this.state.searchMode) {
+            this.props.resetSearch();
+            this.setState({searchText: ""})
+        }
+    }
+
+    onSearchTextChange = (e) => {
+        let nextSearchText = e.target.value;
+
+        this.setState({searchText: nextSearchText});
+        this.props.searchNotes(nextSearchText, this.state.searchRepeatType);
+    }
+
+    triggerSearchType = () => {
+        this.props.resetSearch();
+        let nextSearchType = this.state.searchRepeatType === "no-repeat" ? "repeat" : "no-repeat";
+        this.props.searchNotes(this.state.searchText, nextSearchType);
+        this.setState({searchRepeatType: nextSearchType});
+    }
+
     render() {
         let {t} = this.props;
 
         return (
             <div className="page-wrapper">
                 <Header
-                    page={(this.props.settings.notesScreenMode === 1) ? "daily-notes" : "notes"}
+                    page={this.state.searchMode ? "search" : (this.props.settings.notesScreenMode === 1) ? "daily-notes" : "notes"}
                     onCalendarRequest={this.triggerCalendar}
                     onSelectToday={this.onTodaySelect}
+                    onSearchMode={this.triggerSearchMode}
+                    onBack={this.state.searchMode ? this.triggerSearchMode : null}
                 />
                 <div className="notes-list-wrapper page-content">
                     {   
-                        (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 1) &&
+                        (!this.state.searchMode) && (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 1) &&
                         <LightCalendar
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
                             currentDate={this.props.currentDate}
@@ -189,7 +206,7 @@ class NotesList extends PureComponent {
                         />
                     }
                     {
-                        (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 2) &&
+                        (!this.state.searchMode) && (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 2) &&
                         <Calendar 
                             currentDate={this.props.currentDate}
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
@@ -198,7 +215,51 @@ class NotesList extends PureComponent {
                         />
                     }
                     {
-                        this.props.settings.notesScreenMode === 2 &&
+                        this.state.searchMode && (this.props.settings.notesScreenMode === 1) &&
+                        <div className={'search-mode-select-wrapper theme-header-background theme-header-border'}>
+                            <span>Показать: </span>
+                            <button
+                                className={`button ${this.state.searchRepeatType === 'no-repeat' ? 'active' : ''}`}
+                                onClick={this.triggerSearchType}
+                            >{t("show-no-repeat-notes")}</button>
+                            <button
+                                className={`button ${this.state.searchRepeatType === 'repeat' ? 'active' : ''}`}
+                                onClick={this.triggerSearchType}
+                            >{t("show-repeat-notes")}</button>
+                        </div>
+                    }
+                    {
+                        this.state.searchMode &&
+                        <div>
+                            <input
+                                type="text"
+                                placeholder={t('search-placeholder')}
+                                value={this.state.searchText}
+                                onChange={this.onSearchTextChange} />
+                        </div>
+                    }
+                    {
+                        this.state.searchMode &&
+                        <div className="notes-list-swiper">
+                            <div>
+                                <div
+                                    className="notes-list-item-wrapper"
+                                    style={{width: '100%'}}
+                                >
+                                    <SearchNotesList
+                                        notes={this.props.search}
+                                        settings={this.props.settings}
+                                        searchRepeatType={this.state.searchRepeatType}
+                                        notesScreenMode={this.props.settings.notesScreenMode}
+                                        onItemDynamicFieldChange={this.props.updateNoteDynamicFields}
+                                        onItemActionsWindowRequest={this.onItemActionsWindowRequest}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    {
+                        (!this.state.searchMode) && (this.props.settings.notesScreenMode === 2) &&
                         <div className="notes-list-swiper">
                             <div>
                                 <div
@@ -219,7 +280,7 @@ class NotesList extends PureComponent {
                         </div>
                     }
                     {
-                        this.props.settings.notesScreenMode === 1 &&
+                        (!this.state.searchMode) && (this.props.settings.notesScreenMode === 1) &&
                         <ReactSwipe
                             ref={node => {
                                 if (node) {
@@ -291,7 +352,7 @@ class NotesList extends PureComponent {
                     }
 
                     {
-                        this.props.settings.fastAdd && 
+                        (!this.state.searchMode) && this.props.settings.fastAdd &&
                         <FastAdd 
                             currentDate={this.props.currentDate}
                         />   
@@ -334,7 +395,8 @@ function mapStateToProps(state) {
     return {
         notes,
         currentDate: state.date,
-        settings: state.settings
+        settings: state.settings,
+        search: state.search
     }
 }
 

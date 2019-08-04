@@ -10,6 +10,7 @@ import user from "./user";
 import meta from "./meta";
 import error from "./error";
 import trash from "./trash";
+import search from "./search";
 
 let reducers = combineReducers({
     settings,
@@ -21,7 +22,8 @@ let reducers = combineReducers({
     user,
     meta,
     error,
-    trash
+    trash,
+    search
 });
 
 export default reducers;

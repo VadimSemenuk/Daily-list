@@ -6,6 +6,125 @@ import notificationService from "./notification.service";
 window.e = executeSQL;
 
 class NotesService {
+    async searchNotes(mode, search, repeatType) {
+        if (mode === 1) {
+            if (!search) {
+                return [];
+            }
+
+            let msCurrentDate = moment().startOf("day").valueOf();
+
+            let select = await executeSQL(
+                `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate,
+                        (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
+                        FROM Tasks t
+                        WHERE
+                            (t.title LIKE ? OR t.dynamicFields LIKE ?)
+                            AND ${repeatType === 'no-repeat' ? `(t.repeatType == 'no-repeat' OR t.repeatType == 'any')` : `(t.repeatType == 'week' OR t.repeatType == 'day')`}
+                            AND t.mode == 1
+                            AND t.lastAction != 'DELETE'
+                            AND t.lastAction != 'CLEAR'
+                        ORDER BY t.added`,
+                [`%${search}%`, `%${search}%`]
+            );
+
+            if (!select.rows.length) {
+                return [];
+            }
+
+            let notes = [];
+            let closestToCurrentDateNoteDateDiff = null;
+            let closestToCurrentDateNoteIndex = 0;
+            let closestToCurrentDate = null;
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+
+                let nextItem = {
+                    ...item,
+                    dynamicFields: JSON.parse(item.dynamicFields),
+                    startTime: ~item.startTime ? moment(item.startTime) : false,
+                    endTime: ~item.endTime ? moment(item.endTime) : false,
+                    added: moment(item.added),
+                    msAdded: item.added,
+                    finished: Boolean(item.finished),
+                    notificate: Boolean(item.notificate),
+                    isShadow: Boolean(item.added === -1),
+                    isSynced: Boolean(item.isSynced),
+                    isLastActionSynced: Boolean(item.isLastActionSynced),
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
+                };
+
+                notes.push(nextItem);
+
+                if (repeatType === "no-repeat") {
+                    let dateDiff = Math.abs(msCurrentDate - nextItem.msAdded);
+                    if ((dateDiff < closestToCurrentDateNoteDateDiff) || (closestToCurrentDateNoteDateDiff === null)) {
+                        closestToCurrentDateNoteDateDiff = dateDiff;
+                        closestToCurrentDateNoteIndex = i;
+                        closestToCurrentDate = nextItem.msAdded;
+                    }
+                }
+            }
+
+            if (repeatType === "no-repeat") {
+                notes = notes.slice(closestToCurrentDateNoteIndex - 50, closestToCurrentDateNoteIndex).concat(notes.slice(closestToCurrentDateNoteIndex, closestToCurrentDateNoteIndex + 50));
+
+                let notesByDates = {};
+                notes.forEach((note) => {
+                    if (!notesByDates[note.msAdded]) {
+                        notesByDates[note.msAdded] = [note];
+                    } else {
+                        notesByDates[note.msAdded].push(note);
+                    }
+                });
+
+                return Object.keys(notesByDates).map((date) => ({
+                    date: moment(+date),
+                    notes: notesByDates[date],
+                    isClosestToCurrentDate: +date === +closestToCurrentDate
+                }));
+            } else {
+                return notes;
+            }
+        } else {
+            let select = await executeSQL(
+                `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate
+                        FROM Tasks t
+                        WHERE
+                            (t.title LIKE ? OR t.dynamicFields LIKE ?)
+                            AND t.mode == 2
+                            AND t.lastAction != 'DELETE'
+                            AND t.lastAction != 'CLEAR';`,
+                [`%${search}%`, `%${search}%`]
+            );
+
+            let notes = [];
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+
+                let nextItem = {
+                    ...item,
+                    dynamicFields: JSON.parse(item.dynamicFields),
+                    startTime: ~item.startTime ? moment(item.startTime) : false,
+                    endTime: ~item.endTime ? moment(item.endTime) : false,
+                    added: moment(item.added),
+                    msAdded: item.added,
+                    finished: Boolean(item.finished),
+                    notificate: Boolean(item.notificate),
+                    isShadow: Boolean(item.added === -1),
+                    isSynced: Boolean(item.isSynced),
+                    isLastActionSynced: Boolean(item.isLastActionSynced),
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
+                };
+
+                notes.push(nextItem);
+            }
+            return notes;
+        }
+    }
+
     async getNotes(mode, dates) {
         let selects = null;
 
@@ -617,7 +736,7 @@ class NotesService {
         '#333',
         "#bfbfbf"
     ];
-    
+
     repeatOptions = [
         { val: "no-repeat", translateId: "repeat-type-no-repeat" },
         { val: "day", translateId: "repeat-type-day" },
@@ -634,12 +753,12 @@ class NotesService {
         { val: 6, translateId: "saturday" },
         { val: 7, translateId: "sunday" }
     ];
-    
+
     priorityOptions = [
         { val: 4, translateId: "priority-very-high" },
         { val: 3, translateId: "priority-high" },
         { val: 2, translateId: "priority-medium" },
-        { val: 1, translateId: "priority-low" },    
+        { val: 1, translateId: "priority-low" },
     ];
 
     getTags() {
