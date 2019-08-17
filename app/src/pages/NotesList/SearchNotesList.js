@@ -28,9 +28,6 @@ class SearchNotesList extends PureComponent {
     render() {
         let {t} = this.props;
 
-        console.log(this.props.notesScreenMode);
-        console.log(this.props.notes);
-
         return (
             <div className={"search-results-wrapper"}>
                 {

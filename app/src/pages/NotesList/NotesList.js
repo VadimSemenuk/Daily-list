@@ -155,11 +155,11 @@ class NotesList extends PureComponent {
             isDragSortMode: !this.state.isDragSortMode,
             isSwipeAvailable: !this.state.isSwipeAvailable
         })
-    }
+    };
 
     onOrderChange = (order) => {
         this.props.updateNotesManualSortIndex(order);
-    }
+    };
 
     triggerSearchMode = () => {
         this.setState({searchMode: !this.state.searchMode});
@@ -168,21 +168,21 @@ class NotesList extends PureComponent {
             this.props.resetSearch();
             this.setState({searchText: ""})
         }
-    }
+    };
 
     onSearchTextChange = (e) => {
         let nextSearchText = e.target.value;
 
         this.setState({searchText: nextSearchText});
         this.props.searchNotes(nextSearchText, this.state.searchRepeatType);
-    }
+    };
 
     triggerSearchType = () => {
         this.props.resetSearch();
         let nextSearchType = this.state.searchRepeatType === "no-repeat" ? "repeat" : "no-repeat";
         this.props.searchNotes(this.state.searchText, nextSearchType);
         this.setState({searchRepeatType: nextSearchType});
-    }
+    };
 
     render() {
         let {t} = this.props;
