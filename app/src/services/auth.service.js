@@ -3,8 +3,9 @@ import moment from 'moment';
 
 import config from "../config/config";
 import CustomError from "../common/CustomError";
-import apiService from "./api.service";
 import deviceService from "./device.service";
+import backupService from "./backup.service";
+import apiService from "./api.service";
 
 class AuthService {
     token = null;
@@ -20,18 +21,26 @@ class AuthService {
                 email: "vadim54787@gmail.com",
                 name: "Vadim",
                 picture: "",
-                token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNTQxOTY5OTkzfQ.HPgRP7wjr-cN8d-U6PKsA-8r4ehuFgyBmOpE3hSYrEY",
-                backup: {
-                    lastBackupTime: null,
+                gAccessToken: "Bearer ya29.GltvB00g8gh8FZ2CtFkaVz5SzrSp5yTUYmu5vtn3aJv0SO_U3741Mw4tz2TkmIq9jhMzFPbKLWldjOrYydN5JkfbCL7AXIkRsXxnwdSMV95PLDXMqwGyDyazxgvH",
+                gRefreshToken: "1/0jjXAph4OlyluEkvVv0VA0e1KlQ0jdGpgld0HnjTviU",
+                msGTokenExpireDateUTC: 0,
+                gdBackup: {
+                    backupFiles: []
+                },
+                localBackup: {
+                    backupFiles: []
                 },
                 settings: {
-                    autoBackup: false
+                    autoBackup: true
                 }
             };
 
             this.setToken(token);
 
-            return token;
+            token.gdBackup.backupFiles = await backupService.getGDBackupFiles(token);
+            this.setToken(token);
+
+            return this.getToken();
         }
 
         let googleUser = await new Promise((resolve, reject) => {
@@ -45,20 +54,23 @@ class AuthService {
                 reject
             );
         });
-
         if (!googleUser) {
             throw new Error("user not found");
         }
 
-        let user = await apiService.post("auth/sign-in-google", {idToken: googleUser.idToken})
+        let authUrl = "oauth2/v4/token" +
+            `?code=${googleUser.serverAuthCode}` +
+            `&client_id=${config.google.webClientId}` +
+            `&client_secret=${config.google.webClientSecret}` +
+            "&grant_type=authorization_code";
+        let googleAccessToken = await apiService.googleApiPost(authUrl, null, false)
             .then((res) => {
                 if (res.status === 200) {
                     return res.json();
                 }
             });
-
-        if (!user) {
-            throw new Error("user not found");
+        if (!googleAccessToken) {
+            throw new Error();
         }
 
         let token = {
@@ -66,18 +78,23 @@ class AuthService {
             email: googleUser.email,
             name: googleUser.displayName,
             picture: googleUser.imageUrl,
-            token: "Bearer " + user.token,
-            backup: {
-                lastBackupTime: user.lastBackupTime !== null ? moment(user.lastBackupTime) : null,
+            gAccessToken: "Bearer " + googleAccessToken.access_token,
+            gRefreshToken: googleAccessToken.refresh_token,
+            msGTokenExpireDateUTC: moment.utc().valueOf() + 3400000,
+            gdBackup: {
+                backupFiles: []
             },
             settings: {
-                autoBackup: false
+                autoBackup: true
             }
         };
 
         this.setToken(token);
 
-        return token;
+        token.gdBackup.backupFiles = await backupService.getGDBackupFiles(token);
+        this.setToken(token);
+
+        return this.getToken();
     };
 
     googleSignOut() {
@@ -85,38 +102,80 @@ class AuthService {
             return Promise.resolve()
         }
         return new Promise((resolve, reject) => window.plugins.googleplus.logout(() => {
-            this.setToken({});
+            this.setToken(null);
             resolve();
         }, () => {
             resolve();
         }));
     }
 
+    async googleRefreshAccessToken() {
+        let user = this.getToken();
+        let authUrl = "oauth2/v4/token" +
+            `?refresh_token=${user.gRefreshToken}` +
+            `&client_id=${config.google.webClientId}` +
+            `&client_secret=${config.google.webClientSecret}` +
+            "&grant_type=refresh_token";
+        let googleAccessToken = await apiService.googleApiPost(authUrl, null, false)
+            .then((res) => {
+                if (res.status === 200) {
+                    return res.json();
+                }
+                return false;
+            });
+        if (!googleAccessToken) {
+            throw new Error();
+        }
+
+        let nextToken = {
+            ...this.getToken(),
+            gAccessToken: "Bearer " + googleAccessToken.access_token,
+            msGTokenExpireDateUTC: moment.utc().valueOf() + 3400000,
+        };
+
+        this.setToken(nextToken);
+
+        return nextToken;
+    }
+
     setToken(token) {
-        let nextToken = null;
-        if (token) {
-            nextToken = {
+        if (!token) {
+            localStorage.removeItem(config.LSTokenKey);
+            this.token = null;
+        } else {
+            let tokenToSave = {
                 ...token,
-                backup: {
-                    ...token.backup,
-                    lastBackupTime: token.backup.lastBackupTime !== null ? token.backup.lastBackupTime.valueOf() : null
+                gdBackup: {
+                    ...token.gdBackup,
+                    backupFiles: token.gdBackup.backupFiles.map((f) => ({...f, modifiedTime: moment(f.modifiedTime).valueOf()}))
                 }
             };
+            localStorage.setItem(config.LSTokenKey, JSON.stringify(tokenToSave));
+            this.token = this.getFormattedToken(token);
         }
-        localStorage.setItem(config.LSTokenKey, JSON.stringify(nextToken));
-        this.token = token;
     }
 
     getToken() {
         if (this.token) {
-            return this.token
+            return this.token;
         } else {
             let token = JSON.parse(localStorage.getItem(config.LSTokenKey));
-            if (token !== null) {
-                token.backup.lastBackupTime = token.backup.lastBackupTime !== null ? moment(token.backup.lastBackupTime) : null;
-            }
+            return this.getFormattedToken(token);
+        }
+    }
+
+    getFormattedToken(token) {
+        if (!token) {
             return token;
         }
+        let nextToken = {
+            ...token,
+            gdBackup: {
+                ...token.gdBackup,
+                backupFiles: token.gdBackup.backupFiles.map((f) => ({...f, modifiedTime: moment(f.modifiedTime)}))
+            }
+        };
+        return nextToken;
     }
 
     resetToken() {

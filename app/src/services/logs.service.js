@@ -46,6 +46,11 @@ class LogsService {
             err.name = "SQLError";
         }
 
+        if (err.constructor && err.constructor.name === "FileError") {
+            err = new Error(`code: ${err.code}`);
+            err.name = "FileError";
+        }
+
         let log = {
             name: err.name,
             message: err.message,

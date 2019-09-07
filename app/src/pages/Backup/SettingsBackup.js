@@ -8,18 +8,34 @@ import * as AppActions from '../../actions';
 import './SettingsBackup.scss';
 
 import Header from '../../components/Header/Header';
-import {SwitchListItem} from "../../components/ListItem/ListItem";
 
 import GoogleImg from '../../assets/img/google.svg';
 import ExportImg from '../../assets/img/upload-to-cloud.svg';
 import ImportImg from '../../assets/img/cloud-computing.svg';
 import LogoutImg from '../../assets/img/logout.svg';
+import Modal from "../../components/Modal/Modal";
+import {ButtonListItem} from "../../components/ListItem/ListItem";
 
 class SettingsBackup extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isSelectFileToRestoreModalVisible: false,
+        }
+    }
+
     componentDidMount() {
         if (this.props.user) {
-            this.props.updateLastBackupTime();
+            this.props.updateGDBackupFiles();
         }
+        this.props.updateLocalBackupFiles();
+    }
+
+    restoreBackup = () => {
+        this.setState({
+            isSelectFileToRestoreModalVisible: true
+        });
     }
 
     render () {
@@ -55,33 +71,139 @@ class SettingsBackup extends Component {
                                 ><img src={LogoutImg} alt="logout"/></button>
                             </div>
                             
-                            <div className="backup-settings-wrapper">
-                                <SwitchListItem 
-                                    text={t("auto-backup")}
-                                    checked={this.props.user.settings.autoBackup}
-                                    onChange={(e) => this.props.setToken({...this.props.user, settings: { ...this.props.user.settings, autoBackup: e }})}
-                                />
-                            </div>
-                            
                             <div className="backup-actions-buttons-wrapper">
                                 <button 
                                     className="text block img-text-button"
                                     type="button"
-                                    onClick={() => this.props.uploadBackup()}
+                                    onClick={() => this.props.uploadGDBackup("user")}
                                 ><img src={ExportImg} alt="export"/>{t("create-backup")}</button>
 
-                                <button 
-                                    className={`text block img-text-button${!this.props.user.backup.lastBackupTime ? " disabled" : ""}`}
-                                    type="button"
-                                    onClick={() => this.props.restoreBackup()}
-                                ><img src={ImportImg} alt="import" />{t("restore-backup")}</button>
+                                {   this.props.user.gdBackup.backupFiles.length > 0 &&
+                                    <button
+                                        className={`text block img-text-button`}
+                                        type="button"
+                                        onClick={this.restoreBackup}
+                                    ><img src={ImportImg} alt="import" />{t("restore-backup")}</button>
+                                }
                             </div>
                             {
-                                this.props.user.backup.lastBackupTime &&
-                                <div className="backup-file-date">{t("copy")} {this.props.user.backup.lastBackupTime.format('LLL')}</div>
+                                (this.props.user && this.props.user.gdBackup.backupFiles.length > 0) &&
+                                <div className="backup-files">
+                                    {t("available-copies")}:
+                                    <ul>
+                                        {
+                                            [...this.props.user.gdBackup.backupFiles]
+                                                .sort((a, b) => {
+                                                    if (a.name === "DailyListSqliteDBFile") {
+                                                        return -1;
+                                                    }
+                                                    if (b.name === "DailyListSqliteDBFile") {
+                                                        return 1;
+                                                    }
+                                                    return -(a.modifiedTime.diff(b.modifiedTime))
+                                                })
+                                                .map((f, i) => {
+                                                    return <li key={i}>
+                                                        {
+                                                            f.name === "DailyListSqliteDBFile_auto" &&
+                                                            <span>{t('copy-auto-created-google-drive')} {f.properties.manufacturer} {f.properties.model}, </span>
+                                                        }
+                                                        <strong>{f.modifiedTime.format('LLL')}</strong>
+                                                    </li>
+                                                })
+                                        }
+                                    </ul>
+                                </div>
                             }
                         </div>
                     }
+
+                    {
+                        <div className="local-baclup-files-wrapper">
+                            {
+                                (this.props.backup.local.length > 0 && !this.props.user) &&
+                                <button
+                                    className={`text block img-text-button`}
+                                    type="button"
+                                    onClick={this.restoreBackup}
+                                ><img src={ImportImg} alt="import" />{t("restore-backup")}</button>
+                            }
+
+                            {
+                                (this.props.backup.local.length > 0) &&
+                                <div className="backup-files">
+                                    {t("available-local-copies")}:
+                                    <ul>
+                                        {
+                                            [...this.props.backup.local]
+                                                .sort((a, b) => {
+                                                    return -(a.modifiedTime.diff(b.modifiedTime))
+                                                })
+                                                .map((f, i) => {
+                                                    return <li key={i}>
+                                                        <span>{t('copy-auto-created-local')} </span>
+                                                        <strong>{f.modifiedTime.format('LLL')}</strong>
+                                                    </li>
+                                                })
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <Modal
+                        isOpen={this.state.isSelectFileToRestoreModalVisible}
+                        onRequestClose={() => this.setState({isSelectFileToRestoreModalVisible: false})}
+                        actionItems={[
+                            {
+                                text: t("close")
+                            }
+                        ]}
+                    >
+                        {
+                            this.props.user && [...this.props.user.gdBackup.backupFiles]
+                                .sort((a, b) => {
+                                    if (a.name === "DailyListSqliteDBFile") {
+                                        return -1;
+                                    }
+                                    if (b.name === "DailyListSqliteDBFile") {
+                                        return 1;
+                                    }
+                                    return -(a.modifiedTime.diff(b.modifiedTime))
+                                })
+                                .map((f, i) => {
+                                    return <ButtonListItem
+                                        key={i}
+                                        className="no-border"
+                                        onClick={() => this.props.restoreGDBackup(f)}
+                                    >
+                                        {
+                                            f.name === "DailyListSqliteDBFile_auto" &&
+                                            <span>{t('copy-auto-created-google-drive')} {f.properties.manufacturer} {f.properties.model}, </span>
+                                        }
+                                        <strong>{f.modifiedTime.format('LLL')}</strong>
+                                    </ButtonListItem>
+                                })
+                        }
+
+                        {
+                            [...this.props.backup.local]
+                                .sort((a, b) => {
+                                    return -(a.modifiedTime.diff(b.modifiedTime))
+                                })
+                                .map((f, i) => {
+                                    return <ButtonListItem
+                                        key={i}
+                                        className="no-border"
+                                        onClick={() => this.props.restoreLocalBackup(f)}
+                                    >
+                                        <span>{t('copy-auto-created-local')} </span>
+                                        <strong>{f.modifiedTime.format('LLL')}</strong>
+                                    </ButtonListItem>
+                                })
+                        }
+                    </Modal>
                 </div>
             </div>
         );
@@ -93,7 +215,8 @@ function mapStateToProps(state) {
         settings: state.settings,
         currentDate: state.date,
         user: state.user,
-        loader: state.loader 
+        loader: state.loader,
+        backup: state.backup
     }
 }
 

@@ -97,7 +97,7 @@ export default {
     "no-content": "Няма запісаў",
     "edit": "Рэдагаваць",
     "delete": "Выдаліць",
-    "to-copy": "Капіяваць",
+    "do-copy": "Капіяваць",
     "move-tomorrow": "Перамясціць на заўтра",
     "finished-split": "Завершаныя",
 

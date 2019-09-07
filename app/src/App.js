@@ -18,6 +18,7 @@ import deviceService from "./services/device.service";
 import notesService from "./services/notes.service";
 import authService from "./services/auth.service";
 import logsService from "./services/logs.service";
+import backupService from "./services/backup.service";
 
 export default class App extends Component {
     constructor(props) {
@@ -65,10 +66,14 @@ export default class App extends Component {
             settings.notesScreenMode === 1 ? [moment(date).add(-1, "day"), date, moment(date).add(1, "day")] : null
         );
         let user = authService.getToken();
-
-        this.store = initStore({settings, password, notes, date, user, meta});
+        backupService.setLocalBackupsDirectory();
+        backupService.setDatabasesDirectory();
+        let localBackups = await backupService.getLocalBackups();
+        let backup = {local: localBackups};
+        this.store = initStore({settings, password, notes, date, user, meta, backup});
 
         this.deviceId = meta.deviceId;
+
 
         this.setState({isAppReady: true});
     }

@@ -39,15 +39,9 @@ class Calendar extends Component {
     }
 
     async componentDidMount() {
-        document.querySelector(".notes-list-swiper").addEventListener("click", this.props.onCloseRequest);
-
         if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(this.state.msSelectedDate, this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
             this.props.getCount(this.state.msSelectedDate, "month");
         }
-    }   
-
-    componentWillUnmount() {
-        document.querySelector(".notes-list-swiper").removeEventListener("click", this.props.onCloseRequest);
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {   

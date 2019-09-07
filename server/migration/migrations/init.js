@@ -16,14 +16,6 @@ module.exports.up = async (db) => {
             google_id VARCHAR
         );
 
-        CREATE TABLE NotesBackups
-        (
-            uuid VARCHAR UNIQUE,
-            note JSON,
-            userId INTEGER references Users(id),
-            datetime timestamp with time zone
-        );
-
         CREATE TABLE LoadLogs 
         (
             id SERIAL PRIMARY KEY,

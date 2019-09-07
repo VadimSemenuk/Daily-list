@@ -71,11 +71,15 @@ export default {
     "graphics": "Графика",
 
     // backup page
+    "copy-auto-created-google-drive": "Автоматически создано на",
+    "copy-auto-created-local": "Автоматически создано локально",
     "google-sign-in": "Войти с помощью Google",
     "sign-out": "Выйти",
     "create-backup": "Загрузить",
     "restore-backup": "Восстановить",
     "copy": "Копия",
+    "available-copies": "Доступные резервные копии",
+    "available-local-copies": "Доступные локальные резервные копии",
     "auth-error": "Произошла ошибка. Повторите позже",
     "restore-local-backup": "Восстановить локальную копию",
     "how-it-works-btn": "Как это работает",
@@ -118,7 +122,7 @@ export default {
     "no-content": "Нет записей",
     "edit": "Редактировать",
     "delete": "Удалить",
-    "to-copy": "Копировать",
+    "do-copy": "Копировать",
     "move-tomorrow": "Переместить на завтра",
     "finished-split": "Завершенные",
 

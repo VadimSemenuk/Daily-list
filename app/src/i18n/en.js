@@ -109,7 +109,7 @@ export default {
     "no-content": "No notes yet",
     "edit": "Edit",
     "delete": "Delete",
-    "to-copy": "Copy",
+    "do-copy": "Copy",
     "move-tomorrow": "Remove on tomorrow",
     "finished-split": "Finished",
 

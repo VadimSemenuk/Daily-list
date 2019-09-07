@@ -24,7 +24,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-let notesRep = new (require("./server/repositories/notes.js"))(DB);
 let logRep = new (require("./server/repositories/log.js"))(DB);
 let usersRep = new (require("./server/repositories/users"))(DB);
 let reportRep = new (require("./server/repositories/report"))(DB);
@@ -36,9 +35,6 @@ passport.use(jwtStrategy(usersRep));
 
 let auth = require('./server/routes/auth');
 app.use("/api/auth/", auth(usersRep));
-
-let notes = require('./server/routes/notes');
-app.use("/api/notes/", notes(notesRep));
 
 let log = require('./server/routes/log');
 app.use("/api/log/", log(logRep));
@@ -58,7 +54,6 @@ app.use(function error404Handler(req, res, next) {
     next(err);
 });
 
-
 app.use(function commonErrorHandler(err, req, res, next) {
     res.status(err.status || 500);
     res.send({
@@ -66,7 +61,6 @@ app.use(function commonErrorHandler(err, req, res, next) {
         stack: err.stack
     });
 });
-
 
 let debug = require('debug')('untitled:server');
 

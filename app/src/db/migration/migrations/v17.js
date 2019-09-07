@@ -15,14 +15,7 @@ export default {
         await alterSettingsTable();
         await addErrorsLogsTable();
         await addLoadsLogsTable();
-
-        let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
-        if (!token || !token.id) {
-            return
-        }
-        token.backup = {lastBackupTime: null};
-        token.settings = {autoBackup: false};
-        localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
+        await updateToken();
 
         async function addUUID() {
             let select = await execureSQL(`SELECT id from Tasks WHERE uuid is null`);
@@ -55,17 +48,15 @@ export default {
                 (   
                     deviceId TEXT,
                     isRateDialogShowed INTEGER,
-                    backupMigrated INTEGER,
                     appInstalledDate INTEGER
                 );
             `);
 
             await execureSQL(`
-                INSERT INTO MetaInfo (deviceId, isRateDialogShowed, backupMigrated, appInstalledDate)
+                INSERT INTO MetaInfo (deviceId, isRateDialogShowed, appInstalledDate)
                 SELECT 
                     deviceId, 
                     0 as isRateDialogShowed,
-                    0 as backupMigrated,
                     ? as appInstalledDate
                 FROM MetaInfo_OLD
             `, [moment().startOf("day").valueOf()]);
@@ -260,6 +251,30 @@ export default {
                     deviceId TEXT
                 );
             `);
+        }
+
+        async function updateToken( ) {
+            let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
+            if (!token || !token.id) {
+                return
+            }
+            token.gdBackup = {
+                backupFiles: []
+            };
+            if (token.backupFile) {
+                let backupFile = token.backupFile;
+                backupFile.modifiedTime = moment(backupFile.modifiedTime).valueOf();
+                token.gdBackup.backupFiles.push(backupFile);
+            }
+            delete token.backupFile;
+            token.settings = {autoBackup: true};
+            token.gAccessToken = token.token;
+            delete token.token;
+            token.gRefreshToken = token.refreshToken;
+            delete token.refreshToken;
+            token.msGTokenExpireDateUTC = token.tokenExpireDate;
+            delete token.tokenExpireDatel;
+            localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
         }
     }
 }

@@ -43,9 +43,12 @@
         }
     }
 
-    .backup-file-date {
-        text-align: center;
-        margin-top: 10px;
+    .backup-files {
+        margin-top: 20px;
+
+        li {
+            padding: 5px 0;
+        }
     }
 
     .local-backup-wrapper {
@@ -56,7 +59,7 @@
 
     .backup-actions-buttons-wrapper {
         display: flex;
-        margin-top: 20px;
+        margin-top: 10px;
 
         button:not(:last-of-type) {
             margin-right: 10px;

@@ -3,13 +3,9 @@ import moment from "moment";
 import executeSQL from '../utils/executeSQL';
 
 class DeviceService {
-    setBackupMigrationState(state) {
-        return executeSQL(`UPDATE MetaInfo SET backupMigrated = ?;`, [+state]);
-    }
-
     async getMetaInfo() {
         let select = await executeSQL(`
-            SELECT deviceId, isRateDialogShowed, backupMigrated, appInstalledDate
+            SELECT deviceId, isRateDialogShowed, appInstalledDate
             FROM MetaInfo;
         `);
         if (select.rows) {
@@ -17,7 +13,6 @@ class DeviceService {
             return {
                 deviceId: metaInfo.deviceId,
                 isRateDialogShowed: Boolean(metaInfo.isRateDialogShowed),
-                backupMigrated: Boolean(metaInfo.backupMigrated),
                 appInstalledDate: moment(metaInfo.appInstalledDate)
             }
         } else {

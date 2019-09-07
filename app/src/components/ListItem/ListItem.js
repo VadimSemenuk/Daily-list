@@ -38,7 +38,7 @@ export let ButtonListItem = (props) => (
         style={props.style}
         onClick={props.onClick}                                
     >
-        <span className="list-item-text">{props.text}</span>
+        <span className="list-item-text">{props.text || props.children}</span>
         {props.ValElement && <props.ValElement />}
         {
             props.img &&

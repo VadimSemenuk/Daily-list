@@ -20,91 +20,34 @@ import About from './pages/About/About';
 import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
 
-import authService from "./services/auth.service";
-import deviceService from "./services/device.service";
-
 class Root extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            backupMigrationModal: false,
-            noBackupNotificationModal: false
-        };
-    }
-
     componentDidMount() {
         this.setKeyboardEvents();
         Modal.init();
-        this.backupNotes();
-
-        if (!this.props.meta.backupMigrated) {
-            this.backupMigrationNotification();
-        } else {
-            this.showNoBackupNotificationIfNeed();
-        }
     }
 
     setKeyboardEvents() {
         window.addEventListener('keyboardDidShow', () => {
-            document.querySelector(".hide-with-active-keyboard").classList.add("hidden");
+            let el = document.querySelector(".hide-with-active-keyboard");
+            if (!el) {
+                return;
+            }
+            el.classList.add("hidden");
             setTimeout(function() {
                 document.activeElement.scrollIntoViewIfNeeded();
             }, 200);
         });
         window.addEventListener('keyboardDidHide', () => {
-            document.querySelector(".hide-with-active-keyboard").classList.remove("hidden"); 
+            let el = document.querySelector(".hide-with-active-keyboard");
+            if (!el) {
+                return;
+            }
+            el.classList.remove("hidden");
             setTimeout(function() {
                 document.activeElement.scrollIntoViewIfNeeded();
             }, 200);           
         });
     }
-       
-    backupMigrationNotification() {
-        if (this.props.user && this.props.user.id) {
-            authService.googleSignOut();
-        }
-        this.setState({
-            backupMigrationModal: true
-        });
-    }
-
-    discardBackupMigrationModal = () => {
-        this.props.setBackupMigrationState(true);
-    };
-
-    closeBackupMigrationModal = () => {
-        this.setState({
-            backupMigrationModal: false
-        });
-    };
-
-    backupNotes = () => {
-        if (
-            this.props.meta.backupMigrated
-            && this.props.user
-            && this.props.user.settings.autoBackup
-            && deviceService.hasNetworkConnection()
-        ) {
-            this.props.uploadBackup(true);
-        }   
-    };
-
-    showNoBackupNotificationIfNeed = () => {
-        if (
-            this.props.user
-            && this.props.user.settings.autoBackup
-            && ((this.props.user.backup.lastBackupTime || moment().startOf("day")).diff(this.props.meta.appInstalledDate, 'days') > 30)
-        ) {
-            this.triggerNoBackupNotificationDialog();
-        }
-    };
-
-    triggerNoBackupNotificationDialog = () => {
-        this.setState({
-            noBackupNotificationModal: !this.state.noBackupNotificationModal
-        })
-    };
 
     render() {
         let {t} = this.props;
@@ -170,27 +113,6 @@ class Root extends Component {
                     />
                     <Loader />
 
-                    <Route render={props => (
-                        <Modal
-                            className="backup-migration-modal"
-                            isOpen={this.state.backupMigrationModal}
-                            onRequestClose={this.closeBackupMigrationModal}
-                            actionItems={[
-                                {
-                                    text: t("move-to-backup-page"),
-                                    onClick: () => props.history.push(`/settings/backup`)
-                                },
-                                {
-                                    text: t("re-enter-discard-button"),
-                                    onClick: this.discardBackupMigrationModal
-                                }
-                            ]}
-                        >
-                            <h3>{t("attention")}</h3>
-                            <p>{t("re-enter-request-description")}</p>
-                        </Modal>
-                    )}/>
-
                     <Modal 
                         isOpen={this.props.error}
                         onRequestClose={this.props.triggerErrorModal}
@@ -204,22 +126,6 @@ class Root extends Component {
                             },
                         ]}
                     >{t(this.props.error.message)}</Modal>
-
-                    <Route render={props => (
-                        <Modal
-                            isOpen={this.state.noBackupNotificationModal}
-                            onRequestClose={this.triggerNoBackupNotificationDialog}
-                            actionItems={[
-                                {
-                                    text: t("close")
-                                },
-                                {
-                                    text: t("move-to-backup-page"),
-                                    onClick: () => props.history.push(`/settings/backup`)
-                                },
-                            ]}
-                        >{t("no-backup-notification")}</Modal>
-                    )}/>
                 </div>
             </HashRouter>
         );

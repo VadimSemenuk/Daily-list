@@ -1,5 +1,3 @@
-import moment from "moment";
-
 import notesService from "../services/notes.service";
 import settingsService from "../services/settings.service";
 import calendarService from "../services/calendar.service";
@@ -7,7 +5,6 @@ import authService from "../services/auth.service";
 import backupService from "../services/backup.service";
 
 import {throttleAction} from "../utils/throttle";
-import deviceService from "../services/device.service";
 import logsService from "../services/logs.service";
 
 // notes
@@ -22,7 +19,7 @@ export function addNote (note) {
                 let state = getState();
 
                 state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-                state.user && state.user.settings.autoBackup && dispatch(uploadBackup(note, null, true));
+                dispatch(saveBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-add"));
@@ -57,7 +54,7 @@ export function updateNote (note, prevNote) {
                 let state = getState();
 
                 state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-                state.user && state.user.settings.autoBackup && dispatch(uploadBackup(note, true, true));
+                dispatch(saveBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -97,7 +94,7 @@ export function updateNoteDynamicFields (note, updatedState) {
 
                 updatedState.hasOwnProperty('finished') && dispatch(renderNotes());
 
-                state.user && state.user.settings.autoBackup && dispatch(uploadBackup(nextNote, null, true));
+                dispatch(saveBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -131,7 +128,7 @@ export function updateNoteDate (note, nextDate) {
                 state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
                 dispatch(renderNotes());
 
-                state.user && state.user.settings.autoBackup && dispatch(uploadBackup(note, null, true));
+                dispatch(saveBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-update"));
@@ -163,7 +160,7 @@ export function deleteNote (note) {
                 let state = getState();
 
                 state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-                state.user && state.user.settings.autoBackup && dispatch(uploadBackup(note, null, true));
+                dispatch(saveBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-delete"));
@@ -218,7 +215,7 @@ export function restoreNote (note) {
                 state.settings.calendarNotesCounter && dispatch(getFullCount(state.date.valueOf()));
                 dispatch(updateNotes());
 
-                state.user && state.user.settings.autoBackup && dispatch(uploadBackup(note, null, true));
+                dispatch(saveBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("error-note-restore"));
@@ -246,8 +243,7 @@ export function cleanDeletedNotes () {
                 type: "CLEAN_TRASH",
             }))
             .then(() => {
-                let state = getState();
-                state.user && state.user.settings.autoBackup && dispatch(uploadBackup());
+                dispatch(saveBackup());
             })
             .catch((err) => {
                 dispatch(triggerErrorModal("clean-trash-error"));
@@ -517,50 +513,53 @@ export function setToken(token) {
         authService.setToken(token);
         return dispatch({
             type: "RECEIVE_USER",
-            user: token
+            user: authService.getToken()
         });
     }
 }
 
 // backup
-export let uploadBackup = throttleAction(function () {
+
+export function saveBackup() {
+    return function (dispatch, getState) {
+        let state = getState();
+        if (state.user && state.user.settings.autoBackup) {
+            dispatch(uploadGDBackup("auto"));
+        } else {
+            dispatch(saveLocalBackup());
+        }
+    }
+}
+
+export let uploadGDBackup = throttleAction(function (actionType) {
     return async function(dispatch, getState) {
         try {
-            dispatch(triggerLoader(true));
+            actionType === "user" && dispatch(triggerLoader(true));
 
-            let msBackupStartTime = new Date();
+            await backupService.uploadGDBackup({
+                actionType: actionType
+            });
 
-            let notes = await notesService.getNotesForBackup();
-            if (!notes || !notes.length) {
-                throw new Error("No notes to backup");
-            }
+            actionType === "user" && dispatch(updateGDBackupFiles());
 
-            await backupService.uploadNotesBackup(notes);
-
-            await notesService.setNoteBackupState(null, true, true, msBackupStartTime);
-
-            dispatch(setBackupMigrationState(true));
-
-            dispatch(updateLastBackupTime(moment()));
-
-            dispatch(triggerLoader(false));
+            actionType === "user" && dispatch(triggerLoader(false));
         } catch(err) {
             dispatch(triggerLoader(false));
             dispatch(triggerErrorModal("error-backup-upload", err.description));
             let deviceId = getState().meta.deviceId;
             logsService.logError(err, {
-                path: "action/index.js -> uploadBackup()",
+                path: "action/index.js -> uploadGDBackup()",
                 deviceId
             });
         }
     }
-}, 1000);
+}, 5000);
 
-export function restoreBackup() {
-    return function(dispatch, getState) {
+export function restoreGDBackup(file) {
+    return async function(dispatch, getState) {
         dispatch(triggerLoader(true));
 
-        return backupService.restoreNotesBackup()
+        return backupService.restoreGDBackup(file)
             .then(() => {
                 dispatch(triggerLoader(false));
                 window.location.reload(true);
@@ -572,7 +571,7 @@ export function restoreBackup() {
                 logsService.logError(
                     err,
                     {
-                        path: "action/index.js -> restoreBackup()",
+                        path: "action/index.js -> restoreGDBackup()",
                     },
                     deviceId
                 );
@@ -580,31 +579,24 @@ export function restoreBackup() {
     }
 }
 
-export function updateLastBackupTime(nextTime) {
+export function updateGDBackupFiles() {
     return async function(dispatch, getState) {
         try {
             let token = getState().user;
 
-            if (!nextTime) {
-                nextTime = await backupService.getUserLastBackupTime();
-            }
-
-            if (nextTime) {
-                let nextToken = {
-                    ...token,
-                    backup: {
-                        ...token.backup,
-                        lastBackupTime: moment(nextTime)
-                    }
-                };
-                dispatch(setToken(nextToken));
-            }
+            let nextToken = {
+                ...token,
+                gdBackup: {
+                    backupFiles: await backupService.getGDBackupFiles()
+                }
+            };
+            dispatch(setToken(nextToken));
         } catch(err) {
             let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
-                    path: "action/index.js -> updateLastBackupTime()",
+                    path: "action/index.js -> updateGDBackupFiles()",
                 },
                 deviceId
             );
@@ -612,16 +604,69 @@ export function updateLastBackupTime(nextTime) {
     }
 }
 
-// meta
-export function setBackupMigrationState(state) {
-    return function(dispatch) {
-        return deviceService.setBackupMigrationState(state)
-            .then(() => {
-                dispatch({
-                    type: "SET_BACKUP_MIGRATION_STATE",
-                    state
-                })
-            })
+export function saveLocalBackup() {
+    return async function(dispatch, getState) {
+        try {
+            let backupFiles = getState().backup.local;
+            backupFiles.sort((a, b) => -(a.modifiedTime.diff(b.modifiedTime)));
+            console.log(backupFiles)
+            if (backupFiles.length > 2) {
+                await backupService.saveLocalBackup(backupFiles[2]);
+            } else {
+                await backupService.saveLocalBackup();
+            }
+            dispatch(updateLocalBackupFiles());
+        } catch(err) {
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> saveLocalBackup()",
+                },
+                deviceId
+            );
+        }
+    }
+}
+
+export function restoreLocalBackup(file) {
+    return async function(dispatch, getState) {
+        try {
+            dispatch(triggerLoader(true));
+            await backupService.restoreLocalBackup(file);
+            dispatch(triggerLoader(false));
+            window.location.reload(true);
+        } catch(err) {
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> restoreLocalBackup()",
+                },
+                deviceId
+            );
+        }
+    }
+}
+
+export function updateLocalBackupFiles() {
+    return async function(dispatch, getState) {
+        try {
+            let files = await backupService.getLocalBackups();
+            dispatch({
+                type: "SET_LOCAL_BACKUP_FILES",
+                files
+            });
+        } catch(err) {
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateLocalBackupFiles()",
+                },
+                deviceId
+            );
+        }
     }
 }
 

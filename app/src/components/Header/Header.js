@@ -34,7 +34,7 @@ let Header = (props) => (
                     onClick={props.onSelectToday}
                     className="current-date clickable"
                 >
-                    <span className="day">{moment().format('dddd')}</span>
+                    <span className="day">{moment().format(props.user ? 'ddd' : 'dddd')}</span>
                     <span className="date">{moment().format('D MMMM')}</span> 
                 </div>
             }
@@ -134,7 +134,7 @@ let Header = (props) => (
                             props.user &&
                             <button 
                                 key={a}
-                                onClick={props.uploadBackup}
+                                onClick={() => props.uploadGDBackup("user")}
                             >
                                 <img 
                                     src={ExportImg}
