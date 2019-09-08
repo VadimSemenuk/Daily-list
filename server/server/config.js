@@ -11,7 +11,6 @@ const config = {
         },
         jwtSecret: process.env.JWT_SECRET || '$doyoureallywannaknow',
         webClientId: process.env.WEB_CLIENT_ID || "390152836612-5rcub6svcoico5lterd17i6fog3pg9lg.apps.googleusercontent.com",
-        telegramToken: process.env.TELEGRAM_TOKEN,
         httpPort: process.env.HTTP_PORT || '3001',
         httpsPort: process.env.HTTPS_PORT || '3001',
         allowHttps: process.env.ALLOW_HTTPS || 'false',

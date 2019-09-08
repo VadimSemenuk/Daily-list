@@ -26,7 +26,6 @@ app.use(function (req, res, next) {
 
 let logRep = new (require("./server/repositories/log.js"))(DB);
 let usersRep = new (require("./server/repositories/users"))(DB);
-let reportRep = new (require("./server/repositories/report"))(DB);
 
 let localStrategy = require("./server/auth/local-strategy");
 let jwtStrategy = require("./server/auth/jwt-strategy");
@@ -38,9 +37,6 @@ app.use("/api/auth/", auth(usersRep));
 
 let log = require('./server/routes/log');
 app.use("/api/log/", log(logRep));
-
-let telegram = require('./server/routes/telegram');
-app.use("/api/telegram/", telegram(reportRep));
 
 let localPassword = require('./server/routes/local-password');
 app.use("/api/local-password/", localPassword());
