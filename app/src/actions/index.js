@@ -355,7 +355,6 @@ export function updateNotes() {
                 err,
                 {
                     path: "action/index.js -> updateNotes()",
-                    dates
                 },
                 deviceId
             );

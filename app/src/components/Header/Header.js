@@ -19,7 +19,7 @@ import SearchImg from "../../assets/img/search.svg";
 let buttons = {
     "daily-notes": [6, 5, 4, 0, 1],
     "notes": [6, 5, 4, 1],
-    "daily-add": [2, 3],
+    "daily-add": [7, 2, 3],
     "add": [2, 3],
     "password": [],
     default: [2],                       
@@ -43,16 +43,7 @@ let Header = (props) => (
             }
             {
                 props.page === "daily-add" &&
-                <div
-                    className="date-pick-view-wrapper" 
-                    onClick={props.onCalendarRequest}
-                >
-                    <button>
-                        <img 
-                            src={CalendarImg}
-                            alt="date"    
-                        />
-                    </button>
+                <div className="date-pick-view-wrapper" >
                     <div className="current-date clickable">
                         <span className="day">{props.currentDate.format('dddd')}</span>
                         <span className="date">{props.currentDate.format('D MMMM')}</span> 
@@ -151,6 +142,18 @@ let Header = (props) => (
                                 <img
                                     src={SearchImg}
                                     alt="search"
+                                />
+                            </button>
+                        );
+                    case 7:
+                        return (
+                            <button
+                                key={a}
+                                onClick={props.onCalendarRequest}
+                            >
+                                <img
+                                    src={CalendarImg}
+                                    alt="date"
                                 />
                             </button>
                         );
