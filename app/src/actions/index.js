@@ -447,14 +447,14 @@ export function setSetting(settingName, value, fn) {
 }
 
 // password
-export function setPasswordValid () {     
+export function setPasswordValid() {
     return {
         type: "SET_VALID"
     }
 }
 
 // loader
-export function triggerLoader (state) {
+export function triggerLoader(state) {
     return {
         type: "TRIGGER_LOADER",
         payload: {
@@ -464,7 +464,7 @@ export function triggerLoader (state) {
 }
 
 // calendar 
-export function getCount (date, period) {
+export function getCount(date, period) {
     return async (dispatch, getState) => {
         try {
             let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
@@ -490,7 +490,7 @@ export function getCount (date, period) {
     }
 }
 
-export function getFullCount (date) {
+export function getFullCount(date) {
     return async (dispatch, getState) => {
         try {
             let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
@@ -522,6 +522,8 @@ export function googleSignIn() {
             dispatch(triggerLoader(true));
 
             let user = await authService.googleSignIn();
+            dispatch(setUser(user));
+            dispatch(updateGDBackupFiles());
 
             dispatch(triggerLoader(false));
 
@@ -553,12 +555,9 @@ export function googleSignOut() {
             dispatch(triggerLoader(true));
 
             await authService.googleSignOut();
+            dispatch(resetUser());
 
             dispatch(triggerLoader(false));
-
-            return dispatch({
-                type: "CLEAR_USER"
-            });
         } catch(err) {
             dispatch(triggerLoader(false));
 
@@ -575,13 +574,25 @@ export function googleSignOut() {
     }
 }
 
-export function setToken(token) {
+export function setUser(user) {
     return (dispatch) => {
-        authService.setToken(token);
+        authService.setUser(user);
         return dispatch({
             type: "RECEIVE_USER",
             payload: {
-                user: authService.getToken()
+                user: authService.getUser()
+            }
+        });
+    }
+}
+
+export function resetUser() {
+    return (dispatch) => {
+        authService.resetUser();
+        return dispatch({
+            type: "CLEAR_USER",
+            payload: {
+                user: authService.getUser()
             }
         });
     }
@@ -650,15 +661,15 @@ export function restoreGDBackup(file) {
 export function updateGDBackupFiles() {
     return async (dispatch, getState) => {
         try {
-            let token = getState().user;
+            let user = getState().user;
 
-            let nextToken = {
-                ...token,
+            let nextUser = {
+                ...user,
                 gdBackup: {
                     backupFiles: await backupService.getGDBackupFiles()
                 }
             };
-            dispatch(setToken(nextToken));
+            dispatch(setUser(nextUser));
         } catch(err) {
             let deviceId = getState().meta.deviceId;
             logsService.logError(

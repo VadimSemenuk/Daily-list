@@ -43,11 +43,12 @@ let Header = (props) => (
             }
             {
                 props.page === "daily-add" &&
-                <div className="date-pick-view-wrapper" >
-                    <div className="current-date clickable">
-                        <span className="day">{props.currentDate.format('dddd')}</span>
-                        <span className="date">{props.currentDate.format('D MMMM')}</span> 
-                    </div>
+                <div
+                    onClick={props.onResetAddedDate}
+                    className="current-date clickable"
+                >
+                    <span className="day">{props.currentDate.format('dddd')}</span>
+                    <span className="date">{props.currentDate.format('D MMMM')}</span>
                 </div>
             }
         </div>

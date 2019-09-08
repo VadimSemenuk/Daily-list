@@ -3,6 +3,7 @@ export default {
     // apiURL: "http://localhost:3001/api",
     apiURL: "http://192.168.100.4:3001/api",
     // apiURL: "http://52.14.213.196/api",
+    LSUserKey: "com.dailylist.vadimsemenyk.user",
     LSTokenKey: "com.dailylist.vadimsemenyk.token",
     defaultLang: "en",
     db: {

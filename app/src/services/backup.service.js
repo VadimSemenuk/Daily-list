@@ -71,7 +71,11 @@ class BackupService {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
-        let user = authService.getToken();
+        await apiService.refreshGTokenIfNeed();
+
+        let user = authService.getUser();
+        let token = authService.getAuthorizationToken();
+
         let backupFile = null;
         if (user.gdBackup.backupFiles.length) {
             if (params.actionType === 'user') {
@@ -84,7 +88,6 @@ class BackupService {
         if (!backupFile) {
             backupFile = await this.createGDBackupFile(params.actionType === 'user' ? "DailyListSqliteDBFile" : "DailyListSqliteDBFile_auto");
             user.gdBackup.backupFiles = [...user.gdBackup.backupFiles, backupFile];
-            authService.setToken(user);
         }
 
         let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);
@@ -97,7 +100,9 @@ class BackupService {
                     let oReq = new XMLHttpRequest();
                     oReq.open("PATCH", `https://www.googleapis.com/upload/drive/v3/files/${backupFile.id}?uploadType=media&fields=modifiedTime,name,id`, true);
                     oReq.setRequestHeader("Content-Type", "application/x-sqlite3");
-                    oReq.setRequestHeader("Authorization", user.gAccessToken);
+                    if (token && token.google) {
+                        oReq.setRequestHeader("Authorization", token.google.accessToken);
+                    }
                     oReq.onload = function () {
                         let backupFile = oReq.response;
                         if (backupFile) {
@@ -121,12 +126,16 @@ class BackupService {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
 
-        let user = authService.getToken();
+        await apiService.refreshGTokenIfNeed();
+
+        let token = authService.getAuthorizationToken();
 
         return new Promise((resolve, reject) => {
             let oReq = new XMLHttpRequest();
             oReq.open("GET", `https://www.googleapis.com/drive/v3/files/${backupFile.id}?alt=media`, true);
-            oReq.setRequestHeader("Authorization", user.gAccessToken);
+            if (token && token.google) {
+                oReq.setRequestHeader("Authorization", token.google.accessToken);
+            }
             oReq.responseType = "blob";
             oReq.onload = async function () {
                 let blob = oReq.response;
@@ -183,6 +192,7 @@ class BackupService {
     async saveLocalBackup(fileToUpdate) {
         let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);
         let targetDirEntry = await filesService.getFileEntry(this.localBackupsDirectory);
+        await new Promise((resolve, reject) => fileEntry.copyTo(targetDirEntry, `DailyList_Backup_${moment().valueOf()}.db`, resolve, reject))
         if (fileToUpdate) {
             let fileToUpdateEntry = await filesService.getFileEntry(`${this.localBackupsDirectory}${fileToUpdate.name}`);
             await new Promise((resolve, reject) => fileToUpdateEntry.remove(resolve, reject));

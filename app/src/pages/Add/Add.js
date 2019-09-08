@@ -216,8 +216,14 @@ class Add extends Component {
     onDateSelect = (date) => {
         this.setState({
             added: date
-        })
+        });
     };
+
+    setDefaultAddedDate = () => {
+        this.setState({
+            added: this.props.date
+        });
+    }
 
     render() {
         let {t} = this.props;
@@ -231,6 +237,7 @@ class Add extends Component {
                     onSubmit={this.onSubmit}
                     onCalendarRequest={this.triggerCalendar}
                     currentDate={this.state.added}
+                    onResetAddedDate={this.setDefaultAddedDate}
                 />
                 {
                     this.state.calendar &&

@@ -13,13 +13,13 @@ class ApiService {
         return str.join("&");
     }
 
-    async refreshTokenIfNeed() {
-        let user = authService.getToken();
-        if (!user) {
+    async refreshGTokenIfNeed() {
+        let token = authService.getAuthorizationToken();
+        if (!token || !token.google) {
             return;
         }
-        if ((user.msGTokenExpireDateUTC - 100) < moment.utc().valueOf()) {
-            await authService.googleRefreshAccessToken();
+        if ((token.google.msTokenExpireDateUTC - 100) < moment.utc().valueOf()) {
+            await authService.gRefreshAccessToken();
         }
     }
 
@@ -33,9 +33,9 @@ class ApiService {
             "Content-Type": "application/json"
         };
 
-        let user = authService.getToken();
-        if (user) {
-            headers["Authorization"] = user.token;
+        let token = authService.getAuthorizationToken();
+        if (token && token.api) {
+            headers["Authorization"] = token.api.token;
         }
 
         return fetch(`${config.apiURL}/${path}${serializedQuery ? `?${serializedQuery}` : ''}`, {
@@ -54,9 +54,9 @@ class ApiService {
             "Content-Type": "application/json"
         };
 
-        let user = authService.getToken();
-        if (user) {
-            headers["Authorization"] = user.token;
+        let token = authService.getAuthorizationToken();
+        if (token && token.api) {
+            headers["Authorization"] = token.api.token;
         }
 
         return fetch(`${config.apiURL}/${path}`, {
@@ -76,9 +76,9 @@ class ApiService {
             "Content-Type": "application/json"
         };
 
-        let user = authService.getToken();
-        if (user) {
-            headers["Authorization"] = user.token;
+        let token = authService.getAuthorizationToken();
+        if (token && token.api) {
+            headers["Authorization"] = token.api.token;
         }
 
         return fetch(`${config.apiURL}/${path}`, {
@@ -98,9 +98,9 @@ class ApiService {
             "Content-Type": "application/json"
         };
 
-        let user = authService.getToken();
-        if (user) {
-            headers["Authorization"] = user.token;
+        let token = authService.getAuthorizationToken();
+        if (token && token.api) {
+            headers["Authorization"] = token.api.token;
         }
 
         return fetch(`${config.apiURL}/${path}`, {
@@ -121,10 +121,10 @@ class ApiService {
         };
 
         if (authorization) {
-            await this.refreshTokenIfNeed();
-            let user = authService.getToken();
-            if (user) {
-                headers["Authorization"] = user.gAccessToken;
+            await this.refreshGTokenIfNeed();
+            let token = authService.getAuthorizationToken();
+            if (token && token.google) {
+                headers["Authorization"] = token.google.accessToken;
             }
         }
 
@@ -150,10 +150,10 @@ class ApiService {
         };
 
         if (authorization) {
-            await this.refreshTokenIfNeed();
-            let user = authService.getToken();
-            if (user) {
-                headers["Authorization"] = user.gAccessToken;
+            await this.refreshGTokenIfNeed();
+            let token = authService.getAuthorizationToken();
+            if (token && token.google) {
+                headers["Authorization"] = token.google.accessToken;
             }
         }
 

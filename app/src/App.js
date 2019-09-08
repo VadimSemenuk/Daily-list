@@ -65,7 +65,8 @@ export default class App extends Component {
             settings.notesScreenMode,
             settings.notesScreenMode === 1 ? [moment(date).add(-1, "day"), date, moment(date).add(1, "day")] : null
         );
-        let user = authService.getToken();
+        let user = authService.getUser();
+        authService.initAuthorizationToken();
         backupService.setLocalBackupsDirectory();
         backupService.setDatabasesDirectory();
         let localBackups = await backupService.getLocalBackups();

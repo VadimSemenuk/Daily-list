@@ -4,11 +4,11 @@ import moment from 'moment';
 import config from "../config/config";
 import CustomError from "../common/CustomError";
 import deviceService from "./device.service";
-import backupService from "./backup.service";
 import apiService from "./api.service";
 
 class AuthService {
-    token = null;
+    gAuthorizationToken = null;
+    user = null;
 
     googleSignIn = async () => {
         if (!deviceService.hasNetworkConnection()) {
@@ -16,14 +16,11 @@ class AuthService {
         }
 
         if (!window.cordova) {
-            let token = {
+            let user = {
                 id: 1,
                 email: "vadim54787@gmail.com",
                 name: "Vadim",
                 picture: "",
-                gAccessToken: "Bearer ya29.GltvB00g8gh8FZ2CtFkaVz5SzrSp5yTUYmu5vtn3aJv0SO_U3741Mw4tz2TkmIq9jhMzFPbKLWldjOrYydN5JkfbCL7AXIkRsXxnwdSMV95PLDXMqwGyDyazxgvH",
-                gRefreshToken: "1/0jjXAph4OlyluEkvVv0VA0e1KlQ0jdGpgld0HnjTviU",
-                msGTokenExpireDateUTC: 0,
                 gdBackup: {
                     backupFiles: []
                 },
@@ -35,12 +32,15 @@ class AuthService {
                 }
             };
 
-            this.setToken(token);
+            this.setAuthorizationToken({
+                google: {
+                    accessToken: "Bearer ya29.GltvB00g8gh8FZ2CtFkaVz5SzrSp5yTUYmu5vtn3aJv0SO_U3741Mw4tz2TkmIq9jhMzFPbKLWldjOrYydN5JkfbCL7AXIkRsXxnwdSMV95PLDXMqwGyDyazxgvH",
+                    refreshToken: "1/0jjXAph4OlyluEkvVv0VA0e1KlQ0jdGpgld0HnjTviU",
+                    msTokenExpireDateUTC: 0,
+                }
+            });
 
-            token.gdBackup.backupFiles = await backupService.getGDBackupFiles(token);
-            this.setToken(token);
-
-            return this.getToken();
+            return this.getFormattedUser(user);
         }
 
         let googleUser = await new Promise((resolve, reject) => {
@@ -73,14 +73,11 @@ class AuthService {
             throw new Error();
         }
 
-        let token = {
+        let user = {
             id: googleUser.userId,
             email: googleUser.email,
             name: googleUser.displayName,
             picture: googleUser.imageUrl,
-            gAccessToken: "Bearer " + googleAccessToken.access_token,
-            gRefreshToken: googleAccessToken.refresh_token,
-            msGTokenExpireDateUTC: moment.utc().valueOf() + 3400000,
             gdBackup: {
                 backupFiles: []
             },
@@ -89,30 +86,28 @@ class AuthService {
             }
         };
 
-        this.setToken(token);
+        this.setAuthorizationToken({
+            google: {
+                accessToken: "Bearer " + googleAccessToken.access_token,
+                refreshToken: googleAccessToken.refresh_token,
+                msTokenExpireDateUTC: moment.utc().valueOf() + 3400000,
+            }
+        });
 
-        token.gdBackup.backupFiles = await backupService.getGDBackupFiles(token);
-        this.setToken(token);
-
-        return this.getToken();
+        return this.getFormattedUser(user);
     };
 
     googleSignOut() {
         if (!window.cordova) {
             return Promise.resolve()
         }
-        return new Promise((resolve, reject) => window.plugins.googleplus.logout(() => {
-            this.setToken(null);
-            resolve();
-        }, () => {
-            resolve();
-        }));
+        return new Promise((resolve) => window.plugins.googleplus.logout(resolve, resolve));
     }
 
-    async googleRefreshAccessToken() {
-        let user = this.getToken();
+    async gRefreshAccessToken() {
+        let token = this.getAuthorizationToken().google;
         let authUrl = "oauth2/v4/token" +
-            `?refresh_token=${user.gRefreshToken}` +
+            `?refresh_token=${token.refreshToken}` +
             `&client_id=${config.google.webClientId}` +
             `&client_secret=${config.google.webClientSecret}` +
             "&grant_type=refresh_token";
@@ -127,60 +122,80 @@ class AuthService {
             throw new Error();
         }
 
-        let nextToken = {
-            ...this.getToken(),
-            gAccessToken: "Bearer " + googleAccessToken.access_token,
-            msGTokenExpireDateUTC: moment.utc().valueOf() + 3400000,
-        };
-
-        this.setToken(nextToken);
-
-        return nextToken;
-    }
-
-    setToken(token) {
-        if (!token) {
-            localStorage.removeItem(config.LSTokenKey);
-            this.token = null;
-        } else {
-            let tokenToSave = {
+        this.setAuthorizationToken({
+            google: {
                 ...token,
-                gdBackup: {
-                    ...token.gdBackup,
-                    backupFiles: token.gdBackup.backupFiles.map((f) => ({...f, modifiedTime: moment(f.modifiedTime).valueOf()}))
-                }
-            };
-            localStorage.setItem(config.LSTokenKey, JSON.stringify(tokenToSave));
-            this.token = this.getFormattedToken(token);
-        }
+                accessToken: "Bearer " + googleAccessToken.access_token,
+                msTokenExpireDateUTC: moment.utc().valueOf() + 3400000,
+            }
+        });
     }
 
-    getToken() {
-        if (this.token) {
-            return this.token;
-        } else {
-            let token = JSON.parse(localStorage.getItem(config.LSTokenKey));
-            return this.getFormattedToken(token);
-        }
-    }
-
-    getFormattedToken(token) {
-        if (!token) {
-            return token;
-        }
-        let nextToken = {
-            ...token,
+    setUser(user) {
+        let tokenToSave = {
+            ...user,
             gdBackup: {
-                ...token.gdBackup,
-                backupFiles: token.gdBackup.backupFiles.map((f) => ({...f, modifiedTime: moment(f.modifiedTime)}))
+                ...user.gdBackup,
+                backupFiles: user.gdBackup.backupFiles.map((f) => ({
+                    ...f,
+                    modifiedTime: moment(f.modifiedTime).valueOf()
+                }))
             }
         };
-        return nextToken;
+        localStorage.setItem(config.LSUserKey, JSON.stringify(tokenToSave));
+        this.user = this.getFormattedUser(user);
     }
 
-    resetToken() {
+    getUser() {
+        if (this.user) {
+            return this.user;
+        } else {
+            let user = JSON.parse(localStorage.getItem(config.LSUserKey));
+            return this.getFormattedUser(user);
+        }
+    }
+
+    getFormattedUser(user) {
+        if (!user) {
+            return user;
+        }
+        let nextUser = {
+            ...user,
+            gdBackup: {
+                ...user.gdBackup,
+                backupFiles: user.gdBackup.backupFiles.map((f) => ({...f, modifiedTime: moment(f.modifiedTime)}))
+            }
+        };
+        return nextUser;
+    }
+
+    resetUser() {
+        localStorage.removeItem(config.LSUserKey);
+        this.user = null;
+        this.resetAuthorizationToken();
+    }
+
+    setAuthorizationToken(token) {
+        let currentToken = this.getAuthorizationToken();
+        this.gAuthorizationToken = {...currentToken, ...token};
+        localStorage.setItem(config.LSTokenKey, JSON.stringify(this.gAuthorizationToken));
+    }
+
+    getAuthorizationToken() {
+        if (this.gAuthorizationToken) {
+            return this.gAuthorizationToken;
+        } else {
+            return JSON.parse(localStorage.getItem(config.LSTokenKey));
+        }
+    }
+
+    resetAuthorizationToken() {
+        this.gAuthorizationToken = null;
         localStorage.removeItem(config.LSTokenKey);
-        this.token = null;
+    }
+
+    initAuthorizationToken() {
+        this.gAuthorizationToken = this.getAuthorizationToken();
     }
 }
 
