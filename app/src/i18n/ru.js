@@ -125,6 +125,7 @@ export default {
     "do-copy": "Копировать",
     "move-tomorrow": "Переместить на завтра",
     "finished-split": "Завершенные",
+    "reorder-fail": "Не удалось переместить заметку",
 
     // add
     "notify": "Напомнить",

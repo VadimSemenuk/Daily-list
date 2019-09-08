@@ -68,36 +68,35 @@ function receiveNote(state, note) {
 
 function notes (state = init, action) {
     switch(action.type) {
-        case 'SET_DATES_AND_UPDATE_NOTES':
-        case 'RECEIVE_NOTES': {
-            return action.notes.slice();
+        case 'SET_DATES_AND_UPDATE_NOTES': {
+            return action.payload.notes.slice();
         }
         case 'UPDATE_DATES_AND_NOTES': {
-            return [...state.slice(0, action.nextIndex), action.notes, ...state.slice(action.nextIndex + 1)]
+            return [...state.slice(0, action.payload.nextIndex), action.payload.notes, ...state.slice(action.payload.nextIndex + 1)]
         }
         case 'RECEIVE_NOTE': {
-            return receiveNote(state, action.note);
+            return receiveNote(state, action.payload.note);
         }
         case 'UPDATE_NOTE': {
             let startState = null;
 
-            if (action.prevNote) {
-                if (action.prevNote.repeatType === "no-repeat") {
+            if (action.payload.prevNote) {
+                if (action.payload.prevNote.repeatType === "no-repeat") {
                     startState = state.map((list) => {
-                        return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
+                        return {...list, items: list.items.filter((note) => note.key !== action.payload.note.key)}
                     });
                 } else {
                     startState = state.map((list) => {
                         return {...list, items: list.items.filter((note) => (
-                            (note.key !== action.note.key) &&
-                            (note.forkFrom !== action.note.key)
+                            (note.key !== action.payload.note.key) &&
+                            (note.forkFrom !== action.payload.note.key)
                         ))}
                     });
                 }
 
-                return receiveNote(startState, action.note);
+                return receiveNote(startState, action.payload.note);
             } else {
-                let actions = action.notes ? action.notes : [action];
+                let actions = action.payload.notes ? action.payload.notes : [action.payload];
 
                 let nextState = state.slice();
 
@@ -126,8 +125,8 @@ function notes (state = init, action) {
         case 'DELETE_NOTE': {
             return state.map((list) => {
                 let nextList = list.items.filter((note) => (
-                    (note.key !== action.note.key) &&
-                    (note.forkFrom !== action.note.key)
+                    (note.key !== action.payload.note.key) &&
+                    (note.forkFrom !== action.payload.note.key)
                 ));
                 return {
                     date: list.date, 
@@ -147,19 +146,19 @@ function notes (state = init, action) {
             return action.notes.slice();
         }
         case "UPDATE_MANUAL_SORT_INDEX": {
-            if (action.notes[0].mode === 2) {
+            if (action.payload.notes[0].mode === 2) {
                 return [
                     {
                         ...state[0],
-                        items: action.notes
+                        items: action.payload.notes
                     }
                 ]
             } else {
                 return state.map((list) => {
-                    if (list.date.valueOf() === action.notes[0].added.valueOf()) {
+                    if (list.date.valueOf() === action.payload.notes[0].added.valueOf()) {
                         return {
                             ...list,
-                            items: action.notes
+                            items: action.payload.notes
                         };
                     }
                     return list;

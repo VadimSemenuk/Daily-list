@@ -6,7 +6,7 @@ let init = {
 function date (state = init, action) {
     switch(action.type) {
         case "GET_COUNT": 
-            return {...state, ...action.nextCount};
+            return {...state, ...action.payload.nextCount};
         default: 
             return state;
     }

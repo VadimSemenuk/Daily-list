@@ -7,7 +7,7 @@ function date (state = init, action) {
         case 'SET_DATES_AND_UPDATE_NOTES':
         case 'UPDATE_DATES_AND_NOTES':
         case 'SET_CURRENT_DATE':        
-            return moment(action.date);
+            return moment(action.payload.date);
         default: 
             return state;
     }

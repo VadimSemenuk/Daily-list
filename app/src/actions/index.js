@@ -8,254 +8,278 @@ import {throttleAction} from "../utils/throttle";
 import logsService from "../services/logs.service";
 
 // notes
-export function addNote (note) {
-    return function(dispatch, getState) {
-        return notesService.addNote(note)
-            .then((nextNote) => dispatch({
+export function addNote(note) {
+    return async (dispatch, getState) => {
+        try {
+            let addedNote = await notesService.addNote(note);
+
+            dispatch({
                 type: "RECEIVE_NOTE",
-                note: nextNote
-            }))
-            .then(({note}) => {
-                let state = getState();
-
-                state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-                dispatch(saveBackup());
-            })
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-note-add"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> addNote()",
-                        note: {
-                            ...note,
-                            title: !!note.title,
-                            dynamicFields: !!note.dynamicFields
-                        }
-                    },
-                    deviceId
-                );
+                payload: {
+                    note: addedNote
+                }
             });
+
+            let state = getState();
+
+            state.settings.calendarNotesCounter && dispatch(getFullCount(addedNote.added.valueOf()));
+
+            dispatch(saveBackup());
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-add"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> addNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    }
+                },
+                deviceId
+            );
+        }
     }
 }
 
-export function updateNote (note, prevNote) {
-    return function(dispatch, getState) {
-        return notesService.updateNote(note, prevNote)
-            .then((nextNote) => {
-                return dispatch({
-                    type: "UPDATE_NOTE",
-                    note: nextNote,
-                    prevNote: prevNote
-                })
-            })
-            .then(({note}) => {
-                let state = getState();
+export function updateNote(note, prevNote) {
+    return async (dispatch, getState) => {
+        try {
+            let updatedNote = await notesService.updateNote(note, prevNote);
 
-                state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-                dispatch(saveBackup());
-            })
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-note-update"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> updateNote()",
-                        note: {
-                            ...note,
-                            title: !!note.title,
-                            dynamicFields: !!note.dynamicFields
-                        },
-                    },
-                    deviceId
-                );
-            });
-    }
-}
-
-export function updateNoteDynamicFields (note, updatedState) {
-    return function(dispatch, getState) {
-        return notesService.updateNoteDynamicFields(note, updatedState)
-            .then((nextNote) => {
-                dispatch({
-                    type: "UPDATE_NOTE",
-                    note: nextNote,
-                    inserted: note.isShadow && !nextNote.isShadow
-                });
-
-                let state = getState();
-
-                updatedState.hasOwnProperty('finished')
-                && state.settings.calendarNotesCounter
-                && !state.settings.calendarNotesCounterIncludeFinished
-                && dispatch(getFullCount(nextNote.added.valueOf()));
-
-                updatedState.hasOwnProperty('finished') && dispatch(renderNotes());
-
-                dispatch(saveBackup());
-            })
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-note-update"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> updateNoteDynamicFields()",
-                        note: {
-                            ...note,
-                            title: !!note.title,
-                            dynamicFields: !!note.dynamicFields
-                        },
-                    },
-                    deviceId
-                );
-            });
-    }
-}
-
-export function updateNoteDate (note, nextDate) {
-    return function(dispatch, getState) {
-        return notesService.updateNoteDate(note, nextDate)
-            .then((nextNote) => dispatch({
+            dispatch({
                 type: "UPDATE_NOTE",
-                note: nextNote
-            }))
-            .then(({note}) => {
-                let state = getState();
-
-                state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-                dispatch(renderNotes());
-
-                dispatch(saveBackup());
-            })
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-note-update"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> updateNoteDate()",
-                        note: {
-                            ...note,
-                            title: !!note.title,
-                            dynamicFields: !!note.dynamicFields
-                        }
-                    },
-                    deviceId
-                );
+                payload: {
+                    note: updatedNote,
+                    prevNote: prevNote
+                }
             });
+
+            let state = getState();
+
+            state.settings.calendarNotesCounter && dispatch(getFullCount(updatedNote.added.valueOf()));
+
+            dispatch(saveBackup());
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-update"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    },
+                },
+                deviceId
+            );
+        }
     }
 }
 
-export function deleteNote (note) {
-    return function(dispatch, getState) {
-        return notesService.deleteNote(note)
-            .then((note) => dispatch({
+export function updateNoteDynamicFields(note, updatedState) {
+    return async (dispatch, getState) => {
+        try {
+            let updatedNote = await notesService.updateNoteDynamicFields(note, updatedState);
+
+            dispatch({
+                type: "UPDATE_NOTE",
+                payload: {
+                    note: updatedNote,
+                    inserted: note.isShadow && !updatedNote.isShadow
+                }
+            });
+
+            let state = getState();
+
+            updatedState.hasOwnProperty('finished')
+            && state.settings.calendarNotesCounter
+            && !state.settings.calendarNotesCounterIncludeFinished
+            && dispatch(getFullCount(updatedNote.added.valueOf()));
+
+            updatedState.hasOwnProperty('finished') && dispatch(renderNotes());
+
+            dispatch(saveBackup());
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-update"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateNoteDynamicFields()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    },
+                },
+                deviceId
+            );
+        }
+    }
+}
+
+export function updateNoteDate(note, nextDate) {
+    return async (dispatch, getState) => {
+        try {
+            let updatedNote = await notesService.updateNoteDate(note, nextDate);
+
+            dispatch({
+                type: "UPDATE_NOTE",
+                payload: {
+                    note: updatedNote
+                }
+            });
+
+            let state = getState();
+
+            state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
+
+            dispatch(renderNotes());
+
+            dispatch(saveBackup());
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-update"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateNoteDate()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    }
+                },
+                deviceId
+            );
+        }
+    }
+}
+
+export function deleteNote(note) {
+    return async (dispatch, getState) => {
+        try {
+            let deletedNote = await notesService.deleteNote(note);
+
+            dispatch({
                 type: "DELETE_NOTE",
-                note
-            }))
-            .then(({note}) => {
-                let state = getState();
-
-                state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-                dispatch(saveBackup());
-            })
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-note-delete"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> deleteNote()",
-                        note: {
-                            ...note,
-                            title: !!note.title,
-                            dynamicFields: !!note.dynamicFields
-                        }
-                    },
-                    deviceId
-                );
+                payload: {
+                    note: deletedNote
+                }
             });
+
+            let state = getState();
+
+            state.settings.calendarNotesCounter && dispatch(getFullCount(deletedNote.added.valueOf()));
+
+            dispatch(saveBackup());
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-delete"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> deleteNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    }
+                },
+                deviceId
+            );
+        }
     }
 }
 
-export function getDeletedNotes () {
-    return function(dispatch, getState) {
-        return notesService.getDeletedNotes()
-            .then((items) => dispatch({
+export function getDeletedNotes() {
+    return async (dispatch, getState) => {
+        try {
+            let items = await notesService.getDeletedNotes();
+
+            dispatch({
                 type: "RECEIVE_DELETED_NOTES",
-                items
-            }))
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-note-get-trash"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> getDeletedNotes()",
-                    },
-                    deviceId
-                );
+                payload: {
+                    items
+                }
             });
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-get-trash"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> getDeletedNotes()",
+                },
+                deviceId
+            );
+        }
     }
 }
 
-export function restoreNote (note) {
-    return function(dispatch, getState) {
-        return notesService.restoreNote(note)
-            .then((note) => dispatch({
+export function restoreNote(note) {
+    return async (dispatch, getState) => {
+        try {
+            let restoredNote = await notesService.restoreNote(note);
+
+            dispatch({
                 type: "RESTORE_NOTE",
-                note
-            }))
-            .then(({note}) => {
-                let state = getState();
-
-                state.settings.calendarNotesCounter && dispatch(getFullCount(state.date.valueOf()));
-                dispatch(updateNotes());
-
-                dispatch(saveBackup());
-            })
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-note-restore"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> restoreNote()",
-                        note: {
-                            ...note,
-                            title: !!note.title,
-                            dynamicFields: !!note.dynamicFields
-                        },
-                    },
-                    deviceId
-                );
+                payload: {
+                    note: restoredNote
+                }
             });
+
+            let state = getState();
+
+            state.settings.calendarNotesCounter && dispatch(getFullCount(state.date.valueOf()));
+            dispatch(updateNotes());
+
+            dispatch(saveBackup());
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-restore"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> restoreNote()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        dynamicFields: !!note.dynamicFields
+                    },
+                },
+                deviceId
+            );
+        }
     }
 }
 
-export function cleanDeletedNotes () {
-    return function(dispatch, getState) {
-        return notesService.cleanDeletedNotes()
-            .then(() => dispatch({
+export function cleanDeletedNotes() {
+    return async (dispatch, getState) => {
+        try {
+            await notesService.cleanDeletedNotes();
+
+            dispatch({
                 type: "CLEAN_TRASH",
-            }))
-            .then(() => {
-                dispatch(saveBackup());
-            })
-            .catch((err) => {
-                dispatch(triggerErrorModal("clean-trash-error"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> cleanDeletedNotes()",
-                    },
-                    deviceId
-                );
             });
+
+            dispatch(saveBackup());
+        } catch(err) {
+            dispatch(triggerErrorModal("clean-trash-error"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> cleanDeletedNotes()",
+                },
+                deviceId
+            );
+        }
     }
 }
 
@@ -266,19 +290,33 @@ export function renderNotes () {
 }
 
 export function updateNotesManualSortIndex(notes) {
-    return function (dispatch) {
-        dispatch({
-            type: "UPDATE_MANUAL_SORT_INDEX",
-            notes: notes
-        });
+    return async (dispatch, getState) => {
+        try {
+            dispatch({
+                type: "UPDATE_MANUAL_SORT_INDEX",
+                payload: {
+                    notes
+                }
+            });
 
-        notesService.updateNotesManualSortIndex(notes)
-            .then((insertedNotes) => {
-                dispatch({
-                    type: "UPDATE_NOTE",
+            let insertedNotes = await notesService.updateNotesManualSortIndex(notes);
+            dispatch({
+                type: "UPDATE_NOTE",
+                payload: {
                     notes: insertedNotes.map((insertedNote) => ({note: insertedNote, inserted: true}))
-                });
-            })
+                }
+            });
+        } catch(err) {
+            dispatch(triggerErrorModal("reorder-fail"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateNotesManualSortIndex()",
+                },
+                deviceId
+            );
+        }
     }
 }
 
@@ -286,107 +324,126 @@ export function updateNotesManualSortIndex(notes) {
 export function setCurrentDate (date) {
     return {
         type: "SET_CURRENT_DATE",
-        date
+        payload: {
+            date
+        }
     }
 }
 
 export function updateNotes() {
-    return function(dispatch, getState) {
-        let state = getState();
+    return async (dispatch, getState) => {
+        try {
+            let state = getState();
 
-        let dates = null;
-        if (state.settings.notesScreenMode === 1) {
-            dates = state.notes.map((n) => n.date);
-        }
+            let dates = null;
+            if (state.settings.notesScreenMode === 1) {
+                dates = state.notes.map((n) => n.date);
+            }
 
-        return notesService.getNotes(state.settings.notesScreenMode, dates)
-            .then((notes) => dispatch({
+            let notes = await notesService.getNotes(state.settings.notesScreenMode, dates);
+
+            dispatch({
                 type: "UPDATE_NOTES",
-                notes
-            }))
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-get-notes"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> updateNotes()",
-                        dates
-                    },
-                    deviceId
-                );
-            });
+                payload: {
+                    notes
+                }
+            })
+        } catch(err) {
+            dispatch(triggerErrorModal("error-get-notes"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateNotes()",
+                    dates
+                },
+                deviceId
+            );
+        }
     }
 }
 
-export function setDatesAndUpdateNotes (dates, dateIndex, notesScreenMode) {
-    return function(dispatch, getState) {
-        return notesService.getNotes(notesScreenMode, dates)
-            .then((notes) => dispatch({
+export function setDatesAndUpdateNotes(dates, dateIndex, notesScreenMode) {
+    return async (dispatch, getState) => {
+        try {
+            let notes = await notesService.getNotes(notesScreenMode, dates);
+
+            dispatch({
                 type: "SET_DATES_AND_UPDATE_NOTES",
-                date: dates[dateIndex],
-                notes
-            }))
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-get-notes"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> setDatesAndUpdateNotes()",
-                        dates, dateIndex
-                    },
-                    deviceId
-                );
-            });
+                payload: {
+                    date: dates[dateIndex],
+                    notes
+                }
+            })
+        } catch(err) {
+            dispatch(triggerErrorModal("error-get-notes"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> setDatesAndUpdateNotes()",
+                    dates, dateIndex
+                },
+                deviceId
+            );
+        }
     }
 }
 
-export function updateDatesAndNotes (date, preRenderDate, nextIndex, notesScreenMode) {
-    return function(dispatch, getState) {
-        return notesService.getNotes(notesScreenMode, preRenderDate)
-            .then((notes) => dispatch({
+export function updateDatesAndNotes(date, preRenderDate, nextIndex, notesScreenMode) {
+    return async (dispatch, getState) => {
+        try {
+            let notes = await notesService.getNotes(notesScreenMode, preRenderDate);
+
+            dispatch({
                 type: "UPDATE_DATES_AND_NOTES",
-                notes,
-                nextIndex,
-                date
-            }))
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-get-notes"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err, {
-                        path: "action/index.js -> updateDatesAndNotes()",
-                        date, preRenderDate, nextIndex
-                    },
-                    deviceId
-                );
-            });
+                payload: {
+                    notes,
+                    nextIndex,
+                    date
+                }
+            })
+        } catch(err) {
+            dispatch(triggerErrorModal("error-get-notes"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err, {
+                    path: "action/index.js -> updateDatesAndNotes()",
+                    date, preRenderDate, nextIndex
+                },
+                deviceId
+            );
+        }
     }
 }
 
 // settings
-export function setSetting (settingName, value, fn) {     
-    return function(dispatch, getState) {
-        return settingsService.setSetting(settingName, value)
-            .then(() => dispatch({
+export function setSetting(settingName, value, fn) {
+    return async (dispatch, getState) => {
+        try {
+            await settingsService.setSetting(settingName, value);
+
+            await dispatch({
                 type: "SET_SETTING",
-                settingName,
-                value
-            }))
-            .then(() => fn && fn())
-            .catch((err) => {
-                dispatch(triggerErrorModal("error-common"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> setSetting()",
-                        settingName, value
-                    },
-                    deviceId
-                );
+                payload: {
+                    settingName,
+                    value
+                }
             });
+
+            fn && fn();
+        } catch(err) {
+            dispatch(triggerErrorModal("error-common"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> setSetting()",
+                    settingName, value
+                },
+                deviceId
+            );
+        }
     }
 }
 
@@ -401,127 +458,139 @@ export function setPasswordValid () {
 export function triggerLoader (state) {
     return {
         type: "TRIGGER_LOADER",
-        state
+        payload: {
+            state
+        }
     }
 }
 
 // calendar 
 export function getCount (date, period) {
-    return function(dispatch, getState) {
-        let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
-        return calendarService.getCount(date, period, includeFinished)
-            .then((nextCount) => dispatch({
+    return async (dispatch, getState) => {
+        try {
+            let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
+            let nextCount = await calendarService.getCount(date, period, includeFinished);
+
+            dispatch({
                 type: "GET_COUNT",
-                nextCount 
-            }))
-            .catch((err) => {
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> getCount()",
-                        date, period
-                    },
-                    deviceId
-                );
+                payload: {
+                    nextCount
+                }
             });
+        } catch(err) {
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> getCount()",
+                    date, period
+                },
+                deviceId
+            );
+        }
     }
 }
 
 export function getFullCount (date) {
-    return function(dispatch, getState) {
-        let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
-        return calendarService.getFullCount(date, includeFinished)
-            .then((nextCount) => dispatch({
+    return async (dispatch, getState) => {
+        try {
+            let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
+            let nextCount = await calendarService.getFullCount(date, includeFinished);
+            dispatch({
                 type: "GET_COUNT",
-                nextCount 
-            }))
-            .catch((err) => {
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> getFullCount()",
-                        date
-                    },
-                    deviceId
-                );
+                payload: {
+                    nextCount
+                }
             });
+        } catch(err) {
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> getFullCount()",
+                    date
+                },
+                deviceId
+            );
+        }
     }
 }
 
 // auth
 export function googleSignIn() {
-    return function(dispatch, getState) {
-        dispatch(triggerLoader(true));
+    return async (dispatch, getState) => {
+        try {
+            dispatch(triggerLoader(true));
 
-        return authService.googleSignIn()
-            .then((user) => {
-                dispatch(triggerLoader(false));
+            let user = await authService.googleSignIn();
 
-                return dispatch({
-                    type: "RECEIVE_USER",
+            dispatch(triggerLoader(false));
+
+            return dispatch({
+                type: "RECEIVE_USER",
+                payload: {
                     user
-                })
+                }
             })
-            .catch((err) => {
-                dispatch(triggerLoader(false));
+        } catch(err) {
+            dispatch(triggerLoader(false));
 
-                dispatch(triggerErrorModal("error-sign-in", err.description));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> googleSignIn()",
-                    },
-                    deviceId
-                );
-            })
+            dispatch(triggerErrorModal("error-sign-in", err.description));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> googleSignIn()",
+                },
+                deviceId
+            );
+        }
     }
 }
 
 export function googleSignOut() {
-    return function(dispatch, getState) {
-        dispatch(triggerLoader(true));
+    return async (dispatch, getState) => {
+        try {
+            dispatch(triggerLoader(true));
 
-        return authService.googleSignOut()
-            .then(() => {
-                dispatch(triggerLoader(false));
+            await authService.googleSignOut();
 
-                return dispatch({
-                    type: "CLEAR_USER"
-                })
-            })
-            .catch((err) => {
-                dispatch(triggerLoader(false));
+            dispatch(triggerLoader(false));
 
-                dispatch(triggerErrorModal("error-sign-out"));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> googleSignOut()",
-                    },
-                    deviceId
-                );
-            })
+            return dispatch({
+                type: "CLEAR_USER"
+            });
+        } catch(err) {
+            dispatch(triggerLoader(false));
+
+            dispatch(triggerErrorModal("error-sign-out"));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> googleSignOut()",
+                },
+                deviceId
+            );
+        }
     }
 }
 
 export function setToken(token) {
-    return function(dispatch) {
+    return (dispatch) => {
         authService.setToken(token);
         return dispatch({
             type: "RECEIVE_USER",
-            user: authService.getToken()
+            payload: {
+                user: authService.getToken()
+            }
         });
     }
 }
 
 // backup
-
 export function saveBackup() {
-    return function (dispatch, getState) {
+    return (dispatch, getState) => {
         let state = getState();
         if (state.user && state.user.settings.autoBackup) {
             dispatch(uploadGDBackup("auto"));
@@ -531,8 +600,8 @@ export function saveBackup() {
     }
 }
 
-export let uploadGDBackup = throttleAction(function (actionType) {
-    return async function(dispatch, getState) {
+export let uploadGDBackup = throttleAction((actionType) => {
+    return async (dispatch, getState) => {
         try {
             actionType === "user" && dispatch(triggerLoader(true));
 
@@ -556,31 +625,31 @@ export let uploadGDBackup = throttleAction(function (actionType) {
 }, 5000);
 
 export function restoreGDBackup(file) {
-    return async function(dispatch, getState) {
-        dispatch(triggerLoader(true));
+    return async (dispatch, getState) => {
+        try {
+            dispatch(triggerLoader(true));
 
-        return backupService.restoreGDBackup(file)
-            .then(() => {
-                dispatch(triggerLoader(false));
-                window.location.reload(true);
-            })
-            .catch((err) => {
-                dispatch(triggerLoader(false));
-                dispatch(triggerErrorModal("error-backup-restore", err.description));
-                let deviceId = getState().meta.deviceId;
-                logsService.logError(
-                    err,
-                    {
-                        path: "action/index.js -> restoreGDBackup()",
-                    },
-                    deviceId
-                );
-            })
+            await backupService.restoreGDBackup(file);
+
+            dispatch(triggerLoader(false));
+            window.location.reload(true);
+        } catch(err) {
+            dispatch(triggerLoader(false));
+            dispatch(triggerErrorModal("error-backup-restore", err.description));
+            let deviceId = getState().meta.deviceId;
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> restoreGDBackup()",
+                },
+                deviceId
+            );
+        }
     }
 }
 
 export function updateGDBackupFiles() {
-    return async function(dispatch, getState) {
+    return async (dispatch, getState) => {
         try {
             let token = getState().user;
 
@@ -605,11 +674,10 @@ export function updateGDBackupFiles() {
 }
 
 export function saveLocalBackup() {
-    return async function(dispatch, getState) {
+    return async (dispatch, getState) => {
         try {
             let backupFiles = getState().backup.local;
             backupFiles.sort((a, b) => -(a.modifiedTime.diff(b.modifiedTime)));
-            console.log(backupFiles)
             if (backupFiles.length > 2) {
                 await backupService.saveLocalBackup(backupFiles[2]);
             } else {
@@ -630,7 +698,7 @@ export function saveLocalBackup() {
 }
 
 export function restoreLocalBackup(file) {
-    return async function(dispatch, getState) {
+    return async (dispatch, getState) => {
         try {
             dispatch(triggerLoader(true));
             await backupService.restoreLocalBackup(file);
@@ -650,12 +718,14 @@ export function restoreLocalBackup(file) {
 }
 
 export function updateLocalBackupFiles() {
-    return async function(dispatch, getState) {
+    return async (dispatch, getState) => {
         try {
             let files = await backupService.getLocalBackups();
             dispatch({
                 type: "SET_LOCAL_BACKUP_FILES",
-                files
+                payload: {
+                    files
+                }
             });
         } catch(err) {
             let deviceId = getState().meta.deviceId;
@@ -674,22 +744,25 @@ export function updateLocalBackupFiles() {
 export function triggerErrorModal(message) {
     return {
         type: "TRIGGER_ERROR_MODAL",
-        message
+        payload: {
+            message
+        }
     }
 }
 
 // search
 export function searchNotes(search, repeatType) {
-    return function (dispatch, getState) {
+    return async (dispatch, getState) => {
         let state = getState();
 
-        return notesService.searchNotes(state.settings.notesScreenMode, search, repeatType)
-            .then((notes) => {
-                dispatch({
-                    type: "RECEIVE_SEARCH_NOTES",
-                    notes
-                })
-            })
+        let notes = await notesService.searchNotes(state.settings.notesScreenMode, search, repeatType);
+
+        dispatch({
+            type: "RECEIVE_SEARCH_NOTES",
+            payload: {
+                notes
+            }
+        })
     }
 }
 
