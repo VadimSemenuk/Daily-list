@@ -42,43 +42,43 @@ class NotificationService {
                         hour: note.startTime.hour(),
                         minute: note.startTime.minute()
                     },
-                    count: 999
                 };
                 notificationConfig.id = note.key;
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
             case "week": {
-                note.repeatDates.forEach((date) => {
-                    window.cordova.plugins.notification.local.schedule(
-                        {
-                            ...notificationConfig,
-                            id: `${date}_${note.key}`,
-                            trigger: {
-                                every:
-                                    {
-                                        weekday: date,
-                                        hour: note.startTime.hour(),
-                                        minute: note.startTime.minute()
-                                    },
-                                count: 999
-                            }
+                let notificationConfigs = note.repeatDates.map((date) => {
+                    return {
+                        ...notificationConfig,
+                        id: +`${note.key}${date}`,
+                        trigger: {
+                            every:
+                                {
+                                    weekday: date,
+                                    hour: note.startTime.hour(),
+                                    minute: note.startTime.minute()
+                                },
                         }
-                    );
-                });
+                    }
+                })
+                window.cordova.plugins.notification.local.schedule(notificationConfigs);
+                console.log(notificationConfigs);
                 break;
             }
             case "any": {
-                note.repeatDates.forEach((date) => {
+                let notificationConfigs = note.repeatDates.map((date) => {
                     let atDate = moment(date).startOf("day").hour(note.startTime.hour()).minute(note.startTime.minute());
                     atDate = new Date(atDate.valueOf());
 
-                    window.cordova.plugins.notification.local.schedule({
+                    return {
                         ...notificationConfig,
-                        id: `${date}_${note.key}`,
+                        id: +`${note.key}${date}`,
                         trigger: { at: atDate }
-                    });
+                    }
                 });
+                window.cordova.plugins.notification.local.schedule(notificationConfigs);
+                console.log(notificationConfigs);
                 break;
             }
             default: break;
@@ -92,7 +92,7 @@ class NotificationService {
 
         let ids = [note.key];
         if (note.repeatType === "any" || note.repeatType === "week") {
-            ids = note.repeatDates.map((date) => `${date}_${note.key}`);
+            ids = note.repeatDates.map((date) => +`${note.key}${date}`);
         }
 
         window.cordova.plugins.notification.local.cancel(ids);
