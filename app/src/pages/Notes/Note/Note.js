@@ -11,9 +11,14 @@ import DownArrowGreenImg from "../../../assets/img/down-arrow-green.svg";
 import DownArrowBlueImg from "../../../assets/img/down-arrow-blue.svg";
 import DownArrowRedImg from "../../../assets/img/down-arrow-red.svg";
 
-import './ListItem.scss';
+import './Note.scss';
 
-class Note extends PureComponent { 
+export let NOTE_CALLBACK_ENUM = {
+    DYNAMIC_FIELD_CHANGE: 1,
+    ACTIONS_WINDOW_REQUEST: 2
+};
+
+class _Note extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -29,19 +34,35 @@ class Note extends PureComponent {
                 ...this.props.itemData.dynamicFields[i],
                 checked: v
             },
-            ...this.props.itemData.dynamicFields.slice(i + 1)];
-        
-        this.props.onDynamicFieldChange(this.props.itemData, {dynamicFields: nextDynamicFields});
+            ...this.props.itemData.dynamicFields.slice(i + 1)
+        ];
+
+        this.props.callbackHandler(
+            NOTE_CALLBACK_ENUM.DYNAMIC_FIELD_CHANGE,
+            {
+                note: this.props.itemData,
+                nextState: {dynamicFields: nextDynamicFields}
+            }
+            );
     };
 
     onItemFinishChange = (v) => {
-        this.props.onDynamicFieldChange(this.props.itemData, {finished: v});
+        this.props.callbackHandler(
+            NOTE_CALLBACK_ENUM.DYNAMIC_FIELD_CHANGE,
+            {
+                note: this.props.itemData,
+                nextState: {finished: v}
+            }
+            );
     };
 
     onItemActionsWindowRequest = (e) => {
         e.stopPropagation();
 
-        this.props.onItemActionsWindowRequest(this.props.itemData);
+        this.props.callbackHandler(
+            NOTE_CALLBACK_ENUM.ACTIONS_WINDOW_REQUEST,
+            {note: this.props.itemData}
+            );
     };
 
     triggerExpanded = () => {
@@ -142,10 +163,10 @@ class Note extends PureComponent {
                             } else if (a && a.type === "snapshot") {
                                 if (this.state.expanded) {
                                     return (
-                                        <div class="attached-image-wrapper">
+                                        <div key={i}
+                                             className="attached-image-wrapper">
                                             <img
                                                 onClick={this.showImage}
-                                                key={i}
                                                 className="attached-image"
                                                 src={a.uri}
                                                 alt="attachment"
@@ -182,4 +203,4 @@ class Note extends PureComponent {
     }
 }
 
-export default translate("translations")(Note)
+export let Note = translate("translations")(_Note)

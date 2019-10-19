@@ -1,11 +1,16 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
 
-import ListItem from './ListItem/ListItem';
+import {Note} from './Note/Note';
 
 import Sortable from 'react-sortablejs';
 
-class DayNotesList extends PureComponent {
+export let NOTES_LIST_CALLBACK_ENUM = {
+    DRAG_SORT_MODE_TRIGGER: 1,
+    ORDER_CHANGE: 2
+};
+
+class _NotesList extends PureComponent {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.sortable && (this.props.settings.sortType !== prevProps.settings.sortType)) {
             this.sortable.option('disabled', this.props.settings.sortType !== 2);
@@ -28,28 +33,34 @@ class DayNotesList extends PureComponent {
             order.reverse();
         }
 
-        this.props.onOrderChange(
-            this.props.notes.map((n) => {
-                let nextManualOrderIndex = order.indexOf(n.key);
-                if (nextManualOrderIndex === -1) {
-                    nextManualOrderIndex = null;
-                }
+        let nextOrder = this.props.notes.map((n) => {
+            let nextManualOrderIndex = order.indexOf(n.key);
+            if (nextManualOrderIndex === -1) {
+                nextManualOrderIndex = null;
+            }
 
-                return {
-                    ...n,
-                    manualOrderIndex: nextManualOrderIndex
-                }
-            })
+            return {
+                ...n,
+                manualOrderIndex: nextManualOrderIndex
+            }
+        })
+
+        this.props.callbackHandler(
+            NOTES_LIST_CALLBACK_ENUM.ORDER_CHANGE,
+            { nextOrder: nextOrder }
         );
     }
 
+    onDragSortModeTrigger = () => {
+        this.props.callbackHandler(NOTES_LIST_CALLBACK_ENUM.DRAG_SORT_MODE_TRIGGER);
+    }
+
     renderItem = (a) => (
-        <ListItem
+        <Note
             key={a.key}
             itemData={a}
             settings={this.props.settings}
-            onDynamicFieldChange={this.props.onItemDynamicFieldChange}
-            onItemActionsWindowRequest={this.props.onItemActionsWindowRequest}
+            callbackHandler={this.props.noteCallbackHandler}
         />
     );
     
@@ -99,4 +110,4 @@ class DayNotesList extends PureComponent {
     }
 }
 
-export default translate("translations")(DayNotesList);
+export let NotesList = translate("translations")(_NotesList);

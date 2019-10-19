@@ -6,7 +6,7 @@ import {translate} from "react-i18next";
 
 import * as AppActions from './actions'; 
 
-import NotesList from './pages/NotesList/NotesList';
+import Notes from './pages/Notes/Notes';
 import Add from './pages/Add/Add';
 import Password from './pages/Password/Password';
 import Settings from './pages/Settings/Settings';
@@ -61,7 +61,7 @@ class Root extends Component {
                     }             
                     <Route 
                         path="/" 
-                        component={NotesList}
+                        component={Notes}
                     />
                     <Route
                         path="/search"

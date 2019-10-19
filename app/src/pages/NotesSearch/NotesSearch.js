@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {translate} from "react-i18next";
 
 import Header from '../../components/Header/Header';
-import ListItem from "../NotesList/ListItem/ListItem";
+import {Note} from "../Notes/Note/Note";
 
 import * as AppActions from '../../actions';
 
@@ -43,13 +43,16 @@ class NotesSearch extends PureComponent {
         this.setState({searchRepeatType: nextSearchType});
     };
 
+    noteCallbackHandler = () => {
+
+    }
+
     renderItem = (a) => (
-        <ListItem
+        <Note
             key={a.key}
             itemData={a}
             settings={this.props.settings}
-            onDynamicFieldChange={this.props.onItemDynamicFieldChange}
-            onItemActionsWindowRequest={this.props.onItemActionsWindowRequest}
+            callbackHandler={this.noteCallbackHandler}
         />
     );
 
