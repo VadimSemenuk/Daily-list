@@ -136,15 +136,16 @@ let Header = (props) => (
                         );
                     case 6:
                         return (
-                            <button
+                            <Link
                                 key={a}
-                                onClick={props.onSearchMode}
+                                className="button"
+                                to={`/search`}
                             >
                                 <img
                                     src={SearchImg}
                                     alt="search"
                                 />
-                            </button>
+                            </Link>
                         );
                     case 7:
                         return (

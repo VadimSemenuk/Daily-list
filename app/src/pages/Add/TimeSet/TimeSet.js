@@ -98,8 +98,6 @@ class TimeSet extends Component {
             repeatTypeSelected: this.props.repeatType,
             repeatDatesSelected: this.props.repeatDates
         });
-
-        console.log(this.props.repeatDates)
     };
 
     render() {  

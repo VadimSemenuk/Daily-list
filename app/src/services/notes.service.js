@@ -63,6 +63,8 @@ class NotesService {
                         closestToCurrentDate = nextItem.msAdded;
                     }
                 }
+
+                notes.push(nextItem);
             }
 
             if (repeatType === "no-repeat") {

@@ -3,7 +3,6 @@ import {HashRouter, Route, Redirect} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
-import moment from "moment";
 
 import * as AppActions from './actions'; 
 
@@ -19,6 +18,7 @@ import Trash from './pages/Trash/Trash';
 import About from './pages/About/About';
 import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
+import NotesSearch from "./pages/NotesSearch/NotesSearch";
 
 class Root extends Component {
     componentDidMount() {
@@ -62,6 +62,10 @@ class Root extends Component {
                     <Route 
                         path="/" 
                         component={NotesList}
+                    />
+                    <Route
+                        path="/search"
+                        component={NotesSearch}
                     />
                     <Route 
                         exact 
