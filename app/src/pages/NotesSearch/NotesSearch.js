@@ -18,11 +18,17 @@ class NotesSearch extends PureComponent {
             searchRepeatType: "no-repeat",
             searchText: ""
         };
+
+        this.needToScrollToClosest = false;
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        let el = document.querySelector("[data-is-closest-to-current-date='true']");
-        el && el.scrollIntoView();
+    componentDidUpdate(prevProps, prevState) {
+        if (this.needToScrollToClosest && prevProps.search != this.props.search) {
+            let el = document.querySelector("[data-is-closest-to-current-date='true']");
+            el && el.scrollIntoView();
+
+            this.needToScrollToClosest = false;
+        }
     }
 
     componentWillUnmount() {
@@ -34,6 +40,7 @@ class NotesSearch extends PureComponent {
 
         this.setState({searchText: nextSearchText});
         this.props.searchNotes(nextSearchText, this.state.searchRepeatType);
+        this.needToScrollToClosest = true;
     };
 
     triggerSearchType = () => {
@@ -48,6 +55,7 @@ class NotesSearch extends PureComponent {
             key={a.key}
             itemData={a}
             settings={this.props.settings}
+            context='search'
         />
     );
 
@@ -93,7 +101,7 @@ class NotesSearch extends PureComponent {
                                              data-is-closest-to-current-date={item.isClosestToCurrentDate}>
                                             <div className={"date-item-date"}>{item.date.format("DD MMM YYYY")}</div>
                                             {
-                                                item.notes.map(this.renderItem)
+                                                item.items.map(this.renderItem)
                                             }
                                         </div>
                                     ))
@@ -123,7 +131,12 @@ class NotesSearch extends PureComponent {
 function mapStateToProps(state) {
     return {
         settings: state.settings,
-        search: state.search
+        search: state.search.map((a) => {
+            return {
+                ...a,
+                items: a.items.slice().sort((a, b) => a.key - b.key)
+            }
+        })
     }
 }
 

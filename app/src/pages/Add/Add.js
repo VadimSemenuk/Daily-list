@@ -30,10 +30,7 @@ class Add extends Component {
 
         this.state = {
             title: "",
-            dynamicFields: [{
-                type: "text",
-                value: ""
-            }],
+            dynamicFields: [],
             notificate: false,
             startTime: false,
             endTime: false,

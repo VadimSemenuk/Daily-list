@@ -90,7 +90,7 @@ class Note extends PureComponent {
     onListItemMove = async () => {
         this.closeDialog();
 
-        let nextDate = moment(this.props.currentDate).add(1, "day");
+        let nextDate = moment(this.props.itemData.added).add(1, "day");
         await this.props.updateNoteDate(this.props.itemData, nextDate);
     };
 
@@ -210,20 +210,26 @@ class Note extends PureComponent {
                         })
                     }
 
-                    <div className="more-button">
-                        <button onClick={this.openDialog}>
-                            <img
-                                src={MoreImg}
-                                alt="more"
+                    {
+                        this.props.context !== 'search' &&
+                        <div className="more-button">
+                            <button onClick={this.openDialog}>
+                                <img
+                                    src={MoreImg}
+                                    alt="more"
+                                />
+                            </button>
+                        </div>
+                    }
+                    {
+                        this.props.context !== 'search' &&
+                        <div className="note-finish-checkbox">
+                            <CustomCheckBox
+                                checked={this.props.itemData.finished}
+                                onChange={this.onItemFinishChange}
                             />
-                        </button>
-                    </div>
-                    <div className="note-finish-checkbox">
-                        <CustomCheckBox
-                            checked={this.props.itemData.finished}
-                            onChange={this.onItemFinishChange}
-                        />
-                    </div>
+                        </div>
+                    }
                 </div>
 
                 <Modal
@@ -233,6 +239,7 @@ class Note extends PureComponent {
                     {
                         (this.props.itemData.repeatType === "no-repeat") &&
                         (this.props.settings.notesScreenMode === 1) &&
+                        (this.props.context !== 'search') &&
                         <ButtonListItem
                             className="no-border"
                             text={t("move-tomorrow")}
@@ -263,15 +270,8 @@ class Note extends PureComponent {
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        settings: state.settings,
-        currentDate: state.date,
-    }
-}
-
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default withRouter(translate("translations")(connect(mapStateToProps, mapDispatchToProps)(Note)));
+export default withRouter(translate("translations")(connect(null, mapDispatchToProps)(Note)));

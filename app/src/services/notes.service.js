@@ -7,6 +7,8 @@ window.e = executeSQL;
 
 class NotesService {
     async searchNotes(mode, search, repeatType) {
+        search = search.toLowerCase().trim();
+
         if (mode === 1) {
             if (!search) {
                 return [];
@@ -16,7 +18,7 @@ class NotesService {
 
             let select = await executeSQL(
                 `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate,
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
                         (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
                         FROM Tasks t
                         WHERE
@@ -33,12 +35,25 @@ class NotesService {
                 return [];
             }
 
+            let filteredNotes = [];
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+                let dynamicFields = JSON.parse(item.dynamicFields);
+
+                if (
+                    (item.title && item.title.toLowerCase().includes(search))
+                    || (dynamicFields.some((f) => f.value && f.value.toLowerCase().includes(search)))
+                ) {
+                    filteredNotes.push(item);
+                }
+            }
+
             let notes = [];
             let closestToCurrentDateNoteDateDiff = null;
             let closestToCurrentDateNoteIndex = 0;
             let closestToCurrentDate = null;
-            for(let i = 0; i < select.rows.length; i++) {
-                let item = select.rows.item(i);
+            for(let i = 0; i < filteredNotes.length; i++) {
+                let item = filteredNotes[i];
 
                 let nextItem = {
                     ...item,
@@ -81,7 +96,7 @@ class NotesService {
 
                 return Object.keys(notesByDates).map((date) => ({
                     date: moment(+date),
-                    notes: notesByDates[date],
+                    items: notesByDates[date],
                     isClosestToCurrentDate: +date === +closestToCurrentDate
                 }));
             } else {
@@ -90,7 +105,7 @@ class NotesService {
         } else {
             let select = await executeSQL(
                 `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
                         FROM Tasks t
                         WHERE
                             (t.title LIKE ? OR t.dynamicFields LIKE ?)
@@ -101,8 +116,21 @@ class NotesService {
             );
 
             let notes = [];
+            let filteredNotes = [];
             for(let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
+                let dynamicFields = JSON.parse(item.dynamicFields);
+
+                if (
+                    (item.title && item.title.toLowerCase().includes(search))
+                    || (dynamicFields.some((f) => f.value && f.value.toLowerCase().includes(search)))
+                ) {
+                    filteredNotes.push(item);
+                }
+            }
+
+            for(let i = 0; i < filteredNotes.length; i++) {
+                let item = filteredNotes[i];
 
                 let nextItem = {
                     ...item,
