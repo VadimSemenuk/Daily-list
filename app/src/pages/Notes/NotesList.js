@@ -56,7 +56,8 @@ class NotesList extends PureComponent {
             key={a.key}
             itemData={a}
             settings={this.props.settings}
-            onCopyRequest={this.props.onNoteCopyRequest}
+            onDynamicFieldChange={this.props.onDynamicFieldChange}
+            onDialogRequest={this.props.onDialogRequest}
         />
     );
 

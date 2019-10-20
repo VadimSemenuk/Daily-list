@@ -18,6 +18,8 @@ import sliderChangeSide from "../../utils/sliderChangeSide";
 import deepCopyObject from "../../utils/deepCopyObject";
 
 import './Notes.scss';
+import Modal from "../../components/Modal/Modal";
+import {ButtonListItem} from "../../components/ListItem/ListItem";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -87,6 +89,50 @@ class Notes extends PureComponent {
         this.setDate(moment().startOf("day"));
     };
 
+    onDynamicFieldChange = (itemData, updatedState) => {
+        this.props.updateNoteDynamicFields(itemData, updatedState);
+    }
+
+    onDialogRequest = (data) => {
+        this.openDialog(data);
+    }
+
+    openDialog = (data) => {
+        this.setState({
+            isListItemDialogVisible: true,
+            listItemDialogData: {note: data}
+        });
+    };
+
+    closeDialog = () => {
+        this.setState({
+            isListItemDialogVisible: false,
+            listItemDialogData: null
+        });
+    };
+
+    onEditRequest = () => {
+        this.closeDialog();
+
+        this.props.history.push({
+            pathname: "/edit",
+            state: { note: this.state.listItemDialogData.note }
+        });
+    };
+
+    onListItemRemove = () => {
+        this.closeDialog();
+
+        this.props.deleteNote(this.state.listItemDialogData.note);
+    };
+
+    onListItemMove = async () => {
+        this.closeDialog();
+
+        let nextDate = moment(this.state.listItemDialogData.note.added).add(1, "day");
+        await this.props.updateNoteDate(this.state.listItemDialogData.note, nextDate);
+    };
+
     pasteCopy = async () => {
         let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
             repeatType: "no-repeat",
@@ -102,9 +148,11 @@ class Notes extends PureComponent {
         });
     };
 
-    onNoteCopyRequest = (data) => {
+    onNoteCopyRequest = () => {
+        this.closeDialog();
+
         this.setState({
-            copyBuffer: data
+            copyBuffer: this.state.listItemDialogData.note
         });
     };
 
@@ -161,6 +209,8 @@ class Notes extends PureComponent {
                                         settings={this.props.settings}
                                         onDragSortModeTrigger={this.onDragSortModeTrigger}
                                         onOrderChange={this.onOrderChange}
+                                        onDynamicFieldChange={this.onDynamicFieldChange}
+                                        onDialogRequest={this.onDialogRequest}
                                     />
                                 </div>
                             </div>
@@ -196,7 +246,8 @@ class Notes extends PureComponent {
                                             settings={this.props.settings}
                                             onDragSortModeTrigger={this.onDragSortModeTrigger}
                                             onOrderChange={this.onOrderChange}
-                                            onNoteCopyRequest={this.onNoteCopyRequest}
+                                            onDynamicFieldChange={this.onDynamicFieldChange}
+                                            onDialogRequest={this.onDialogRequest}
                                         />
                                     </div>
                                 ))
@@ -214,6 +265,37 @@ class Notes extends PureComponent {
                         <FastAdd currentDate={this.props.currentDate} />
                     }
                 </div>
+
+                <Modal
+                    isOpen={this.state.isListItemDialogVisible}
+                    onRequestClose={this.closeDialog}
+                >
+                    {
+                        this.state.isListItemDialogVisible &&
+                        (this.state.listItemDialogData.note.repeatType === "no-repeat") &&
+                        (this.props.settings.notesScreenMode === 1) &&
+                        <ButtonListItem
+                            className="no-border"
+                            text={t("move-tomorrow")}
+                            onClick={this.onListItemMove}
+                        />
+                    }
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("edit")}
+                        onClick={this.onEditRequest}
+                    />
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("delete")}
+                        onClick={this.onListItemRemove}
+                    />
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("do-copy")}
+                        onClick={this.onNoteCopyRequest}
+                    />
+                </Modal>
             </div>
         )
     }

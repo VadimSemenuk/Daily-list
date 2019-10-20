@@ -105,7 +105,7 @@ class NotesService {
         } else {
             let select = await executeSQL(
                 `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode
                         FROM Tasks t
                         WHERE
                             (t.title LIKE ? OR t.dynamicFields LIKE ?)
@@ -195,7 +195,7 @@ class NotesService {
                 dates.map((date) => {
                     return executeSQL(
                         `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode
                         FROM Tasks t
                         WHERE
                             t.mode == 2

@@ -1,14 +1,8 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import moment from "moment";
-import {withRouter} from "react-router-dom";
 
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
-import {ButtonListItem} from "../../../components/ListItem/ListItem";
-import Modal from "../../../components/Modal/Modal";
 
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
@@ -16,8 +10,6 @@ import RepeatImg from "../../../assets/img/two-circling-arrows.svg";
 import DownArrowGreenImg from "../../../assets/img/down-arrow-green.svg";
 import DownArrowBlueImg from "../../../assets/img/down-arrow-blue.svg";
 import DownArrowRedImg from "../../../assets/img/down-arrow-red.svg";
-
-import * as AppActions from '../../../actions';
 
 import './Note.scss';
 
@@ -27,11 +19,14 @@ class Note extends PureComponent {
 
         this.state = {
             expanded: false,
-            isListItemDialogVisible: false,
         };
     }
 
     onDynamicFieldChange = (i, v) => {
+        if (this.props.context && (this.props.context === 'search' && this.props.context.params.searchRepeatType !== 'no-repeat')) {
+            return;
+        }
+
         let nextDynamicFields = [
             ...this.props.itemData.dynamicFields.slice(0, i),
             {
@@ -41,12 +36,18 @@ class Note extends PureComponent {
             ...this.props.itemData.dynamicFields.slice(i + 1)
         ];
 
-        this.props.updateNoteDynamicFields(this.props.itemData, {dynamicFields: nextDynamicFields});
+        this.props.onDynamicFieldChange(this.props.itemData, {dynamicFields: nextDynamicFields});
     };
 
     onItemFinishChange = (v) => {
-        this.props.updateNoteDynamicFields(this.props.itemData, {finished: v});
+        this.props.onDynamicFieldChange(this.props.itemData, {finished: v});
     };
+
+    onDialogRequest = (e) => {
+        e.stopPropagation();
+
+        this.props.onDialogRequest(this.props.itemData);
+    }
 
     triggerExpanded = () => {
         this.setState({expanded: !this.state.expanded});
@@ -58,48 +59,6 @@ class Note extends PureComponent {
         window.PhotoViewer.show(e.target.src, this.props.itemData.title, {share: false});         
     };
 
-    openDialog = (e) => {
-        e.stopPropagation();
-
-        this.setState({
-            isListItemDialogVisible: true,
-        });
-    };
-
-    closeDialog = () => {
-        this.setState({
-            isListItemDialogVisible: false
-        });
-    };
-
-    onEditRequest = () => {
-        this.closeDialog();
-
-        this.props.history.push({
-            pathname: "/edit",
-            state: { note: this.props.itemData }
-        });
-    };
-
-    onListItemRemove = () => {
-        this.closeDialog();
-
-        this.props.deleteNote(this.props.itemData);
-    };
-
-    onListItemMove = async () => {
-        this.closeDialog();
-
-        let nextDate = moment(this.props.itemData.added).add(1, "day");
-        await this.props.updateNoteDate(this.props.itemData, nextDate);
-    };
-
-    onCopyRequest = () => {
-        this.closeDialog();
-
-        this.props.onCopyRequest(this.props.itemData);
-    }
-
     render () {
         let {t} = this.props;
         
@@ -107,6 +66,7 @@ class Note extends PureComponent {
             <div
                 data-id={this.props.itemData.key}
                 className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'} ${this.props.itemData.finished && 'finished'} ${!this.props.itemData.finished && 'not-finished'}`}
+                onClick={this.triggerExpanded}
             >
                 <div
                     style={{backgroundColor: this.props.itemData.tag}}
@@ -136,10 +96,7 @@ class Note extends PureComponent {
                         alt="very high"
                     />
                 }
-                <div
-                    className="note-content"
-                    onClick={this.triggerExpanded}
-                >
+                <div className="note-content">
                     <div style={{fontSize: 12, color: '#ccc', position: 'absolute', top: 3, left: 3}}>{this.props.itemData.manualOrderIndex}</div>
 
                     <div className="note-header">
@@ -211,9 +168,9 @@ class Note extends PureComponent {
                     }
 
                     {
-                        this.props.context !== 'search' &&
+                        (!this.props.context || (this.props.context.name === 'search' && this.props.context.params.searchRepeatType === 'no-repeat')) &&
                         <div className="more-button">
-                            <button onClick={this.openDialog}>
+                            <button onClick={this.onDialogRequest}>
                                 <img
                                     src={MoreImg}
                                     alt="more"
@@ -222,7 +179,7 @@ class Note extends PureComponent {
                         </div>
                     }
                     {
-                        this.props.context !== 'search' &&
+                        (!this.props.context || (this.props.context.name === 'search' && this.props.context.params.searchRepeatType === 'no-repeat')) &&
                         <div className="note-finish-checkbox">
                             <CustomCheckBox
                                 checked={this.props.itemData.finished}
@@ -231,47 +188,9 @@ class Note extends PureComponent {
                         </div>
                     }
                 </div>
-
-                <Modal
-                    isOpen={this.state.isListItemDialogVisible}
-                    onRequestClose={this.closeDialog}
-                >
-                    {
-                        (this.props.itemData.repeatType === "no-repeat") &&
-                        (this.props.settings.notesScreenMode === 1) &&
-                        (this.props.context !== 'search') &&
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("move-tomorrow")}
-                            onClick={this.onListItemMove}
-                        />
-                    }
-                    <ButtonListItem
-                        className="no-border"
-                        text={t("edit")}
-                        onClick={this.onEditRequest}
-                    />
-                    <ButtonListItem
-                        className="no-border"
-                        text={t("delete")}
-                        onClick={this.onListItemRemove}
-                    />
-                    {
-                        !!this.props.onCopyRequest &&
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("do-copy")}
-                            onClick={this.onCopyRequest}
-                        />
-                    }
-                </Modal>
             </div>
         )
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators(AppActions, dispatch);
-}
-
-export default withRouter(translate("translations")(connect(null, mapDispatchToProps)(Note)));
+export default translate("translations")(Note);

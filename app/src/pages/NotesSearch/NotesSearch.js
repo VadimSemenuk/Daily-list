@@ -5,10 +5,13 @@ import {translate} from "react-i18next";
 
 import Header from '../../components/Header/Header';
 import Note from "../Notes/Note/Note";
+import Modal from "../../components/Modal/Modal";
+import {ButtonListItem} from "../../components/ListItem/ListItem";
 
 import * as AppActions from '../../actions';
 
 import './NotesSearch.scss';
+import NotesList from "../Notes/NotesList";
 
 class NotesSearch extends PureComponent {
     constructor(props) {
@@ -16,7 +19,9 @@ class NotesSearch extends PureComponent {
 
         this.state = {
             searchRepeatType: "no-repeat",
-            searchText: ""
+            searchText: "",
+            isListItemDialogVisible: false,
+            listItemDialogData: null,
         };
 
         this.needToScrollToClosest = false;
@@ -50,12 +55,51 @@ class NotesSearch extends PureComponent {
         this.setState({searchRepeatType: nextSearchType});
     };
 
+    onDynamicFieldChange = (itemData, updatedState) => {
+        this.props.updateNoteDynamicFields(itemData, updatedState);
+    }
+
+    onDialogRequest = (data) => {
+        this.openDialog(data);
+    }
+
+    openDialog = (data) => {
+        this.setState({
+            isListItemDialogVisible: true,
+            listItemDialogData: {note: data}
+        });
+    };
+
+    closeDialog = () => {
+        this.setState({
+            isListItemDialogVisible: false,
+            listItemDialogData: null
+        });
+    };
+
+    onEditRequest = () => {
+        this.closeDialog();
+
+        this.props.history.push({
+            pathname: "/edit",
+            state: { note: this.state.listItemDialogData.note }
+        });
+    };
+
+    onListItemRemove = () => {
+        this.closeDialog();
+
+        this.props.deleteNote(this.state.listItemDialogData.note);
+    };
+
     renderItem = (a) => (
         <Note
             key={a.key}
             itemData={a}
             settings={this.props.settings}
-            context='search'
+            context={{name: 'search', params: {searchRepeatType: this.state.searchRepeatType}}}
+            onDynamicFieldChange={this.onDynamicFieldChange}
+            onDialogRequest={this.onDialogRequest}
         />
     );
 
@@ -123,6 +167,22 @@ class NotesSearch extends PureComponent {
                         }
                     </div>
                 </div>
+
+                <Modal
+                    isOpen={this.state.isListItemDialogVisible}
+                    onRequestClose={this.closeDialog}
+                >
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("edit")}
+                        onClick={this.onEditRequest}
+                    />
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("delete")}
+                        onClick={this.onListItemRemove}
+                    />
+                </Modal>
             </div>
         )
     }
