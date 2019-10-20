@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
 
-import {Note} from "../../Notes/Note/Note";
+import Note from "../../Notes/Note/Note";
 
 import './TrashListItem.scss';
 

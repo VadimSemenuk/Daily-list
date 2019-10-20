@@ -143,7 +143,7 @@ function notes (state = init, action) {
             })
         }
         case "UPDATE_NOTES": {
-            return action.notes.slice();
+            return action.payload.notes.slice();
         }
         case "UPDATE_MANUAL_SORT_INDEX": {
             if (action.payload.notes[0].mode === 2) {

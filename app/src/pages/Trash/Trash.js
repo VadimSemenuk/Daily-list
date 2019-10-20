@@ -15,12 +15,6 @@ class Trash extends Component {
         this.props.getDeletedNotes();
     }
 
-    onItemActionsWindowRequest = () => {}
-
-    onImageShowRequest = () => {}
-
-    onItemDynaicFieldChange = () => {}
-
     onRestore = (note) => this.props.restoreNote(note);
 
     render() {
@@ -42,9 +36,6 @@ class Trash extends Component {
                                     key={a.key}
                                     itemData={a}
                                     settings={this.props.settings}
-                                    onShowImage={this.onImageShowRequest}
-                                    onDynaicFieldChange={this.onItemDynaicFieldChange}
-                                    onItemActionsWindowRequest={this.onItemActionsWindowRequest}
                                     onRestore={this.onRestore}
                                 /> 
                             ))

@@ -67,6 +67,10 @@ class BackupService {
     }
 
     async uploadGDBackup(params) {
+        if (!window.cordova) {
+            return
+        }
+
         if (!deviceService.hasNetworkConnection()) {
             throw new CustomError("no internet connection", i18next.t("internet-required"));
         }
@@ -190,6 +194,10 @@ class BackupService {
     }
 
     async saveLocalBackup(fileToUpdate) {
+        if (!window.cordova) {
+            return
+        }
+
         let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);
         let targetDirEntry = await filesService.getFileEntry(this.localBackupsDirectory);
         await new Promise((resolve, reject) => fileEntry.copyTo(targetDirEntry, `DailyList_Backup_${moment().valueOf()}.db`, resolve, reject))

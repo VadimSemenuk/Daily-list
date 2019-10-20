@@ -1,16 +1,11 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
 
-import {Note} from './Note/Note';
+import Note from './Note/Note';
 
 import Sortable from 'react-sortablejs';
 
-export let NOTES_LIST_CALLBACK_ENUM = {
-    DRAG_SORT_MODE_TRIGGER: 1,
-    ORDER_CHANGE: 2
-};
-
-class _NotesList extends PureComponent {
+class NotesList extends PureComponent {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.sortable && (this.props.settings.sortType !== prevProps.settings.sortType)) {
             this.sortable.option('disabled', this.props.settings.sortType !== 2);
@@ -43,16 +38,17 @@ class _NotesList extends PureComponent {
                 ...n,
                 manualOrderIndex: nextManualOrderIndex
             }
-        })
+        });
 
-        this.props.callbackHandler(
-            NOTES_LIST_CALLBACK_ENUM.ORDER_CHANGE,
-            { nextOrder: nextOrder }
-        );
+        this.props.onOrderChange(nextOrder);
     }
 
-    onDragSortModeTrigger = () => {
-        this.props.callbackHandler(NOTES_LIST_CALLBACK_ENUM.DRAG_SORT_MODE_TRIGGER);
+    onDragSortModeEnable = () => {
+        this.props.onDragSortModeTrigger(true);
+    }
+
+    onDragSortModeDisable = () => {
+        this.props.onDragSortModeTrigger(false);
     }
 
     renderItem = (a) => (
@@ -60,10 +56,10 @@ class _NotesList extends PureComponent {
             key={a.key}
             itemData={a}
             settings={this.props.settings}
-            callbackHandler={this.props.noteCallbackHandler}
+            onCopyRequest={this.props.onNoteCopyRequest}
         />
     );
-    
+
     render() {
         let {t} = this.props;
 
@@ -77,8 +73,8 @@ class _NotesList extends PureComponent {
                 delay: 400,
                 draggable: this.props.settings.sortFinBehaviour === 1 ? ".not-finished" : ".note-wrapper",
                 direction: 'vertical',
-                onStart: this.props.onDragSortModeTrigger,
-                onEnd: this.props.onDragSortModeTrigger
+                onStart: this.onDragSortModeEnable,
+                onEnd: this.onDragSortModeDisable
             },
             onChange: this.onOrderChange
         }
@@ -110,4 +106,4 @@ class _NotesList extends PureComponent {
     }
 }
 
-export let NotesList = translate("translations")(_NotesList);
+export default translate("translations")(NotesList);

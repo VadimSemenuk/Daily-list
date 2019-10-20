@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {translate} from "react-i18next";
 
 import Header from '../../components/Header/Header';
-import {Note} from "../Notes/Note/Note";
+import Note from "../Notes/Note/Note";
 
 import * as AppActions from '../../actions';
 
@@ -43,16 +43,11 @@ class NotesSearch extends PureComponent {
         this.setState({searchRepeatType: nextSearchType});
     };
 
-    noteCallbackHandler = () => {
-
-    }
-
     renderItem = (a) => (
         <Note
             key={a.key}
             itemData={a}
             settings={this.props.settings}
-            callbackHandler={this.noteCallbackHandler}
         />
     );
 

@@ -9,11 +9,8 @@ import FastAdd from '../../components/FastAdd/FastAdd';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
-import Modal from '../../components/Modal/Modal';
 import Fab from '../../components/Fab/Fab';
-import {ButtonListItem} from "../../components/ListItem/ListItem";
-import {NOTE_CALLBACK_ENUM} from "./Note/Note";
-import {NotesList, NOTES_LIST_CALLBACK_ENUM} from "./NotesList";
+import NotesList from "./NotesList";
 
 import * as AppActions from '../../actions'; 
 
@@ -43,12 +40,6 @@ class Notes extends PureComponent {
             this.swipe.disableScrolling(!nextState.isSwipeAvailable);
         }
     }
-
-    triggerSwipeAvailable = () => {
-        this.setState({
-            isSwipeAvailable: !this.state.isSwipeAvailable
-        });
-    };
 
     onSlideChange = async ({index, nextIndex, side}) => {
         if (side === "left") {    
@@ -96,42 +87,6 @@ class Notes extends PureComponent {
         this.setDate(moment().startOf("day"));
     };
 
-    openNoteDialog = (note) => {
-        this.setState({
-            isListItemDialogVisible: true,
-            listItemDialogData: {note}
-        });
-    };
-
-    closeDialog = () => {
-        this.setState({
-            isListItemDialogVisible: false,
-            listItemDialogData: null
-        });
-    };
-
-    onEditRequest = () => {
-        this.props.history.push({
-            pathname: "/edit",
-            state: { note: this.state.listItemDialogData.note }
-        });
-
-        this.closeDialog();
-    };
-
-    onListItemRemove = () => {
-        this.props.deleteNote(this.state.listItemDialogData.note);
-
-        this.closeDialog();
-    };
-
-    onListItemMove = async () => {
-        let nextDate = moment(this.props.currentDate).add(1, "day");
-        await this.props.updateNoteDate(this.state.listItemDialogData.note, nextDate);
-
-        this.closeDialog();
-    };
-
     pasteCopy = async () => {
         let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
             repeatType: "no-repeat",
@@ -147,39 +102,21 @@ class Notes extends PureComponent {
         });
     };
 
-    onCopyRequest = () => {
+    onNoteCopyRequest = (data) => {
         this.setState({
-            copyBuffer: this.state.listItemDialogData.note,
+            copyBuffer: data
         });
-
-        this.closeDialog();
     };
 
-    noteCallbackHandler = (action, data) => {
-        switch(action) {
-            case NOTE_CALLBACK_ENUM.ACTIONS_WINDOW_REQUEST: {
-                this.openNoteDialog(data.note);
-                break;
-            }
-            case NOTE_CALLBACK_ENUM.DYNAMIC_FIELD_CHANGE: {
-                this.props.updateNoteDynamicFields(data.note, data.nextState);
-                break;
-            }
-        }
-    }
+    onDragSortModeTrigger = (value) => {
+        this.setState({
+            isSwipeAvailable: !value
+        });
+    };
 
-    notesListCallbackHandler = (action, data) => {
-        switch(action) {
-            case NOTES_LIST_CALLBACK_ENUM.DRAG_SORT_MODE_TRIGGER: {
-                this.triggerSwipeAvailable();
-                break;
-            }
-            case NOTES_LIST_CALLBACK_ENUM.ORDER_CHANGE: {
-                this.props.updateNotesManualSortIndex(data.nextOrder);
-                break;
-            }
-        }
-    }
+    onOrderChange = (order) => {
+        this.props.updateNotesManualSortIndex(order);
+    };
 
     render() {
         let {t} = this.props;
@@ -222,8 +159,8 @@ class Notes extends PureComponent {
                                         index={0}
                                         notes={this.props.notes[0].items}
                                         settings={this.props.settings}
-                                        noteCallbackHandler={this.noteCallbackHandler}
-                                        callbackHandler={this.notesListCallbackHandler}
+                                        onDragSortModeTrigger={this.onDragSortModeTrigger}
+                                        onOrderChange={this.onOrderChange}
                                     />
                                 </div>
                             </div>
@@ -257,42 +194,15 @@ class Notes extends PureComponent {
                                             index={i}
                                             notes={notes.items}
                                             settings={this.props.settings}
-                                            noteCallbackHandler={this.noteCallbackHandler}
-                                            callbackHandler={this.notesListCallbackHandler}
+                                            onDragSortModeTrigger={this.onDragSortModeTrigger}
+                                            onOrderChange={this.onOrderChange}
+                                            onNoteCopyRequest={this.onNoteCopyRequest}
                                         />
                                     </div>
                                 ))
                             }
                         </ReactSwipe>
                     }
-
-                    <Modal 
-                        isOpen={this.state.isListItemDialogVisible}
-                        onRequestClose={this.closeDialog}
-                    >
-                        {   (this.state.isListItemDialogVisible && (this.state.listItemDialogData.note.repeatType === "no-repeat") && (this.props.settings.notesScreenMode === 1)) &&
-                            <ButtonListItem
-                                className="no-border"
-                                text={t("move-tomorrow")}
-                                onClick={this.onListItemMove}
-                            />
-                        }
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("edit")}
-                            onClick={this.onEditRequest}
-                        />
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("delete")}
-                            onClick={this.onListItemRemove}
-                        />
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("do-copy")}
-                            onClick={this.onCopyRequest}
-                        />
-                    </Modal>
 
                     {
                         this.state.copyBuffer && 

@@ -138,7 +138,7 @@ class NotesService {
                     let currentDate = date.valueOf();
                     return executeSQL(
                         `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate,
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
                         (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
                         FROM Tasks t
                         LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
@@ -167,7 +167,7 @@ class NotesService {
                 dates.map((date) => {
                     return executeSQL(
                         `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
                         FROM Tasks t
                         WHERE
                             t.mode == 2
@@ -381,7 +381,7 @@ class NotesService {
                 lastActionTime = ?
             WHERE id = ?
         `, [
-            note.added.valueOf(),
+            nextDate.valueOf(),
             nextNote.isLastActionSynced,
             nextNote.lastAction,
             nextNote.lastActionTime,
