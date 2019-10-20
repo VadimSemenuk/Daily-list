@@ -44,13 +44,18 @@ class TimeSet extends Component {
         })
     };
 
-    pickTime = (state) => {
-        let date = this.props[state] || moment();
+    pickTime = async (state) => {
+        let date = await new Promise((resolve, reject) => {
+            window.cordova.plugins.DateTimePicker.show({
+                mode: 'time',
+                date: (this.props[state] || moment()).toDate(),
+                success: (data) => resolve(moment(data)),
+                cancel: () => reject(null),
+                error: (err) => reject(err)
+            })
+        });
 
-        window.DateTimePicker.pick({
-            type: 'time',         
-            date: new Date(date.valueOf())
-        }, (date) => this.onTimeSet(moment(date).startOf("minute").valueOf(), state));
+        this.onTimeSet(moment(date).startOf("minute").valueOf(), state);
     };
 
     onNotificateChange = (notificate) => {
