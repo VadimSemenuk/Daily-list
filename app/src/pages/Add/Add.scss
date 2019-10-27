@@ -51,7 +51,6 @@
     }
 
     .add-additionals-wrapper {
-        flex-basis: 214px;
         flex-shrink: 0;
         height: 214px;
         padding: 0 10px;         
@@ -66,11 +65,6 @@
 
         &.hidden {
             display: none;
-        }
-
-        &.hidden-triggered {
-            height: 18px;
-            flex-basis: 18px;
         }
 
         &.minified {
@@ -90,6 +84,11 @@
             margin-top: -15px;
             position: relative;
             z-index: 1111;
+            transition: 100ms ease all;
+
+            &.is-touching {
+                width: 50px;
+            }
     
             .line {
                 height: 4px;
