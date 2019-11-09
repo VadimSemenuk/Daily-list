@@ -24,8 +24,6 @@ import deepCopy from '../../utils/deepCopyObject'
 
 import './Add.scss';
 
-import * as Hammer from "hammerjs";
-
 class Add extends Component {
     constructor(props) {
         super(props);
@@ -47,125 +45,15 @@ class Add extends Component {
             calendar: false,
             pictureModal: false,
             editRepeatableDialog: false,
+            addAdditioanlsViewHidden: false,
             tags: notesService.getTags()
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (this.props.match.path === "/edit") {
             this.setState({...this.props.location.state.note});
             this.prevNote = deepCopy(this.props.location.state.note);
-        }
-
-        this.prepareSwipeHandler();
-    }
-
-    componentWillUnmount() {
-        this.unsubscribeSwipeHandler();
-    }
-
-    prepareSwipeHandler() {
-        let toggleElement = document.querySelector('.toggle-icon-wrapper');
-        let manager = new Hammer.Manager(toggleElement);
-        let Swipe = new Hammer.Swipe();
-        manager.add(Swipe);
-
-        let swipe = null;
-        manager.on("swipeup swipedown", onSwipe);
-        function onSwipe(e) {
-            swipe = {
-                type: e.type
-            };
-        }
-
-        var mc = new Hammer(toggleElement);
-        mc.get('pan').set({
-            direction: Hammer.DIRECTION_ALL
-        });
-
-        let moveElement = document.querySelector('.add-additionals-wrapper');
-        let maxTranslateX = moveElement.clientHeight - 20;
-        let changePositionMinTranslateX = maxTranslateX / 2;
-
-        let elementYStateBeforePan = 0;
-        let currentPanDeltaY = 0;
-        let isPanned = false;
-        mc.on("panup pandown", onPan);
-        function onPan(e) {
-            currentPanDeltaY = e.deltaY;
-            let elementY = elementYStateBeforePan + e.deltaY;
-
-            if (elementY > maxTranslateX || elementY < 0) {
-                return
-            }
-
-            isPanned = true;
-
-            moveElement.style.transform = `translateY(${elementY}px)`;
-        }
-
-        toggleElement.addEventListener('touchstart', onTouchStart);
-        function onTouchStart() {
-            currentPanDeltaY = 0;
-            toggleElement.classList.add("is-touching");
-        }
-
-        toggleElement.addEventListener('touchend', onTouchEnd);
-        function onTouchEnd() {
-            toggleElement.classList.remove("is-touching");
-
-            if (swipe) {
-                if (swipe.type === "swipeup") {
-                    moveElement.style.transform = `translateY(0px)`;
-                    elementYStateBeforePan = 0;
-                } else {
-                    moveElement.style.transform = `translateY(${maxTranslateX}px)`;
-                    elementYStateBeforePan = maxTranslateX;
-                }
-                swipe = null;
-                isPanned = false;
-            } else if (isPanned) {
-                if (currentPanDeltaY > 0) {
-                    if (currentPanDeltaY > changePositionMinTranslateX) {
-                        moveElement.style.transform = `translateY(${maxTranslateX}px)`;
-                        elementYStateBeforePan = maxTranslateX;
-                    } else {
-                        moveElement.style.transform = `translateY(0px)`;
-                        elementYStateBeforePan = 0;
-                    }
-                } else {
-                    if (currentPanDeltaY > -changePositionMinTranslateX) {
-                        moveElement.style.transform = `translateY(${maxTranslateX}px)`;
-                        elementYStateBeforePan = maxTranslateX;
-                    } else {
-                        moveElement.style.transform = `translateY(0px)`;
-                        elementYStateBeforePan = 0;
-                    }
-                }
-
-                isPanned = false;
-            }
-        }
-
-        toggleElement.addEventListener('click', onClick);
-        function onClick() {
-            if (!isPanned) {
-                if (elementYStateBeforePan === 0) {
-                    moveElement.style.transform = `translateY(${maxTranslateX}px)`;
-                    elementYStateBeforePan = maxTranslateX;
-                } else {
-                    moveElement.style.transform = `translateY(0px)`;
-                    elementYStateBeforePan = 0;
-                }
-            }
-        }
-
-        this.unsubscribeSwipeHandler = () => {
-            mc.off("panup pandown", onPan);
-            manager.off("swipeup swipedown", onSwipe);
-            toggleElement.removeEventListener('touchstart', onTouchStart);
-            toggleElement.removeEventListener('touchend', onTouchEnd);
-            toggleElement.removeEventListener('click', onClick);
         }
     }
 
@@ -478,13 +366,14 @@ class Add extends Component {
                         </div>
                     </div>
                     <div 
-                        className={`add-additionals-wrapper hide-with-active-keyboard${this.props.settings.notesScreenMode === 1 ? "" : " minified"}`}
+                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === 1 ? "" : " minified"}`}
                         style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
                     >
                         {
                             (this.props.settings.notesScreenMode === 1) &&
                             <div
                                 className="toggle-icon-wrapper"
+                                onClick={() => this.setState({addAdditioanlsViewHidden: !this.state.addAdditioanlsViewHidden})}
                             >
                                 <div className="line"></div>
                             </div>
