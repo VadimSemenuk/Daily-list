@@ -175,7 +175,6 @@ class Notes extends PureComponent {
                     page={(this.props.settings.notesScreenMode === 1) ? "daily-notes" : "notes"}
                     onCalendarRequest={this.triggerCalendar}
                     onSelectToday={this.onTodaySelect}
-                    onSearchMode={this.triggerSearchMode}
                 />
                 <div className="notes-list-wrapper page-content">
                     {   

@@ -24,7 +24,8 @@ class NotificationService {
         let notificationConfig = {
             title: note.title || i18next.t("default-notification-title"),
             text: this.getMessage(note),
-            sound: true
+            sound: true,
+            priority: 2
         };
 
         switch(note.repeatType) {
@@ -59,11 +60,10 @@ class NotificationService {
                                     hour: note.startTime.hour(),
                                     minute: note.startTime.minute()
                                 },
-                        }
+                        },
                     }
                 })
                 window.cordova.plugins.notification.local.schedule(notificationConfigs);
-                console.log(notificationConfigs);
                 break;
             }
             case "any": {
@@ -78,7 +78,6 @@ class NotificationService {
                     }
                 });
                 window.cordova.plugins.notification.local.schedule(notificationConfigs);
-                console.log(notificationConfigs);
                 break;
             }
             default: break;
@@ -122,7 +121,7 @@ class NotificationService {
             endTime = data.endTime.format("HH:mm")
         }
 
-        return `${startTime}${(data.startTime && data.endTime) ? " - " : ""}${endTime}\n${data.dynamicFields[0] && data.dynamicFields[0].value.length > 50 ? data.dynamicFields[0].value.slice(0, 47) + '...' : data.dynamicFields[0].value}`
+        return `${startTime}${(data.startTime && data.endTime) ? " - " : ""}${endTime}\n${data.dynamicFields[0] ? (data.dynamicFields[0].value.length > 50 ? data.dynamicFields[0].value.slice(0, 47) + '...' : data.dynamicFields[0].value) : ""}`
     }
 }
 

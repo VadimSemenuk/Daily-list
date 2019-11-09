@@ -55,7 +55,7 @@ class TimeSet extends Component {
             })
         });
 
-        this.onTimeSet(moment(date).startOf("minute").valueOf(), state);
+        this.onTimeSet(moment(date).startOf("minute"), state);
     };
 
     onNotificateChange = (notificate) => {

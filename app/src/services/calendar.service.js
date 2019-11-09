@@ -1,5 +1,6 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
+import getUTCOffset from "../utils/getUTCOffset";
 
 window.moment = moment;
 
@@ -11,6 +12,8 @@ class CalendarService {
     async getCount(date, period, includeFinished, halfInterval = 20) {
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
+        let intervalStartDateUTC = intervalStartDate + getUTCOffset();
+        let intervalEndDateUTC = intervalEndDate + getUTCOffset();
 
         let select = await executeSQL(`
             SELECT t.added, t.repeatType, rep.value as repeatValue, t.finished
@@ -25,7 +28,7 @@ class CalendarService {
                     OR (t.forkFrom = -1 AND repeatType != 'any')
                 )
                 AND mode = 1;
-        `, [intervalStartDate, intervalEndDate, intervalStartDate, intervalEndDate]);
+        `, [intervalStartDateUTC, intervalEndDateUTC, intervalStartDateUTC, intervalEndDateUTC]);
 
         let repeatableDay = 0;
         let repeatableWeek = {};
@@ -33,6 +36,13 @@ class CalendarService {
 
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
+
+            if (~note.added) {
+                note.added = note.added - getUTCOffset();
+            }
+            if (note.repeatType === "any") {
+                note.repeatValue = note.repeatValue - getUTCOffset();
+            }
 
             if (!includeFinished && note.finished) {
                 if (note.repeatType !== "no-repeat") {

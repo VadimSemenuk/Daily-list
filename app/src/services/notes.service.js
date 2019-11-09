@@ -2,6 +2,7 @@ import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 import uuid from "uuid/v1";
 import notificationService from "./notification.service";
+import getUTCOffset from "../utils/getUTCOffset";
 
 window.e = executeSQL;
 
@@ -67,7 +68,7 @@ class NotesService {
                     isShadow: Boolean(item.added === -1),
                     isSynced: Boolean(item.isSynced),
                     isLastActionSynced: Boolean(item.isLastActionSynced),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
                 };
 
                 if (repeatType === "no-repeat") {
@@ -144,7 +145,7 @@ class NotesService {
                     isShadow: Boolean(item.added === -1),
                     isSynced: Boolean(item.isSynced),
                     isLastActionSynced: Boolean(item.isLastActionSynced),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
                 };
 
                 notes.push(nextItem);
@@ -163,7 +164,7 @@ class NotesService {
 
             selects = await Promise.all(
                 dates.map((date) => {
-                    let currentDate = date.valueOf();
+                    let msDateUTC = date.valueOf() + getUTCOffset();
                     return executeSQL(
                         `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
                         t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
@@ -185,7 +186,7 @@ class NotesService {
                                 )
                             )
                             AND t.mode == 1;`,
-                        [currentDate, currentDate, date.isoWeekday(), currentDate]
+                        [msDateUTC, msDateUTC, date.isoWeekday(), msDateUTC]
                     );
                 })
             )
@@ -215,15 +216,15 @@ class NotesService {
                 let nextItem = {
                     ...item,
                     dynamicFields: JSON.parse(item.dynamicFields),
-                    startTime: ~item.startTime ? moment(item.startTime) : false,
-                    endTime: ~item.endTime ? moment(item.endTime) : false,
+                    startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
+                    endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
                     added: moment(dates[selectIndex]),
                     finished: Boolean(item.finished),
                     notificate: Boolean(item.notificate),
                     isShadow: Boolean(item.added === -1),
                     isSynced: Boolean(item.isSynced),
                     isLastActionSynced: Boolean(item.isLastActionSynced),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => +a) : [],
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
                 };
 
                 notes.push(nextItem);
@@ -279,8 +280,8 @@ class NotesService {
             [
                 note.uuid,
                 note.title,
-                note.startTime ? note.startTime.valueOf() : -1,
-                note.endTime ? note.endTime.valueOf() : -1,
+                note.startTime ? note.startTime.valueOf() + getUTCOffset() : -1,
+                note.endTime ? note.endTime.valueOf() + getUTCOffset() : -1,
                 Number(note.notificate),
                 note.tag,
                 note.lastAction,
@@ -291,7 +292,7 @@ class NotesService {
                 note.repeatType,
                 JSON.stringify(note.dynamicFields),
                 Number(note.finished),
-                isShadow ? -1 : note.added.valueOf(),
+                isShadow ? -1 : note.added.valueOf() + getUTCOffset(),
                 note.forkFrom,
                 note.priority,
                 note.repeatDate,
@@ -369,9 +370,9 @@ class NotesService {
             WHERE id = ?;`,
             [
                 nextNote.title,
-                nextNote.isShadow ? -1 : nextNote.added.valueOf(),
-                nextNote.startTime ? nextNote.startTime.valueOf() : -1,
-                nextNote.endTime ? nextNote.endTime.valueOf() : -1,
+                nextNote.isShadow ? -1 : nextNote.added.valueOf() + getUTCOffset(),
+                nextNote.startTime ? nextNote.startTime.valueOf() + getUTCOffset() : -1,
+                nextNote.endTime ? nextNote.endTime.valueOf() + getUTCOffset() : -1,
                 Number(nextNote.notificate),
                 nextNote.tag,
                 nextNote.lastAction,
@@ -409,7 +410,7 @@ class NotesService {
                 lastActionTime = ?
             WHERE id = ?
         `, [
-            nextDate.valueOf(),
+            nextDate.valueOf() + getUTCOffset(),
             nextNote.isLastActionSynced,
             nextNote.lastAction,
             nextNote.lastActionTime,
@@ -459,7 +460,13 @@ class NotesService {
 
         let params = note.repeatDates.reduce((acc) => `${acc}, (?, ?)`, "");
         params = params.slice(2);
-        let values = note.repeatDates.reduce((acc, value) => [...acc, note.key, value], []);
+        let values = note.repeatDates.reduce((acc, item) => {
+            let value = item;
+            if (note.repeatType === 'any') {
+                value = item + getUTCOffset();
+            }
+            return [...acc, note.key, value]
+        }, []);
 
         await executeSQL(`
             INSERT INTO TasksRepeatValues
@@ -467,21 +474,6 @@ class NotesService {
             VALUES
             ${params};
         `, values);
-    }
-
-    async getNoteRepeatDates(note) {
-        let key = note.forkFrom === -1 ? note.key : note.forkFrom;
-
-        let select = await executeSQL(`SELECT value from TasksRepeatValues WHERE taskId = ?`, [key]);
-
-        let values = [];
-        if (select.rows) {
-            for(let i = 0; i < select.rows.length; i++) {
-                values.push(select.rows.item(i).value);
-            }
-        }
-
-        return values;
     }
 
     async getDeletedNotes() {

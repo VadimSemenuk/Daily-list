@@ -63,7 +63,7 @@ export default class App extends Component {
         let date = moment().startOf("day");
         let notes = await notesService.getNotes(
             settings.notesScreenMode,
-            settings.notesScreenMode === 1 ? [moment(date).add(-1, "day"), date, moment(date).add(1, "day")] : null
+            settings.notesScreenMode === 1 ? [moment(date).add(-1, "day"), moment(date), moment(date).add(1, "day")] : null
         );
         let user = authService.getUser();
         authService.initAuthorizationToken();

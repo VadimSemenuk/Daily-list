@@ -321,15 +321,6 @@ export function updateNotesManualSortIndex(notes) {
 }
 
 // date
-export function setCurrentDate (date) {
-    return {
-        type: "SET_CURRENT_DATE",
-        payload: {
-            date
-        }
-    }
-}
-
 export function updateNotes() {
     return async (dispatch, getState) => {
         try {
