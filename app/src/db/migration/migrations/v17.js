@@ -3,6 +3,7 @@ import moment from "moment";
 
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
+import getUTCOffset from "../../../utils/getUTCOffset";
 
 export default {
     name: "1.7",
@@ -16,6 +17,7 @@ export default {
         await addErrorsLogsTable();
         await addLoadsLogsTable();
         await updateToken();
+        await convertDatesToUTC();
 
         async function addUUID() {
             let select = await execureSQL(`SELECT id from Tasks WHERE uuid is null`);
@@ -90,6 +92,7 @@ export default {
                     repeatDate INTEGER,
                     manualOrderIndex INTEGER,
                     mode INTEGER,
+                    utcOffset INTEGER,
                     UNIQUE (uuid) ON CONFLICT REPLACE
                 );
             `);
@@ -275,6 +278,31 @@ export default {
             token.msGTokenExpireDateUTC = token.tokenExpireDate;
             delete token.tokenExpireDatel;
             localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
+        }
+
+        async function convertDatesToUTC( ) {
+            let utcOffset = getUTCOffset();
+
+            await execureSQL(`
+                UPDATE Tasks
+                SET
+                    added = added + ${utcOffset},
+                    startTime = CASE startTime WHEN -1 THEN -1 ELSE startTime + ${utcOffset} END,
+                    endTime = CASE endTime WHEN -1 THEN -1 ELSE endTime + ${utcOffset} END,
+                    utcOffset = ${utcOffset};
+            `);
+
+            let anyRepeatTasksSelect = await execureSQL(`SELECT id from Tasks WHERE repeatType = 'any'`);
+
+            if (anyRepeatTasksSelect.rows.length) {
+                let anyRepeatTasksIDs = [];
+                for(let i = 0; i < anyRepeatTasksSelect.rows.length; i++) {
+                    let item = anyRepeatTasksSelect.rows.item(i);
+                    anyRepeatTasksIDs.push(item.id);
+                }
+
+                await execureSQL(`UPDATE TasksRepeatValues SET value = value + ${utcOffset} WHERE taskId IN (${anyRepeatTasksIDs.join(", ")})`);
+            }
         }
     }
 }

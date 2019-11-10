@@ -8,10 +8,11 @@ import Note from "../Notes/Note/Note";
 import Modal from "../../components/Modal/Modal";
 import {ButtonListItem} from "../../components/ListItem/ListItem";
 
+import {throttle} from "../../utils/throttle";
+
 import * as AppActions from '../../actions';
 
 import './NotesSearch.scss';
-import NotesList from "../Notes/NotesList";
 
 class NotesSearch extends PureComponent {
     constructor(props) {
@@ -25,6 +26,13 @@ class NotesSearch extends PureComponent {
         };
 
         this.needToScrollToClosest = false;
+    }
+
+    componentDidMount() {
+        let inputEl = document.querySelector(`.search-input-wrapper input`);
+        if (inputEl) {
+            inputEl.focus();
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -44,9 +52,13 @@ class NotesSearch extends PureComponent {
         let nextSearchText = e.target.value;
 
         this.setState({searchText: nextSearchText});
-        this.props.searchNotes(nextSearchText, this.state.searchRepeatType);
+        this.searchNotes(nextSearchText);
         this.needToScrollToClosest = true;
-    };
+    }
+
+    searchNotes = throttle((nextSearchText) => {
+        this.props.searchNotes(nextSearchText, this.state.searchRepeatType);
+    }, 500);
 
     triggerSearchType = () => {
         this.props.resetSearch();
@@ -137,27 +149,18 @@ class NotesSearch extends PureComponent {
                             this.props.search.length !== 0 &&
                             <React.Fragment>
                                 {
-                                    (this.state.searchRepeatType === "no-repeat")
-                                    && (this.props.settings.notesScreenMode === 1)
-                                    && this.props.search.map((item, index) => (
+                                    this.props.search.map((item, index) => (
                                         <div key={index}
                                              className={"date-item"}
                                              data-is-closest-to-current-date={item.isClosestToCurrentDate}>
-                                            <div className={"date-item-date"}>{item.date.format("DD MMM YYYY")}</div>
+                                            {
+                                                this.state.searchRepeatType === "no-repeat" && this.props.settings.notesScreenMode === 1 && <div className={"date-item-date"}>{item.date.format("DD MMM YYYY")}</div>
+                                            }
                                             {
                                                 item.items.map(this.renderItem)
                                             }
                                         </div>
                                     ))
-                                }
-                                {
-                                    (this.state.searchRepeatType === "repeat")
-                                    && (this.props.settings.notesScreenMode === 1)
-                                    && this.props.search.map(this.renderItem)
-                                }
-                                {
-                                    (this.props.settings.notesScreenMode === 2)
-                                    && this.props.search.map(this.renderItem)
                                 }
                             </React.Fragment>
                         }

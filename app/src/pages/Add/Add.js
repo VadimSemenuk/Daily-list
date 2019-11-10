@@ -52,7 +52,7 @@ class Add extends Component {
 
     async componentDidMount() {
         if (this.props.match.path === "/edit") {
-            this.setState({...this.props.location.state.note});
+            this.setState(deepCopy(this.props.location.state.note));
             this.prevNote = deepCopy(this.props.location.state.note);
         }
     }

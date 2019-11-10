@@ -10,10 +10,11 @@ class NotesService {
     async searchNotes(mode, search, repeatType) {
         search = search.toLowerCase().trim();
 
+        if (!search) {
+            return [];
+        }
+
         if (mode === 1) {
-            if (!search) {
-                return [];
-            }
 
             let msCurrentDate = moment().startOf("day").valueOf();
 
@@ -59,10 +60,10 @@ class NotesService {
                 let nextItem = {
                     ...item,
                     dynamicFields: JSON.parse(item.dynamicFields),
-                    startTime: ~item.startTime ? moment(item.startTime) : false,
-                    endTime: ~item.endTime ? moment(item.endTime) : false,
-                    added: moment(item.added),
-                    msAdded: item.added,
+                    startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
+                    endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
+                    added: moment(item.added - getUTCOffset()),
+                    msAdded: item.added - getUTCOffset(),
                     finished: Boolean(item.finished),
                     notificate: Boolean(item.notificate),
                     isShadow: Boolean(item.added === -1),
@@ -101,7 +102,7 @@ class NotesService {
                     isClosestToCurrentDate: +date === +closestToCurrentDate
                 }));
             } else {
-                return notes;
+                return [{items: notes}];
             }
         } else {
             let select = await executeSQL(
@@ -136,10 +137,9 @@ class NotesService {
                 let nextItem = {
                     ...item,
                     dynamicFields: JSON.parse(item.dynamicFields),
-                    startTime: ~item.startTime ? moment(item.startTime) : false,
-                    endTime: ~item.endTime ? moment(item.endTime) : false,
-                    added: moment(item.added),
-                    msAdded: item.added,
+                    startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
+                    endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
+                    added: moment(item.added - getUTCOffset()),
                     finished: Boolean(item.finished),
                     notificate: Boolean(item.notificate),
                     isShadow: Boolean(item.added === -1),
@@ -150,7 +150,7 @@ class NotesService {
 
                 notes.push(nextItem);
             }
-            return notes;
+            return [{items: notes}];
         }
     }
 
@@ -275,8 +275,8 @@ class NotesService {
         let insert = await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
-                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, repeatDate, mode)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, repeatDate, mode, utcOffset)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -296,7 +296,8 @@ class NotesService {
                 note.forkFrom,
                 note.priority,
                 note.repeatDate,
-                note.mode
+                note.mode,
+                getUTCOffset()
             ]
         );
 
@@ -366,7 +367,7 @@ class NotesService {
         await executeSQL(
             `UPDATE Tasks
             SET title = ?, added = ?, startTime = ?, endTime = ?, notificate = ?, tag = ?, 
-                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0, priority = ?
+                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0, priority = ?, utcOffset = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -380,7 +381,8 @@ class NotesService {
                 nextNote.repeatType,
                 JSON.stringify(nextNote.dynamicFields),
                 nextNote.priority,
-                nextNote.key
+                getUTCOffset(),
+                nextNote.key,
             ]
         );
 
@@ -407,14 +409,16 @@ class NotesService {
                 added = ?,
                 isLastActionSynced = ?,
                 lastAction = ?,
-                lastActionTime = ?
+                lastActionTime = ?,
+                utcOffset = ?
             WHERE id = ?
         `, [
             nextDate.valueOf() + getUTCOffset(),
             nextNote.isLastActionSynced,
             nextNote.lastAction,
             nextNote.lastActionTime,
-            note.key
+            getUTCOffset(),
+            note.key,
         ]);
 
         notificationService.clear(note);

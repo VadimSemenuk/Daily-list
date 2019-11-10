@@ -90,6 +90,11 @@
             margin-top: -15px;
             position: relative;
             z-index: 1111;
+            transition: 100ms ease all;
+
+            &.is-touching {
+                width: 50px;
+            }
     
             .line {
                 height: 4px;
