@@ -4,8 +4,7 @@ import {connect} from 'react-redux';
 import * as AppActions from '../../actions'; 
 import {getGreeting} from "../../utils/dayPart"
 import {translate} from "react-i18next";
-
-import arrowRight from '../../assets/img/right-grey.svg';
+import md5 from "md5";
 
 import './Password.scss';
 import deviceService from "../../services/device.service";
@@ -20,33 +19,36 @@ class Password extends Component {
 		}
 	}
 
-    validatePassword() {
-        if (this.props.settings.password === this.state.password) {
-            return true
-        } else {
-            window.plugins.toast.showLongBottom(this.props.t("invalid-password"))
+    validatePassword(value) {
+        if (this.props.settings.password === md5(value)) {
+            return true;
         }
+        return false;
     }
 
-    in = async () => {
-        if (this.validatePassword()) {
+    onPasswordInput = async (e) => {
+	    let value = e.target.value;
+
+        if (this.validatePassword(value)) {
             await this.props.setPasswordValid();
             this.props.history.replace("/");
+        } else {
+            this.setState({password: e.target.value});
         }
     }
 
-    onKeyPress = (e) => e.key === "Enter" && this.in()
-
-    resetPassword = () => {
+    resetPassword = async () => {
 	    if (!deviceService.hasNetworkConnection()) {
             window.plugins.toast.showLongBottom(this.props.t("internet-required"));
             return
         }
 
-	    let newPassword = Math.random().toString(36).slice(-8);
-        apiService.post("local-password/send-new", {lang: this.props.settings.lang, newPassword: newPassword});
-        window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset"));
+	    let emailTo = this.props.user ? this.props.user.email : this.props.settings.passwordResetEmail;
+
+        let response = await apiService.post("local-password/reset", {lang: this.props.settings.lang, email: emailTo});
+        let newPassword = await response.text();
         this.props.setSetting('password', newPassword);
+        window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset").replace("{{email}}", emailTo));
     }
 
     render () {
@@ -61,22 +63,21 @@ class Password extends Component {
                         <input
                             type="password"
                             placeholder={t("pass-in")}
-                            onChange={(e) => this.setState({password: e.target.value})}
-                            onKeyPress={this.onKeyPress}
-                        /> 
-                        <button onClick={this.in}>
-                            <img 
-                                className="in"
-                                src={arrowRight} 
-                                alt="in"
-                            />
-                        </button>      
+                            onChange={this.onPasswordInput}
+                        />
                     </div>
 
-                    <button
-                        className="text clear reset-password"
-                        onClick={this.resetPassword}
-                    >{t("reset-password")}</button>
+                    {
+                        !this.props.settings.passwordResetEmail && !this.props.user &&
+                        <span className="reset-password-notification">{t("reset-password-notification")}</span>
+                    }
+                    {
+                        Boolean(this.props.settings.passwordResetEmail || this.props.user) &&
+                        <button
+                            className="text clear reset-password"
+                            onClick={this.resetPassword}
+                        >{t("reset-password")}</button>
+                    }
                 </div>
             </div>
 		);
@@ -85,7 +86,8 @@ class Password extends Component {
 
 function mapStateToProps(state, props) {
     return {
-        settings: state.settings
+        settings: state.settings,
+        user: state.user
     }
 }
 

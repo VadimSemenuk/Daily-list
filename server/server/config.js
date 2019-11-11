@@ -16,6 +16,9 @@ const config = {
         allowHttps: process.env.ALLOW_HTTPS || 'false',
         sslKeyPath: process.env.SSL_KEY_PATH,
         sslCertPath: process.env.SSL_CERT_PATH,
+        smtpUsername: process.env.SMTP_USERNAME,
+        smtpPassword: process.env.SMTP_PASSWORD,
+        emailFrom: process.env.EMAIL_FROM,
     },
 };
 

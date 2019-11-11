@@ -55,7 +55,8 @@ export default {
     "password-reset-email": "Email для сброса пароля",
     "reset-password-email-no-user": "Войдите что бы привязать email для сбросса пароля",
     "reset-password": "Сбросить пароль",
-    "password-has-been-reset": "Новый пароль отправлен на email",
+    "password-has-been-reset": "Новый пароль отправлен на адрес {{email}}",
+    "reset-password-notification": "Укажите email адрес для сброса пароля. Для этого войдите в аккаутн в разделах 'Резервное копирование' или 'Установка пароля'",
 
     //troubleshooting page
     "help": "Помощь",

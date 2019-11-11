@@ -80,7 +80,8 @@ class SettingsService {
                 minimizeNotes,
                 calendarMode,
                 sortIncludePriority,
-                notesScreenMode
+                notesScreenMode,
+                passwordResetEmail
             FROM Settings;`
         );
 

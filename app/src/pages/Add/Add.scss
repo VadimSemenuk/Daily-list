@@ -92,7 +92,7 @@
             z-index: 1111;
             transition: 100ms ease all;
 
-            &.is-touching {
+            &:active {
                 width: 50px;
             }
     
@@ -101,10 +101,6 @@
                 border-radius: 10px;
                 background: #a9a9a9;
             }
-        }
-
-        .set-time-wrapper {
-            //border-bottom: 1px solid #eceaea;
         }
 
         .priority-select {

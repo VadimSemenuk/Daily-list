@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
+import md5 from "md5";
 
 import * as AppActions from '../../actions'; 
 
@@ -37,7 +38,8 @@ class SettingsPassword extends Component {
 
     onPassSet = () => {
         if (this.validatePassword()) {
-            this.props.setSetting('password', this.state.password0);
+            this.props.setSetting('password', md5(this.state.password0));
+            this.props.setSetting('passwordResetEmail', this.props.user.email);
             this.props.history.goBack();
         }
     }

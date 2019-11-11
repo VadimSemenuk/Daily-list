@@ -1,5 +1,6 @@
 import uuid from "uuid/v1";
 import moment from "moment";
+import md5 from "md5";
 
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
@@ -18,6 +19,7 @@ export default {
         await addLoadsLogsTable();
         await updateToken();
         await convertDatesToUTC();
+        await addPasswordEncryption();
 
         async function addUUID() {
             let select = await execureSQL(`SELECT id from Tasks WHERE uuid is null`);
@@ -191,7 +193,8 @@ export default {
                     sortIncludePriority INTEGER,
                     minimizeNotes INTEGER,
                     calendarMode INTEGER,
-                    notesScreenMode INTEGER
+                    notesScreenMode INTEGER,
+                    passwordResetEmail TEXT
                 );
             `);
             await execureSQL(`
@@ -280,7 +283,7 @@ export default {
             localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
         }
 
-        async function convertDatesToUTC( ) {
+        async function convertDatesToUTC() {
             let utcOffset = getUTCOffset();
 
             await execureSQL(`
@@ -302,6 +305,14 @@ export default {
                 }
 
                 await execureSQL(`UPDATE TasksRepeatValues SET value = value + ${utcOffset} WHERE taskId IN (${anyRepeatTasksIDs.join(", ")})`);
+            }
+        }
+
+        async function addPasswordEncryption() {
+            let select = await execureSQL('SELECT password FROM Settings');
+            let password = select.rows.item(0).password;
+            if (password) {
+                await execureSQL('UPDATE Settings SET password = ?', [md5(password)]);
             }
         }
     }
