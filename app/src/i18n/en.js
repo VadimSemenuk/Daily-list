@@ -11,11 +11,14 @@ export default {
     "default-notification": "Automatically set notification",
     "backup": "Backup",
     "set-setting-error": "Failed to update setting",
+    "show-daily-notes-screen": "Show screen \"Diary\"",
+    "show-notes-screen": "Show screen \"Notes\"",
   
     // view settings page
     "sort": "Sorting",
     "time-sort": "At the specified time",
     "time-add-sort": "At the adding time",
+    "custom-sort": "Custom sort",
     "view-direction": "View order",
     "view-direction-asc": "Direct order",
     "view-direction-desc": "Reverse order",
@@ -49,6 +52,11 @@ export default {
     "min-symbols-password": "Enter at least 4 symbols",
     "new-password": "Enter new password",
     "repeat-password": "Enter your password again",
+    "password-reset-email": "Password reset email",
+    "reset-password-email-no-user": "Login to bind reset password email",
+    "reset-password": "Reset the password",
+    "password-has-been-reset": "New password sent to {{email}}",
+    "reset-password-notification": "Add your email address to reset your password. To do this, enter the account in the 'Backup' or 'Add password' sections",
 
     //troubleshooting page
     "help": "Help",
@@ -64,11 +72,15 @@ export default {
     "graphics": "Graphics",
 
     // backup page
+    "copy-auto-created-google-drive": "Automatically created on",
+    "copy-auto-created-local": "Automatically created locally",
     "google-sign-in": "Sign in with Google",
     "sign-out": "Sign out",
     "create-backup": "Backup",
     "restore-backup": "Restore",
     "copy": "Copy",
+    "available-copies": "Available backups",
+    "available-local-copies": "Available local backups",
     "auth-error": "An error has occurred. Repeat later",
     "restore-local-backup": "Restore local backup",
     "how-it-works-btn": "How it works",
@@ -97,10 +109,8 @@ export default {
     "ok": "Ok",
     "cancel": "Cancel",
     "close": "Close",
-
-    // share
-    "share-theme": "Diary",
-    "share-content": "Diary notes and notifications in conviniet form",
+    "attention": "Attention",
+    "later": "Later",
 
     // fast-add field
     "description": "Description...",
@@ -112,6 +122,7 @@ export default {
     "do-copy": "Copy",
     "move-tomorrow": "Remove on tomorrow",
     "finished-split": "Finished",
+    "reorder-fail": "Failed to move note",
 
     // add
     "notify": "Remind",
@@ -128,6 +139,7 @@ export default {
     "input-placeholder-text": "Text",
     "list-item-btn": "List item",
     "field-btn": "Field",
+    "update-current": "Update only current",
     "update-all": "Update all",
     "update-shadow": "Update only not touched",
     "specify-btn": "Select",
@@ -166,9 +178,12 @@ export default {
     "error-note-restore": "Failed to restore note",
     "deleted-date": "Deleted date",
 
-    // meta
-    "re-enter-request-title": "Please log in again to complete the update",
-    "re-enter-request-description": "The application will save your backups. This is necessary for further normal operation. Backup data will not be overwritten",
-    "re-enter-later-button": "Later",
-    "re-enter-discard-button": "Not show anymore",
+    // notification
+    "default-notification-title": "Note Notification",
+
+    // search
+    "no-search-content": "Nothing found",
+    "search-placeholder": "Search",
+    "show-repeat-notes": "repetitive",
+    "show-no-repeat-notes": "non-repeating",
 }

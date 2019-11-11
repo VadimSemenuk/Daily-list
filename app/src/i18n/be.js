@@ -7,13 +7,18 @@ export default {
     "remove-pass": "Выдаліць пароль", 
     "issues": "Ліквідацыя няспраўнасцяў",
     "about": "Аб праграме",
+    "trash": "Кошык",
     "default-notification": "Аўтаматычна дадаваць апавяшчэннеы",
     "backup": "Рэзервовае капіраванне",
+    "set-setting-error": "Не атрымалася абнавіць наладу. Перазапусціце праграму і попробуйие зноў",
+    "show-daily-notes-screen": "Паказаць панэль \"Штодзённік\"",
+    "show-notes-screen": "Паказаць панэль \"Нататкі\"",
     
     // view settings page
     "sort": "Сартаванне",
     "time-sort": "Па усталяваным часе",
-    "time-add-sort": "Па часе дадання",  
+    "time-add-sort": "Па часе дадання",
+    "custom-sort": "Ўласная сартаванне",
     "view-direction": "Парадак адлюстравання",  
     "view-direction-asc": "У прамым парадку",
     "view-direction-desc": "У адваротным парадку",
@@ -21,9 +26,8 @@ export default {
     "notes-show-interval": "Адлюстроўваць за перыяд",
     "notes-show-interval-week": "Тыдзень",
     "notes-show-interval-day": "Дзень",
-    "show-notes-count": "Адлюстроўваць лічыльнікі на календары",
-    "reload-app-note": "Перазапусціце праграму для ўступлення змяненняў у сілу",
-    
+    "priority-sort": "Сартаваць па прыярытэце",
+
     // interface page
     "theme": "Тэма",
     "random-theme": "Выпадковая тэма",
@@ -34,6 +38,10 @@ export default {
     "ru": "Руссский",
     "en": "English",
     "be": "Беларускі",
+    "show-notes-count": "Адлюстроўваць лічыльнікі на календары",
+    "show-notes-count-include-finished": "Включать завершенные заметки в счетчик на календаре",
+    "reload-app-note": "Перазапусціце праграму для ўступлення змяненняў у сілу",
+    "minimize-notes": "Сворачивать длинные заметки",
 
     // password page
     "password": "Пароль",
@@ -44,14 +52,18 @@ export default {
     "min-symbols-password": "Увядзіце мінімум 4 сімвала",
     "new-password": "Увядзіце новы пароль",
     "repeat-password": "Увядзіце пароль паўторна",
+    "password-reset-email": "Email для скіду пароля",
+    "reset-password-email-no-user": "Ўвайдзіце што б прывязаць email для сбросса пароля",
+    "reset-password": "Скінуць пароль",
+    "password-has-been-reset": "Новы пароль адпраўлены на адрас {{email}}",
+    "reset-password-notification": "Пакажыце email адрас для скіду пароля. Для гэтага ўвайдзіце ў аккаутн ў раздзелах 'Рэзервовае капіраванне' ці 'Дадаць пароль'",
 
     //troubleshooting page
     "help": "Дапамога",
     "previous-version": "Папярэдняя версія", 
     "no-notification": "Не прыходзяць апавяшчэння",
-    "no-notification-a": "Перайдзіце ў налады прыкладання",
-    "no-notification-b": "Затым перайдзіце да налад дазволаў",
-    "no-notification-c": "Для дазволу 'Запуск у фоне' (назва можа адрознівацца) устанавіце значэнне 'Дазволіць'",
+    "no-notification-description": `Перайдзіце ў налады прыкладання ў сістэме: Налады -> Прыкладанні -> Штодзённік.
+    Пераканайцеся што ў дадатку ёсць дазволу на апавяшчэння і працу ў фоне`,
 
     // about page
     "app-name": "Штодзённік",
@@ -60,15 +72,25 @@ export default {
     "graphics": "Графіка",
 
     // backup page
+    "copy-auto-created-google-drive": "Аўтаматычна створана на",
+    "copy-auto-created-local": "Аўтаматычна створана лакальна",
     "google-sign-in": "Увайсці з дапамогай Google",
     "sign-out": "Выйсці",
     "create-backup": "Загрузіць",
     "restore-backup": "Аднавіць",
     "copy": "Копія",
+    "available-copies": "Даступныя рэзервовыя копіі",
+    "available-local-copies": "Даступныя лакальныя рэзервовыя копіі",
     "auth-error": "Адбылася памылка. Паўтарыце пазней",
     "restore-local-backup": "Аднавіць лькальную копію",
     "how-it-works-btn": "Як гэта працуе",
     "how-it-works": "Файлы праграмы захоўваюцца на вашым Google Drive. Праграма будзе мець доступ толькі да створаным ім файлаў",
+    "auto-backup": "Выконваць рэзервовае капіраванне аўтаматычна",
+    "error-sign-in": "Не атрымалася ўвайсці ў акаўнт",
+    "error-sign-out": "Не ўдалося выйсці з акаўнта",
+    "error-backup-upload": "Не атрымалася загрузіць рэзервовую копію. Паўторная спроба аўтаматычна будзе выканана пры наступным запуску прыкладання",
+    "error-backup-restore": "Не атрымалася восстаносить рэзервовую копію",
+    "error-no-backup": "У вас няма рэзервовых копій",
 
     // common
     "save": "Захаваць",
@@ -84,11 +106,11 @@ export default {
     "g-night": "Дабранач",
     "g-morning": "Добрай раніцы",
     "reload": "Перазапусціць",
-    "error-repeat-common": "Адбылася памылка. Паўтарыце пазней",
-
-    // share
-    "share-theme": "Штодзённік",
-    "share-content": "Штодзённік - нататкі і напамінкі ў зручным выглядзе",
+    "ok": "Ok",
+    "cancel": "Адмяніць",
+    "close": "Зачыніць",
+    "attention": "Увага",
+    "later": "Пазней",
 
     // fast-add field
     "description": "Тэкст...",
@@ -100,6 +122,7 @@ export default {
     "do-copy": "Капіяваць",
     "move-tomorrow": "Перамясціць на заўтра",
     "finished-split": "Завершаныя",
+    "reorder-fail": "Не атрымалася перанесьці заметку",
 
     // add
     "notify": "Нагадаць",
@@ -125,12 +148,42 @@ export default {
     "priority-high": "Высокі",
     "priority-medium": "Сярэдні",
     "priority-low": "Нізкі",
+    "error-note-add": "Не атрымалася дадаць нататку",
+    "error-note-update": "Не атрымалася абнавіць нататку",
+    "error-note-delete": "Не атрымалася выдаліць заметку",
+    "error-get-notes": "Не атрымалася атрымаць нататкі",
+    "monday": "Панядзелак",
+    "tuesday": "Аўторак",
+    "wednesday": "Серада",
+    "thursday": "Чацвер",
+    "friday": "Пятніца",
+    "saturday": "Субота",
+    "sunday": "Нядзеля",
+    "error-notification-permission": "У вас няма правоў, каб дадаваць апавяшчэння",
+    "night-mode": "Начны рэжым",
 
     // note-item
     "attached-image": "Прымацаванаы малюнак",
-    
-    "re-enter-request-title": "Калі ласка, ўвайдзіце ў рахунак паўторна для завяршэння абнаўлення",
-    "re-enter-request-description": "Дадатак пересохранит Вашы рэзервовыя копіі. Гэта неабходна для далейшай нармальнай працы. Дадзеныя рэзервовых копій перапішуцца не будуць",
-    "re-enter-later-button": "Пазней",
-    "re-enter-discard-button": "Больш не паказваць",
+
+    // error
+    "error-repeat-common": "Адбылася памылка. Паўтарыце пазней",
+    "error-common": "Адбылася памылка",
+    "error-reload-app": "Перазапусціце прыкладанне",
+
+    // trash
+    "remove-old": "Нататкі будуць выдаленыя праз 30 дзён",
+    "clean-trash": "Ачысціць кошык",
+    "clean-trash-error": "Не атрымалася ачысціць кошык",
+    "error-note-get-trash": "Не атрымалася атрымаць аддаленыя нататкі",
+    "error-note-restore": "Не атрымалася аднавіць заметку",
+    "deleted-date": "Дата выдалення",
+
+    // notification
+    "default-notification-title": "Апавяшчэнне аб нататцы",
+
+    // search
+    "no-search-content": "Нічога не знойдзена",
+    "search-placeholder": "Пошук",
+    "show-repeat-notes": "Паўтараюцца",
+    "show-no-repeat-notes": "Якiя не паўтараюцца",
 }
