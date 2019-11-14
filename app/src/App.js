@@ -67,11 +67,8 @@ export default class App extends Component {
         );
         let user = authService.getUser();
         authService.initAuthorizationToken();
-        backupService.setLocalBackupsDirectory();
         backupService.setDatabasesDirectory();
-        let localBackups = await backupService.getLocalBackups();
-        let backup = {local: localBackups};
-        this.store = initStore({settings, password, notes, date, user, meta, backup});
+        this.store = initStore({settings, password, notes, date, user, meta});
 
         this.deviceId = meta.deviceId;
 

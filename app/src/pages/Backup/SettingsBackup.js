@@ -29,7 +29,6 @@ class SettingsBackup extends Component {
         if (this.props.user) {
             this.props.updateGDBackupFiles();
         }
-        this.props.updateLocalBackupFiles();
     }
 
     restoreBackup = () => {
@@ -118,40 +117,6 @@ class SettingsBackup extends Component {
                         </div>
                     }
 
-                    {
-                        <div className="local-baclup-files-wrapper">
-                            {
-                                (this.props.backup.local.length > 0 && !this.props.user) &&
-                                <button
-                                    className={`text block img-text-button`}
-                                    type="button"
-                                    onClick={this.restoreBackup}
-                                ><img src={ImportImg} alt="import" />{t("restore-backup")}</button>
-                            }
-
-                            {
-                                (this.props.backup.local.length > 0) &&
-                                <div className="backup-files">
-                                    {t("available-local-copies")}:
-                                    <ul>
-                                        {
-                                            [...this.props.backup.local]
-                                                .sort((a, b) => {
-                                                    return -(a.modifiedTime.diff(b.modifiedTime))
-                                                })
-                                                .map((f, i) => {
-                                                    return <li key={i}>
-                                                        <span>{t('copy-auto-created-local')} </span>
-                                                        <strong>{f.modifiedTime.format('LLL')}</strong>
-                                                    </li>
-                                                })
-                                        }
-                                    </ul>
-                                </div>
-                            }
-                        </div>
-                    }
-
                     <Modal
                         isOpen={this.state.isSelectFileToRestoreModalVisible}
                         onRequestClose={() => this.setState({isSelectFileToRestoreModalVisible: false})}
@@ -182,23 +147,6 @@ class SettingsBackup extends Component {
                                             f.name === "DailyListSqliteDBFile_auto" &&
                                             <span>{t('copy-auto-created-google-drive')} {f.properties.manufacturer} {f.properties.model}, </span>
                                         }
-                                        <strong>{f.modifiedTime.format('LLL')}</strong>
-                                    </ButtonListItem>
-                                })
-                        }
-
-                        {
-                            [...this.props.backup.local]
-                                .sort((a, b) => {
-                                    return -(a.modifiedTime.diff(b.modifiedTime))
-                                })
-                                .map((f, i) => {
-                                    return <ButtonListItem
-                                        key={i}
-                                        className="no-border"
-                                        onClick={() => this.props.restoreLocalBackup(f)}
-                                    >
-                                        <span>{t('copy-auto-created-local')} </span>
                                         <strong>{f.modifiedTime.format('LLL')}</strong>
                                     </ButtonListItem>
                                 })

@@ -595,8 +595,6 @@ export function saveBackup() {
         let state = getState();
         if (state.user && state.user.settings.autoBackup) {
             dispatch(uploadGDBackup("auto"));
-        } else {
-            dispatch(saveLocalBackup());
         }
     }
 }
@@ -667,73 +665,6 @@ export function updateGDBackupFiles() {
                 err,
                 {
                     path: "action/index.js -> updateGDBackupFiles()",
-                },
-                deviceId
-            );
-        }
-    }
-}
-
-export function saveLocalBackup() {
-    return async (dispatch, getState) => {
-        try {
-            let backupFiles = getState().backup.local;
-            backupFiles.sort((a, b) => -(a.modifiedTime.diff(b.modifiedTime)));
-            if (backupFiles.length > 2) {
-                await backupService.saveLocalBackup(backupFiles[2]);
-            } else {
-                await backupService.saveLocalBackup();
-            }
-            dispatch(updateLocalBackupFiles());
-        } catch(err) {
-            let deviceId = getState().meta.deviceId;
-            logsService.logError(
-                err,
-                {
-                    path: "action/index.js -> saveLocalBackup()",
-                },
-                deviceId
-            );
-        }
-    }
-}
-
-export function restoreLocalBackup(file) {
-    return async (dispatch, getState) => {
-        try {
-            dispatch(triggerLoader(true));
-            await backupService.restoreLocalBackup(file);
-            dispatch(triggerLoader(false));
-            window.location.reload(true);
-        } catch(err) {
-            let deviceId = getState().meta.deviceId;
-            logsService.logError(
-                err,
-                {
-                    path: "action/index.js -> restoreLocalBackup()",
-                },
-                deviceId
-            );
-        }
-    }
-}
-
-export function updateLocalBackupFiles() {
-    return async (dispatch, getState) => {
-        try {
-            let files = await backupService.getLocalBackups();
-            dispatch({
-                type: "SET_LOCAL_BACKUP_FILES",
-                payload: {
-                    files
-                }
-            });
-        } catch(err) {
-            let deviceId = getState().meta.deviceId;
-            logsService.logError(
-                err,
-                {
-                    path: "action/index.js -> updateLocalBackupFiles()",
                 },
                 deviceId
             );

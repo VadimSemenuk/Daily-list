@@ -10,13 +10,6 @@ import apiService from "./api.service";
 class BackupService {
     databaseFileName = 'com.mamindeveloper.dailylist.db';
 
-    setLocalBackupsDirectory() {
-        if (!window.cordova) {
-            this.localBackupsDirectory = '';
-            return;
-        }
-        this.localBackupsDirectory = window.cordova.file.dataDirectory;
-    }
     setDatabasesDirectory() {
         if (!window.cordova) {
             this.databasesDirectory = '';
@@ -150,61 +143,6 @@ class BackupService {
             };
             oReq.send(null);
         });
-    }
-
-    async getLocalBackups() {
-        if (!window.cordova) {
-            return [
-                {
-                    modifiedTime: moment(),
-                    name: 'test'
-                },
-                {
-                    modifiedTime: moment(),
-                    name: 'test1'
-                }
-            ]
-        }
-
-        let filesEntry = await filesService.getFileEntry(this.localBackupsDirectory);
-        let reader = filesEntry.createReader();
-        let entries = await new Promise((resolve, reject) => reader.readEntries(resolve, reject));
-        let backupEntries = [];
-        for (let i = 0; i < entries.length; i++) {
-            let e = entries[i];
-            if (e.isFile && (e.name.indexOf('DailyList_Backup') !== -1)) {
-                backupEntries.push(e);
-            }
-        }
-        let backupFiles = [];
-        for (let e of backupEntries) {
-            let f = await new Promise((resolve, reject) => e.file(resolve, reject));
-            backupFiles.push({
-                modifiedTime: moment(f.lastModified),
-                name: f.name
-            });
-        }
-        return backupFiles;
-    }
-
-    async restoreLocalBackup(file) {
-        let backupFileEntry = await filesService.getFileEntry(`${this.localBackupsDirectory}${file.name}`);
-        let targetDirEntry = await filesService.getFileEntry(this.databasesDirectory);
-        return new Promise((resolve, reject) => backupFileEntry.copyTo(targetDirEntry, this.databaseFileName, resolve, reject));
-    }
-
-    async saveLocalBackup(fileToUpdate) {
-        if (!window.cordova) {
-            return
-        }
-
-        let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);
-        let targetDirEntry = await filesService.getFileEntry(this.localBackupsDirectory);
-        await new Promise((resolve, reject) => fileEntry.copyTo(targetDirEntry, `DailyList_Backup_${moment().valueOf()}.db`, resolve, reject))
-        if (fileToUpdate) {
-            let fileToUpdateEntry = await filesService.getFileEntry(`${this.localBackupsDirectory}${fileToUpdate.name}`);
-            await new Promise((resolve, reject) => fileToUpdateEntry.remove(resolve, reject));
-        }
     }
 }
 

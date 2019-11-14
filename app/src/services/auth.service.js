@@ -24,9 +24,6 @@ class AuthService {
                 gdBackup: {
                     backupFiles: []
                 },
-                localBackup: {
-                    backupFiles: []
-                },
                 settings: {
                     autoBackup: true
                 }
