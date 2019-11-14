@@ -289,9 +289,10 @@ export default {
             await execureSQL(`
                 UPDATE Tasks
                 SET
-                    added = added + ${utcOffset},
+                    added = CASE added WHEN -1 THEN -1 ELSE added + ${utcOffset} END,
                     startTime = CASE startTime WHEN -1 THEN -1 ELSE startTime + ${utcOffset} END,
                     endTime = CASE endTime WHEN -1 THEN -1 ELSE endTime + ${utcOffset} END,
+                    repeatDate = CASE repeatDate WHEN -1 THEN -1 ELSE repeatDate + ${utcOffset} END,
                     utcOffset = ${utcOffset};
             `);
 

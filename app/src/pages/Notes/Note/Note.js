@@ -7,9 +7,6 @@ import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
 import RepeatImg from "../../../assets/img/two-circling-arrows.svg";
-import DownArrowGreenImg from "../../../assets/img/down-arrow-green.svg";
-import DownArrowBlueImg from "../../../assets/img/down-arrow-blue.svg";
-import DownArrowRedImg from "../../../assets/img/down-arrow-red.svg";
 
 import './Note.scss';
 
@@ -72,30 +69,6 @@ class Note extends PureComponent {
                     style={{backgroundColor: this.props.itemData.tag}}
                     className="tag"
                 ></div>
-                {
-                    this.props.itemData.priority === 11 &&
-                    <img
-                        className="note-header-priority"
-                        src={DownArrowGreenImg}
-                        alt="low"
-                    />
-                }
-                {
-                    this.props.itemData.priority === 13 &&
-                    <img
-                        className="note-header-priority rotated"
-                        src={DownArrowBlueImg}
-                        alt="high"
-                    />
-                }
-                {
-                    this.props.itemData.priority === 14 &&
-                    <img
-                        className="note-header-priority rotated"
-                        src={DownArrowRedImg}
-                        alt="very high"
-                    />
-                }
                 <div className="note-content">
                     <div style={{fontSize: 12, color: '#ccc', position: 'absolute', top: 3, left: 3}}>{this.props.itemData.manualOrderIndex}</div>
 
@@ -124,7 +97,17 @@ class Note extends PureComponent {
                             </div>
                         }
                     </div>
-                    {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
+                    <div className="title-wrapper">
+                        {
+                            this.props.itemData.priority !== 2 &&
+                            <div className="priority-label">
+                                {this.props.itemData.priority === 1 && <div className="arrow bottom green"></div>}
+                                {this.props.itemData.priority === 3 && <div className="arrow top blue"></div>}
+                                {this.props.itemData.priority === 4 && <div className="arrow top red"></div>}
+                            </div>
+                        }
+                        {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
+                    </div>
                     {
                         this.props.itemData.dynamicFields.map((a, i) => {
                             if (a && a.type === "text") {

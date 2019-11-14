@@ -4,6 +4,46 @@
     overflow: hidden;
     border-radius: 6px;
 
+    .title-wrapper {
+        display: flex;
+        align-items: center;
+    }
+
+    .priority-label {
+        height: 12px;
+        width: 12px;
+        margin-right: 10px;
+
+        .arrow {
+            height: 7px;
+            width: 7px;
+            border-top: 2px solid #fff;
+            border-left: 2px solid #fff;
+            margin-left: 2px;
+
+            &.top {
+                margin-top: 5px;
+                transform: rotate(45deg);
+            }
+
+            &.bottom {
+                transform: rotate(-135deg);
+            }
+
+            &.red {
+                border-color: #c74141;
+            }
+
+            &.blue {
+                border-color: #6767d3;
+            }
+
+            &.green {
+                border-color: #6ac56a;
+            }
+        }
+    }
+
     .note-header-priority {
         position: absolute;
         top: 50%;

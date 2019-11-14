@@ -320,7 +320,7 @@ class NotesService {
         if (nextNote.isShadow) {
             nextNote.uuid = uuid();
             nextNote.forkFrom = note.key;
-            nextNote.repeatDate = note.repeatDate === -1 ? note.added.valueOf() : note.repeatDate;
+            nextNote.repeatDate = note.repeatDate === -1 ? note.added.valueOf() + getUTCOffset() : note.repeatDate;
             nextNote = await this.insertNote(nextNote);
         } else {
             await executeSQL(
@@ -589,7 +589,7 @@ class NotesService {
             if (note.isShadow) {
                 note.uuid = uuid();
                 note.forkFrom = note.key;
-                note.repeatDate = note.repeatDate === -1 ? note.added.valueOf() : note.repeatDate;
+                note.repeatDate = note.repeatDate === -1 ? note.added.valueOf() + getUTCOffset() : note.repeatDate;
                 note = await this.insertNote(note);
                 notesInserted.push(note);
             }
