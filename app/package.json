@@ -171,7 +171,9 @@
       "com-sarriaroman-photoviewer": {},
       "cordova-plugin-file": {},
       "cordova-plugin-device": {},
-      "cordova-plugin-local-notification": {},
+      "cordova-plugin-local-notification": {
+        "ANDROID_SUPPORT_V4_VERSION": "26.+"
+      },
       "skwas-cordova-plugin-datetimepicker": {}
     }
   }

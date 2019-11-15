@@ -202,6 +202,13 @@ public final class Notification {
             return;
         }
 
+        try {
+            JSONObject _trigger = options.getTrigger();
+            _trigger.put("timezone-offset", TimeZone.getDefault().getRawOffset());
+        } catch(JSONException e) {
+            Log.d("local-notification", e.toString());
+        }
+
         persist(ids);
 
         if (!options.isInfiniteTrigger()) {
