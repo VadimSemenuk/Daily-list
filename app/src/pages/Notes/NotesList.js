@@ -71,7 +71,7 @@ class NotesList extends PureComponent {
         let sortableOptions = {
             options: {
                 disabled: this.props.settings.sortType !== 2,
-                delay: 400,
+                delay: 300,
                 draggable: this.props.settings.sortFinBehaviour === 1 ? ".not-finished" : ".note-wrapper",
                 direction: 'vertical',
                 onStart: this.onDragSortModeEnable,

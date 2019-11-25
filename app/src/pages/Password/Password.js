@@ -56,7 +56,7 @@ class Password extends Component {
 
 		return (
             <div className="page-wrapper">
-                <div className="password-wrapper">
+                <div className="password-wrapper page-content">
                     <span className="greeting">{t(getGreeting())}</span>
 
                     <div className="password-input-wrapper">

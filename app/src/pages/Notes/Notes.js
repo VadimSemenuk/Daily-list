@@ -41,6 +41,14 @@ class Notes extends PureComponent {
         if (this.swipe && (nextState.isSwipeAvailable !== this.props.isSwipeAvailable)) {
             this.swipe.disableScrolling(!nextState.isSwipeAvailable);
         }
+        if (nextProps.settings.notesScreenMode !== this.props.settings.notesScreenMode) {
+            this.activePageIndex = 1;
+            this.prevPageIndex = 1;
+            this.slideChanged = false;
+            this.setState({
+                isSwipeAvailable: true
+            })
+        }
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
@@ -344,7 +352,7 @@ function mapDispatchToProps(dispatch) {
 export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(Notes));
 
 function sort (data, settings) {
-    let notesCompareFn = getNotesCompareFn();
+    let notesCompareFn = getNotesCompareFn(settings);
 
     return data.map((list) => {
         list.items.sort((a, b) => notesCompareFn(a, b));
@@ -353,58 +361,62 @@ function sort (data, settings) {
         }
         return list;
     });
+}
 
-    function getNotesCompareFn() {
-        if (settings.sortType === 0) {
-            if (settings.notesScreenMode === 1) {
-                return (a, b) => {
-                    let aDayTimeSum = a.startTime ?
-                        (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
-                        : 0;
-                    let bDayTimeSum = b.startTime ?
-                        (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
-                        : 0;
-
-                    if (settings.sortDirection === 1) {
-                        return aDayTimeSum - bDayTimeSum;
-                    } else {
-                        return bDayTimeSum - aDayTimeSum;
-                    }
-                };
-            } else {
-                if (settings.sortDirection === 1) {
-                    return (a, b) => a.key - b.key
-                } else {
-                    return (a, b) =>  b.key - a.key
-                }
-            }
-        }
-
-        if (settings.sortType === 1) {
-            if (settings.sortDirection === 1) {
-                return (a, b) => a.key - b.key
-            } else {
-                return (a, b) =>  b.key - a.key
-            }
-        }
-
-        if (settings.sortType === 2) {
+function getNotesCompareFn(settings) {
+    if (settings.sortType === 0) {
+        if (settings.notesScreenMode === 1) {
             return (a, b) => {
-                let aManualOrderIndex = (a.manualOrderIndex !== undefined && a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
-                let bManualOrderIndex = (b.manualOrderIndex !== undefined && b.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
-                if (aManualOrderIndex === bManualOrderIndex) {
-                    if (settings.sortDirection === 1) {
-                        return a.key - b.key;
-                    } else {
-                        return b.key - a.key;
-                    }
-                }
+                let aDayTimeSum = a.startTime ?
+                    (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
+                    : 0;
+                let bDayTimeSum = b.startTime ?
+                    (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
+                    : 0;
+
                 if (settings.sortDirection === 1) {
-                    return aManualOrderIndex - bManualOrderIndex;
+                    return aDayTimeSum - bDayTimeSum;
                 } else {
-                    return bManualOrderIndex - aManualOrderIndex;
+                    return bDayTimeSum - aDayTimeSum;
                 }
+            };
+        } else {
+            return getSortByAddedTimeFn(settings);
+        }
+    }
+
+    if (settings.sortType === 1) {
+        return getSortByAddedTimeFn(settings);
+    }
+
+    if (settings.sortType === 2) {
+        return (a, b) => {
+            let aManualOrderIndex = (a.manualOrderIndex !== undefined && a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
+            let bManualOrderIndex = (b.manualOrderIndex !== undefined && b.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
+            if (aManualOrderIndex === bManualOrderIndex) {
+                return getSortByAddedTimeFn(settings)(a, b);
             }
+            if (settings.sortDirection === 1) {
+                return aManualOrderIndex - bManualOrderIndex;
+            } else {
+                return bManualOrderIndex - aManualOrderIndex;
+            }
+        }
+    }
+}
+
+function getSortByAddedTimeFn(settings) {
+    if (settings.sortDirection === 1) {
+        return (a, b) => {
+            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.key;
+            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.key;
+            return aVal - bVal;
+        }
+    } else {
+        return (a, b) => {
+            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.key;
+            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.key;
+            return bVal - aVal;
         }
     }
 }

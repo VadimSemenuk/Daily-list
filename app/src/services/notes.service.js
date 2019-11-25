@@ -25,7 +25,7 @@ class NotesService {
                         FROM Tasks t
                         WHERE
                             (t.title LIKE ? OR t.dynamicFields LIKE ?)
-                            AND ${repeatType === 'no-repeat' ? `(t.repeatType == 'no-repeat' OR t.repeatType == 'any')` : `(t.repeatType == 'week' OR t.repeatType == 'day')`}
+                            AND ${repeatType === 'no-repeat' ? `(t.repeatType == 'no-repeat' OR t.repeatType == 'any')` : `((t.repeatType == 'week' OR t.repeatType == 'day') AND t.forkFrom == -1)`}
                             AND t.mode == 1
                             AND t.lastAction != 'DELETE'
                             AND t.lastAction != 'CLEAR'
@@ -240,6 +240,8 @@ class NotesService {
             return dateNotes[0];
         }
 
+        console.log(dateNotes);
+
         return dateNotes;
     }
 
@@ -260,6 +262,8 @@ class NotesService {
             forkFrom: -1,
             repeatDate: -1
         };
+
+        noteToLocalInsert.priority = noteToLocalInsert.priority || 2;
 
         let addedNote = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(addedNote);
@@ -363,6 +367,8 @@ class NotesService {
         nextNote.forkFrom = -1;
         nextNote.finished = false;
         nextNote.repeatDate = -1;
+
+        nextNote.priority = nextNote.priority || 2;
 
         await executeSQL(
             `UPDATE Tasks

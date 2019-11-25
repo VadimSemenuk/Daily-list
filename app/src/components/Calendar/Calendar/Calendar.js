@@ -23,7 +23,7 @@ class Calendar extends Component {
         let currentMonthStartDate = moment(msSelectedDate).startOf("month");  
 
         this.state = {
-            monthes: this.getMonthes(currentMonthStartDate),
+            months: this.getMonths(currentMonthStartDate),
             currentMonthStartDate,
             msSelectedDate,
             msSelectedDates: (this.props.msSelectedDates && this.props.msSelectedDates.length) ? this.props.msSelectedDates : [msSelectedDate],
@@ -47,7 +47,7 @@ class Calendar extends Component {
     onSlideChange = async ({index, nextIndex, side}) => {   
         let currentMonthStartDate = side === "left" ? moment(this.state.currentMonthStartDate).subtract(1, 'month') : moment(this.state.currentMonthStartDate).add(1, 'month');
         let nextMonthStartDate = side === "left" ? moment(currentMonthStartDate).subtract(1, 'month') : moment(currentMonthStartDate).add(1, 'month');
-        let monthes = [...this.state.monthes.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.monthes.slice(nextIndex + 1)];        
+        let months = [...this.state.months.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.months.slice(nextIndex + 1)];        
 
         if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
             this.dispatchedActionName = "GET_COUNT";
@@ -55,12 +55,12 @@ class Calendar extends Component {
         } 
 
         this.setState({
-            monthes: monthes,
+            months: months,
             currentMonthStartDate
         })
     }
 
-    getMonthes = (startMonthDate) => {
+    getMonths = (startMonthDate) => {
         return [
             this.getMonthDays(moment(startMonthDate).subtract(1, 'month')),
             this.getMonthDays(moment(startMonthDate)),
@@ -147,43 +147,39 @@ class Calendar extends Component {
         }
 
         let msSelectedDate = moment(nextProps.currentDate).startOf("day").valueOf();
-        let currentMonthStartDate = moment(msSelectedDate).startOf("month");       
-
-        if (this.state.msSelectedDate === msSelectedDate) {
-            return
-        }
+        let currentMonthStartDate = moment(msSelectedDate).startOf("month");
 
         if (currentMonthStartDate.valueOf() === this.state.currentMonthStartDate.valueOf()) {
             this.setState({
                 msSelectedDate
             });
         } else {
-            let monthes;
+            let months;
 
-            let prevMonthStartDate = moment(currentMonthStartDate).subtract(1, 'week');
-            let nextMonthStartDate = moment(currentMonthStartDate).add(1, 'week');
+            let prevMonthStartDate = moment(currentMonthStartDate).subtract(1, 'month');
+            let nextMonthStartDate = moment(currentMonthStartDate).add(1, 'month');
             
             let nextDate;
 
             if (currentMonthStartDate.valueOf() > this.state.currentMonthStartDate.valueOf()) {
                 if (this.activePageIndex === 2) {
-                    monthes = [this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate)];
+                    months = [this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate)];
                 } else if (this.activePageIndex === 0) {
-                    monthes = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
+                    months = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
                 } else {
-                    monthes = [this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate)];
-                }  
+                    months = [this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate)];
+                }
 
                 this.noSlideEventHandle = true;
                 this.sliderRef.next();
                 nextDate = nextMonthStartDate;
             } else {
                 if (this.activePageIndex === 2) {
-                    monthes = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
+                    months = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
                 } else if (this.activePageIndex === 0) {
-                    monthes = [this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate)];
+                    months = [this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate)];
                 } else {
-                    monthes = [this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate)];
+                    months = [this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate)];
                 }  
 
                 this.noSlideEventHandle = true;
@@ -196,7 +192,7 @@ class Calendar extends Component {
             }
 
             this.setState({
-                monthes,
+                months,
                 currentMonthStartDate,
                 msSelectedDate
             })
@@ -223,7 +219,7 @@ class Calendar extends Component {
                     key={3}
                 >
                     {
-                        this.state.monthes.map((monthWeeks, i) => {
+                        this.state.months.map((monthWeeks, i) => {
                             return (
                                 <div
                                     key={i}

@@ -58,7 +58,7 @@ h3 {
     height: 100%;
 }
 .scroll {
-    overflow-y: auto;
+    overflow-y: auto !important;
 }
 .page-content {
     background: #fff;
@@ -264,16 +264,6 @@ button.google-in {
         color: #ce4747;
     }
 
-    .note-wrapper .note-content {
-        border: none;
-        background: #222;
-        color: #eee;
-
-        .note-finish-checkbox {
-            filter: invert(1);
-        }
-    }
-
     input, textarea {
         color: #eee;
     }
@@ -322,9 +312,6 @@ button.google-in {
         &.pick {
             filter: invert(1);
         }
-        img {
-            filter: invert(1);
-        }
         &.text {
             color: #eee;
         }
@@ -357,6 +344,32 @@ button.google-in {
     .fast-add-wrapper {
         button img {
             filter: none;
+        }
+    }
+
+    .note-wrapper  {
+        .note-content {
+            border-color: #222;
+            background: #222;
+            color: #eee;
+
+            .note-finish-checkbox,
+            .repeat-identifier,
+            .notification-identifier,
+            .more-button img {
+                filter: invert(1);
+            }
+        }
+    }
+
+    .note-wrapper.sortable-chosen .note-content {
+        border-width: 2px;
+        border-color: #b4b4b4;
+    }
+
+    .profile-wrapper {
+        .log-out {
+            filter: invert(1);
         }
     }
 }

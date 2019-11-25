@@ -19,7 +19,7 @@ import SearchImg from "../../assets/img/search.svg";
 let buttons = {
     "daily-notes": [6, 5, 4, 0, 1],
     "notes": [6, 5, 4, 1],
-    "daily-add": [7, 2, 3],
+    "daily-add": [2, 7, 3],
     "add": [2, 3],
     "password": [],
     default: [2],                       
