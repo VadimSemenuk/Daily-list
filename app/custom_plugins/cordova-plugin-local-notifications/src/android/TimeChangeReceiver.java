@@ -41,7 +41,7 @@ public class TimeChangeReceiver extends BroadcastReceiver {
                 try {
                     JSONObject trigger = options.getTrigger();
 
-                    if (trigger.optLong("at", -1) != -1) {
+                    if (trigger.optLong("at", -1) != -1 && trigger.optInt("timezone-offset", -1) != -1) {
                         trigger.put("at", trigger.optLong("at", 0) + trigger.optInt("timezone-offset", 0) - TimeZone.getDefault().getRawOffset());
                     }
                     trigger.put("timezone-offset", TimeZone.getDefault().getRawOffset());
