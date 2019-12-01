@@ -9,6 +9,8 @@ let config = require("./server/config");
 let DB = require("./server/db");
 let passport = require("passport");
 let fs = require('fs');
+let aws = require('aws-sdk');
+aws.config.update({region: 'eu-central-1'});
 
 app.use(logger('dev'));
 app.use(bodyParser.json());

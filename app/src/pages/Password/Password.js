@@ -9,6 +9,7 @@ import md5 from "md5";
 import './Password.scss';
 import deviceService from "../../services/device.service";
 import apiService from "../../services/api.service";
+import {triggerLoader} from "../../actions";
 
 class Password extends Component {
 	constructor(props) {
@@ -45,7 +46,9 @@ class Password extends Component {
 
 	    let emailTo = this.props.user ? this.props.user.email : this.props.settings.passwordResetEmail;
 
+	    this.props.triggerLoader(true);
         let response = await apiService.post("local-password/reset", {lang: this.props.settings.lang, email: emailTo});
+        this.props.triggerLoader(false);
         let newPassword = await response.text();
         this.props.setSetting('password', newPassword);
         window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset").replace("{{email}}", emailTo));

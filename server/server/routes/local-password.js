@@ -1,7 +1,7 @@
 const router = require('express-promise-router')();
 const md5 = require('md5');
-const nodemailer = require('nodemailer');
 const config = require("../config");
+const email = require("../utils/email");
 
 module.exports = function () {
     router.post('/reset', async (req, res, next) => {
@@ -29,24 +29,12 @@ module.exports = function () {
             }
         }
 
-        let transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
-            auth: {
-                user: config.smtpUsername,
-                pass: config.smtpPassword
-            }
+        await email.send({
+            from: config.emailFrom,
+            to: [req.body.email],
+            subject: subject,
+            text: text,
         });
-
-        await transporter.sendMail(
-            {
-                from: config.emailFrom,
-                to: req.body.email,
-                subject: subject,
-                text: text,
-            }
-        );
 
         res.send(md5(newPassword));
     });
