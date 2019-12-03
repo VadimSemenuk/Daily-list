@@ -41,6 +41,10 @@ class BackupService {
                 }
             });
 
+        if (backupFile) {
+            backupFile.modifiedTime = moment(backupFile.modifiedTime);
+        }
+
         return backupFile;
     }
 
@@ -56,7 +60,12 @@ class BackupService {
             throw Error();
         }
 
-        return files.files;
+        return (files.files || []).map((file) => {
+            return {
+                ...file,
+                modifiedTime: moment(file.modifiedTime)
+            }
+        });
     }
 
     async uploadGDBackup(params) {
@@ -134,7 +143,7 @@ class BackupService {
                 oReq.setRequestHeader("Authorization", token.google.accessToken);
             }
             oReq.responseType = "blob";
-            oReq.onload = async function () {
+            oReq.onload = async () => {
                 let blob = oReq.response;
 
                 let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);

@@ -268,6 +268,10 @@ button.google-in {
         color: #eee;
     }
 
+    input {
+        border-bottom: 1px solid #ccc;
+    }
+
     ::placeholder {
         color: #eee;
     }
@@ -333,6 +337,11 @@ button.google-in {
                 border-bottom: none;
             }
         }
+
+        .removable-textarea-wrapper .remove-button,
+        .removable-text-checkbox-wrapper .remove-button {
+            filter: invert(1);
+        }
     }
 
     .color-item-wrapper.active {
@@ -369,6 +378,12 @@ button.google-in {
 
     .profile-wrapper {
         .log-out {
+            filter: invert(1);
+        }
+    }
+
+    .trash-list-page-content {
+        .restore-button {
             filter: invert(1);
         }
     }

@@ -18,7 +18,10 @@ export default class RemovableTextArea extends PureComponent {
                     onChange={this.onChange}
                     value={this.props.value}
                 />
-                <button onClick={this.props.onListItemRemove}>
+                <button
+                    className='remove-button'
+                    onClick={this.props.onListItemRemove}
+                >
                     <img
                         src={RemoveImg} 
                         alt="rm"

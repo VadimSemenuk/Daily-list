@@ -38,7 +38,9 @@ export default class App extends Component {
 
         setTimeout(() => window.cordova && navigator.splashscreen.hide());
 
-        logsService.logLoad(this.store.deviceId);
+        let state = this.store.getState();
+
+        logsService.logLoad(state.meta.deviceId);
         if (deviceService.hasNetworkConnection()) {
             logsService.uploadSavedErrorLogs();
             logsService.uploadSavedLoadLogs();
@@ -69,9 +71,6 @@ export default class App extends Component {
         authService.initAuthorizationToken();
         backupService.setDatabasesDirectory();
         this.store = initStore({settings, password, notes, date, user, meta});
-
-        this.deviceId = meta.deviceId;
-
 
         this.setState({isAppReady: true});
     }

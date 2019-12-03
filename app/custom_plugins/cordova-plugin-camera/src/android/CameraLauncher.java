@@ -300,7 +300,7 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
 
         // Specify file so that large image is captured and returned
         // File photo = createCaptureFile(encodingType);
-        File photo = new File(getPicturesPath()));
+        File photo = new File(getPicturesPath());
         this.imageUri = new CordovaUri(FileProvider.getUriForFile(cordova.getActivity(),
                 applicationId + ".provider",
                 photo));
@@ -499,7 +499,7 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
         // CB-5479 When this option is given the unchanged image should be saved
         // in the gallery and the modified image is saved in the temporary
         // directory
-        if (this.saveToPhotoAlbum) {
+        if (this.saveToPhotoAlbum && false) {
             galleryUri = Uri.fromFile(new File(getPicturesPath()));
 
             if (this.allowEdit && this.croppedUri != null) {
@@ -510,6 +510,10 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
             }
 
             refreshGallery(galleryUri);
+        }
+
+        if (this.saveToPhotoAlbum) {
+            refreshGallery(this.imageUri.getFileUri());
         }
 
         // If sending base64 image back
@@ -545,7 +549,7 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
                 // If we saved the uncompressed photo to the album, we can just
                 // return the URI we already created
                 if (this.saveToPhotoAlbum) {
-                    this.callbackContext.success(galleryUri.toString());
+                    this.callbackContext.success(this.imageUri.getFileUri().toString());
                 } else {
                     Uri uri = Uri.fromFile(createCaptureFile(this.encodingType, System.currentTimeMillis() + ""));
 
@@ -599,7 +603,7 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
             throw new IllegalStateException();
         }
 
-        this.cleanup(FILE_URI, this.imageUri.getFileUri(), galleryUri, bitmap);
+        // this.cleanup(FILE_URI, this.imageUri.getFileUri(), galleryUri, bitmap);
         bitmap = null;
     }
 
@@ -706,7 +710,7 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
                     (destType == FILE_URI || destType == NATIVE_URI) && !this.correctOrientation &&
                     mimeType != null && mimeType.equalsIgnoreCase(getMimetypeForFormat(encodingType)))
             {
-                this.callbackContext.success(uriString);
+                this.callbackContext.success(fileLocation);
             } else {
                 Bitmap bitmap = null;
                 try {

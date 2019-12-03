@@ -594,12 +594,12 @@ export function saveBackup() {
     return (dispatch, getState) => {
         let state = getState();
         if (state.user && state.user.settings.autoBackup) {
-            dispatch(uploadGDBackup("auto"));
+            dispatch(uploadGDBackupThrottled("auto"));
         }
     }
 }
 
-export let uploadGDBackup = throttleAction((actionType) => {
+export function uploadGDBackup(actionType) {
     return async (dispatch, getState) => {
         try {
             actionType === "user" && dispatch(triggerLoader(true));
@@ -621,7 +621,9 @@ export let uploadGDBackup = throttleAction((actionType) => {
             });
         }
     }
-}, 5000);
+}
+
+export let uploadGDBackupThrottled = throttleAction(uploadGDBackup, 30000);
 
 export function restoreGDBackup(file) {
     return async (dispatch, getState) => {

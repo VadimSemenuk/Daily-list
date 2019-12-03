@@ -70,8 +70,6 @@ class Note extends PureComponent {
                     className="tag"
                 ></div>
                 <div className="note-content">
-                    <div style={{fontSize: 12, color: '#ccc', position: 'absolute', top: 3, left: 3}}>{this.props.itemData.manualOrderIndex}</div>
-
                     <div className="note-header">
                         {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>}
                         {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
@@ -128,7 +126,7 @@ class Note extends PureComponent {
                                     />
                                 )
                             } else if (a && a.type === "snapshot") {
-                                if (this.state.expanded) {
+                                if (this.state.expanded || !this.props.settings.minimizeNotes) {
                                     return (
                                         <div key={i}
                                              className="attached-image-wrapper">

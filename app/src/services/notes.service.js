@@ -14,8 +14,25 @@ class NotesService {
             return [];
         }
 
-        if (mode === 1) {
+        let allNotesSelect = await executeSQL(`SELECT t.id, t.title, t.dynamicFields FROM Tasks t;`);
+        let filteredNotesIDs = [];
+        for(let i = 0; i < allNotesSelect.rows.length; i++) {
+            let item = allNotesSelect.rows.item(i);
 
+            if (item.title && item.title.toLowerCase().includes(search)) {
+                filteredNotesIDs.push(item.id);
+                continue;
+            }
+
+            if (item.dynamicFields && item.dynamicFields.toLowerCase().includes(search)) {
+                let dynamicFields = JSON.parse(item.dynamicFields);
+                if (dynamicFields.some((f) => f.value && f.value.toLowerCase().includes(search))) {
+                    filteredNotesIDs.push(item.id);
+                }
+            }
+        }
+
+        if (mode === 1) {
             let msCurrentDate = moment().startOf("day").valueOf();
 
             let select = await executeSQL(
@@ -24,38 +41,24 @@ class NotesService {
                         (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
                         FROM Tasks t
                         WHERE
-                            (t.title LIKE ? OR t.dynamicFields LIKE ?)
+                            t.id IN (${filteredNotesIDs.join(',')})
                             AND ${repeatType === 'no-repeat' ? `(t.repeatType == 'no-repeat' OR t.repeatType == 'any')` : `((t.repeatType == 'week' OR t.repeatType == 'day') AND t.forkFrom == -1)`}
                             AND t.mode == 1
                             AND t.lastAction != 'DELETE'
                             AND t.lastAction != 'CLEAR'
-                        ORDER BY t.added`,
-                [`%${search}%`, `%${search}%`]
+                        ORDER BY t.added`
             );
 
             if (!select.rows.length) {
                 return [];
             }
 
-            let filteredNotes = [];
-            for(let i = 0; i < select.rows.length; i++) {
-                let item = select.rows.item(i);
-                let dynamicFields = JSON.parse(item.dynamicFields);
-
-                if (
-                    (item.title && item.title.toLowerCase().includes(search))
-                    || (dynamicFields.some((f) => f.value && f.value.toLowerCase().includes(search)))
-                ) {
-                    filteredNotes.push(item);
-                }
-            }
-
             let notes = [];
             let closestToCurrentDateNoteDateDiff = null;
             let closestToCurrentDateNoteIndex = 0;
             let closestToCurrentDate = null;
-            for(let i = 0; i < filteredNotes.length; i++) {
-                let item = filteredNotes[i];
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
 
                 let nextItem = {
                     ...item,
@@ -110,29 +113,15 @@ class NotesService {
                         t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode
                         FROM Tasks t
                         WHERE
-                            (t.title LIKE ? OR t.dynamicFields LIKE ?)
+                            t.id IN (${filteredNotesIDs.join(',')})
                             AND t.mode == 2
                             AND t.lastAction != 'DELETE'
-                            AND t.lastAction != 'CLEAR';`,
-                [`%${search}%`, `%${search}%`]
+                            AND t.lastAction != 'CLEAR';`
             );
 
             let notes = [];
-            let filteredNotes = [];
             for(let i = 0; i < select.rows.length; i++) {
                 let item = select.rows.item(i);
-                let dynamicFields = JSON.parse(item.dynamicFields);
-
-                if (
-                    (item.title && item.title.toLowerCase().includes(search))
-                    || (dynamicFields.some((f) => f.value && f.value.toLowerCase().includes(search)))
-                ) {
-                    filteredNotes.push(item);
-                }
-            }
-
-            for(let i = 0; i < filteredNotes.length; i++) {
-                let item = filteredNotes[i];
 
                 let nextItem = {
                     ...item,
@@ -239,8 +228,6 @@ class NotesService {
         if (mode === 1 && dateNotes.length === 1) {
             return dateNotes[0];
         }
-
-        console.log(dateNotes);
 
         return dateNotes;
     }

@@ -32,7 +32,10 @@ export default class RemovableTextCheckBox extends PureComponent {
                     className={`content-input${this.props.value ? " crossed" : ""}`}
                     onKeyPress={this.onKeyPress}
                 />
-                <button onClick={this.onListItemRemove}>
+                <button
+                    className='remove-button'
+                    onClick={this.onListItemRemove}
+                >
                     <img
                         src={RemoveImg} 
                         alt="rm"

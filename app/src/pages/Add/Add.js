@@ -165,13 +165,9 @@ class Add extends Component {
             {
                 sourceType,
                 saveToPhotoAlbum: true,
-                quality: 50,
+                quality: 100,
                 destinationType: window.navigator.camera.DestinationType.FILE_URI,
-                encodingType: window.navigator.camera.EncodingType.JPEG,
                 mediaType: window.navigator.camera.MediaType.PICTURE,
-                correctOrientation: true,
-                targetHeight: 3000,
-                targetWidth: 3000
             }
         );
     };
