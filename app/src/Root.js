@@ -3,7 +3,11 @@ import {HashRouter, Route, Redirect} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import * as AppActions from './actions'; 
+import * as AppActions from './actions';
+
+import timezoneService from './services/timezone.service';
+import noteService from './services/notes.service';
+import deviceService from './services/device.service';
 
 import NotesList from './pages/NotesList/NotesList';
 import Add from './pages/Add/Add';
@@ -16,18 +20,148 @@ import SettingsBackup from './pages/Backup/SettingsBackup';
 import About from './pages/About/About';
 import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
+import Radio from "./components/Radio/Radio";
+
+let timezones = [{
+    name: '-12',
+    val: -12
+}, {
+    name: '-11',
+    val: -11
+}, {
+    name: '-10',
+    val: -10
+}, {
+    name: '-9.30',
+    val: -9.50
+}, {
+    name: '-9',
+    val: -9
+}, {
+    name: '-8',
+    val: -8
+}, {
+    name: '-7',
+    val: -7
+}, {
+    name: '-6',
+    val: -6
+}, {
+    name: '-5',
+    val: -5
+}, {
+    name: '-4',
+    val: -4
+}, {
+    name: '-3.30',
+    val: -3.50
+}, {
+    name: '-3',
+    val: -3
+}, {
+    name: '-2',
+    val: -2
+}, {
+    name: '-1',
+    val: -1
+}, {
+    name: '0',
+    val: 0
+}, {
+    name: '+1',
+    val: 1
+}, {
+    name: '+2',
+    val: 2
+}, {
+    name: '+3',
+    val: 3
+}, {
+    name: '+3.30',
+    val: 3.50
+}, {
+    name: '+4',
+    val: 4
+}, {
+    name: '+4.30',
+    val: 4.50
+}, {
+    name: '+5',
+    val: 5
+}, {
+    name: '+5.30',
+    val: 5.50
+}, {
+    name: '+5.45',
+    val: 5.75
+}, {
+    name: '+6',
+    val: 6
+}, {
+    name: '+6.30',
+    val: 6.50
+}, {
+    name: '+7',
+    val: 7
+}, {
+    name: '+8',
+    val: 8
+}, {
+    name: '+8.45',
+    val: 8.75
+}, {
+    name: '+9',
+    val: 9
+}, {
+    name: '+9.30',
+    val: 9.50
+}, {
+    name: '+10',
+    val: 10
+}, {
+    name: '+10.30',
+    val: 10.50
+}, {
+    name: '+11',
+    val: 11
+}, {
+    name: '+12',
+    val: 12
+}, {
+    name: '+12.45',
+    val: 12.75
+}, {
+    name: '+13',
+    val: 13
+}, {
+    name: '+14',
+    val: 14
+}];
 
 class Root extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { }
+        this.state = {
+            isTimezoneDialogOpen: false,
+            selectedTimezone: null
+        }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.setKeyoardEvents();
 
-        Modal.init();    
+        Modal.init();
+
+        let isPreviousTimezoneProcessed = await deviceService.isPreviousTimezoneProcessed();
+        if (!isPreviousTimezoneProcessed) {
+            let hasNotes = await noteService.hasNotes();
+            if (hasNotes) {
+                this.setState({
+                    isTimezoneDialogOpen: true
+                })
+            }
+        }
     }
 
     setKeyoardEvents() {
@@ -44,7 +178,22 @@ class Root extends Component {
             }, 100);           
         });
     }
-       
+
+    closeDialog = () => {
+        this.setState({
+            isTimezoneDialogOpen: false
+        })
+    }
+
+    onTimezoneSelect = (timezone) => {
+        this.closeDialog();
+        this.setState({
+            selectedTimezone: timezone
+        })
+
+        timezoneService.processDefaultTimezone(timezone * 60);
+    }
+
     render() {
         return (
             <HashRouter>
@@ -102,6 +251,27 @@ class Root extends Component {
                         component={About} 
                     />                                              
                     <Loader />
+
+                    <Modal
+                        isOpen={this.state.isTimezoneDialogOpen}
+                        onRequestClose={this.closeDialog}
+                    >
+                        Выберете предыдущий часовой пояс
+                        <div className="radio-group">
+                            {
+                                timezones.map((timezone, i) => (
+                                    <Radio
+                                        key={i}
+                                        name="timezone"
+                                        checked={this.state.selectedTimezone === timezone.val}
+                                        value={timezone.val}
+                                        onChange={(e) => this.onTimezoneSelect(e)}
+                                        text={'UTC ' + timezone.name}
+                                    />
+                                ))
+                            }
+                        </div>
+                    </Modal>
                 </div>
             </HashRouter>
         );

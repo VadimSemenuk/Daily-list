@@ -416,6 +416,11 @@ class NotesService {
     getRepeatTypeOptions() {
         return [...repeatOptions]
     }
+
+    async hasNotes() {
+        let select = await executeSQL(`SELECT id FROM Tasks WHERE id > 1;`);
+        return Boolean(select.rows.length);
+    }
 }
 
 let noteService = new NotesService();

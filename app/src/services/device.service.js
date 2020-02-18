@@ -21,6 +21,11 @@ class DeviceService {
             body: JSON.stringify({deviceId})        
         }).catch((err) => console.warn(err))
     }
+
+    async isPreviousTimezoneProcessed() {
+        let select = (await executeSQL(`select savedTimezone, isPreviousTimezoneProcessed from MetaInfo;`)).rows;
+        return select.item(0).isPreviousTimezoneProcessed;
+    }
 }
 
 let deviceService = new DeviceService();

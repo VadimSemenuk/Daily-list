@@ -16,6 +16,7 @@ import migration from './db/migration/migration';
 import settingsService from "./services/settings.service";
 import themesService from "./services/themes.service";
 import deviceService from "./services/device.service";
+import timezoneService from "./services/timezone.service";
 
 let store;
 let i18n;
@@ -39,7 +40,10 @@ export default class App extends Component {
             await new Promise((resolve) => document.addEventListener("deviceready", resolve, false));
         }
 
-        await this.initDb();       
+        await this.initDb();
+
+        await timezoneService.processTimezone();
+
         let settings = await this.initSettings();
         store = await initStore(settings);
 
