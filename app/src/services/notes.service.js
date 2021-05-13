@@ -3,6 +3,7 @@ import moment from 'moment';
 import uuid from "uuid/v1";
 import notificationService from "./notification.service";
 import getUTCOffset from "../utils/getUTCOffset";
+import {NoteMode} from "../constants";
 
 window.e = executeSQL;
 
@@ -155,7 +156,7 @@ class NotesService {
                 dates.map((date) => {
                     let msDateUTC = date.valueOf() + getUTCOffset();
                     return executeSQL(
-                        `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
+                        `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag,
                         t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
                         (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
                         FROM Tasks t
@@ -178,7 +179,7 @@ class NotesService {
                         [msDateUTC, msDateUTC, date.isoWeekday(), msDateUTC]
                     );
                 })
-            )
+            );
         } else {
             dates = [moment().startOf("day")];
             selects = await Promise.all(

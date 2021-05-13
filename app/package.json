@@ -17,7 +17,6 @@
     "case-sensitive-paths-webpack-plugin": "2.1.2",
     "chalk": "2.4.1",
     "com-sarriaroman-photoviewer": "^1.2.2",
-    "cordova-android": "^7.1.1",
     "cordova-launch-review": "^3.1.1",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-camera": "file:custom_plugins/cordova-plugin-camera",
@@ -174,5 +173,8 @@
       "cordova-plugin-local-notification": {},
       "cordova-plugin-camera": {}
     }
+  },
+  "devDependencies": {
+    "cordova-android": "^9.1.0"
   }
 }

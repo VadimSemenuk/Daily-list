@@ -1,7 +1,7 @@
-function password (state = false, action) {
+function password (state = true, action) {
     switch(action.type) {   
-        case 'SET_VALID':
-            return true
+        case 'SET_PASSWORD_CHECK_STATE':
+            return action.payload.value
         default:        
             return state;
     }

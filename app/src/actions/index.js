@@ -3,9 +3,11 @@ import settingsService from "../services/settings.service";
 import calendarService from "../services/calendar.service";
 import authService from "../services/auth.service";
 import backupService from "../services/backup.service";
+import logsService from "../services/logs.service";
 
 import {throttleAction} from "../utils/throttle";
-import logsService from "../services/logs.service";
+
+import {NotesScreenMode} from "./../constants";
 
 // notes
 export function addNote(note) {
@@ -87,10 +89,10 @@ export function updateNoteDynamicFields(note, updatedState) {
             let updatedNote = await notesService.updateNoteDynamicFields(note, updatedState);
 
             dispatch({
-                type: "UPDATE_NOTE",
+                type: "UPDATE_NOTE_DYNAMIC_FIELDS",
                 payload: {
                     note: updatedNote,
-                    inserted: note.isShadow && !updatedNote.isShadow
+                    realFromShadow: note.isShadow && !updatedNote.isShadow
                 }
             });
 
@@ -129,7 +131,7 @@ export function updateNoteDate(note, nextDate) {
             let updatedNote = await notesService.updateNoteDate(note, nextDate);
 
             dispatch({
-                type: "UPDATE_NOTE",
+                type: "UPDATE_NOTE_DYNAMIC_FIELDS",
                 payload: {
                     note: updatedNote
                 }
@@ -301,9 +303,9 @@ export function updateNotesManualSortIndex(notes) {
 
             let insertedNotes = await notesService.updateNotesManualSortIndex(notes);
             dispatch({
-                type: "UPDATE_NOTE",
+                type: "UPDATE_NOTE_DYNAMIC_FIELDS",
                 payload: {
-                    notes: insertedNotes.map((insertedNote) => ({note: insertedNote, inserted: true}))
+                    notes: insertedNotes.map((insertedNote) => ({note: insertedNote, realFromShadow: true}))
                 }
             });
         } catch(err) {
@@ -327,7 +329,7 @@ export function updateNotes() {
             let state = getState();
 
             let dates = null;
-            if (state.settings.notesScreenMode === 1) {
+            if (state.settings.notesScreenMode === NotesScreenMode.WithTime) {
                 dates = state.notes.map((n) => n.date);
             }
 
@@ -438,9 +440,12 @@ export function setSetting(settingName, value, fn) {
 }
 
 // password
-export function setPasswordValid() {
+export function setPasswordCheckState(value) {
     return {
-        type: "SET_VALID"
+        type: "SET_PASSWORD_CHECK_STATE",
+        payload: {
+            value: true
+        }
     }
 }
 

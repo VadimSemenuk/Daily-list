@@ -11,15 +11,17 @@ import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
 import Fab from '../../components/Fab/Fab';
 import NotesList from "./NotesList";
+import Modal from "../../components/Modal/Modal";
+import {ButtonListItem} from "../../components/ListItem/ListItem";
 
 import * as AppActions from '../../actions'; 
 
 import sliderChangeSide from "../../utils/sliderChangeSide";
 import deepCopyObject from "../../utils/deepCopyObject";
 
+import {NotesScreenMode} from "../../constants";
+
 import './Notes.scss';
-import Modal from "../../components/Modal/Modal";
-import {ButtonListItem} from "../../components/ListItem/ListItem";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -52,7 +54,7 @@ class Notes extends PureComponent {
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
-        if (side === "left") {    
+        if (side === "left") {
             let nextDate = moment(this.props.currentDate).add(-1, "day");
             this.props.updateDatesAndNotes(
                 nextDate,
@@ -72,7 +74,7 @@ class Notes extends PureComponent {
     };
 
     setDate = (date) => {
-        if (this.props.settings.notesScreenMode === 2) {
+        if (this.props.settings.notesScreenMode === NotesScreenMode.WithoutTime) {
             return;
         }
 
@@ -180,13 +182,13 @@ class Notes extends PureComponent {
         return (
             <div className="page-wrapper">
                 <Header
-                    page={(this.props.settings.notesScreenMode === 1) ? "daily-notes" : "notes"}
+                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithTime) ? "daily-notes" : "notes"}
                     onCalendarRequest={this.triggerCalendar}
                     onSelectToday={this.onTodaySelect}
                 />
                 <div className="notes-list-wrapper page-content">
                     {   
-                        (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 1) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) && (this.props.settings.calendarMode === 1) &&
                         <LightCalendar
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
                             currentDate={this.props.currentDate}
@@ -194,7 +196,7 @@ class Notes extends PureComponent {
                         />
                     }
                     {
-                        (this.props.settings.notesScreenMode === 1) && (this.props.settings.calendarMode === 2) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) && (this.props.settings.calendarMode === 2) &&
                         <Calendar 
                             currentDate={this.props.currentDate}
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
@@ -203,7 +205,7 @@ class Notes extends PureComponent {
                         />
                     }
                     {
-                        (this.props.settings.notesScreenMode === 2) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithoutTime) &&
                         <div className="notes-list-swiper">
                             <div>
                                 <div
@@ -224,7 +226,7 @@ class Notes extends PureComponent {
                         </div>
                     }
                     {
-                        (this.props.settings.notesScreenMode === 1) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
                         <ReactSwipe
                             ref={node => {
                                 if (node) {
@@ -280,7 +282,7 @@ class Notes extends PureComponent {
                     {
                         this.state.isListItemDialogVisible &&
                         (this.state.listItemDialogData.note.repeatType === "no-repeat") &&
-                        (this.props.settings.notesScreenMode === 1) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
                         <ButtonListItem
                             className="no-border"
                             text={t("move-tomorrow")}
@@ -365,7 +367,7 @@ function sort (data, settings) {
 
 function getNotesCompareFn(settings) {
     if (settings.sortType === 0) {
-        if (settings.notesScreenMode === 1) {
+        if (settings.notesScreenMode === NotesScreenMode.WithTime) {
             return (a, b) => {
                 let aDayTimeSum = a.startTime ?
                     (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())

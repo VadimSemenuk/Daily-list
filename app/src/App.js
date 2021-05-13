@@ -20,6 +20,8 @@ import authService from "./services/auth.service";
 import logsService from "./services/logs.service";
 import backupService from "./services/backup.service";
 
+import {NotesScreenMode} from "./constants";
+
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -65,7 +67,7 @@ export default class App extends Component {
         let date = moment().startOf("day");
         let notes = await notesService.getNotes(
             settings.notesScreenMode,
-            settings.notesScreenMode === 1 ? [moment(date).add(-1, "day"), moment(date), moment(date).add(1, "day")] : null
+            settings.notesScreenMode === NotesScreenMode.WithTime ? [moment(date).add(-1, "day"), moment(date), moment(date).add(1, "day")] : null
         );
         let user = authService.getUser();
         authService.initAuthorizationToken();

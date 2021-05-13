@@ -1,5 +1,6 @@
 .vscode/
 .idea/
+TODO.txt
 
 server/node_modules/
 server/.env
@@ -10,3 +11,4 @@ app/plugins
 app/screenshots
 app/www
 app/vadimKeystore.keystore
+app/encrypted_private_key_path

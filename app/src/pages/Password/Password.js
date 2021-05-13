@@ -31,7 +31,7 @@ class Password extends Component {
 	    let value = e.target.value;
 
         if (this.validatePassword(value)) {
-            await this.props.setPasswordValid();
+            await this.props.setPasswordCheckState(true);
             this.props.history.replace("/");
         } else {
             this.setState({password: e.target.value});

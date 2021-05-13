@@ -12,6 +12,8 @@ import {throttle} from "../../utils/throttle";
 
 import * as AppActions from '../../actions';
 
+import {NotesScreenMode} from "../../constants";
+
 import './NotesSearch.scss';
 
 class NotesSearch extends PureComponent {
@@ -123,7 +125,7 @@ class NotesSearch extends PureComponent {
                 <Header page="search"/>
                 <div className="search-notes-wrapper page-content">
                     {
-                        this.props.settings.notesScreenMode === 1 &&
+                        this.props.settings.notesScreenMode === NotesScreenMode.WithTime &&
                         <div className={'search-mode-select-wrapper theme-header-background theme-header-border'}>
                             <span>Показать: </span>
                             <button
@@ -154,7 +156,7 @@ class NotesSearch extends PureComponent {
                                              className={"date-item"}
                                              data-is-closest-to-current-date={item.isClosestToCurrentDate}>
                                             {
-                                                this.state.searchRepeatType === "no-repeat" && this.props.settings.notesScreenMode === 1 && <div className={"date-item-date"}>{item.date.format("DD MMM YYYY")}</div>
+                                                this.state.searchRepeatType === "no-repeat" && this.props.settings.notesScreenMode === NotesScreenMode.WithTime && <div className={"date-item-date"}>{item.date.format("DD MMM YYYY")}</div>
                                             }
                                             {
                                                 item.items.map(this.renderItem)

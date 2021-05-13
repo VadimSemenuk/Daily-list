@@ -22,6 +22,8 @@ import AddGeryImg from '../../assets/img/add-grey.svg';
 
 import deepCopy from '../../utils/deepCopyObject'
 
+import {NotesScreenMode} from "../../constants";
+
 import './Add.scss';
 
 class Add extends Component {
@@ -226,7 +228,7 @@ class Add extends Component {
         return (
             <div className="page-wrapper">
                 <Header
-                    page={(this.props.settings.notesScreenMode === 1) ? "daily-add" : "add"}
+                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithTime) ? "daily-add" : "add"}
                     onSubmit={this.onSubmit}
                     onCalendarRequest={this.triggerCalendar}
                     currentDate={this.state.added}
@@ -362,11 +364,11 @@ class Add extends Component {
                         </div>
                     </div>
                     <div 
-                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === 1 ? "" : " minified"}`}
+                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === NotesScreenMode.WithTime ? "" : " minified"}`}
                         style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
                     >
                         {
-                            (this.props.settings.notesScreenMode === 1) &&
+                            (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
                             <div
                                 className="toggle-icon-wrapper"
                                 onClick={() => this.setState({addAdditioanlsViewHidden: !this.state.addAdditioanlsViewHidden})}
@@ -376,7 +378,7 @@ class Add extends Component {
                         }
 
                         {
-                            (this.props.settings.notesScreenMode === 1) &&
+                            (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
                             <TimeSet
                                 notificate={this.state.notificate}
                                 startTime={this.state.startTime}
@@ -391,7 +393,7 @@ class Add extends Component {
                         }
 
                         {
-                            (this.props.settings.notesScreenMode === 1) &&
+                            (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
                             <ModalListItem
                                 className="tiny priority-select"
                                 text={t("priority")}

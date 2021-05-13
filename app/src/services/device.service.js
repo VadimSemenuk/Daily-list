@@ -8,16 +8,19 @@ class DeviceService {
             SELECT deviceId, isRateDialogShowed, appInstalledDate
             FROM MetaInfo;
         `);
+
+        let meta = {};
+
         if (select.rows) {
             let metaInfo = select.rows.item(0);
-            return {
+            meta = {
                 deviceId: metaInfo.deviceId,
                 isRateDialogShowed: Boolean(metaInfo.isRateDialogShowed),
                 appInstalledDate: moment(metaInfo.appInstalledDate)
             }
-        } else {
-            return {}
         }
+
+        return meta;
     }
 
     hasNetworkConnection() {

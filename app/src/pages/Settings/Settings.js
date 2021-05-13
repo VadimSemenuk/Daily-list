@@ -9,6 +9,8 @@ import * as AppActions from '../../actions';
 import Header from '../../components/Header/Header';
 import {InsetListItem, ButtonListItem} from "../../components/ListItem/ListItem";
 
+import {NotesScreenMode} from "../../constants";
+
 import './Settings.scss';
 import externalLink from "../../assets/img/external-link.svg";
 
@@ -21,10 +23,10 @@ class Settings extends Component {
                 <Header title={t("settings")} />
                 <div className="scroll page-content padding">
                     <ButtonListItem
-                        text={t(this.props.settings.notesScreenMode === 1 ? "show-notes-screen" : "show-daily-notes-screen")}
+                        text={t(this.props.settings.notesScreenMode === NotesScreenMode.WithTime ? "show-notes-screen" : "show-daily-notes-screen")}
                         img={externalLink}
                         onClick={() => {
-                            let nextNotesScreenMode = this.props.settings.notesScreenMode === 1 ? 2 : 1;
+                            let nextNotesScreenMode = this.props.settings.notesScreenMode === NotesScreenMode.WithTime ? NotesScreenMode.WithoutTime : NotesScreenMode.WithTime;
                             this.props.setSetting("notesScreenMode", nextNotesScreenMode);
                             setTimeout(() => {
                                 let msCurDate = moment().startOf("day");
@@ -47,16 +49,20 @@ class Settings extends Component {
                         text={t("backup")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/backup`)}
                     />
-                    <InsetListItem 
-                        text={this.props.settings.password === null ? t("add-pass") : t("remove-pass")}
-                        onClick={() => {
-                            if (this.props.settings.password === null) {
-                                this.props.history.push(`${this.props.match.url}/password`);
-                            } else {
-                                this.props.setSetting('password', null);
-                            }
-                        }}
-                    />
+                    {
+                        this.props.settings.password === null &&
+                        <InsetListItem
+                            text={t("add-pass")}
+                            onClick={() => this.props.history.push(`${this.props.match.url}/password`)}
+                        />
+                    }
+                    {
+                        this.props.settings.password !== null &&
+                        <InsetListItem
+                            text={t("remove-pass")}
+                            onClick={() => this.props.setSetting('password', null)}
+                        />
+                    }
                     <InsetListItem 
                         text={t("trash")}
                         onClick={() => this.props.history.push(`/trash`)}

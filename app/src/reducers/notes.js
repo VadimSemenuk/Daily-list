@@ -1,20 +1,5 @@
 let init = [];
 
-function receiveSingleNote(state, note) {
-    let assignFn = (list) => ({
-        date: list.date, 
-        items: [...list.items, note] 
-    });
-    let fn = (list) => {
-        if (list.date.valueOf() === note.added.valueOf()) {
-            return assignFn(list)
-        }
-        return list
-    };
-
-    return state.map(fn);    
-}
-
 function receiveNote(state, note) {
     delete note.prevNote;
 
@@ -80,47 +65,54 @@ function notes (state = init, action) {
         case 'UPDATE_NOTE': {
             let startState = null;
 
-            if (action.payload.prevNote) {
-                if (action.payload.prevNote.repeatType === "no-repeat") {
-                    startState = state.map((list) => {
-                        return {...list, items: list.items.filter((note) => note.key !== action.payload.note.key)}
+            if (action.payload.prevNote.repeatType === "no-repeat") {
+                startState = state.map((list) => {
+                    return {...list, items: list.items.filter((note) => note.key !== action.payload.note.key)}
+                });
+            } else {
+                startState = state.map((list) => {
+                    return {...list, items: list.items.filter((note) => (
+                        (note.key !== action.payload.note.key) &&
+                        (note.forkFrom !== action.payload.note.key)
+                    ))}
+                });
+            }
+
+            return receiveNote(startState, action.payload.note);
+        }
+        case 'UPDATE_NOTE_DYNAMIC_FIELDS': {
+            let nextState = state.slice();
+
+            let actions = action.payload.notes ? action.payload.notes : [action.payload];
+
+            actions.forEach((action) => {
+                if (action.realFromShadow) {
+                    let noteToFilterDate = action.note.added.valueOf();
+
+                    nextState = nextState.map((list) => {
+                        if (list.date.valueOf() === noteToFilterDate) {
+                            return {...list, items: list.items.filter((note) => note.key !== action.note.forkFrom)}
+                        }
+                        return list;
                     });
                 } else {
-                    startState = state.map((list) => {
-                        return {...list, items: list.items.filter((note) => (
-                            (note.key !== action.payload.note.key) &&
-                            (note.forkFrom !== action.payload.note.key)
-                        ))}
+                    nextState = nextState.map((list) => {
+                        return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
                     });
                 }
 
-                return receiveNote(startState, action.payload.note);
-            } else {
-                let actions = action.payload.notes ? action.payload.notes : [action.payload];
-
-                let nextState = state.slice();
-
-                actions.forEach((action) => {
-                    if (action.inserted) {
-                        let noteToFilterDate = action.note.added.valueOf();
-
-                        startState = nextState.map((list) => {
-                            if (list.date.valueOf() === noteToFilterDate) {
-                                return {...list, items: list.items.filter((note) => note.key !== action.note.forkFrom)}
-                            }
-                            return list
-                        });
-                    } else {
-                        startState = nextState.map((list) => {
-                            return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
-                        });
+                nextState = nextState.map((list) => {
+                    if (list.date.valueOf() === action.note.added.valueOf()) {
+                        return {
+                            date: list.date,
+                            items: [...list.items, action.note]
+                        }
                     }
+                    return list;
+                });
+            });
 
-                    nextState = receiveSingleNote(startState, action.note);
-                })
-
-                return nextState;
-            }
+            return nextState;
         }
         case 'DELETE_NOTE': {
             return state.map((list) => {

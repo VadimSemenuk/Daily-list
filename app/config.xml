@@ -51,5 +51,4 @@
     <plugin name="cordova-plugin-googleplus" spec="^7.0.0">
         <variable name="PLAY_SERVICES_VERSION" value="11.8.0" />
     </plugin>
-    <engine name="android" spec="^7.1.1" />
 </widget>
