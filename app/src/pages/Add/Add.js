@@ -41,7 +41,6 @@ class Add extends Component {
             finished: false,
             repeatType: "no-repeat",
             repeatDates: [],
-            priority: 2,
             mode: this.props.settings.notesScreenMode,
 
             calendar: false,
@@ -222,8 +221,6 @@ class Add extends Component {
 
     render() {
         let {t} = this.props;
-        let priorityOptions = notesService.getPriorityOptions();
-        let selectedPriorityOption = priorityOptions.find((a) => a.val === this.state.priority);
 
         return (
             <div className="page-wrapper">
@@ -390,31 +387,6 @@ class Add extends Component {
                                 mode={this.props.match.path === "/edit" ? "edit" : "add"}
                                 onStateChange={(time) => this.setState({...time})}
                             />
-                        }
-
-                        {
-                            (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
-                            <ModalListItem
-                                className="tiny priority-select"
-                                text={t("priority")}
-                                value={t(selectedPriorityOption.translateId)}
-                                listItem={ValueListItem}
-                            >
-                                <div className="radio-group">
-                                    {
-                                        priorityOptions.map((setting, i) => (
-                                            <Radio
-                                                key={i}
-                                                name="repeat-type"
-                                                checked={this.state.priority === setting.val}
-                                                value={setting.val}
-                                                onChange={(val) => this.setState({priority: +val})}
-                                                text={t(setting.translateId)}
-                                            />
-                                        ))
-                                    }
-                                </div>
-                            </ModalListItem>
                         }
 
                         <ColorPicker 

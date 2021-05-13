@@ -96,14 +96,6 @@ class Note extends PureComponent {
                         }
                     </div>
                     <div className="title-wrapper">
-                        {
-                            this.props.itemData.priority !== 2 &&
-                            <div className="priority-label">
-                                {this.props.itemData.priority === 1 && <div className="arrow bottom green"></div>}
-                                {this.props.itemData.priority === 3 && <div className="arrow top blue"></div>}
-                                {this.props.itemData.priority === 4 && <div className="arrow top red"></div>}
-                            </div>
-                        }
                         {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
                     </div>
                     {

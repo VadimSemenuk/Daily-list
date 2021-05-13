@@ -26,7 +26,6 @@ export default {
     "notes-show-interval": "Display for the period",
     "notes-show-interval-week": "Week",
     "notes-show-interval-day": "Day",
-    "priority-sort": "Sort by priority",
 
     // interface page
     "theme": "Theme",
@@ -143,11 +142,6 @@ export default {
     "update-all": "Update all",
     "update-shadow": "Update only not touched",
     "specify-btn": "Select",
-    "priority": "Priority",
-    "priority-very-high": "Very high",
-    "priority-high": "High",
-    "priority-medium": "Medium",
-    "priority-low": "Low",
     "error-note-add": "Failed to add a note",
     "error-note-update": "Failed to update a note",
     "error-note-delete": "Failed to delete a note",

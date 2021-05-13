@@ -26,7 +26,6 @@ export default {
     "notes-show-interval": "Отображать за период",
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
-    "priority-sort": "Сортировать по приоритету",
 
     // interface page
     "theme": "Тема",
@@ -143,11 +142,6 @@ export default {
     "update-all": "Обновить все",
     "update-shadow": "Обновить только не затронутые",
     "specify-btn": "Указать",
-    "priority": "Приоритет",
-    "priority-very-high": "Очень высокий",
-    "priority-high": "Высокий",
-    "priority-medium": "Средний",
-    "priority-low": "Низкий",
     "error-note-add": "Не удалось добавить заметку",
     "error-note-update": "Не удалось обновить заметку",
     "error-note-delete": "Не удалось удалить заметку",

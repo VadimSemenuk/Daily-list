@@ -3,7 +3,7 @@ import moment from 'moment';
 import uuid from "uuid/v1";
 import notificationService from "./notification.service";
 import getUTCOffset from "../utils/getUTCOffset";
-import {NoteMode} from "../constants";
+import {NoteActions, NoteMode} from "../constants";
 
 window.e = executeSQL;
 
@@ -38,7 +38,7 @@ class NotesService {
 
             let select = await executeSQL(
                 `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
                         (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
                         FROM Tasks t
                         WHERE
@@ -111,7 +111,7 @@ class NotesService {
         } else {
             let select = await executeSQL(
                 `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode
                         FROM Tasks t
                         WHERE
                             t.id IN (${filteredNotesIDs.join(',')})
@@ -157,7 +157,7 @@ class NotesService {
                     let msDateUTC = date.valueOf() + getUTCOffset();
                     return executeSQL(
                         `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag,
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
                         (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
                         FROM Tasks t
                         LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
@@ -186,7 +186,7 @@ class NotesService {
                 dates.map((date) => {
                     return executeSQL(
                         `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.priority, t.added, t.manualOrderIndex, t.repeatDate, t.mode
+                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode
                         FROM Tasks t
                         WHERE
                             t.mode == 2
@@ -233,25 +233,15 @@ class NotesService {
         return dateNotes;
     }
 
-    async getNotesByDates(dates) {
-        let tasks = dates.map((a) => this.getNotes(a));
-        return Promise.all(tasks);
-    }
-
     async addNote(note) {
         let noteToLocalInsert = {
             ...note,
-            lastAction: "ADD",
-            userId: 1,
-            isLastActionSynced: 0,
-            isSynced: 0,
+            lastAction: NoteActions.ADD,
             uuid: uuid(),
             lastActionTime: moment().valueOf(),
             forkFrom: -1,
             repeatDate: -1
         };
-
-        noteToLocalInsert.priority = noteToLocalInsert.priority || 2;
 
         let addedNote = await this.insertNote(noteToLocalInsert);
         await this.setNoteRepeat(addedNote);
@@ -267,8 +257,8 @@ class NotesService {
         let insert = await executeSQL(
             `INSERT INTO Tasks
             (uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
-                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, priority, repeatDate, mode, utcOffset)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, repeatDate, mode, utcOffset)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.uuid,
                 note.title,
@@ -286,7 +276,6 @@ class NotesService {
                 Number(note.finished),
                 isShadow ? -1 : note.added.valueOf() + getUTCOffset(),
                 note.forkFrom,
-                note.priority,
                 note.repeatDate,
                 note.mode,
                 getUTCOffset()
@@ -356,12 +345,10 @@ class NotesService {
         nextNote.finished = false;
         nextNote.repeatDate = -1;
 
-        nextNote.priority = nextNote.priority || 2;
-
         await executeSQL(
             `UPDATE Tasks
             SET title = ?, added = ?, startTime = ?, endTime = ?, notificate = ?, tag = ?, 
-                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0, priority = ?, utcOffset = ?
+                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0, utcOffset = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -374,7 +361,6 @@ class NotesService {
                 nextNote.lastActionTime,
                 nextNote.repeatType,
                 JSON.stringify(nextNote.dynamicFields),
-                nextNote.priority,
                 getUTCOffset(),
                 nextNote.key,
             ]
@@ -477,7 +463,7 @@ class NotesService {
     async getDeletedNotes() {
         let select = await executeSQL(
             `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
-            t.dynamicFields, t.finished, t.forkFrom, t.priority, t.lastActionTime
+            t.dynamicFields, t.finished, t.forkFrom, t.lastActionTime
             FROM Tasks t
             WHERE t.lastAction = 'DELETE' AND
             t.forkFrom = -1
@@ -634,13 +620,6 @@ class NotesService {
         { val: 7, translateId: "sunday" }
     ];
 
-    priorityOptions = [
-        { val: 4, translateId: "priority-very-high" },
-        { val: 3, translateId: "priority-high" },
-        { val: 2, translateId: "priority-medium" },
-        { val: 1, translateId: "priority-low" },
-    ];
-
     getTags() {
         return [...this.tags];
     }
@@ -651,10 +630,6 @@ class NotesService {
 
     getRepeatTypeOptions() {
         return [...this.repeatOptions]
-    }
-
-    getPriorityOptions() {
-        return [...this.priorityOptions]
     }
 
     getWeekRepeatOptions() {

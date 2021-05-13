@@ -26,7 +26,6 @@ export default {
     "notes-show-interval": "Адлюстроўваць за перыяд",
     "notes-show-interval-week": "Тыдзень",
     "notes-show-interval-day": "Дзень",
-    "priority-sort": "Сартаваць па прыярытэце",
 
     // interface page
     "theme": "Тэма",
@@ -143,11 +142,6 @@ export default {
     "update-all": "Абнавіць усе",
     "update-shadow": "Абнавіць толькі не закранутыя",
     "specify-btn": "Пазначыць",
-    "priority": "Прыярытэт",
-    "priority-very-high": "Вельмі высокі",
-    "priority-high": "Высокі",
-    "priority-medium": "Сярэдні",
-    "priority-low": "Нізкі",
     "error-note-add": "Не атрымалася дадаць нататку",
     "error-note-update": "Не атрымалася абнавіць нататку",
     "error-note-delete": "Не атрымалася выдаліць заметку",

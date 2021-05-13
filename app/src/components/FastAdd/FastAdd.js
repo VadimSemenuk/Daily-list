@@ -33,7 +33,6 @@ class FastAdd extends Component {
             repeatType: "no-repeat",
             repeatDates: [],
             mode: this.props.settings.notesScreenMode,
-            priority: 2
         });
         this.setState({
             fastAddInputValue: ""

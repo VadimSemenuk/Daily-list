@@ -23,14 +23,10 @@ class SettingsSort extends Component {
 
         let sortTypeSelectedValue = sortTypeSettings.find((a) => a.val === this.props.settings.sortType).val;
         let sortDirectionSelectedValue = sortDirectionSettings.find((a) => a.val === this.props.settings.sortDirection).val;
-        let isSortIncludePriorityEnabled = sortTypeSelectedValue !== 2;
 
         this.state = {
             sortTypeSelectedValue,
             sortDirectionSelectedValue,
-            sortIncludePriority: this.props.settings.sortIncludePriority,
-
-            isSortIncludePriorityEnabled: isSortIncludePriorityEnabled
         }
     }
 
@@ -54,8 +50,6 @@ class SettingsSort extends Component {
                                 onClick: () => {
                                     this.setState({
                                         sortTypeSelectedValue: activeSortType.val,
-                                        sortIncludePriority: this.props.settings.sortIncludePriority,
-                                        isSortIncludePriorityEnabled: activeSortType.val !== 2
                                     })
                                 }
                             },
@@ -63,7 +57,6 @@ class SettingsSort extends Component {
                                 text: t("ok"),
                                 onClick: () => {
                                     this.props.setSetting("sortType", this.state.sortTypeSelectedValue);
-                                    this.props.setSetting("sortIncludePriority", this.state.sortIncludePriority, this.props.renderNotes);
                                 }
                             }
                         ]}
@@ -80,25 +73,12 @@ class SettingsSort extends Component {
                                             let nextState = {
                                                 sortTypeSelectedValue: +e
                                             }
-                                            if (nextState.sortTypeSelectedValue === 2) {
-                                                nextState.sortIncludePriority = false;
-                                                nextState.isSortIncludePriorityEnabled = false;
-                                            } else {
-                                                nextState.isSortIncludePriorityEnabled = true;
-                                            }
                                             this.setState(nextState);
                                         }}
                                         text={t(setting.translateId)}
                                     />
                                 ))
                             }
-
-                            <SwitchListItem
-                                text={t("priority-sort")}
-                                checked={this.state.sortIncludePriority}
-                                disabled={!this.state.isSortIncludePriorityEnabled}
-                                onChange={(e) => this.setState({sortIncludePriority: e})}
-                            />
                         </div>
                     </ModalListItem>
 

@@ -79,7 +79,6 @@ class SettingsService {
                 sortFinBehaviour,
                 minimizeNotes,
                 calendarMode,
-                sortIncludePriority,
                 notesScreenMode,
                 passwordResetEmail
             FROM Settings;`
@@ -94,7 +93,6 @@ class SettingsService {
             theme: themesService.getThemeById(result.theme),
             calendarNotesCounter: Boolean(result.calendarNotesCounter),
             calendarNotesCounterIncludeFinished: Boolean(result.calendarNotesCounterIncludeFinished),
-            sortIncludePriority: Boolean(result.sortIncludePriority),
             minimizeNotes: Boolean(result.minimizeNotes)
         };
     }
@@ -106,7 +104,6 @@ class SettingsService {
             case("theme"): value = value.id; break;
             case("calendarNotesCounter"): value = Number(value); break;
             case("calendarNotesCounterIncludeFinished"): value = Number(value); break;
-            case("sortIncludePriority"): value = Number(value); break;
             case("minimizeNotes"): value = Number(value); break;
             default: break;
         }
