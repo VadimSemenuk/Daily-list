@@ -9,7 +9,6 @@ import Header from '../../components/Header/Header';
 import TrashListItem from './TrashListItem/TrashListItem';
 
 import './Trash.scss';
-import {removeDeletedNotes} from "../../actions";
 
 class Trash extends Component {
     async componentDidMount() {

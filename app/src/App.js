@@ -20,9 +20,6 @@ import authService from "./services/auth.service";
 import logsService from "./services/logs.service";
 import backupService from "./services/backup.service";
 
-import {NotesScreenMode} from "./constants";
-import executeSQL from "./utils/executeSQL";
-
 export default class App extends Component {
     constructor(props) {
         super(props);

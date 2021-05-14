@@ -5,7 +5,7 @@ import {translate} from "react-i18next";
 
 import * as AppActions from '../../actions'; 
 
-import {ModalListItem, ButtonListItem, ValueListItem} from "../../components/ListItem/ListItem";
+import {ModalListItem, ButtonListItem} from "../../components/ListItem/ListItem";
 import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/RemovableTextCheckBox';
 import RemovableTextArea from '../../components/RemovableTextArea/RemovableTextArea';
 import TimeSet from './TimeSet/TimeSet';
@@ -13,7 +13,6 @@ import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
-import Radio from '../../components/Radio/Radio';
 
 import notesService from '../../services/notes.service';
 

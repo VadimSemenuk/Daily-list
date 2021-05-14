@@ -9,7 +9,6 @@ import md5 from "md5";
 import './Password.scss';
 import deviceService from "../../services/device.service";
 import apiService from "../../services/api.service";
-import {triggerLoader} from "../../actions";
 
 class Password extends Component {
 	constructor(props) {
