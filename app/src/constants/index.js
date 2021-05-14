@@ -1,11 +1,11 @@
 export const NoteMode = {
-    WithTime: 1,
-    WithoutTime: 2
+    WithDateTime: 1,
+    WithoutDateTime: 2
 };
 
 export const NotesScreenMode = {
-    WithTime: 1,
-    WithoutTime: 2
+    WithDateTime: 1,
+    WithoutDateTime: 2
 };
 
 export const NoteAction = {

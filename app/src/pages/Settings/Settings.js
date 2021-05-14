@@ -23,10 +23,10 @@ class Settings extends Component {
                 <Header title={t("settings")} />
                 <div className="scroll page-content padding">
                     <ButtonListItem
-                        text={t(this.props.settings.notesScreenMode === NotesScreenMode.WithTime ? "show-notes-screen" : "show-daily-notes-screen")}
+                        text={t(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "show-notes-screen" : "show-daily-notes-screen")}
                         img={externalLink}
                         onClick={() => {
-                            let nextNotesScreenMode = this.props.settings.notesScreenMode === NotesScreenMode.WithTime ? NotesScreenMode.WithoutTime : NotesScreenMode.WithTime;
+                            let nextNotesScreenMode = this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? NotesScreenMode.WithoutDateTime : NotesScreenMode.WithDateTime;
                             this.props.setSetting("notesScreenMode", nextNotesScreenMode);
                             setTimeout(() => {
                                 let msCurDate = moment().startOf("day");

@@ -187,7 +187,7 @@ class NotesService {
                             )
                         )
                         AND n.mode == ?;`,
-                    [NoteAction.Delete, msDateUTC, msDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, date.isoWeekday(), NoteRepeatType.Any, msDateUTC, NoteMode.WithTime]
+                    [NoteAction.Delete, msDateUTC, msDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, date.isoWeekday(), NoteRepeatType.Any, msDateUTC, NoteMode.WithDateTime]
                 );
             })
         );
@@ -216,7 +216,7 @@ class NotesService {
             WHERE
                 mode == ?
                 AND lastAction != ?`,
-            [NoteMode.WithoutTime, NoteAction.Delete]
+            [NoteMode.WithoutDateTime, NoteAction.Delete]
         );
 
         let notes = [];
@@ -228,7 +228,7 @@ class NotesService {
     }
 
     async getNotes(mode, dates) {
-        if (mode === NoteMode.WithTime) {
+        if (mode === NoteMode.WithDateTime) {
             return this.getNotesWithTime(dates);
         } else {
             return this.getNotesWithoutTime();

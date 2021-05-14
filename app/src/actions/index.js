@@ -292,7 +292,7 @@ export function updateNotes() {
             let state = getState();
 
             let dates = null;
-            if (state.settings.notesScreenMode === NotesScreenMode.WithTime) {
+            if (state.settings.notesScreenMode === NotesScreenMode.WithDateTime) {
                 dates = state.notes.map((n) => n.date);
             }
 

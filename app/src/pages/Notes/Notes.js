@@ -73,7 +73,7 @@ class Notes extends PureComponent {
     };
 
     setDate = (date) => {
-        if (this.props.settings.notesScreenMode === NotesScreenMode.WithoutTime) {
+        if (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) {
             return;
         }
 
@@ -174,13 +174,13 @@ class Notes extends PureComponent {
         return (
             <div className="page-wrapper">
                 <Header
-                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithTime) ? "daily-notes" : "notes"}
+                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) ? "daily-notes" : "notes"}
                     onCalendarRequest={this.triggerCalendar}
                     onSelectToday={this.onTodaySelect}
                 />
                 <div className="notes-list-wrapper page-content">
                     {   
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) && (this.props.settings.calendarMode === 1) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && (this.props.settings.calendarMode === 1) &&
                         <LightCalendar
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
                             currentDate={this.props.currentDate}
@@ -188,7 +188,7 @@ class Notes extends PureComponent {
                         />
                     }
                     {
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) && (this.props.settings.calendarMode === 2) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && (this.props.settings.calendarMode === 2) &&
                         <Calendar 
                             currentDate={this.props.currentDate}
                             calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
@@ -197,7 +197,7 @@ class Notes extends PureComponent {
                         />
                     }
                     {
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithoutTime) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) &&
                         <div className="notes-list-swiper">
                             <div>
                                 <div
@@ -218,7 +218,7 @@ class Notes extends PureComponent {
                         </div>
                     }
                     {
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
+                        (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
                         <ReactSwipe
                             ref={node => {
                                 if (node) {
@@ -341,7 +341,7 @@ function sort (data, settings) {
 
 function getNotesCompareFn(settings) {
     if (settings.sortType === 0) {
-        if (settings.notesScreenMode === NotesScreenMode.WithTime) {
+        if (settings.notesScreenMode === NotesScreenMode.WithDateTime) {
             return (a, b) => {
                 let aDayTimeSum = a.startTime ?
                     (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())

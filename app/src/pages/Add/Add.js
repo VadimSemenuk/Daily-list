@@ -228,7 +228,7 @@ class Add extends Component {
         return (
             <div className="page-wrapper">
                 <Header
-                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithTime) ? "daily-add" : "add"}
+                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) ? "daily-add" : "add"}
                     onSubmit={this.onSubmit}
                     onCalendarRequest={this.triggerCalendar}
                     currentDate={this.state.date}
@@ -364,11 +364,11 @@ class Add extends Component {
                         </div>
                     </div>
                     <div 
-                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === NotesScreenMode.WithTime ? "" : " minified"}`}
+                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "" : " minified"}`}
                         style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
                     >
                         {
-                            (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
+                            (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
                             <div
                                 className="toggle-icon-wrapper"
                                 onClick={() => this.setState({addAdditioanlsViewHidden: !this.state.addAdditioanlsViewHidden})}
@@ -378,7 +378,7 @@ class Add extends Component {
                         }
 
                         {
-                            (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
+                            (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
                             <TimeSet
                                 isNotificationEnabled={this.state.isNotificationEnabled}
                                 startTime={this.state.startTime}
