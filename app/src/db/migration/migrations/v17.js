@@ -1,4 +1,3 @@
-import uuid from "uuid/v1";
 import moment from "moment";
 import md5 from "md5";
 
@@ -10,10 +9,9 @@ export default {
     name: "1.7",
 
     async run() {
-        await addUUID();
+        await alterTasksRepeatValuesTable();
         await addMetaTable();
         await alterTasksTable();
-        // await forkFromFieldToUUID();
         await alterSettingsTable();
         await addErrorsLogsTable();
         await addLoadsLogsTable();
@@ -21,27 +19,22 @@ export default {
         await convertDatesToUTC();
         await addPasswordEncryption();
 
-        async function addUUID() {
-            let select = await execureSQL(`SELECT id from Tasks WHERE uuid is null`);
-            let updateValues = [];
-            let updateValuesStr = "";
-            if (!select.rows || !select.rows.length) {
-                return
-            }
+        async function alterTasksRepeatValuesTable () {
+            await execureSQL(`
+                CREATE TABLE IF NOT EXISTS NotesRepeatValues
+                (   
+                    noteId INTEGER,
+                    value INTEGER,
+                    FOREIGN KEY(noteId) REFERENCES Notes(id)
+                );
+            `);
 
-            for (let i = 0; i < select.rows.length; i++) {
-                let item = select.rows.item(i);
-                updateValues.push(item.id);
-                updateValues.push(uuid());
-                updateValuesStr += ", (?, ?)";
-            }
-            updateValuesStr = updateValuesStr.slice(2);
+            await execureSQL(`
+                INSERT INTO NotesRepeatValues (noteId, value) 
+                SELECT taskId, value FROM TasksRepeatValues;
+            `);
 
-            return execureSQL(`
-                WITH Tmp(id, uuid) AS (VALUES ${updateValuesStr})
-	
-                UPDATE Tasks SET uuid = (SELECT uuid FROM Tmp WHERE Tasks.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
-            `, updateValues);
+            await execureSQL(`DROP TABLE TasksRepeatValues`);
         }
 
         async function addMetaTable () {
@@ -69,94 +62,65 @@ export default {
         }
 
         async function alterTasksTable () {
-            await execureSQL(`ALTER TABLE Tasks RENAME TO Tasks_OLD;`);
             await execureSQL(`                           
-                CREATE TABLE IF NOT EXISTS Tasks
+                CREATE TABLE IF NOT EXISTS Notes
                 (
                     id INTEGER PRIMARY KEY,
-                    uuid TEXT,
                     title TEXT,
-                    added INTEGER,
-                    finished INTEGER,
-                    dynamicFields TEXT,
+                    date INTEGER,
+                    isFinished INTEGER,
+                    contentItems TEXT,
                     startTime INTEGER,
                     endTime INTEGER,
-                    notificate INTEGER,
+                    isNotificationEnabled INTEGER,
                     tag TEXT,
-                    isSynced INTEGER,
-                    isLastActionSynced INTEGER,
                     lastAction TEXT,
                     lastActionTime INTEGER,
-                    userId INTEGER,
                     repeatType INTEGER,
                     forkFrom INTEGER,
-                    repeatDate INTEGER,
                     manualOrderIndex INTEGER,
                     mode INTEGER,
                     utcOffset INTEGER,
-                    UNIQUE (uuid) ON CONFLICT REPLACE
+                    UNIQUE (id) ON CONFLICT REPLACE
                 );
             `);
 
             await execureSQL(`
-                INSERT INTO Tasks (
+                INSERT INTO Notes (
                     id,
-                    uuid, 
                     title, 
-                    added,
-                    finished,
-                    dynamicFields,
+                    date,
+                    isFinished,
+                    contentItems,
                     startTime, 
                     endTime, 
-                    notificate, 
+                    isNotificationEnabled, 
                     tag, 
-                    isSynced,
-                    isLastActionSynced,
                     lastAction,
                     lastActionTime,
-                    userId,
                     repeatType,
                     forkFrom,
-                    repeatDate,
                     mode
                 ) 
                 SELECT
                     id, 
-                    uuid,
                     title, 
-                    added,
+                    added as date,
                     finished,
-                    dynamicFields,
+                    dynamicFields as contentItems,
                     startTime, 
                     endTime, 
-                    notificate, 
+                    notificate as isNotificationEnabled, 
                     tag, 
-                    0,
-                    0,
                     lastAction,
                     lastActionTime,
-                    userId,
                     repeatType,
                     forkFrom,
-                    CASE forkFrom WHEN -1 THEN -1 ELSE added END as repeatDate,
                     1 as mode
-                FROM Tasks_OLD;
+                FROM Tasks;
             `);
 
-            await execureSQL(`DROP TABLE Tasks_OLD;`);
-        }
-
-        async function forkFromFieldToUUID() {
-            await execureSQL(`
-                update Tasks
-                set forkFrom =
-                    (
-                        select (select uuid from Tasks ttt where tt.forkFrom = ttt.id ) original
-                        from Tasks tt
-                        where Tasks.id = tt.id
-                    )
-                where forkFrom != -1
-            `);
+            await execureSQL(`DROP TABLE Tasks;`);
         }
 
         async function alterSettingsTable () {
@@ -176,7 +140,6 @@ export default {
                 CREATE TABLE IF NOT EXISTS Settings
                 (
                     defaultNotification INTEGER,
-                    fastAdd INTEGER,
                     theme INTEGER,
                     password TEXT,    
                     fontSize INTEGER,
@@ -196,7 +159,6 @@ export default {
             await execureSQL(`
                 INSERT INTO Settings (
                     defaultNotification,
-                    fastAdd,
                     theme,
                     password,    
                     fontSize,
@@ -213,7 +175,6 @@ export default {
                 ) 
                 SELECT 
                     defaultNotification, 
-                    fastAdd,
                     theme, 
                     password, 
                     fontSize, 
@@ -281,16 +242,15 @@ export default {
             let utcOffset = getUTCOffset();
 
             await execureSQL(`
-                UPDATE Tasks
+                UPDATE Notes
                 SET
-                    added = CASE added WHEN -1 THEN -1 ELSE added + ${utcOffset} END,
+                    date = CASE date WHEN -1 THEN -1 ELSE date + ${utcOffset} END,
                     startTime = CASE startTime WHEN -1 THEN -1 ELSE startTime + ${utcOffset} END,
                     endTime = CASE endTime WHEN -1 THEN -1 ELSE endTime + ${utcOffset} END,
-                    repeatDate = CASE repeatDate WHEN -1 THEN -1 ELSE repeatDate + ${utcOffset} END,
                     utcOffset = ${utcOffset};
             `);
 
-            let anyRepeatTasksSelect = await execureSQL(`SELECT id from Tasks WHERE repeatType = 'any'`);
+            let anyRepeatTasksSelect = await execureSQL(`SELECT id from Notes WHERE repeatType = 'any'`);
 
             if (anyRepeatTasksSelect.rows.length) {
                 let anyRepeatTasksIDs = [];
@@ -299,7 +259,7 @@ export default {
                     anyRepeatTasksIDs.push(item.id);
                 }
 
-                await execureSQL(`UPDATE TasksRepeatValues SET value = value + ${utcOffset} WHERE taskId IN (${anyRepeatTasksIDs.join(", ")})`);
+                await execureSQL(`UPDATE NotesRepeatValues SET value = value + ${utcOffset} WHERE noteId IN (${anyRepeatTasksIDs.join(", ")})`);
             }
         }
 

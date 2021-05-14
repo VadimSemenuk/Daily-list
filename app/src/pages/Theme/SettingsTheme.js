@@ -122,12 +122,6 @@ class SettingsTheme extends Component {
                             }
                         </div>
                     </ModalListItem>
-                    
-                    <SwitchListItem 
-                        text={t("fast-add")}  
-                        checked={this.props.settings.fastAdd}
-                        onChange={(e) => this.props.setSetting('fastAdd', e)}     
-                    />
 
                     <SwitchListItem 
                         text={t("show-notes-count")}  

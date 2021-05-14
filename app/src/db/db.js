@@ -6,9 +6,9 @@ export default async () => {
             window.sqlitePlugin.openDatabase({
                 name: config.db.name,
                 location: config.db.location,
-            }, resolve, reject)
+            }, resolve, reject);
         } else {
-            resolve(window.openDatabase(config.db.name, config.db.version, config.db.displayname, config.db.size))
+            resolve(window.openDatabase(config.db.name, config.db.version, config.db.displayname, config.db.size));
         }
     })
 }

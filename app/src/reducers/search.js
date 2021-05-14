@@ -15,7 +15,7 @@ function notes (state = init, action) {
             actions.forEach((action) => {
                 nextState = nextState.map((list) => {
                     let nextItems = list.items.filter((note) => note.key !== action.note.key);
-                    if (!list.date || (list.date.valueOf() === action.note.added.valueOf())) {
+                    if (!list.date || (list.date.valueOf() === action.note.date.valueOf())) {
                         nextItems.push(action.note);
                     }
 

@@ -21,6 +21,7 @@ import logsService from "./services/logs.service";
 import backupService from "./services/backup.service";
 
 import {NotesScreenMode} from "./constants";
+import executeSQL from "./utils/executeSQL";
 
 export default class App extends Component {
     constructor(props) {
@@ -48,7 +49,7 @@ export default class App extends Component {
             logsService.uploadSavedLoadLogs();
         }
 
-        notesService.cleanOldDeletedNotes();
+        notesService.removeDeletedNotes(moment().subtract(30, "day").valueOf());
     }
 
     async initApp() {
@@ -65,10 +66,7 @@ export default class App extends Component {
 
         let password = !settings.password;
         let date = moment().startOf("day");
-        let notes = await notesService.getNotes(
-            settings.notesScreenMode,
-            settings.notesScreenMode === NotesScreenMode.WithTime ? [moment(date).add(-1, "day"), moment(date), moment(date).add(1, "day")] : null
-        );
+        let notes = await notesService.getNotes(settings.notesScreenMode, [moment(date).add(-1, "day"), moment(date), moment(date).add(1, "day")]);
         let user = authService.getUser();
         authService.initAuthorizationToken();
         backupService.setDatabasesDirectory();

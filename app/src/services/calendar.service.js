@@ -16,14 +16,13 @@ class CalendarService {
         let intervalEndDateUTC = intervalEndDate + getUTCOffset();
 
         let select = await executeSQL(`
-            SELECT t.added, t.repeatType, rep.value as repeatValue, t.finished
-            FROM Tasks t
-            LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
+            SELECT t.date, t.repeatType, rep.value as repeatValue, t.isFinished
+            FROM Notes t
+            LEFT JOIN NotesRepeatValues rep ON t.id = rep.noteId
             WHERE
                 lastAction != 'DELETE' 
-                AND lastAction != 'CLEAR' 
                 AND (
-                    (repeatType = 'no-repeat' OR forkFrom != -1 AND added >= ? AND added <= ?)
+                    (repeatType = 'no-repeat' OR forkFrom != -1 AND date >= ? AND date <= ?)
                     OR (repeatType = 'any' AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
                     OR (t.forkFrom = -1 AND repeatType != 'any')
                 )
@@ -37,23 +36,23 @@ class CalendarService {
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
 
-            if (~note.added) {
-                note.added = note.added - getUTCOffset();
+            if (~note.date) {
+                note.date = note.date - getUTCOffset();
             }
             if (note.repeatType === "any") {
                 note.repeatValue = note.repeatValue - getUTCOffset();
             }
 
-            if (!includeFinished && note.finished) {
+            if (!includeFinished && note.isFinished) {
                 if (note.repeatType !== "no-repeat") {
-                    dates[note.added] = (dates[note.added] || 0) - 1;
+                    dates[note.date] = (dates[note.date] || 0) - 1;
                 }
                 continue;
             }
 
-            if (note.added !== -1) {
+            if (note.date !== -1) {
                 if (note.repeatType === "no-repeat") {
-                    dates[note.added] = (dates[note.added] || 0) + 1;
+                    dates[note.date] = (dates[note.date] || 0) + 1;
                 }
             } else {
                 if (note.repeatType === "week") {

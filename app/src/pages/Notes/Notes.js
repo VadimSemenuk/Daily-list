@@ -5,7 +5,6 @@ import moment from "moment";
 import ReactSwipe from 'react-swipe';
 import {translate} from "react-i18next";
 
-import FastAdd from '../../components/FastAdd/FastAdd';
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
@@ -58,7 +57,7 @@ class Notes extends PureComponent {
             let nextDate = moment(this.props.currentDate).add(-1, "day");
             this.props.updateDatesAndNotes(
                 nextDate,
-                moment(nextDate).add(-1, "day"),
+                [moment(nextDate).add(-1, "day")],
                 nextIndex,
                 this.props.settings.notesScreenMode
             );
@@ -66,7 +65,7 @@ class Notes extends PureComponent {
             let nextDate = moment(this.props.currentDate).add(1, "day");
             this.props.updateDatesAndNotes(
                 nextDate,
-                moment(nextDate).add(1, "day"),
+                [moment(nextDate).add(1, "day")],
                 nextIndex,
                 this.props.settings.notesScreenMode
             );
@@ -136,17 +135,10 @@ class Notes extends PureComponent {
         this.props.deleteNote(this.state.listItemDialogData.note);
     };
 
-    onListItemMove = async () => {
-        this.closeDialog();
-
-        let nextDate = moment(this.state.listItemDialogData.note.added).add(1, "day");
-        await this.props.updateNoteDate(this.state.listItemDialogData.note, nextDate);
-    };
-
     pasteCopy = async () => {
         let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
             repeatType: "no-repeat",
-            added: moment(this.props.currentDate),
+            date: moment(this.props.currentDate),
             forkFrom: -1,
             isShadow: false
         }));
@@ -268,27 +260,12 @@ class Notes extends PureComponent {
                         this.state.copyBuffer && 
                         <Fab onClick={this.pasteCopy} />
                     }
-
-                    {
-                        this.props.settings.fastAdd &&
-                        <FastAdd currentDate={this.props.currentDate} />
-                    }
                 </div>
 
                 <Modal
                     isOpen={this.state.isListItemDialogVisible}
                     onRequestClose={this.closeDialog}
                 >
-                    {
-                        this.state.isListItemDialogVisible &&
-                        (this.state.listItemDialogData.note.repeatType === "no-repeat") &&
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("move-tomorrow")}
-                            onClick={this.onListItemMove}
-                        />
-                    }
                     <ButtonListItem
                         className="no-border"
                         text={t("edit")}

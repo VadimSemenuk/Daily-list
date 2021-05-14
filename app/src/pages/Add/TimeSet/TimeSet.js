@@ -26,20 +26,20 @@ class TimeSet extends Component {
     }
 
     onTimeSet = (date, state) => {     
-        let notificate;
+        let isNotificationEnabled;
         if (
             this.props.settings.defaultNotification && 
             !this.removeNotificationFromDefault && 
-            !this.props.notificate && 
+            !this.props.isNotificationEnabled &&
             state === "startTime"
         ) {
-            notificate = true
+            isNotificationEnabled = true
         } else {
-            notificate = this.props.notificate;
+            isNotificationEnabled = this.props.isNotificationEnabled;
         }
 
         this.props.onStateChange({
-            notificate,
+            isNotificationEnabled,
             [state]: moment(date)                 
         })
     };
@@ -58,31 +58,31 @@ class TimeSet extends Component {
         this.onTimeSet(moment(date).startOf("minute"), state);
     };
 
-    onNotificateChange = (notificate) => {
+    onNotificateChange = (isNotificationEnabled) => {
         if (!this.props.startTime) {
             window.plugins.toast.showLongBottom(this.props.t("set-time-first"));
             return
         }
         
-        if (this.props.settings.defaultNotification && !notificate) {
+        if (this.props.settings.defaultNotification && !isNotificationEnabled) {
             this.removeNotificationFromDefault = true;
         }
 
         this.props.onStateChange({
-            notificate                   
+            isNotificationEnabled
         })
     };
 
     reset = (field) => {
-        let notificate = this.props.notificate;
+        let isNotificationEnabled = this.props.isNotificationEnabled;
 
         if (field === "startTime") {
-            notificate = false;
+            isNotificationEnabled = false;
         }
 
         this.props.onStateChange({
             [field]: false,
-            notificate                
+            isNotificationEnabled
         })
     };
 
@@ -166,7 +166,7 @@ class TimeSet extends Component {
                 <SwitchListItem 
                     className="tiny"
                     text={t("notify")}  
-                    checked={this.props.notificate}
+                    checked={this.props.isNotificationEnabled}
                     onChange={this.onNotificateChange} 
                     disabled={!this.props.startTime}  
                 />

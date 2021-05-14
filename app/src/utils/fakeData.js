@@ -13,10 +13,10 @@ export async function addFakeListItemsData () {
     for (let date of dates) {
         for (let i of sequence) {     
             await execureSQL(
-                `INSERT INTO Tasks
-                (title, startTime, endTime, notificate, tag, dynamicFields, added, userId, lastAction, forkFrom, repeatType, mode)
+                `INSERT INTO Notes
+                (title, startTime, endTime, isNotificationEnabled, tag, contentItems, date, lastAction, forkFrom, repeatType, mode)
                 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-                [new Date(date).toDateString(), +new Date(date + (i * 10000)), +new Date(date + (i * 100000)), 0, "transparent", dynamicDataJson, date, 1, "ADD", -1, "no-repeat", 1]
+                [new Date(date).toDateString(), +new Date(date + (i * 10000)), +new Date(date + (i * 100000)), 0, "transparent", dynamicDataJson, date, "ADD", -1, "no-repeat", 1]
             );  
         }
     };

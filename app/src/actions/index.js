@@ -7,7 +7,7 @@ import logsService from "../services/logs.service";
 
 import {throttleAction} from "../utils/throttle";
 
-import {NotesScreenMode} from "./../constants";
+import {NotesScreenMode} from "../constants";
 
 // notes
 export function addNote(note) {
@@ -24,7 +24,7 @@ export function addNote(note) {
 
             let state = getState();
 
-            state.settings.calendarNotesCounter && dispatch(getFullCount(addedNote.added.valueOf()));
+            state.settings.calendarNotesCounter && dispatch(getFullCount(addedNote.date.valueOf()));
 
             dispatch(saveBackup());
         } catch(err) {
@@ -37,7 +37,7 @@ export function addNote(note) {
                     note: {
                         ...note,
                         title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                        contentItems: !!note.contentItems
                     }
                 },
                 deviceId
@@ -61,7 +61,7 @@ export function updateNote(note, prevNote) {
 
             let state = getState();
 
-            state.settings.calendarNotesCounter && dispatch(getFullCount(updatedNote.added.valueOf()));
+            state.settings.calendarNotesCounter && dispatch(getFullCount(updatedNote.date.valueOf()));
 
             dispatch(saveBackup());
         } catch(err) {
@@ -74,7 +74,7 @@ export function updateNote(note, prevNote) {
                     note: {
                         ...note,
                         title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                        contentItems: !!note.contentItems
                     },
                 },
                 deviceId
@@ -89,21 +89,20 @@ export function updateNoteDynamicFields(note, updatedState) {
             let updatedNote = await notesService.updateNoteDynamicFields(note, updatedState);
 
             dispatch({
-                type: "UPDATE_NOTE_DYNAMIC_FIELDS",
+                type: "UPDATE_NOTE_DYNAMIC",
                 payload: {
-                    note: updatedNote,
-                    realFromShadow: note.isShadow && !updatedNote.isShadow
+                    notes: [updatedNote],
                 }
             });
 
             let state = getState();
 
-            updatedState.hasOwnProperty('finished')
+            updatedState.hasOwnProperty('isFinished')
             && state.settings.calendarNotesCounter
             && !state.settings.calendarNotesCounterIncludeFinished
-            && dispatch(getFullCount(updatedNote.added.valueOf()));
+            && dispatch(getFullCount(updatedNote.date.valueOf()));
 
-            updatedState.hasOwnProperty('finished') && dispatch(renderNotes());
+            updatedState.hasOwnProperty('isFinished') && dispatch(renderNotes());
 
             dispatch(saveBackup());
         } catch(err) {
@@ -116,46 +115,8 @@ export function updateNoteDynamicFields(note, updatedState) {
                     note: {
                         ...note,
                         title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                        contentItems: !!note.contentItems
                     },
-                },
-                deviceId
-            );
-        }
-    }
-}
-
-export function updateNoteDate(note, nextDate) {
-    return async (dispatch, getState) => {
-        try {
-            let updatedNote = await notesService.updateNoteDate(note, nextDate);
-
-            dispatch({
-                type: "UPDATE_NOTE_DYNAMIC_FIELDS",
-                payload: {
-                    note: updatedNote
-                }
-            });
-
-            let state = getState();
-
-            state.settings.calendarNotesCounter && dispatch(getFullCount(note.added.valueOf()));
-
-            dispatch(renderNotes());
-
-            dispatch(saveBackup());
-        } catch(err) {
-            dispatch(triggerErrorModal("error-note-update"));
-            let deviceId = getState().meta.deviceId;
-            logsService.logError(
-                err,
-                {
-                    path: "action/index.js -> updateNoteDate()",
-                    note: {
-                        ...note,
-                        title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
-                    }
                 },
                 deviceId
             );
@@ -177,7 +138,7 @@ export function deleteNote(note) {
 
             let state = getState();
 
-            state.settings.calendarNotesCounter && dispatch(getFullCount(deletedNote.added.valueOf()));
+            state.settings.calendarNotesCounter && dispatch(getFullCount(deletedNote.date.valueOf()));
 
             dispatch(saveBackup());
         } catch(err) {
@@ -190,7 +151,7 @@ export function deleteNote(note) {
                     note: {
                         ...note,
                         title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                        contentItems: !!note.contentItems
                     }
                 },
                 deviceId
@@ -239,6 +200,7 @@ export function restoreNote(note) {
             let state = getState();
 
             state.settings.calendarNotesCounter && dispatch(getFullCount(state.date.valueOf()));
+
             dispatch(updateNotes());
 
             dispatch(saveBackup());
@@ -252,7 +214,7 @@ export function restoreNote(note) {
                     note: {
                         ...note,
                         title: !!note.title,
-                        dynamicFields: !!note.dynamicFields
+                        contentItems: !!note.contentItems
                     },
                 },
                 deviceId
@@ -261,10 +223,10 @@ export function restoreNote(note) {
     }
 }
 
-export function cleanDeletedNotes() {
+export function removeDeletedNotes() {
     return async (dispatch, getState) => {
         try {
-            await notesService.cleanDeletedNotes();
+            await notesService.removeDeletedNotes();
 
             dispatch({
                 type: "CLEAN_TRASH",
@@ -277,7 +239,7 @@ export function cleanDeletedNotes() {
             logsService.logError(
                 err,
                 {
-                    path: "action/index.js -> cleanDeletedNotes()",
+                    path: "action/index.js -> removeDeletedNotes()",
                 },
                 deviceId
             );
@@ -295,17 +257,18 @@ export function updateNotesManualSortIndex(notes) {
     return async (dispatch, getState) => {
         try {
             dispatch({
-                type: "UPDATE_MANUAL_SORT_INDEX",
+                type: "SET_NOTES_LIST_ITEMS",
                 payload: {
-                    notes
+                    notes,
+                    date: getState().date
                 }
             });
 
             let insertedNotes = await notesService.updateNotesManualSortIndex(notes);
             dispatch({
-                type: "UPDATE_NOTE_DYNAMIC_FIELDS",
+                type: "UPDATE_NOTE_DYNAMIC",
                 payload: {
-                    notes: insertedNotes.map((insertedNote) => ({note: insertedNote, realFromShadow: true}))
+                    notes: insertedNotes
                 }
             });
         } catch(err) {
@@ -336,7 +299,7 @@ export function updateNotes() {
             let notes = await notesService.getNotes(state.settings.notesScreenMode, dates);
 
             dispatch({
-                type: "UPDATE_NOTES",
+                type: "UPDATE_NOTES_LIST",
                 payload: {
                     notes
                 }
@@ -385,7 +348,7 @@ export function setDatesAndUpdateNotes(dates, dateIndex, notesScreenMode) {
 export function updateDatesAndNotes(date, preRenderDate, nextIndex, notesScreenMode) {
     return async (dispatch, getState) => {
         try {
-            let notes = await notesService.getNotes(notesScreenMode, preRenderDate);
+            let notes = (await notesService.getNotes(notesScreenMode, preRenderDate))[0];
 
             dispatch({
                 type: "UPDATE_DATES_AND_NOTES",
@@ -489,7 +452,9 @@ export function getCount(date, period) {
 export function getFullCount(date) {
     return async (dispatch, getState) => {
         try {
-            let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
+            let state = getState();
+            date = state.date.valueOf();
+            let includeFinished = state.settings.calendarNotesCounterIncludeFinished;
             let nextCount = await calendarService.getFullCount(date, includeFinished);
             dispatch({
                 type: "GET_COUNT",

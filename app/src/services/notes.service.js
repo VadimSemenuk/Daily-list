@@ -1,9 +1,8 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
-import uuid from "uuid/v1";
 import notificationService from "./notification.service";
 import getUTCOffset from "../utils/getUTCOffset";
-import {NoteActions, NoteMode} from "../constants";
+import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
 
 window.e = executeSQL;
 
@@ -15,7 +14,7 @@ class NotesService {
             return [];
         }
 
-        let allNotesSelect = await executeSQL(`SELECT t.id, t.title, t.dynamicFields FROM Tasks t;`);
+        let allNotesSelect = await executeSQL(`SELECT t.id, t.title, t.contentItems FROM Notes t;`);
         let filteredNotesIDs = [];
         for(let i = 0; i < allNotesSelect.rows.length; i++) {
             let item = allNotesSelect.rows.item(i);
@@ -25,9 +24,9 @@ class NotesService {
                 continue;
             }
 
-            if (item.dynamicFields && item.dynamicFields.toLowerCase().includes(search)) {
-                let dynamicFields = JSON.parse(item.dynamicFields);
-                if (dynamicFields.some((f) => f.value && f.value.toLowerCase().includes(search))) {
+            if (item.contentItems && item.contentItems.toLowerCase().includes(search)) {
+                let contentItems = JSON.parse(item.contentItems);
+                if (contentItems.some((f) => f.value && f.value.toLowerCase().includes(search))) {
                     filteredNotesIDs.push(item.id);
                 }
             }
@@ -37,17 +36,16 @@ class NotesService {
             let msCurrentDate = moment().startOf("day").valueOf();
 
             let select = await executeSQL(
-                `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
-                        (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
-                        FROM Tasks t
+                `SELECT t.id as key, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
+                        t.repeatType, t.contentItems, t.isFinished, t.forkFrom, t.date, t.manualOrderIndex, t.mode,
+                        (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = t.id) as repeatDates
+                        FROM Notes t
                         WHERE
                             t.id IN (${filteredNotesIDs.join(',')})
                             AND ${repeatType === 'no-repeat' ? `(t.repeatType == 'no-repeat' OR t.repeatType == 'any')` : `((t.repeatType == 'week' OR t.repeatType == 'day') AND t.forkFrom == -1)`}
                             AND t.mode == 1
                             AND t.lastAction != 'DELETE'
-                            AND t.lastAction != 'CLEAR'
-                        ORDER BY t.added`
+                        ORDER BY t.date`
             );
 
             if (!select.rows.length) {
@@ -63,16 +61,14 @@ class NotesService {
 
                 let nextItem = {
                     ...item,
-                    dynamicFields: JSON.parse(item.dynamicFields),
+                    contentItems: JSON.parse(item.contentItems),
                     startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
                     endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
-                    added: moment(item.added - getUTCOffset()),
-                    msAdded: item.added - getUTCOffset(),
-                    finished: Boolean(item.finished),
-                    notificate: Boolean(item.notificate),
-                    isShadow: Boolean(item.added === -1),
-                    isSynced: Boolean(item.isSynced),
-                    isLastActionSynced: Boolean(item.isLastActionSynced),
+                    date: moment(item.date - getUTCOffset()),
+                    msAdded: item.date - getUTCOffset(),
+                    isFinished: Boolean(item.isFinished),
+                    isNotificationEnabled: Boolean(item.isNotificationEnabled),
+                    isShadow: Boolean(item.date === -1),
                     repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
                 };
 
@@ -110,14 +106,13 @@ class NotesService {
             }
         } else {
             let select = await executeSQL(
-                `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode
-                        FROM Tasks t
+                `SELECT t.id as key, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
+                        t.repeatType, t.contentItems, t.isFinished, t.forkFrom, t.date, t.manualOrderIndex, t.mode
+                        FROM Notes t
                         WHERE
                             t.id IN (${filteredNotesIDs.join(',')})
                             AND t.mode == 2
-                            AND t.lastAction != 'DELETE'
-                            AND t.lastAction != 'CLEAR';`
+                            AND t.lastAction != 'DELETE'`
             );
 
             let notes = [];
@@ -126,15 +121,13 @@ class NotesService {
 
                 let nextItem = {
                     ...item,
-                    dynamicFields: JSON.parse(item.dynamicFields),
+                    contentItems: JSON.parse(item.contentItems),
                     startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
                     endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
-                    added: moment(item.added - getUTCOffset()),
-                    finished: Boolean(item.finished),
-                    notificate: Boolean(item.notificate),
-                    isShadow: Boolean(item.added === -1),
-                    isSynced: Boolean(item.isSynced),
-                    isLastActionSynced: Boolean(item.isLastActionSynced),
+                    date: moment(item.date - getUTCOffset()),
+                    isFinished: Boolean(item.isFinished),
+                    isNotificationEnabled: Boolean(item.isNotificationEnabled),
+                    isShadow: Boolean(item.date === -1),
                     repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
                 };
 
@@ -144,80 +137,67 @@ class NotesService {
         }
     }
 
-    async getNotes(mode, dates) {
-        let selects = null;
+    parseNoteWithTime(note, utcOffset) {
+        return {
+            ...note,
+            contentItems: JSON.parse(note.contentItems),
+            startTime: ~note.startTime ? moment(note.startTime - utcOffset) : false,
+            endTime: ~note.endTime ? moment(note.endTime - utcOffset) : false,
+            date: ~note.date ? moment(note.date - utcOffset) : -1,
+            isFinished: Boolean(note.isFinished),
+            isNotificationEnabled: Boolean(note.isNotificationEnabled),
+            isShadow: Boolean(note.date === -1),
+            repeatDates: note.repeatDates ? note.repeatDates.split(",").map(a => note.repeatType === NoteRepeatType.Any ? +a - utcOffset : +a) : [],
+            lastActionTime: moment(note.lastActionTime),
+        };
+    }
 
-        if (mode === 1) {
-            if (!Array.isArray(dates)) {
-                dates = [dates];
-            }
+    parseNoteWithoutTime(note) {
+        return {
+            ...note,
+            contentItems: JSON.parse(note.contentItems),
+            isFinished: Boolean(note.isFinished),
+            lastActionTime: moment(note.lastActionTime)
+        }
+    }
 
-            selects = await Promise.all(
-                dates.map((date) => {
-                    let msDateUTC = date.valueOf() + getUTCOffset();
-                    return executeSQL(
-                        `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag,
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode,
-                        (select GROUP_CONCAT(rep.value, ',') from TasksRepeatValues rep where rep.taskId = t.id) as repeatDates
-                        FROM Tasks t
-                        LEFT JOIN TasksRepeatValues rep ON t.id = rep.taskId
-                        WHERE
-                            t.lastAction != 'DELETE'
-                            AND t.lastAction != 'CLEAR'
-                            AND (
-                                t.added = ?
-                                OR (
-                                    t.added = -1 AND NOT EXISTS (SELECT forkFrom FROM Tasks WHERE forkFrom = t.id AND repeatDate = ?)
-                                    AND (
-                                        t.repeatType = "day"
-                                        OR (t.repeatType = "week" AND rep.value = ?)
-                                        OR (t.repeatType = "any" AND rep.value = ?)
-                                    )
+    async getNotesWithTime(dates) {
+        let utcOffset = getUTCOffset();
+
+        let selects = await Promise.all(
+            dates.map((date) => {
+                let msDateUTC = date.valueOf() + utcOffset;
+                return executeSQL(
+                    `SELECT n.id as key, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, 
+                        n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
+                    (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatDates
+                    FROM Notes n
+                    LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
+                    WHERE
+                        n.lastAction != ?
+                        AND (
+                            n.date = ?
+                            OR (
+                                n.date = -1 AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND date = ?)
+                                AND (
+                                    n.repeatType = ?
+                                    OR (n.repeatType = ? AND rep.value = ?)
+                                    OR (n.repeatType = ? AND rep.value = ?)
                                 )
                             )
-                            AND t.mode == 1;`,
-                        [msDateUTC, msDateUTC, date.isoWeekday(), msDateUTC]
-                    );
-                })
-            );
-        } else {
-            dates = [moment().startOf("day")];
-            selects = await Promise.all(
-                dates.map((date) => {
-                    return executeSQL(
-                        `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, 
-                        t.isSynced, t.isLastActionSynced, t.repeatType, t.userId, t.dynamicFields, t.finished, t.forkFrom, t.added, t.manualOrderIndex, t.repeatDate, t.mode
-                        FROM Tasks t
-                        WHERE
-                            t.mode == 2
-                            AND t.lastAction != 'DELETE'
-                            AND t.lastAction != 'CLEAR';`,
-                        []
-                    );
-                })
-            )
-        }
+                        )
+                        AND n.mode == ?;`,
+                    [NoteAction.Delete, msDateUTC, msDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, date.isoWeekday(), NoteRepeatType.Any, msDateUTC, NoteMode.WithTime]
+                );
+            })
+        );
 
-        let dateNotes = selects.map((select, selectIndex) => {
+        let result = selects.map((select, selectIndex) => {
             let notes = [];
             for(let i = 0; i < select.rows.length; i++) {
-                let item = select.rows.item(i);
-
-                let nextItem = {
-                    ...item,
-                    dynamicFields: JSON.parse(item.dynamicFields),
-                    startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
-                    endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
-                    added: moment(dates[selectIndex]),
-                    finished: Boolean(item.finished),
-                    notificate: Boolean(item.notificate),
-                    isShadow: Boolean(item.added === -1),
-                    isSynced: Boolean(item.isSynced),
-                    isLastActionSynced: Boolean(item.isLastActionSynced),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
-                };
-
-                notes.push(nextItem);
+                let note = this.parseNoteWithTime(select.rows.item(i));
+                note.date = dates[selectIndex];
+                notes.push(note);
             }
 
             return {
@@ -226,217 +206,84 @@ class NotesService {
             }
         });
 
-        if (mode === 1 && dateNotes.length === 1) {
-            return dateNotes[0];
+        return result;
+    }
+
+    async getNotesWithoutTime() {
+        let select = await executeSQL(
+            `SELECT id as key, title, tag, contentItems, manualOrderIndex, mode, isFinished, lastAction, lastActionTime
+            FROM Notes
+            WHERE
+                mode == ?
+                AND lastAction != ?`,
+            [NoteMode.WithoutTime, NoteAction.Delete]
+        );
+
+        let notes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            notes.push(this.parseNoteWithoutTime(select.rows.item(i)));
         }
 
-        return dateNotes;
+        return [{ items: notes }];
+    }
+
+    async getNotes(mode, dates) {
+        if (mode === NoteMode.WithTime) {
+            return this.getNotesWithTime(dates);
+        } else {
+            return this.getNotesWithoutTime();
+        }
     }
 
     async addNote(note) {
-        let noteToLocalInsert = {
+        let nextNote = {
             ...note,
-            lastAction: NoteActions.ADD,
-            uuid: uuid(),
+            lastAction: NoteAction.Add,
             lastActionTime: moment().valueOf(),
             forkFrom: -1,
-            repeatDate: -1
+            isShadow: note.repeatType !== NoteRepeatType.NoRepeat
         };
 
-        let addedNote = await this.insertNote(noteToLocalInsert);
-        await this.setNoteRepeat(addedNote);
+        let noteId = await this.insertNote(nextNote);
+        nextNote.key = noteId;
 
-        addedNote.notificate && notificationService.set(addedNote);
+        await this.addNoteRepeatValues(nextNote);
 
-        return addedNote;
+        nextNote.isNotificationEnabled && notificationService.set(nextNote);
+
+        return nextNote;
     }
 
     async insertNote(note) {
-        let isShadow = note.repeatType !== "no-repeat" && note.forkFrom === -1;
+        let utcOffset = getUTCOffset();
 
         let insert = await executeSQL(
-            `INSERT INTO Tasks
-            (uuid, title, startTime, endTime, notificate, tag, lastAction, lastActionTime, userId, 
-                isSynced, isLastActionSynced, repeatType, dynamicFields, finished, added, forkFrom, repeatDate, mode, utcOffset)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            `INSERT INTO Notes
+            (title, startTime, endTime, isNotificationEnabled, tag, lastAction, lastActionTime, repeatType, contentItems, isFinished, date, forkFrom, mode, utcOffset)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
-                note.uuid,
                 note.title,
-                note.startTime ? note.startTime.valueOf() + getUTCOffset() : -1,
-                note.endTime ? note.endTime.valueOf() + getUTCOffset() : -1,
-                Number(note.notificate),
+                note.startTime ? note.startTime.valueOf() + utcOffset : -1,
+                note.endTime ? note.endTime.valueOf() + utcOffset : -1,
+                Number(note.isNotificationEnabled),
                 note.tag,
                 note.lastAction,
                 note.lastActionTime,
-                note.userId,
-                note.isSynced,
-                note.isLastActionSynced,
                 note.repeatType,
-                JSON.stringify(note.dynamicFields),
-                Number(note.finished),
-                isShadow ? -1 : note.added.valueOf() + getUTCOffset(),
+                JSON.stringify(note.contentItems),
+                Number(note.isFinished),
+                ~note.date.valueOf() ? note.date.valueOf() + utcOffset : -1,
                 note.forkFrom,
-                note.repeatDate,
                 note.mode,
-                getUTCOffset()
+                utcOffset
             ]
         );
 
-        return {
-            ...note,
-            key: insert.insertId,
-            isShadow
-        }
+        return insert.insertId;
     }
 
-    async updateNoteDynamicFields(note, fieldObj) {
-        let nextNote = {
-            ...note,
-            ...fieldObj,
-            isLastActionSynced: 0,
-            lastAction: "EDIT",
-            lastActionTime: moment().valueOf(),
-        };
-
-        if (nextNote.isShadow) {
-            nextNote.uuid = uuid();
-            nextNote.forkFrom = note.key;
-            nextNote.repeatDate = note.repeatDate === -1 ? note.added.valueOf() + getUTCOffset() : note.repeatDate;
-            nextNote = await this.insertNote(nextNote);
-        } else {
-            await executeSQL(
-                `UPDATE Tasks
-                SET 
-                    dynamicFields = ?,
-                    finished = ?,
-                    isLastActionSynced = ?,
-                    lastAction = ?,
-                    lastActionTime = ?
-                WHERE id = ?;`,
-                [
-                    JSON.stringify(nextNote.dynamicFields),
-                    Number(nextNote.finished),
-                    nextNote.isLastActionSynced,
-                    nextNote.lastAction,
-                    nextNote.lastActionTime,
-                    nextNote.key
-                ]
-            )
-        }
-
-        return nextNote;
-    }
-
-    async updateNote(note, prevNote) {
-        let nextNote = {
-            ...note,
-            lastAction: "EDIT",
-            lastActionTime: moment().valueOf(),
-            isLastActionSynced: 0
-        };
-        if (prevNote.repeatType !== "no-repeat") {
-            if (!nextNote.isShadow) {
-                nextNote.key = nextNote.forkFrom;
-            }
-            await executeSQL(`DELETE FROM Tasks WHERE forkFrom = ?`, [nextNote.key]);
-        }
-        nextNote.isShadow = nextNote.repeatType !== "no-repeat";
-        nextNote.forkFrom = -1;
-        nextNote.finished = false;
-        nextNote.repeatDate = -1;
-
-        await executeSQL(
-            `UPDATE Tasks
-            SET title = ?, added = ?, startTime = ?, endTime = ?, notificate = ?, tag = ?, 
-                isLastActionSynced = 0, lastAction = ?, lastActionTime = ?, repeatType = ?, dynamicFields = ?, finished = 0, utcOffset = ?
-            WHERE id = ?;`,
-            [
-                nextNote.title,
-                nextNote.isShadow ? -1 : nextNote.added.valueOf() + getUTCOffset(),
-                nextNote.startTime ? nextNote.startTime.valueOf() + getUTCOffset() : -1,
-                nextNote.endTime ? nextNote.endTime.valueOf() + getUTCOffset() : -1,
-                Number(nextNote.notificate),
-                nextNote.tag,
-                nextNote.lastAction,
-                nextNote.lastActionTime,
-                nextNote.repeatType,
-                JSON.stringify(nextNote.dynamicFields),
-                getUTCOffset(),
-                nextNote.key,
-            ]
-        );
-
-        await this.setNoteRepeat(nextNote);
-
-        notificationService.clear({...prevNote, key: nextNote.key});
-        nextNote.notificate && notificationService.set(nextNote);
-
-        return nextNote;
-    }
-
-    async updateNoteDate(note, nextDate) {
-        let nextNote = {
-            ...note,
-            added: nextDate,
-            lastAction: "EDIT",
-            lastActionTime: moment().valueOf(),
-            isLastActionSynced: 0
-        };
-
-        await executeSQL(`
-            UPDATE Tasks
-            SET
-                added = ?,
-                isLastActionSynced = ?,
-                lastAction = ?,
-                lastActionTime = ?,
-                utcOffset = ?
-            WHERE id = ?
-        `, [
-            nextDate.valueOf() + getUTCOffset(),
-            nextNote.isLastActionSynced,
-            nextNote.lastAction,
-            nextNote.lastActionTime,
-            getUTCOffset(),
-            note.key,
-        ]);
-
-        notificationService.clear(note);
-        note.notificate && notificationService.set(note);
-
-        return nextNote;
-    }
-
-    async deleteNote(note) {
-        let actionTime = moment().valueOf();
-        let nextNote = {...note};
-        if (nextNote.repeatType !== "no-repeat" && !nextNote.isShadow) {
-            nextNote.isShadow = true;
-            nextNote.key = nextNote.forkFrom;
-            nextNote.forkFrom = -1;
-        }
-
-        await executeSQL(
-            `UPDATE Tasks
-            SET 
-                lastAction = ?, 
-                lastActionTime = ?, 
-                isLastActionSynced = 0
-            WHERE id = ? OR forkFrom = ?;`,
-            [
-                "DELETE",
-                actionTime,
-                nextNote.key,
-                nextNote.key
-            ]
-        );
-        notificationService.clear(nextNote);
-
-        return nextNote;
-    }
-
-    async setNoteRepeat(note) {
-        await executeSQL(`DELETE FROM TasksRepeatValues WHERE taskId = ?`, [ note.key ]);
+    async addNoteRepeatValues(note) {
+        await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [ note.key ]);
 
         if (note.repeatType === "no-repeat" || note.repeatDates.length === 0) {
             return
@@ -453,59 +300,110 @@ class NotesService {
         }, []);
 
         await executeSQL(`
-            INSERT INTO TasksRepeatValues
-            (taskId, value)
+            INSERT INTO NotesRepeatValues
+            (noteId, value)
             VALUES
             ${params};
         `, values);
     }
 
-    async getDeletedNotes() {
-        let select = await executeSQL(
-            `SELECT t.id as key, t.uuid, t.title, t.startTime, t.endTime, t.notificate, t.tag, t.isSynced, t.isLastActionSynced, t.repeatType, t.userId,
-            t.dynamicFields, t.finished, t.forkFrom, t.lastActionTime
-            FROM Tasks t
-            WHERE t.lastAction = 'DELETE' AND
-            t.forkFrom = -1
-            ORDER BY t.lastActionTime
-            LIMIT 100;`
-        );
-
-        let notes = [];
-        for(let i = 0; i < select.rows.length; i++) {
-            let item = select.rows.item(i);
-
-            let nextItem = {
-                ...item,
-                dynamicFields: JSON.parse(item.dynamicFields),
-                startTime: ~item.startTime ? moment(item.startTime) : false,
-                endTime: ~item.endTime ? moment(item.endTime) : false,
-                added: moment(item.added),
-                finished: Boolean(item.finished),
-                notificate: Boolean(item.notificate),
-                isShadow: Boolean(item.isShadow),
-                isSynced: Boolean(item.isSynced),
-                isLastActionSynced: Boolean(item.isLastActionSynced),
-                lastActionTime: moment(item.lastActionTime)
-            };
-
-            notes.push(nextItem);
-        }
-
-        return notes;
-    }
-
-    async restoreNote(note) {
+    async updateNoteDynamicFields(note, fieldObj) {
         let nextNote = {
             ...note,
-            isShadow: note.added === -1,
-            lastAction: "UPDATE",
-            lastActionTime: moment().valueOf()
+            ...fieldObj,
+            lastAction: NoteAction.Edit,
+            lastActionTime: moment().valueOf(),
         };
 
+        if (nextNote.isShadow) {
+            nextNote.forkFrom = note.key;
+            nextNote.isShadow = false;
+            let noteId = await this.insertNote(nextNote);
+            nextNote.key = noteId;
+        } else {
+            await executeSQL(
+                `UPDATE Notes
+                SET 
+                    contentItems = ?,
+                    isFinished = ?,
+                    lastAction = ?,
+                    lastActionTime = ?
+                WHERE id = ?;`,
+                [
+                    JSON.stringify(nextNote.contentItems),
+                    Number(nextNote.isFinished),
+                    nextNote.lastAction,
+                    nextNote.lastActionTime,
+                    nextNote.key
+                ]
+            )
+        }
+
+        return nextNote;
+    }
+
+    async updateNote(note, prevNote) {
+        let nextNote = {
+            ...note,
+            lastAction: NoteAction.Edit,
+            lastActionTime: moment().valueOf(),
+        };
+        if (prevNote.repeatType !== "no-repeat") {
+            if (!nextNote.isShadow) {
+                nextNote.key = nextNote.forkFrom;
+            }
+            await executeSQL(`DELETE FROM Notes WHERE forkFrom = ?`, [nextNote.key]);
+        }
+        nextNote.isShadow = nextNote.repeatType !== "no-repeat";
+        nextNote.forkFrom = -1;
+        nextNote.isFinished = false;
+
         await executeSQL(
-            `UPDATE Tasks
-            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = 0
+            `UPDATE Notes
+            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, lastAction = ?, lastActionTime = ?, repeatType = ?, contentItems = ?, isFinished = ?, utcOffset = ?
+            WHERE id = ?;`,
+            [
+                nextNote.title,
+                nextNote.isShadow ? -1 : nextNote.date.valueOf() + getUTCOffset(),
+                nextNote.startTime ? nextNote.startTime.valueOf() + getUTCOffset() : -1,
+                nextNote.endTime ? nextNote.endTime.valueOf() + getUTCOffset() : -1,
+                Number(nextNote.isNotificationEnabled),
+                nextNote.tag,
+                nextNote.lastAction,
+                nextNote.lastActionTime,
+                nextNote.repeatType,
+                JSON.stringify(nextNote.contentItems),
+                Number(nextNote.isFinished),
+                getUTCOffset(),
+                nextNote.key,
+            ]
+        );
+
+        await this.addNoteRepeatValues(nextNote);
+
+        notificationService.clear({...prevNote, key: nextNote.key});
+        nextNote.isNotificationEnabled && notificationService.set(nextNote);
+
+        return nextNote;
+    }
+
+    async deleteNote(note) {
+        let nextNote = {
+            ...note,
+            lastAction: NoteAction.Delete,
+            lastActionTime: moment().valueOf(),
+        };
+        if (nextNote.repeatType !== NoteRepeatType.NoRepeat && !nextNote.isShadow) {
+            nextNote.isShadow = true;
+            nextNote.key = nextNote.forkFrom;
+            nextNote.forkFrom = -1;
+        }
+
+        await executeSQL(
+            `UPDATE Notes
+            SET 
+                lastAction = ?, 
+                lastActionTime = ?
             WHERE id = ? OR forkFrom = ?;`,
             [
                 nextNote.lastAction,
@@ -514,52 +412,70 @@ class NotesService {
                 nextNote.key
             ]
         );
-        nextNote.notificate && notificationService.set(nextNote);
+        notificationService.clear(nextNote);
 
         return nextNote;
     }
 
-    async cleanDeletedNotes() {
-        await executeSQL(`                               
-            UPDATE Tasks
-            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = ?
-            WHERE lastAction = 'DELETE';
-        `, ['CLEAR', moment().valueOf(), 0]);
+    async getDeletedNotes() {
+        let utcOffset = getUTCOffset();
 
-        return this.removeClearedNotes();
-    }
+        let select = await executeSQL(
+            `SELECT id as key, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
+                contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date
+            FROM Notes n
+            WHERE lastAction = ? AND
+            forkFrom = -1
+            ORDER BY lastActionTime
+            LIMIT 100;`
+        , [NoteAction.Delete]);
 
-    async cleanOldDeletedNotes() {
-        await executeSQL(`                               
-            UPDATE Tasks
-            SET lastAction = ?, lastActionTime = ?, isLastActionSynced = ?
-            WHERE lastAction = 'DELETE' AND lastActionTime <= ?;
-        `, ['CLEAR', moment().valueOf(), 0, moment().subtract(30, "day").valueOf()]);
-
-        return this.removeClearedNotes();
-    }
-
-    async removeClearedNotes(msBackupStartTime) {
-        let params = [];
-        let whereStatement = "";
-        if (msBackupStartTime !== undefined) {
-            whereStatement += "lastActionTime <= ?";
-            params.push(msBackupStartTime);
+        let notes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            notes.push(this.parseNoteWithTime(select.rows.item(i), utcOffset));
         }
 
+        return notes;
+    }
+
+    async restoreNote(note) {
+        let nextNote = {
+            ...note,
+            isShadow: note.date === -1,
+            lastAction: NoteAction.Edit,
+            lastActionTime: moment().valueOf()
+        };
+
+        await executeSQL(
+            `UPDATE Notes
+            SET lastAction = ?, lastActionTime = ?
+            WHERE id = ? OR forkFrom = ?;`,
+            [
+                nextNote.lastAction,
+                nextNote.lastActionTime,
+                nextNote.key,
+                nextNote.key
+            ]
+        );
+        nextNote.isNotificationEnabled && notificationService.set(nextNote);
+
+        return nextNote;
+    }
+
+    async removeDeletedNotes(untilDate) {
         await executeSQL(`
-            DELETE FROM TasksRepeatValues
-            WHERE taskId IN (
-                SELECT taskId FROM TasksRepeatValues
-                LEFT JOIN Tasks ON TasksRepeatValues.taskId = Tasks.id
-                WHERE Tasks.lastAction = 'CLEAR' ${whereStatement ? "AND " + whereStatement : ""}
+            DELETE FROM NotesRepeatValues
+            WHERE noteId IN (
+                SELECT noteId FROM NotesRepeatValues
+                LEFT JOIN Notes ON NotesRepeatValues.noteId = Notes.id
+                WHERE lastAction = ? AND lastActionTime <= ?
             );
-        `, params);
+        `, [NoteAction.Delete, untilDate]);
 
         return executeSQL(`
-            DELETE FROM Tasks
-            WHERE lastAction = 'CLEAR' ${whereStatement ? "AND " + whereStatement : ""}
-        `, params);
+            DELETE FROM Notes 
+            WHERE lastAction = ? AND lastActionTime <= ?
+        `, [NoteAction.Delete, untilDate]);
     }
 
     async updateNotesManualSortIndex(notes) {
@@ -567,10 +483,10 @@ class NotesService {
         let notesInserted = [];
         for (let note of nextNotes) {
             if (note.isShadow) {
-                note.uuid = uuid();
                 note.forkFrom = note.key;
-                note.repeatDate = note.repeatDate === -1 ? note.added.valueOf() + getUTCOffset() : note.repeatDate;
-                note = await this.insertNote(note);
+                note.isShadow = false;
+                let noteId = await this.insertNote(note);
+                note.key = noteId;
                 notesInserted.push(note);
             }
         }
@@ -580,7 +496,7 @@ class NotesService {
 
         let sql = `
             WITH Tmp (id, manualOrderIndex) AS (VALUES ${valuesPlaces})
-            UPDATE Tasks SET manualOrderIndex = (SELECT manualOrderIndex FROM Tmp WHERE Tasks.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
+            UPDATE Notes SET manualOrderIndex = (SELECT manualOrderIndex FROM Tmp WHERE Notes.id = Tmp.id) WHERE id IN (SELECT id FROM Tmp);
         `;
         await executeSQL(sql, values);
 

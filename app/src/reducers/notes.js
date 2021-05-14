@@ -1,15 +1,13 @@
 let init = [];
 
-function receiveNote(state, note) {
-    delete note.prevNote;
-
+function getReceiveNoteFn(note) {
     let assignFn = (list) => ({
         date: list.date, 
         items: [
             ...list.items, 
             {
                 ...note,
-                added: list.date
+                date: list.date
             }
         ] 
     });
@@ -40,7 +38,7 @@ function receiveNote(state, note) {
         }
         default: {
             fn = (list) => {
-                if (list.date.valueOf() === note.added.valueOf()) {
+                if (list.date.valueOf() === note.date.valueOf()) {
                     return assignFn(list)
                 }
                 return list
@@ -48,68 +46,50 @@ function receiveNote(state, note) {
         }
     }
 
-    return state.map(fn);
+    return fn;
 }
 
 function notes (state = init, action) {
     switch(action.type) {
-        case 'SET_DATES_AND_UPDATE_NOTES': {
-            return action.payload.notes.slice();
-        }
-        case 'UPDATE_DATES_AND_NOTES': {
-            return [...state.slice(0, action.payload.nextIndex), action.payload.notes, ...state.slice(action.payload.nextIndex + 1)]
-        }
         case 'RECEIVE_NOTE': {
-            return receiveNote(state, action.payload.note);
+            return state.map(getReceiveNoteFn(action.payload.note));
         }
         case 'UPDATE_NOTE': {
-            let startState = null;
-
-            if (action.payload.prevNote.repeatType === "no-repeat") {
-                startState = state.map((list) => {
-                    return {...list, items: list.items.filter((note) => note.key !== action.payload.note.key)}
-                });
-            } else {
-                startState = state.map((list) => {
-                    return {...list, items: list.items.filter((note) => (
-                        (note.key !== action.payload.note.key) &&
-                        (note.forkFrom !== action.payload.note.key)
-                    ))}
-                });
-            }
-
-            return receiveNote(startState, action.payload.note);
+            return state
+                .map((list) => {
+                    return {
+                        ...list,
+                        items: list.items.filter((note) => (
+                            (note.key !== action.payload.note.key) &&
+                            (note.forkFrom !== action.payload.note.key)
+                        ))
+                    }
+                })
+                .map(getReceiveNoteFn(action.payload.note));
         }
-        case 'UPDATE_NOTE_DYNAMIC_FIELDS': {
+        case 'UPDATE_NOTE_DYNAMIC': {
             let nextState = state.slice();
 
-            let actions = action.payload.notes ? action.payload.notes : [action.payload];
-
-            actions.forEach((action) => {
-                if (action.realFromShadow) {
-                    let noteToFilterDate = action.note.added.valueOf();
-
+            action.payload.notes.forEach((note) => {
+                if (note.forkFrom !== -1) {
                     nextState = nextState.map((list) => {
-                        if (list.date.valueOf() === noteToFilterDate) {
-                            return {...list, items: list.items.filter((note) => note.key !== action.note.forkFrom)}
+                        if (list.date.valueOf() === note.date.valueOf()) {
+                            return {...list, items: list.items.filter((item) => item.key !== note.forkFrom)}
                         }
                         return list;
                     });
-                } else {
-                    nextState = nextState.map((list) => {
-                        return {...list, items: list.items.filter((note) => note.key !== action.note.key)}
-                    });
                 }
-
-                nextState = nextState.map((list) => {
-                    if (list.date.valueOf() === action.note.added.valueOf()) {
-                        return {
-                            date: list.date,
-                            items: [...list.items, action.note]
+                nextState = nextState
+                    .map((list) => ({...list, items: list.items.filter((item) => item.key !== note.key)}))
+                    .map((list) => {
+                        if (list.date.valueOf() === note.date.valueOf()) {
+                            return {
+                                date: list.date,
+                                items: [...list.items, note]
+                            }
                         }
-                    }
-                    return list;
-                });
+                        return list;
+                    });
             });
 
             return nextState;
@@ -126,6 +106,13 @@ function notes (state = init, action) {
                 }
             });
         }
+        case 'SET_DATES_AND_UPDATE_NOTES':
+        case "UPDATE_NOTES_LIST": {
+            return action.payload.notes.slice();
+        }
+        case 'UPDATE_DATES_AND_NOTES': {
+            return [...state.slice(0, action.payload.nextIndex), action.payload.notes, ...state.slice(action.payload.nextIndex + 1)]
+        }
         case "RENDER_NOTES": {
             return state.map((list) => {
                 return {
@@ -134,28 +121,16 @@ function notes (state = init, action) {
                 }
             })
         }
-        case "UPDATE_NOTES": {
-            return action.payload.notes.slice();
-        }
-        case "UPDATE_MANUAL_SORT_INDEX": {
-            if (action.payload.notes[0].mode === 2) {
-                return [
-                    {
-                        ...state[0],
+        case "SET_NOTES_LIST_ITEMS": {
+            return state.map((list) => {
+                if (!list.date || (list.date.isSame(action.payload.date))) {
+                    return {
+                        ...list,
                         items: action.payload.notes
-                    }
-                ]
-            } else {
-                return state.map((list) => {
-                    if (list.date.valueOf() === action.payload.notes[0].added.valueOf()) {
-                        return {
-                            ...list,
-                            items: action.payload.notes
-                        };
-                    }
-                    return list;
-                });
-            }
+                    };
+                }
+                return list;
+            });
         }
         default: 
             return state;

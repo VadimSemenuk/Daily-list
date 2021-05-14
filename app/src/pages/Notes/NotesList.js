@@ -81,8 +81,8 @@ class NotesList extends PureComponent {
         }
 
         if (this.props.settings.sortFinBehaviour === 1) {
-            let notFinished = this.props.notes.filter((a) => !a.finished);
-            let finished = this.props.notes.filter((a) => a.finished);
+            let notFinished = this.props.notes.filter((a) => !a.isFinished);
+            let finished = this.props.notes.filter((a) => a.isFinished);
 
             return (
                 <Sortable ref={this.setSortableRef} {...sortableOptions}>

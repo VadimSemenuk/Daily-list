@@ -22,7 +22,7 @@ import AddGeryImg from '../../assets/img/add-grey.svg';
 
 import deepCopy from '../../utils/deepCopyObject'
 
-import {NotesScreenMode} from "../../constants";
+import {NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Add.scss';
 
@@ -32,13 +32,13 @@ class Add extends Component {
 
         this.state = {
             title: "",
-            dynamicFields: [],
-            notificate: false,
+            contentItems: [],
+            isNotificationEnabled: false,
             startTime: false,
             endTime: false,
             tag: 'transparent',
-            added: this.props.date,
-            finished: false,
+            date: this.props.date,
+            isFinished: false,
             repeatType: "no-repeat",
             repeatDates: [],
             mode: this.props.settings.notesScreenMode,
@@ -59,11 +59,11 @@ class Add extends Component {
     }
 
     addField(field, index) {
-        let nextDynamicFields = [...this.state.dynamicFields.slice(0, index), field, ...this.state.dynamicFields.slice(index)];
+        let nextDynamicFields = [...this.state.contentItems.slice(0, index), field, ...this.state.contentItems.slice(index)];
 
         return new Promise((resolve) => {
             this.setState({
-                dynamicFields: nextDynamicFields
+                contentItems: nextDynamicFields
             }, resolve)
         });
     }
@@ -112,7 +112,7 @@ class Add extends Component {
             value: ""
         };
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
-        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.dynamicFields.length;
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.contentItems.length;
         await this.addField(field, nextIndex);
         this.focusDynamicField(nextIndex);
         this.scrollToBottom();
@@ -125,7 +125,7 @@ class Add extends Component {
             checked: false
         };
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
-        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.dynamicFields.length;
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.contentItems.length;
         await this.addField(field, nextIndex);
         this.focusDynamicField(nextIndex);
         this.scrollToBottom();
@@ -134,7 +134,7 @@ class Add extends Component {
     onDynamicItemRemove = async (i) => {
         await new Promise((resolve) => {
             this.setState({
-                dynamicFields: [...this.state.dynamicFields.slice(0, i), ...this.state.dynamicFields.slice(i + 1)]
+                contentItems: [...this.state.contentItems.slice(0, i), ...this.state.contentItems.slice(i + 1)]
             }, resolve);
         });
         if (!this.focusDynamicField(i)) {
@@ -149,7 +149,7 @@ class Add extends Component {
         };
 
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
-        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.dynamicFields.length;
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.contentItems.length;
 
         await this.addField(field, nextIndex);
         this.scrollToBottom();
@@ -174,15 +174,19 @@ class Add extends Component {
     };
 
     getInputsValues = () => {
-        let dynamicFields = this.state.dynamicFields.filter((a) => a !== null);
+        let contentItems = this.state.contentItems.filter((a) => a !== null);
         return {
-            ...this.state, 
-            dynamicFields
+            ...this.state,
+            contentItems
         }
     };
 
     onSubmit = async () => {
         let note = this.getInputsValues();
+
+        if (note.repeatType !== NoteRepeatType.NoRepeat) {
+            note.date = -1;
+        }
 
         if (this.props.match.path === "/edit") {
             await this.props.updateNote(note, this.prevNote);
@@ -199,7 +203,7 @@ class Add extends Component {
     }
 
     showImage = (i) => {
-        let field = this.state.dynamicFields[i];
+        let field = this.state.contentItems[i];
         window.PhotoViewer.show(field.uri, this.state.title, {share: false});         
     };
 
@@ -209,13 +213,13 @@ class Add extends Component {
 
     onDateSelect = (date) => {
         this.setState({
-            added: date
+            date: date
         });
     };
 
     setDefaultAddedDate = () => {
         this.setState({
-            added: this.props.date
+            date: this.props.date
         });
     }
 
@@ -228,13 +232,13 @@ class Add extends Component {
                     page={(this.props.settings.notesScreenMode === NotesScreenMode.WithTime) ? "daily-add" : "add"}
                     onSubmit={this.onSubmit}
                     onCalendarRequest={this.triggerCalendar}
-                    currentDate={this.state.added}
+                    currentDate={this.state.date}
                     onResetAddedDate={this.setDefaultAddedDate}
                 />
                 {
                     this.state.calendar &&
                     <Calendar 
-                        currentDate={this.state.added}
+                        currentDate={this.state.date}
                         calendarNotesCounter={this.props.settings.calendarNotesCounter}
                         onDateSet={this.onDateSelect}
                         onCloseRequest={this.triggerCalendar}
@@ -250,7 +254,7 @@ class Add extends Component {
                             onChange={(e) => this.setState({title: e.target.value})}
                         />
                         {
-                            this.state.dynamicFields.map((a, i) => {
+                            this.state.contentItems.map((a, i) => {
                                 if (!a) {
                                     return null;
                                 } else if (a.type === "text") {
@@ -261,9 +265,9 @@ class Add extends Component {
                                             placeholder={t("input-placeholder-text")}
                                             value={a.value}
                                             onChange={(value) => {
-                                                let dynamicFields = this.state.dynamicFields.slice();
-                                                dynamicFields[i].value = value;
-                                                this.setState({dynamicFields});
+                                                let contentItems = this.state.contentItems.slice();
+                                                contentItems[i].value = value;
+                                                this.setState({contentItems});
                                             }}
                                             onListItemRemove={() => this.onDynamicItemRemove(i)}
                                         />
@@ -275,14 +279,14 @@ class Add extends Component {
                                             className="add-content-item dynamic-field"
                                             onListItemRemove={(inputRef) => this.onDynamicItemRemove(i)}
                                             onTextChange={(text) => {
-                                                let dynamicFields = this.state.dynamicFields.slice();
-                                                dynamicFields[i] = {...dynamicFields[i], value: text};                                        
-                                                this.setState({dynamicFields});
+                                                let contentItems = this.state.contentItems.slice();
+                                                contentItems[i] = {...contentItems[i], value: text};
+                                                this.setState({contentItems});
                                             }}
                                             onValueChange={(value) => {
-                                                let dynamicFields = this.state.dynamicFields.slice();
-                                                dynamicFields[i] = {...dynamicFields[i], checked: value};                                         
-                                                this.setState({dynamicFields});
+                                                let contentItems = this.state.contentItems.slice();
+                                                contentItems[i] = {...contentItems[i], checked: value};
+                                                this.setState({contentItems});
                                             }}
                                             onEnterPress={() => this.addListItem(i)}
                                             textValue={a.value} 
@@ -377,12 +381,12 @@ class Add extends Component {
                         {
                             (this.props.settings.notesScreenMode === NotesScreenMode.WithTime) &&
                             <TimeSet
-                                notificate={this.state.notificate}
+                                isNotificationEnabled={this.state.isNotificationEnabled}
                                 startTime={this.state.startTime}
                                 endTime={this.state.endTime}
                                 settings={this.props.settings}
                                 repeatType={this.state.repeatType}
-                                currentDate={this.state.added}
+                                currentDate={this.state.date}
                                 repeatDates={this.state.repeatDates}
                                 mode={this.props.match.path === "/edit" ? "edit" : "add"}
                                 onStateChange={(time) => this.setState({...time})}

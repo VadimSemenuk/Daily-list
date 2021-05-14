@@ -9,6 +9,7 @@ import Header from '../../components/Header/Header';
 import TrashListItem from './TrashListItem/TrashListItem';
 
 import './Trash.scss';
+import {removeDeletedNotes} from "../../actions";
 
 class Trash extends Component {
     async componentDidMount() {
@@ -46,7 +47,7 @@ class Trash extends Component {
                         <div className="clean-trash-button-wrapper">
                             <button 
                                 className="text block"
-                                onClick={this.props.cleanDeletedNotes}
+                                onClick={this.props.removeDeletedNotes}
                             >{t("clean-trash")}</button>
                         </div>
                     }

@@ -66,7 +66,6 @@ class SettingsService {
         let select = await executeSQL(
             `SELECT 
                 defaultNotification, 
-                fastAdd, 
                 theme, 
                 password, 
                 fontSize, 
@@ -89,7 +88,6 @@ class SettingsService {
         return {
             ...result,
             defaultNotification: Boolean(result.defaultNotification),
-            fastAdd: Boolean(result.fastAdd),
             theme: themesService.getThemeById(result.theme),
             calendarNotesCounter: Boolean(result.calendarNotesCounter),
             calendarNotesCounterIncludeFinished: Boolean(result.calendarNotesCounterIncludeFinished),
@@ -100,7 +98,6 @@ class SettingsService {
     async setSetting (item, value) {
         switch(item) {
             case("defaultNotification"): value = Number(value); break;
-            case("fastAdd"): value = Number(value); break;
             case("theme"): value = value.id; break;
             case("calendarNotesCounter"): value = Number(value); break;
             case("calendarNotesCounterIncludeFinished"): value = Number(value); break;

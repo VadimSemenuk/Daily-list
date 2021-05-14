@@ -25,19 +25,19 @@ class Note extends PureComponent {
         }
 
         let nextDynamicFields = [
-            ...this.props.itemData.dynamicFields.slice(0, i),
+            ...this.props.itemData.contentItems.slice(0, i),
             {
-                ...this.props.itemData.dynamicFields[i],
+                ...this.props.itemData.contentItems[i],
                 checked: v
             },
-            ...this.props.itemData.dynamicFields.slice(i + 1)
+            ...this.props.itemData.contentItems.slice(i + 1)
         ];
 
-        this.props.onDynamicFieldChange(this.props.itemData, {dynamicFields: nextDynamicFields});
+        this.props.onDynamicFieldChange(this.props.itemData, {contentItems: nextDynamicFields});
     };
 
     onItemFinishChange = (v) => {
-        this.props.onDynamicFieldChange(this.props.itemData, {finished: v});
+        this.props.onDynamicFieldChange(this.props.itemData, {isFinished: v});
     };
 
     onDialogRequest = (e) => {
@@ -62,7 +62,7 @@ class Note extends PureComponent {
         return (
             <div
                 data-id={this.props.itemData.key}
-                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'} ${this.props.itemData.finished && 'finished'} ${!this.props.itemData.finished && 'not-finished'}`}
+                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'} ${this.props.itemData.isFinished && 'finished'} ${!this.props.itemData.isFinished && 'not-finished'}`}
                 onClick={this.triggerExpanded}
             >
                 <div
@@ -75,7 +75,7 @@ class Note extends PureComponent {
                         {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
                         {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>}
                         {
-                            this.props.itemData.notificate &&
+                            this.props.itemData.isNotificationEnabled &&
                             <div className="notification-identifier-wrapper">
                                 <img
                                     className="notification-identifier"
@@ -99,7 +99,7 @@ class Note extends PureComponent {
                         {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
                     </div>
                     {
-                        this.props.itemData.dynamicFields.map((a, i) => {
+                        this.props.itemData.contentItems.map((a, i) => {
                             if (a && a.type === "text") {
                                 return (
                                     <div
@@ -155,7 +155,7 @@ class Note extends PureComponent {
                         (!this.props.context || (this.props.context.name === 'search' && this.props.context.params.searchRepeatType === 'no-repeat')) &&
                         <div className="note-finish-checkbox">
                             <CustomCheckBox
-                                checked={this.props.itemData.finished}
+                                checked={this.props.itemData.isFinished}
                                 onChange={this.onItemFinishChange}
                             />
                         </div>

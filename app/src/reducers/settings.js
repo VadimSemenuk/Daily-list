@@ -7,7 +7,6 @@ let init = {
         realId: 0
     },
     defaultNotification: true,
-    fastAdd: false,
     sort: {
         type: 0,
         direction: 0,

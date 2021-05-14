@@ -5,7 +5,7 @@ import {addFakeListItemsData} from "../../utils/fakeData";
 
 class Migration {
     async checkDBExisting() {
-        return (await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks';`)).rows.length;
+        return (await execureSQL(`SELECT name FROM sqlite_master WHERE type='table' AND name='Migrations';`)).rows.length;
     }
 
     async initDb() {
