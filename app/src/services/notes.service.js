@@ -36,7 +36,7 @@ class NotesService {
             let msCurrentDate = moment().startOf("day").valueOf();
 
             let select = await executeSQL(
-                `SELECT t.id as key, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
+                `SELECT t.id, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
                         t.repeatType, t.contentItems, t.isFinished, t.forkFrom, t.date, t.manualOrderIndex, t.mode,
                         (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = t.id) as repeatDates
                         FROM Notes t
@@ -106,7 +106,7 @@ class NotesService {
             }
         } else {
             let select = await executeSQL(
-                `SELECT t.id as key, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
+                `SELECT t.id, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
                         t.repeatType, t.contentItems, t.isFinished, t.forkFrom, t.date, t.manualOrderIndex, t.mode
                         FROM Notes t
                         WHERE
@@ -168,7 +168,7 @@ class NotesService {
             dates.map((date) => {
                 let msDateUTC = date.valueOf() + utcOffset;
                 return executeSQL(
-                    `SELECT n.id as key, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, 
+                    `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, 
                         n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
                     (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatDates
                     FROM Notes n
@@ -211,7 +211,7 @@ class NotesService {
 
     async getNotesWithoutTime() {
         let select = await executeSQL(
-            `SELECT id as key, title, tag, contentItems, manualOrderIndex, mode, isFinished, lastAction, lastActionTime
+            `SELECT id, title, tag, contentItems, manualOrderIndex, mode, isFinished, lastAction, lastActionTime
             FROM Notes
             WHERE
                 mode == ?
@@ -245,7 +245,7 @@ class NotesService {
         };
 
         let noteId = await this.insertNote(nextNote);
-        nextNote.key = noteId;
+        nextNote.id = noteId;
 
         await this.addNoteRepeatValues(nextNote);
 
@@ -283,7 +283,7 @@ class NotesService {
     }
 
     async addNoteRepeatValues(note) {
-        await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [ note.key ]);
+        await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [ note.id ]);
 
         if (note.repeatType === NoteRepeatType.NoRepeat || note.repeatDates.length === 0) {
             return
@@ -296,7 +296,7 @@ class NotesService {
             if (note.repeatType === NoteRepeatType.Any) {
                 value = item + getUTCOffset();
             }
-            return [...acc, note.key, value]
+            return [...acc, note.id, value]
         }, []);
 
         await executeSQL(`
@@ -316,10 +316,10 @@ class NotesService {
         };
 
         if (nextNote.isShadow) {
-            nextNote.forkFrom = note.key;
+            nextNote.forkFrom = note.id;
             nextNote.isShadow = false;
             let noteId = await this.insertNote(nextNote);
-            nextNote.key = noteId;
+            nextNote.id = noteId;
         } else {
             await executeSQL(
                 `UPDATE Notes
@@ -334,7 +334,7 @@ class NotesService {
                     Number(nextNote.isFinished),
                     nextNote.lastAction,
                     nextNote.lastActionTime,
-                    nextNote.key
+                    nextNote.id
                 ]
             )
         }
@@ -350,9 +350,9 @@ class NotesService {
         };
         if (prevNote.repeatType !== NoteRepeatType.NoRepeat) {
             if (!nextNote.isShadow) {
-                nextNote.key = nextNote.forkFrom;
+                nextNote.id = nextNote.forkFrom;
             }
-            await executeSQL(`DELETE FROM Notes WHERE forkFrom = ?`, [nextNote.key]);
+            await executeSQL(`DELETE FROM Notes WHERE forkFrom = ?`, [nextNote.id]);
         }
         nextNote.isShadow = nextNote.repeatType !== NoteRepeatType.NoRepeat;
         nextNote.forkFrom = -1;
@@ -375,13 +375,13 @@ class NotesService {
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
                 getUTCOffset(),
-                nextNote.key,
+                nextNote.id,
             ]
         );
 
         await this.addNoteRepeatValues(nextNote);
 
-        notificationService.clear({...prevNote, key: nextNote.key});
+        notificationService.clear({...prevNote, id: nextNote.id});
         nextNote.isNotificationEnabled && notificationService.set(nextNote);
 
         return nextNote;
@@ -395,7 +395,7 @@ class NotesService {
         };
         if (nextNote.repeatType !== NoteRepeatType.NoRepeat && !nextNote.isShadow) {
             nextNote.isShadow = true;
-            nextNote.key = nextNote.forkFrom;
+            nextNote.id = nextNote.forkFrom;
             nextNote.forkFrom = -1;
         }
 
@@ -408,8 +408,8 @@ class NotesService {
             [
                 nextNote.lastAction,
                 nextNote.lastActionTime,
-                nextNote.key,
-                nextNote.key
+                nextNote.id,
+                nextNote.id
             ]
         );
         notificationService.clear(nextNote);
@@ -421,7 +421,7 @@ class NotesService {
         let utcOffset = getUTCOffset();
 
         let select = await executeSQL(
-            `SELECT id as key, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
+            `SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
                 contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date
             FROM Notes n
             WHERE lastAction = ? AND
@@ -453,8 +453,8 @@ class NotesService {
             [
                 nextNote.lastAction,
                 nextNote.lastActionTime,
-                nextNote.key,
-                nextNote.key
+                nextNote.id,
+                nextNote.id
             ]
         );
         nextNote.isNotificationEnabled && notificationService.set(nextNote);
@@ -483,15 +483,15 @@ class NotesService {
         let notesInserted = [];
         for (let note of nextNotes) {
             if (note.isShadow) {
-                note.forkFrom = note.key;
+                note.forkFrom = note.id;
                 note.isShadow = false;
                 let noteId = await this.insertNote(note);
-                note.key = noteId;
+                note.id = noteId;
                 notesInserted.push(note);
             }
         }
 
-        const values = notes.reduce((acc, val) => [...acc, val.key, val.manualOrderIndex], []);
+        const values = notes.reduce((acc, val) => [...acc, val.id, val.manualOrderIndex], []);
         const valuesPlaces = notes.reduce((acc) => [...acc, '(?, ?)'], []).join(", ");
 
         let sql = `

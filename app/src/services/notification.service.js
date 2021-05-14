@@ -34,7 +34,7 @@ class NotificationService {
                 let atDate = moment(note.date).hour(note.startTime.hour()).minute(note.startTime.minute());
                 atDate = new Date(atDate.valueOf());
                 notificationConfig.trigger = { at: atDate };
-                notificationConfig.id = note.key;
+                notificationConfig.id = note.id;
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
@@ -45,7 +45,7 @@ class NotificationService {
                         minute: note.startTime.minute()
                     },
                 };
-                notificationConfig.id = note.key;
+                notificationConfig.id = note.id;
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
@@ -53,7 +53,7 @@ class NotificationService {
                 let notificationConfigs = note.repeatDates.map((date) => {
                     return {
                         ...notificationConfig,
-                        id: +`${note.key}${date}`,
+                        id: +`${note.id}${date}`,
                         trigger: {
                             every:
                                 {
@@ -74,7 +74,7 @@ class NotificationService {
 
                     return {
                         ...notificationConfig,
-                        id: +`${note.key}${date}`,
+                        id: +`${note.id}${date}`,
                         trigger: { at: atDate }
                     }
                 });
@@ -90,9 +90,9 @@ class NotificationService {
             return;
         }
 
-        let ids = [note.key];
+        let ids = [note.id];
         if (note.repeatType === NoteRepeatType.Any || note.repeatType === NoteRepeatType.Week) {
-            ids = note.repeatDates.map((date) => +`${note.key}${date}`);
+            ids = note.repeatDates.map((date) => +`${note.id}${date}`);
         }
 
         window.cordova.plugins.notification.local.cancel(ids);
@@ -103,7 +103,7 @@ class NotificationService {
     };
 
     clearOldVersionNotes(note) {
-        let ids = [note.key];
+        let ids = [note.id];
 
         if (note.repeatType === NoteRepeatType.Any) {
             ids = note.repeatDates;

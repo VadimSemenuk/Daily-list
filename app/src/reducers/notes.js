@@ -62,8 +62,8 @@ function notes (state = init, action) {
                     return {
                         ...list,
                         items: list.items.filter((note) => (
-                            (note.key !== action.payload.note.key) &&
-                            (note.forkFrom !== action.payload.note.key)
+                            (note.id !== action.payload.note.id) &&
+                            (note.forkFrom !== action.payload.note.id)
                         ))
                     }
                 })
@@ -76,13 +76,13 @@ function notes (state = init, action) {
                 if (note.forkFrom !== -1) {
                     nextState = nextState.map((list) => {
                         if (list.date.valueOf() === note.date.valueOf()) {
-                            return {...list, items: list.items.filter((item) => item.key !== note.forkFrom)}
+                            return {...list, items: list.items.filter((item) => item.id !== note.forkFrom)}
                         }
                         return list;
                     });
                 }
                 nextState = nextState
-                    .map((list) => ({...list, items: list.items.filter((item) => item.key !== note.key)}))
+                    .map((list) => ({...list, items: list.items.filter((item) => item.id !== note.id)}))
                     .map((list) => {
                         if (list.date.valueOf() === note.date.valueOf()) {
                             return {
@@ -99,8 +99,8 @@ function notes (state = init, action) {
         case 'DELETE_NOTE': {
             return state.map((list) => {
                 let nextList = list.items.filter((note) => (
-                    (note.key !== action.payload.note.key) &&
-                    (note.forkFrom !== action.payload.note.key)
+                    (note.id !== action.payload.note.id) &&
+                    (note.forkFrom !== action.payload.note.id)
                 ));
                 return {
                     date: list.date, 

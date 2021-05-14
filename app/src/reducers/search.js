@@ -14,7 +14,7 @@ function notes (state = init, action) {
             let nextState = state.slice();
             actions.forEach((action) => {
                 nextState = nextState.map((list) => {
-                    let nextItems = list.items.filter((note) => note.key !== action.note.key);
+                    let nextItems = list.items.filter((note) => note.id !== action.note.id);
                     if (!list.date || (list.date.valueOf() === action.note.date.valueOf())) {
                         nextItems.push(action.note);
                     }
@@ -30,8 +30,8 @@ function notes (state = init, action) {
         case 'DELETE_NOTE': {
             return state.map((list) => {
                 let nextList = list.items.filter((note) => (
-                    (note.key !== action.payload.note.key) &&
-                    (note.forkFrom !== action.payload.note.key)
+                    (note.id !== action.payload.note.id) &&
+                    (note.forkFrom !== action.payload.note.id)
                 ));
                 return {
                     ...list,

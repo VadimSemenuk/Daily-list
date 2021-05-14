@@ -29,7 +29,7 @@ class NotesList extends PureComponent {
         }
 
         let nextOrder = this.props.notes.map((n) => {
-            let nextManualOrderIndex = order.indexOf(n.key);
+            let nextManualOrderIndex = order.indexOf(n.id);
             if (nextManualOrderIndex === -1) {
                 nextManualOrderIndex = null;
             }
@@ -53,7 +53,7 @@ class NotesList extends PureComponent {
 
     renderItem = (a) => (
         <Note
-            key={a.key}
+            key={a.id}
             itemData={a}
             settings={this.props.settings}
             onDynamicFieldChange={this.props.onDynamicFieldChange}

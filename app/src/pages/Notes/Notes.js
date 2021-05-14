@@ -384,14 +384,14 @@ function getNotesCompareFn(settings) {
 function getSortByAddedTimeFn(settings) {
     if (settings.sortDirection === 1) {
         return (a, b) => {
-            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.key;
-            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.key;
+            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.id;
+            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.id;
             return aVal - bVal;
         }
     } else {
         return (a, b) => {
-            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.key;
-            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.key;
+            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.id;
+            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.id;
             return bVal - aVal;
         }
     }

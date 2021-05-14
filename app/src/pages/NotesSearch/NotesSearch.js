@@ -108,7 +108,7 @@ class NotesSearch extends PureComponent {
 
     renderItem = (a) => (
         <Note
-            key={a.key}
+            key={a.id}
             itemData={a}
             settings={this.props.settings}
             context={{name: 'search', params: {searchRepeatType: this.state.searchRepeatType}}}
@@ -199,7 +199,7 @@ function mapStateToProps(state) {
         search: state.search.map((a) => {
             return {
                 ...a,
-                items: a.items.slice().sort((a, b) => a.key - b.key)
+                items: a.items.slice().sort((a, b) => a.id - b.id)
             }
         })
     }

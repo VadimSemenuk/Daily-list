@@ -34,7 +34,7 @@ class Trash extends Component {
                         {
                             this.props.trash.map((a) => (
                                 <TrashListItem 
-                                    key={a.key}
+                                    key={a.id}
                                     itemData={a}
                                     settings={this.props.settings}
                                     onRestore={this.onRestore}

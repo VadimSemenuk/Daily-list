@@ -5,7 +5,7 @@ function trash (state = initState, action) {
         case 'RECEIVE_DELETED_NOTES':
             return action.payload.items;
         case 'RESTORE_NOTE':
-            return state.filter((i) => i.key !== action.payload.note.key);
+            return state.filter((i) => i.id !== action.payload.note.id);
         case 'CLEAN_TRASH':
             return initState;
         default:        

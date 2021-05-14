@@ -62,7 +62,7 @@ class Note extends PureComponent {
         
         return (
             <div
-                data-id={this.props.itemData.key}
+                data-id={this.props.itemData.id}
                 className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'} ${this.props.itemData.isFinished && 'finished'} ${!this.props.itemData.isFinished && 'not-finished'}`}
                 onClick={this.triggerExpanded}
             >
