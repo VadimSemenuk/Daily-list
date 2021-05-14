@@ -18,7 +18,7 @@ import * as AppActions from '../../actions';
 import sliderChangeSide from "../../utils/sliderChangeSide";
 import deepCopyObject from "../../utils/deepCopyObject";
 
-import {NotesScreenMode} from "../../constants";
+import {NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Notes.scss';
 
@@ -137,7 +137,7 @@ class Notes extends PureComponent {
 
     pasteCopy = async () => {
         let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
-            repeatType: "no-repeat",
+            repeatType: NoteRepeatType.NoRepeat,
             date: moment(this.props.currentDate),
             forkFrom: -1,
             isShadow: false

@@ -12,6 +12,7 @@ import RemoveImg from '../../../assets/img/remove.png';
 
 import './TimeSet.scss';
 import TextCheckBox from "../../../components/TextCheckBox/TextCheckBox";
+import {NoteRepeatType} from "../../../constants";
 
 class TimeSet extends Component {
     constructor(props) {
@@ -201,10 +202,10 @@ class TimeSet extends Component {
                                         value={setting.val}
                                         onChange={(e) => {
                                             let nextRepeatDates = [];
-                                            if (e === "any") {
+                                            if (e === NoteRepeatType.Any) {
                                                 nextRepeatDates = [moment(this.props.date).startOf("day").valueOf()];
                                             }
-                                            if (e === "week") {
+                                            if (e === NoteRepeatType.Week) {
                                                 nextRepeatDates = [moment(this.props.date).isoWeekday()];
                                             }
                                             this.setState({
@@ -216,7 +217,7 @@ class TimeSet extends Component {
                                     />
 
                                     {
-                                        setting.val === "week" && this.state.repeatTypeSelected === setting.val &&
+                                        setting.val === NoteRepeatType.Week && this.state.repeatTypeSelected === setting.val &&
                                         weekRepeatOptions.map((option, i) => (
                                             <TextCheckBox
                                                 key={i}
@@ -244,7 +245,7 @@ class TimeSet extends Component {
                     </div>
 
                     {
-                        this.state.repeatTypeSelected === "any" &&
+                        this.state.repeatTypeSelected === NoteRepeatType.Any &&
                         <Calendar 
                             mode="multiselect"
                             currentDate={this.props.currentDate}

@@ -1,3 +1,5 @@
+import {NoteRepeatType} from "../constants";
+
 let init = [];
 
 function getReceiveNoteFn(note) {
@@ -14,11 +16,11 @@ function getReceiveNoteFn(note) {
     let fn;
 
     switch(note.repeatType) {
-        case "day": {
+        case NoteRepeatType.Day: {
             fn = assignFn;
             break;
         }
-        case "any": {
+        case NoteRepeatType.Any: {
             fn = (list) => {
                 if (note.repeatDates.includes(list.date.valueOf())) {
                     return assignFn(list)
@@ -27,7 +29,7 @@ function getReceiveNoteFn(note) {
             };
             break;
         }
-        case "week": {
+        case NoteRepeatType.Week: {
             fn = (list) => {
                 if (note.repeatDates.includes(list.date.isoWeekday())) {
                     return assignFn(list)

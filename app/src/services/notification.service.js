@@ -1,5 +1,6 @@
 import moment from "moment";
 import i18next from "i18next";
+import {NoteRepeatType} from "../constants";
 
 class NotificationService {
     set = async (note) => {
@@ -29,7 +30,7 @@ class NotificationService {
         };
 
         switch(note.repeatType) {
-            case "no-repeat": {
+            case NoteRepeatType.NoRepeat: {
                 let atDate = moment(note.date).hour(note.startTime.hour()).minute(note.startTime.minute());
                 atDate = new Date(atDate.valueOf());
                 notificationConfig.trigger = { at: atDate };
@@ -37,7 +38,7 @@ class NotificationService {
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
-            case "day": {
+            case NoteRepeatType.Day: {
                 notificationConfig.trigger = {
                     every: {
                         hour: note.startTime.hour(),
@@ -48,7 +49,7 @@ class NotificationService {
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
-            case "week": {
+            case NoteRepeatType.Week: {
                 let notificationConfigs = note.repeatDates.map((date) => {
                     return {
                         ...notificationConfig,
@@ -66,7 +67,7 @@ class NotificationService {
                 window.cordova.plugins.notification.local.schedule(notificationConfigs);
                 break;
             }
-            case "any": {
+            case NoteRepeatType.Any: {
                 let notificationConfigs = note.repeatDates.map((date) => {
                     let atDate = moment(date).startOf("day").hour(note.startTime.hour()).minute(note.startTime.minute());
                     atDate = new Date(atDate.valueOf());
@@ -90,13 +91,13 @@ class NotificationService {
         }
 
         let ids = [note.key];
-        if (note.repeatType === "any" || note.repeatType === "week") {
+        if (note.repeatType === NoteRepeatType.Any || note.repeatType === NoteRepeatType.Week) {
             ids = note.repeatDates.map((date) => +`${note.key}${date}`);
         }
 
         window.cordova.plugins.notification.local.cancel(ids);
 
-        if (note.repeatType === "any" || note.repeatType === "week") {
+        if (note.repeatType === NoteRepeatType.Any || note.repeatType === NoteRepeatType.Week) {
             this.clearOldVersionNotes(note);
         }
     };
@@ -104,7 +105,7 @@ class NotificationService {
     clearOldVersionNotes(note) {
         let ids = [note.key];
 
-        if (note.repeatType === "any") {
+        if (note.repeatType === NoteRepeatType.Any) {
             ids = note.repeatDates;
         }
 

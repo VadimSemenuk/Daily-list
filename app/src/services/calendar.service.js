@@ -1,6 +1,7 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 import getUTCOffset from "../utils/getUTCOffset";
+import {NoteAction, NoteRepeatType} from "../constants";
 
 window.moment = moment;
 
@@ -20,14 +21,14 @@ class CalendarService {
             FROM Notes t
             LEFT JOIN NotesRepeatValues rep ON t.id = rep.noteId
             WHERE
-                lastAction != 'DELETE' 
+                lastAction != ? 
                 AND (
-                    (repeatType = 'no-repeat' OR forkFrom != -1 AND date >= ? AND date <= ?)
-                    OR (repeatType = 'any' AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
-                    OR (t.forkFrom = -1 AND repeatType != 'any')
+                    (repeatType = ? OR forkFrom != -1 AND date >= ? AND date <= ?)
+                    OR (repeatType = ? AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
+                    OR (t.forkFrom = -1 AND repeatType != ?)
                 )
                 AND mode = 1;
-        `, [intervalStartDateUTC, intervalEndDateUTC, intervalStartDateUTC, intervalEndDateUTC]);
+        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any]);
 
         let repeatableDay = 0;
         let repeatableWeek = {};
@@ -39,27 +40,27 @@ class CalendarService {
             if (~note.date) {
                 note.date = note.date - getUTCOffset();
             }
-            if (note.repeatType === "any") {
+            if (note.repeatType === NoteRepeatType.Any) {
                 note.repeatValue = note.repeatValue - getUTCOffset();
             }
 
             if (!includeFinished && note.isFinished) {
-                if (note.repeatType !== "no-repeat") {
+                if (note.repeatType !== NoteRepeatType.NoRepeat) {
                     dates[note.date] = (dates[note.date] || 0) - 1;
                 }
                 continue;
             }
 
             if (note.date !== -1) {
-                if (note.repeatType === "no-repeat") {
+                if (note.repeatType === NoteRepeatType.NoRepeat) {
                     dates[note.date] = (dates[note.date] || 0) + 1;
                 }
             } else {
-                if (note.repeatType === "week") {
+                if (note.repeatType === NoteRepeatType.Week) {
                     repeatableWeek[note.repeatValue] = (repeatableWeek[note.repeatValue] || 0) + 1;
-                } else if (note.repeatType === "day") {
+                } else if (note.repeatType === NoteRepeatType.Day) {
                     repeatableDay += 1;
-                } else if (note.repeatType === "any") {
+                } else if (note.repeatType === NoteRepeatType.Any) {
                     dates[note.repeatValue] = (dates[note.repeatValue] || 0) + 1;
                 }
             }

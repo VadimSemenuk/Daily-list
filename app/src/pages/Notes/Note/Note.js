@@ -9,6 +9,7 @@ import MoreImg from "../../../assets/img/more.svg";
 import RepeatImg from "../../../assets/img/two-circling-arrows.svg";
 
 import './Note.scss';
+import {NoteRepeatType} from "../../../constants";
 
 class Note extends PureComponent {
     constructor(props) {
@@ -85,7 +86,7 @@ class Note extends PureComponent {
                             </div>
                         }
                         {
-                            this.props.itemData.repeatType !== "no-repeat" &&
+                            this.props.itemData.repeatType !== NoteRepeatType.NoRepeat &&
                             <div className="repeat-identifier-wrapper">
                                 <img
                                     className="repeat-identifier"

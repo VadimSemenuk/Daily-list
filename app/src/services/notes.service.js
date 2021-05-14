@@ -44,9 +44,9 @@ class NotesService {
                             t.id IN (${filteredNotesIDs.join(',')})
                             AND ${repeatType === 'no-repeat' ? `(t.repeatType == 'no-repeat' OR t.repeatType == 'any')` : `((t.repeatType == 'week' OR t.repeatType == 'day') AND t.forkFrom == -1)`}
                             AND t.mode == 1
-                            AND t.lastAction != 'DELETE'
+                            AND t.lastAction != ?
                         ORDER BY t.date`
-            );
+                    , [NoteAction.Delete]);
 
             if (!select.rows.length) {
                 return [];
@@ -69,7 +69,7 @@ class NotesService {
                     isFinished: Boolean(item.isFinished),
                     isNotificationEnabled: Boolean(item.isNotificationEnabled),
                     isShadow: Boolean(item.date === -1),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
                 };
 
                 if (repeatType === "no-repeat") {
@@ -112,8 +112,8 @@ class NotesService {
                         WHERE
                             t.id IN (${filteredNotesIDs.join(',')})
                             AND t.mode == 2
-                            AND t.lastAction != 'DELETE'`
-            );
+                            AND t.lastAction != ?`
+            , [NoteAction.Delete]);
 
             let notes = [];
             for(let i = 0; i < select.rows.length; i++) {
@@ -128,7 +128,7 @@ class NotesService {
                     isFinished: Boolean(item.isFinished),
                     isNotificationEnabled: Boolean(item.isNotificationEnabled),
                     isShadow: Boolean(item.date === -1),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === 'any' ? +a - getUTCOffset() : +a) : [],
+                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
                 };
 
                 notes.push(nextItem);
@@ -285,7 +285,7 @@ class NotesService {
     async addNoteRepeatValues(note) {
         await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [ note.key ]);
 
-        if (note.repeatType === "no-repeat" || note.repeatDates.length === 0) {
+        if (note.repeatType === NoteRepeatType.NoRepeat || note.repeatDates.length === 0) {
             return
         }
 
@@ -293,7 +293,7 @@ class NotesService {
         params = params.slice(2);
         let values = note.repeatDates.reduce((acc, item) => {
             let value = item;
-            if (note.repeatType === 'any') {
+            if (note.repeatType === NoteRepeatType.Any) {
                 value = item + getUTCOffset();
             }
             return [...acc, note.key, value]
@@ -348,13 +348,13 @@ class NotesService {
             lastAction: NoteAction.Edit,
             lastActionTime: moment().valueOf(),
         };
-        if (prevNote.repeatType !== "no-repeat") {
+        if (prevNote.repeatType !== NoteRepeatType.NoRepeat) {
             if (!nextNote.isShadow) {
                 nextNote.key = nextNote.forkFrom;
             }
             await executeSQL(`DELETE FROM Notes WHERE forkFrom = ?`, [nextNote.key]);
         }
-        nextNote.isShadow = nextNote.repeatType !== "no-repeat";
+        nextNote.isShadow = nextNote.repeatType !== NoteRepeatType.NoRepeat;
         nextNote.forkFrom = -1;
         nextNote.isFinished = false;
 
@@ -520,10 +520,10 @@ class NotesService {
     ];
 
     repeatOptions = [
-        { val: "no-repeat", translateId: "repeat-type-no-repeat" },
-        { val: "day", translateId: "repeat-type-day" },
-        { val: "week", translateId: "repeat-type-week" },
-        { val: "any", translateId: "repeat-type-any" }
+        { val: NoteRepeatType.NoRepeat, translateId: "repeat-type-no-repeat" },
+        { val: NoteRepeatType.Day, translateId: "repeat-type-day" },
+        { val: NoteRepeatType.Week, translateId: "repeat-type-week" },
+        { val: NoteRepeatType.Any, translateId: "repeat-type-any" }
     ];
 
     weekRepeatOptions = [

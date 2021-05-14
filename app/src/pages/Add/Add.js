@@ -39,7 +39,7 @@ class Add extends Component {
             tag: 'transparent',
             date: this.props.date,
             isFinished: false,
-            repeatType: "no-repeat",
+            repeatType: NoteRepeatType.NoRepeat,
             repeatDates: [],
             mode: this.props.settings.notesScreenMode,
 

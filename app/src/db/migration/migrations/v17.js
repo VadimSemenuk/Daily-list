@@ -4,6 +4,7 @@ import md5 from "md5";
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
 import getUTCOffset from "../../../utils/getUTCOffset";
+import {NoteRepeatType} from "../../../constants";
 
 export default {
     name: "1.7",
@@ -250,7 +251,7 @@ export default {
                     utcOffset = ${utcOffset};
             `);
 
-            let anyRepeatTasksSelect = await execureSQL(`SELECT id from Notes WHERE repeatType = 'any'`);
+            let anyRepeatTasksSelect = await execureSQL(`SELECT id from Notes WHERE repeatType = ?`, [NoteRepeatType.Any]);
 
             if (anyRepeatTasksSelect.rows.length) {
                 let anyRepeatTasksIDs = [];
