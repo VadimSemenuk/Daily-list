@@ -21,7 +21,7 @@ import AddGeryImg from '../../assets/img/add-grey.svg';
 
 import deepCopy from '../../utils/deepCopyObject'
 
-import {NoteRepeatType, NotesScreenMode} from "../../constants";
+import {NoteContentItemType, NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Add.scss';
 
@@ -30,6 +30,18 @@ class Add extends Component {
         super(props);
 
         this.state = {
+            note: this.getDefaultNoteData(),
+
+            isCalendarOpen: false,
+            pictureModal: false,
+            editRepeatableDialog: false,
+            isNoteSettingViewVisible: true,
+            tags: notesService.getTags()
+        };
+    }
+
+    getDefaultNoteData() {
+        return {
             title: "",
             contentItems: [],
             isNotificationEnabled: false,
@@ -41,13 +53,7 @@ class Add extends Component {
             repeatType: NoteRepeatType.NoRepeat,
             repeatDates: [],
             mode: this.props.settings.notesScreenMode,
-
-            calendar: false,
-            pictureModal: false,
-            editRepeatableDialog: false,
-            addAdditioanlsViewHidden: false,
-            tags: notesService.getTags()
-        };
+        }
     }
 
     async componentDidMount() {
@@ -55,16 +61,6 @@ class Add extends Component {
             this.setState(deepCopy(this.props.location.state.note));
             this.prevNote = deepCopy(this.props.location.state.note);
         }
-    }
-
-    addField(field, index) {
-        let nextDynamicFields = [...this.state.contentItems.slice(0, index), field, ...this.state.contentItems.slice(index)];
-
-        return new Promise((resolve) => {
-            this.setState({
-                contentItems: nextDynamicFields
-            }, resolve)
-        });
     }
 
     getDynamicFiledElements() {
@@ -96,72 +92,99 @@ class Add extends Component {
         if (field) {
             if (field.querySelector("textarea")) {
                 field.querySelector("textarea").focus();
-                return true;
             } else if (field.querySelector("input")) {
                 field.querySelector("input").focus();
-                return true;
             }
         }
-        return false;
     }
 
-    addInput = async () => {
+    canFocusDynamicField(index) {
+        let field = this.getDynamicFiledElements()[index];
+        return field && (field.querySelector("textarea") || field.querySelector("input"))
+    }
+
+    addInputContentItem = async () => {
         let field = {
-            type: "text",
+            type: NoteContentItemType.Text,
             value: ""
         };
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
-        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.contentItems.length;
-        await this.addField(field, nextIndex);
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.note.contentItems.length;
+        await this.addContentItem(field, nextIndex);
         this.focusDynamicField(nextIndex);
         this.scrollToBottom();
     };
 
-    addListItem = async () => {
+    addListItemContentItem = async () => {
         let field = {
-            type: "listItem",
+            type: NoteContentItemType.ListItem,
             value: "",
             checked: false
         };
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
-        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.contentItems.length;
-        await this.addField(field, nextIndex);
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.note.contentItems.length;
+        await this.addContentItem(field, nextIndex);
         this.focusDynamicField(nextIndex);
         this.scrollToBottom();
     };
 
-    onDynamicItemRemove = async (i) => {
-        await new Promise((resolve) => {
-            this.setState({
-                contentItems: [...this.state.contentItems.slice(0, i), ...this.state.contentItems.slice(i + 1)]
-            }, resolve);
-        });
-        if (!this.focusDynamicField(i)) {
-            this.focusDynamicField(i - 1);
-        }
-    };
-
-    addSnapshootItem = async (url) => {
+    addPhotoContentItem = async (url) => {
         let field = {
-            type: "snapshot",
+            type: NoteContentItemType.Photo,
             uri: url
         };
 
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
-        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.contentItems.length;
+        let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.note.contentItems.length;
 
-        await this.addField(field, nextIndex);
+        await this.addContentItem(field, nextIndex);
         this.scrollToBottom();
     };
+
+    addContentItem(contentItem, index) {
+        let nextContentItems = [...this.state.note.contentItems.slice(0, index), contentItem, ...this.state.note.contentItems.slice(index)];
+        return this.updateNoteData({contentItems: nextContentItems})
+    }
+
+    updateNoteContentItem(contentItemIndex, nextState) {
+        let nextContentItems = [
+            ...this.state.note.contentItems.slice(0, contentItemIndex),
+            {...this.state.note.contentItems[contentItemIndex], ...nextState},
+            ...this.state.note.contentItems.slice(contentItemIndex + 1)
+        ];
+        this.updateNoteData({contentItems: nextContentItems});
+    }
+
+    removeContentItem = async (contentItemIndex) => {
+        let nextContentItems = [...this.state.note.contentItems.slice(0, contentItemIndex), ...this.state.note.contentItems.slice(contentItemIndex + 1)];
+        await this.updateNoteData({contentItems: nextContentItems});
+
+        if (!this.canFocusDynamicField(contentItemIndex)) {
+            this.focusDynamicField(contentItemIndex - 1);
+        }
+    };
+
+    async updateNoteData(nextData) {
+        await new Promise((resolve) => {
+            this.setState({
+                note: {
+                    ...this.state.note,
+                    ...nextData
+                }
+            }, resolve);
+        });
+    }
 
     addCameraShot = async (sourceType) => {
         window.navigator.camera.getPicture(
             (a) => {
                 if (a) {
-                    this.addSnapshootItem(a);
+                    this.addPhotoContentItem(a);
                 }
             },
-            (err) => {console.log(err)},
+            (err) => {
+                this.props.triggerErrorModal("error-common");
+            },
             {
                 sourceType,
                 saveToPhotoAlbum: true,
@@ -172,16 +195,16 @@ class Add extends Component {
         );
     };
 
-    getInputsValues = () => {
-        let contentItems = this.state.contentItems.filter((a) => a !== null);
+    getNoteData = () => {
+        let contentItems = this.state.note.contentItems.filter((a) => a !== null);
         return {
-            ...this.state,
+            ...this.state.note,
             contentItems
         }
     };
 
-    onSubmit = async () => {
-        let note = this.getInputsValues();
+    submit = async () => {
+        let note = this.getNoteData();
 
         if (note.repeatType !== NoteRepeatType.NoRepeat) {
             note.date = -1;
@@ -202,25 +225,13 @@ class Add extends Component {
     }
 
     showImage = (i) => {
-        let field = this.state.contentItems[i];
-        window.PhotoViewer.show(field.uri, this.state.title, {share: false});         
+        let field = this.state.note.contentItems[i];
+        window.PhotoViewer.show(field.uri, this.state.note.title, {share: false});
     };
 
     triggerCalendar = () => {
-        this.setState({calendar: !this.state.calendar})
+        this.setState({isCalendarOpen: !this.state.isCalendarOpen})
     };
-
-    onDateSelect = (date) => {
-        this.setState({
-            date: date
-        });
-    };
-
-    setDefaultAddedDate = () => {
-        this.setState({
-            date: this.props.date
-        });
-    }
 
     render() {
         let {t} = this.props;
@@ -229,17 +240,17 @@ class Add extends Component {
             <div className="page-wrapper">
                 <Header
                     page={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) ? "daily-add" : "add"}
-                    onSubmit={this.onSubmit}
+                    onSubmit={this.submit}
                     onCalendarRequest={this.triggerCalendar}
-                    currentDate={this.state.date}
-                    onResetAddedDate={this.setDefaultAddedDate}
+                    currentDate={this.state.note.date}
+                    onResetAddedDate={() => this.updateNoteData(this.props.date)}
                 />
                 {
-                    this.state.calendar &&
+                    this.state.isCalendarOpen &&
                     <Calendar 
-                        currentDate={this.state.date}
+                        currentDate={this.state.note.date}
                         calendarNotesCounter={this.props.settings.calendarNotesCounter}
-                        onDateSet={this.onDateSelect}
+                        onDateSet={(date) => this.updateNoteData({date: date})}
                         onCloseRequest={this.triggerCalendar}
                     />
                 }
@@ -249,67 +260,55 @@ class Add extends Component {
                             className="title add-content-item"
                             type="text" 
                             placeholder={t("input-placeholder-title")}
-                            value={this.state.title}
-                            onChange={(e) => this.setState({title: e.target.value})}
+                            value={this.state.note.title}
+                            onChange={(e) => this.updateNoteData({title: e.target.value})}
                         />
                         {
-                            this.state.contentItems.map((a, i) => {
-                                if (!a) {
+                            this.state.note.contentItems.map((contentItem, i) => {
+                                if (!contentItem) {
                                     return null;
-                                } else if (a.type === "text") {
+                                } else if (contentItem.type === NoteContentItemType.Text) {
                                     return (
                                         <RemovableTextArea
                                             key={i}
                                             className="add-content-item dynamic-field"
                                             placeholder={t("input-placeholder-text")}
-                                            value={a.value}
-                                            onChange={(value) => {
-                                                let contentItems = this.state.contentItems.slice();
-                                                contentItems[i].value = value;
-                                                this.setState({contentItems});
-                                            }}
-                                            onListItemRemove={() => this.onDynamicItemRemove(i)}
+                                            value={contentItem.value}
+                                            onChange={(value) => this.updateNoteContentItem(i, {value})}
+                                            onListItemRemove={() => this.removeContentItem(i)}
                                         />
                                     )
-                                } else if (a.type === "listItem") {
+                                } else if (contentItem.type === NoteContentItemType.ListItem) {
                                     return (
                                         <RemovableTextCheckBox 
                                             key={i} 
                                             className="add-content-item dynamic-field"
-                                            onListItemRemove={(inputRef) => this.onDynamicItemRemove(i)}
-                                            onTextChange={(text) => {
-                                                let contentItems = this.state.contentItems.slice();
-                                                contentItems[i] = {...contentItems[i], value: text};
-                                                this.setState({contentItems});
-                                            }}
-                                            onValueChange={(value) => {
-                                                let contentItems = this.state.contentItems.slice();
-                                                contentItems[i] = {...contentItems[i], checked: value};
-                                                this.setState({contentItems});
-                                            }}
-                                            onEnterPress={() => this.addListItem(i)}
-                                            textValue={a.value} 
-                                            value={a.checked}                                                                                                                       
+                                            onListItemRemove={() => this.removeContentItem(i)}
+                                            onTextChange={(value) => this.updateNoteContentItem(i, {value})}
+                                            onValueChange={(value) => this.updateNoteContentItem(i, {checked: value})}
+                                            onEnterPress={() => this.addListItemContentItem(i)}
+                                            textValue={contentItem.value}
+                                            value={contentItem.checked}
                                         />
                                     )
-                                } else if (a.type === "snapshot") {
+                                } else if (contentItem.type === NoteContentItemType.Photo) {
                                     return (
                                         <RemovableImage 
                                             key={i}
                                             className="add-content-item dynamic-field"
-                                            src={a.uri}
+                                            src={contentItem.uri}
                                             onClick={() => this.showImage(i)}
-                                            onRemove={() => this.onDynamicItemRemove(i)}
+                                            onRemove={() => this.removeContentItem(i)}
                                         />
                                     )
                                 }
-                                return null
+                                return null;
                             })
                         }
                         <div className="add-actions-wrapper">
                             <button
                                 onTouchStart={this.saveFocusedElement}
-                                onClick={this.addListItem}
+                                onClick={this.addInputContentItem}
                             >
                                 <img
                                     src={AddGeryImg} 
@@ -319,7 +318,7 @@ class Add extends Component {
                             </button>  
                             <button
                                 onTouchStart={this.saveFocusedElement}
-                                onClick={this.addInput}
+                                onClick={this.addListItemContentItem}
                             >
                                 <img 
                                     src={AddGeryImg} 
@@ -364,14 +363,14 @@ class Add extends Component {
                         </div>
                     </div>
                     <div 
-                        className={`add-additionals-wrapper hide-with-active-keyboard${this.state.addAdditioanlsViewHidden ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "" : " minified"}`}
+                        className={`add-additionals-wrapper hide-with-active-keyboard${!this.state.isNoteSettingViewVisible ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "" : " minified"}`}
                         style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
                     >
                         {
                             (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
                             <div
                                 className="toggle-icon-wrapper"
-                                onClick={() => this.setState({addAdditioanlsViewHidden: !this.state.addAdditioanlsViewHidden})}
+                                onClick={() => this.setState({isNoteSettingViewVisible: !this.state.isNoteSettingViewVisible})}
                             >
                                 <div className="line"></div>
                             </div>
@@ -380,15 +379,15 @@ class Add extends Component {
                         {
                             (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
                             <TimeSet
-                                isNotificationEnabled={this.state.isNotificationEnabled}
-                                startTime={this.state.startTime}
-                                endTime={this.state.endTime}
+                                isNotificationEnabled={this.state.note.isNotificationEnabled}
+                                startTime={this.state.note.startTime}
+                                endTime={this.state.note.endTime}
                                 settings={this.props.settings}
-                                repeatType={this.state.repeatType}
-                                currentDate={this.state.date}
-                                repeatDates={this.state.repeatDates}
+                                repeatType={this.state.note.repeatType}
+                                currentDate={this.state.note.date}
+                                repeatDates={this.state.note.repeatDates}
                                 mode={this.props.match.path === "/edit" ? "edit" : "add"}
-                                onStateChange={(time) => this.setState({...time})}
+                                onStateChange={(time) => this.updateNoteData({...time})}
                             />
                         }
 

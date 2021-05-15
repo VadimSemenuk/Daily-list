@@ -21,3 +21,9 @@ export const NoteRepeatType = {
     Month: 'month',
     Any: 'any',
 };
+
+export const NoteContentItemType = {
+    Text: 'text',
+    ListItem: 'listItem',
+    Photo: 'snapshot'
+}
