@@ -30,6 +30,8 @@ import deepCopy from '../../utils/deepCopyObject'
 import {NoteContentItemType, NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Add.scss';
+import CalendarImg from "../../assets/img/calendar.svg";
+import CheckedImg from "../../assets/img/checked.svg";
 
 class Add extends Component {
     constructor(props) {
@@ -323,11 +325,24 @@ class Add extends Component {
         return (
             <div className="page-wrapper">
                 <Header
-                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) ? "daily-add" : "add"}
-                    onSubmit={this.submit}
-                    onCalendarRequest={this.triggerCalendar}
-                    currentDate={this.state.note.date}
-                    onResetAddedDate={() => this.updateNoteData(this.props.date)}
+                    buttons={[
+                        ...(
+                            (
+                                (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime)
+                                && (this.state.note.repeatType === NoteRepeatType.NoRepeat)
+                            ) ?
+                                [{
+                                    action: this.triggerCalendar,
+                                    img: CalendarImg
+                                }] : []
+                        ),
+                        {
+                            action: this.submit,
+                            img: CheckedImg
+                        }
+                    ]}
+                    isDateViewVisible={true}
+                    dateViewValue={this.state.note.date}
                 />
                 {
                     this.state.isCalendarOpen &&
@@ -392,7 +407,7 @@ class Add extends Component {
                     </div>
                     <div className={`note-actions-wrapper hide-with-active-keyboard${this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "" : " minified"}`}>
                         <div className="content-items-actions-wrapper">
-                            <div className="label">Добавить:</div>
+                            <div className="label">{t("add-content-item")}</div>
                             <div className="content-items-actions">
                                 <button
                                     onTouchStart={this.saveFocusedElement}
@@ -470,7 +485,15 @@ class Add extends Component {
                                         repeatType={this.state.note.repeatType}
                                         repeatValues={this.state.note.repeatValues}
                                         calendarNotesCounter={this.props.settings.calendarNotesCounter}
-                                        onSubmit={(data) => this.updateNoteData({repeatType: data.repeatType, repeatValues: data.repeatValues})}
+                                        onSubmit={async (data) => {
+                                            await this.updateNoteData({repeatType: data.repeatType, repeatValues: data.repeatValues});
+
+                                            if (this.state.isCalendarOpen) {
+                                                this.setState({
+                                                    isCalendarOpen: false
+                                                });
+                                            }
+                                        }}
                                         onRequestClose={() => this.setState({isRepeatTypeSelectModalOpen: false})}
                                     />
                                 </div>

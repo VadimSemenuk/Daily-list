@@ -21,6 +21,11 @@ import deepCopyObject from "../../utils/deepCopyObject";
 import {NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Notes.scss';
+import CalendarImg from "../../assets/img/calendar.svg";
+import AddImg from "../../assets/img/add.svg";
+import SettingsImg from "../../assets/img/settings.svg";
+import ExportImg from "../../assets/img/upload-to-cloud.svg";
+import SearchImg from "../../assets/img/search.svg";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -94,7 +99,7 @@ class Notes extends PureComponent {
         this.props.setSetting('calendarMode', this.props.settings.calendarMode === 1 ? 2 : 1);
     };
 
-    onTodaySelect = () => {
+    onHeaderDateViewClick = () => {
         this.setDate(moment().startOf("day"));
     };
 
@@ -174,9 +179,38 @@ class Notes extends PureComponent {
         return (
             <div className="page-wrapper">
                 <Header
-                    page={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) ? "daily-notes" : "notes"}
-                    onCalendarRequest={this.triggerCalendar}
-                    onSelectToday={this.onTodaySelect}
+                    buttons={[
+                        {
+                            link: "/search",
+                            img: SearchImg
+                        },
+                        {
+                            link: "/settings",
+                            img: SettingsImg
+                        },
+                        ...(
+                            this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ?
+                                [{
+                                    action: this.triggerCalendar,
+                                    img: CalendarImg
+                                }] : []
+                        ),
+                        ...(
+                            this.props.user ?
+                                [{
+                                    action: () => this.props.uploadGDBackup("user"),
+                                    img: ExportImg
+                                }] : []
+                        ),
+                        {
+                            link: "/add",
+                            img: AddImg
+                        }
+                    ]}
+                    isBackButtonVisible={false}
+                    isDateViewVisible={true}
+                    dateViewValue={this.props.currentDate}
+                    onDateViewClick={this.onHeaderDateViewClick}
                 />
                 <div className="notes-list-wrapper page-content">
                     {   
@@ -320,7 +354,8 @@ function mapStateToProps(state) {
         notes,
         currentDate: state.date,
         settings: state.settings,
-        search: state.search
+        search: state.search,
+        user: state.user
     }
 }
 

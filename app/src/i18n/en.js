@@ -155,6 +155,7 @@ export default {
     "sunday": "Sunday",
     "error-notification-permission": "You have no permission to set notifications",
     "night-mode": "Night mode",
+    "add-content-item": "Добавить",
 
     // note-item
     "attached-image": "Attached image",

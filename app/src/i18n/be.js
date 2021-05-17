@@ -155,6 +155,7 @@ export default {
     "sunday": "Нядзеля",
     "error-notification-permission": "У вас няма правоў, каб дадаваць апавяшчэння",
     "night-mode": "Начны рэжым",
+    "add-content-item": "Дадаць",
 
     // note-item
     "attached-image": "Прымацаванаы малюнак",

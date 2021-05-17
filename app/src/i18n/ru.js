@@ -155,6 +155,7 @@ export default {
     "sunday": "Воскресенье",
     "error-notification-permission": "У вас нет прав для добавления уведомления",
     "night-mode": "Ночной режим",
+    "add-content-item": "Добавить",
 
     // note-item
     "attached-image": "Прикрепленное изображение",
