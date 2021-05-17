@@ -22,7 +22,7 @@ function getReceiveNoteFn(note) {
         }
         case NoteRepeatType.Any: {
             fn = (list) => {
-                if (note.repeatDates.includes(list.date.valueOf())) {
+                if (note.repeatValues.includes(list.date.valueOf())) {
                     return assignFn(list)
                 }
                 return list
@@ -31,7 +31,7 @@ function getReceiveNoteFn(note) {
         }
         case NoteRepeatType.Week: {
             fn = (list) => {
-                if (note.repeatDates.includes(list.date.isoWeekday())) {
+                if (note.repeatValues.includes(list.date.isoWeekday())) {
                     return assignFn(list)
                 }
                 return list

@@ -64,7 +64,7 @@ export default class CustomModal extends Component {
                                 this.props.actionItems.map((a, i) => (
                                     <button 
                                         key={i}
-                                        className="text clear" 
+                                        className="text clear inline-block f-600"
                                         onClick={() => this.onActionButtonClick(a.onClick)}
                                     >{a.text}</button>
                                 ))

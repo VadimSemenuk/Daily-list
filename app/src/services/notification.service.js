@@ -50,7 +50,7 @@ class NotificationService {
                 break;
             }
             case NoteRepeatType.Week: {
-                let notificationConfigs = note.repeatDates.map((date) => {
+                let notificationConfigs = note.repeatValues.map((date) => {
                     return {
                         ...notificationConfig,
                         id: +`${note.id}${date}`,
@@ -68,7 +68,7 @@ class NotificationService {
                 break;
             }
             case NoteRepeatType.Any: {
-                let notificationConfigs = note.repeatDates.map((date) => {
+                let notificationConfigs = note.repeatValues.map((date) => {
                     let atDate = moment(date).startOf("day").hour(note.startTime.hour()).minute(note.startTime.minute());
                     atDate = new Date(atDate.valueOf());
 
@@ -92,7 +92,7 @@ class NotificationService {
 
         let ids = [note.id];
         if (note.repeatType === NoteRepeatType.Any || note.repeatType === NoteRepeatType.Week) {
-            ids = note.repeatDates.map((date) => +`${note.id}${date}`);
+            ids = note.repeatValues.map((date) => +`${note.id}${date}`);
         }
 
         window.cordova.plugins.notification.local.cancel(ids);
@@ -106,7 +106,7 @@ class NotificationService {
         let ids = [note.id];
 
         if (note.repeatType === NoteRepeatType.Any) {
-            ids = note.repeatDates;
+            ids = note.repeatValues;
         }
 
         window.cordova.plugins.notification.local.cancel(ids);

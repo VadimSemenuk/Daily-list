@@ -55,7 +55,6 @@ export function updateNote(note, prevNote) {
                 type: "UPDATE_NOTE",
                 payload: {
                     note: updatedNote,
-                    prevNote: prevNote
                 }
             });
 

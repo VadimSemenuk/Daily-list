@@ -76,7 +76,7 @@ class Password extends Component {
                     {
                         Boolean(this.props.settings.passwordResetEmail || this.props.user) &&
                         <button
-                            className="text clear reset-password"
+                            className="text clear reset-password f-600"
                             onClick={this.resetPassword}
                         >{t("reset-password")}</button>
                     }

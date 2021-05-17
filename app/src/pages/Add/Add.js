@@ -1,23 +1,29 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
+import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
 import {ModalListItem, ButtonListItem} from "../../components/ListItem/ListItem";
 import RemovableTextCheckBox from '../../components/RemovableTextCheckBox/RemovableTextCheckBox';
 import RemovableTextArea from '../../components/RemovableTextArea/RemovableTextArea';
-import TimeSet from './TimeSet/TimeSet';
 import ColorPicker from '../../components/ColorPicker/ColorPicker';
 import Header from '../../components/Header/Header';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
+import Switch from "../../components/Switch/Switch";
+import RepeatTypeSelectModal from "./RepeatTypeSelectModal/RepeatTypeSelectModal";
 
 import notesService from '../../services/notes.service';
 
-import CameraImg from '../../assets/img/photo-camera.svg';
-import AddGeryImg from '../../assets/img/add-grey.svg';
+import ImageImg from '../../assets/img/image.svg';
+import TextImg from '../../assets/img/text.svg';
+import ListImg from '../../assets/img/list.svg';
+import ClockImg from '../../assets/img/clock.svg';
+import RepeatImg from '../../assets/img/repeat.svg';
+import NotificationImg from '../../assets/img/notification.svg';
 
 import deepCopy from '../../utils/deepCopyObject'
 
@@ -33,14 +39,15 @@ class Add extends Component {
             note: this.getDefaultNoteData(),
 
             isCalendarOpen: false,
-            pictureModal: false,
-            editRepeatableDialog: false,
-            isNoteSettingViewVisible: true,
-            tags: notesService.getTags()
+            isRepeatTypeSelectModalOpen: false,
+            isNotificationWasUnchecked: false
         };
+
+        this.repeatTypeOptions = notesService.getRepeatTypeOptions();
+        this.tags = notesService.getTags();
     }
 
-    getDefaultNoteData() {
+    getDefaultNoteData = () => {
         return {
             title: "",
             contentItems: [],
@@ -51,19 +58,23 @@ class Add extends Component {
             date: this.props.date,
             isFinished: false,
             repeatType: NoteRepeatType.NoRepeat,
-            repeatDates: [],
+            repeatValues: [],
             mode: this.props.settings.notesScreenMode,
         }
     }
 
     async componentDidMount() {
         if (this.props.match.path === "/edit") {
-            this.setState(deepCopy(this.props.location.state.note));
+            this.setState({note: deepCopy(this.props.location.state.note)});
             this.prevNote = deepCopy(this.props.location.state.note);
+        }
+
+        if (this.props.match.path === "/add") {
+            this.addInputContentItem();
         }
     }
 
-    getDynamicFiledElements() {
+    getDynamicFiledElements = () => {
         return Array.prototype.slice.call(document.querySelectorAll(".dynamic-field"));
     }
 
@@ -71,7 +82,7 @@ class Add extends Component {
         this.lastFocusedElement = document.activeElement;
     }
 
-    getFocusedFieldIndex() {
+    getFocusedFieldIndex = () => {
         let focusedDynamicField;
         let activeElement;
         if (document.activeElement && document.activeElement.closest(".dynamic-field")) {
@@ -87,7 +98,7 @@ class Add extends Component {
         return this.getDynamicFiledElements().indexOf(focusedDynamicField);
     }
 
-    focusDynamicField(index) {
+    focusDynamicField = (index) => {
         let field = this.getDynamicFiledElements()[index];
         if (field) {
             if (field.querySelector("textarea")) {
@@ -98,7 +109,7 @@ class Add extends Component {
         }
     }
 
-    canFocusDynamicField(index) {
+    canFocusDynamicField = (index) => {
         let field = this.getDynamicFiledElements()[index];
         return field && (field.querySelector("textarea") || field.querySelector("input"))
     }
@@ -110,6 +121,18 @@ class Add extends Component {
         };
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
         let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.note.contentItems.length;
+
+        let prevContentItem = this.state.note.contentItems[nextIndex - 1];
+        if (prevContentItem && prevContentItem.type === NoteContentItemType.Text && !prevContentItem.value) {
+            this.focusDynamicField(nextIndex - 1);
+            return;
+        }
+        let nextContentItem = this.state.note.contentItems[nextIndex];
+        if (nextContentItem && nextContentItem.type === NoteContentItemType.Text && !nextContentItem.value) {
+            this.focusDynamicField(nextIndex);
+            return;
+        }
+
         await this.addContentItem(field, nextIndex);
         this.focusDynamicField(nextIndex);
         this.scrollToBottom();
@@ -123,14 +146,30 @@ class Add extends Component {
         };
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
         let nextIndex = focusedDynamicFieldIndex !== null ? (focusedDynamicFieldIndex + 1) : this.state.note.contentItems.length;
+
+        let prevContentItem = this.state.note.contentItems[nextIndex - 1];
+        if (prevContentItem && prevContentItem.type === NoteContentItemType.Text && !prevContentItem.value) {
+            await this.removeContentItem(nextIndex - 1);
+            nextIndex = nextIndex - 1;
+        }
+        if (prevContentItem && prevContentItem.type === NoteContentItemType.ListItem && !prevContentItem.value) {
+            this.focusDynamicField(nextIndex - 1);
+            return;
+        }
+        let nextContentItem = this.state.note.contentItems[nextIndex];
+        if (nextContentItem && nextContentItem.type === NoteContentItemType.ListItem && !nextContentItem.value) {
+            this.focusDynamicField(nextIndex);
+            return;
+        }
+
         await this.addContentItem(field, nextIndex);
         this.focusDynamicField(nextIndex);
         this.scrollToBottom();
     };
 
-    addPhotoContentItem = async (url) => {
+    addImageContentItem = async (url) => {
         let field = {
-            type: NoteContentItemType.Photo,
+            type: NoteContentItemType.Image,
             uri: url
         };
 
@@ -141,12 +180,12 @@ class Add extends Component {
         this.scrollToBottom();
     };
 
-    addContentItem(contentItem, index) {
+    addContentItem = (contentItem, index) => {
         let nextContentItems = [...this.state.note.contentItems.slice(0, index), contentItem, ...this.state.note.contentItems.slice(index)];
         return this.updateNoteData({contentItems: nextContentItems})
     }
 
-    updateNoteContentItem(contentItemIndex, nextState) {
+    updateNoteContentItem = (contentItemIndex, nextState) => {
         let nextContentItems = [
             ...this.state.note.contentItems.slice(0, contentItemIndex),
             {...this.state.note.contentItems[contentItemIndex], ...nextState},
@@ -164,7 +203,7 @@ class Add extends Component {
         }
     };
 
-    async updateNoteData(nextData) {
+    updateNoteData = async (nextData) => {
         await new Promise((resolve) => {
             this.setState({
                 note: {
@@ -175,11 +214,11 @@ class Add extends Component {
         });
     }
 
-    addCameraShot = async (sourceType) => {
+    addImage = async (sourceType) => {
         window.navigator.camera.getPicture(
             (a) => {
                 if (a) {
-                    this.addPhotoContentItem(a);
+                    this.addImageContentItem(a);
                 }
             },
             (err) => {
@@ -219,7 +258,7 @@ class Add extends Component {
         this.props.history.goBack();
     };
 
-    scrollToBottom() {
+    scrollToBottom = () => {
         let el = document.querySelector(".add-content-wrapper");
         el.scrollTop = el.scrollHeight;
     }
@@ -233,8 +272,53 @@ class Add extends Component {
         this.setState({isCalendarOpen: !this.state.isCalendarOpen})
     };
 
+    onNotificationStateChange = (state) => {
+        if (!this.state.note.startTime) {
+            window.plugins.toast.showLongBottom(this.props.t("set-time-first"));
+            return;
+        }
+
+        if (!this.state.isNotificationWasUnchecked && !state) {
+            this.setState({
+                isNotificationWasUnchecked: true
+            });
+        }
+
+        this.updateNoteData({isNotificationEnabled: state});
+    }
+
+    pickTime = async (field) => {
+        let dateTime = await new Promise((resolve, reject) => {
+            window.cordova.plugins.DateTimePicker.show({
+                mode: 'time',
+                date: (this.state.note[field] || moment()).toDate(),
+                success: (data) => resolve(moment(data)),
+                cancel: () => {
+                    let isNotificationEnabled = this.state.note.isNotificationEnabled;
+                    if (field === 'startTime') {
+                        isNotificationEnabled = false;
+                    }
+
+                    this.updateNoteData({[field]: null, isNotificationEnabled});
+                },
+                error: (err) => reject(err)
+            })
+        });
+
+        await this.updateNoteData({[field]: moment(dateTime).startOf("minute")});
+
+        if (
+            this.props.settings.defaultNotification &&
+            !this.state.isNotificationWasUnchecked
+        ) {
+            this.updateNoteData({isNotificationEnabled: true});
+        }
+    }
+
     render() {
         let {t} = this.props;
+
+        let selectedRepeatTypeOption = this.repeatTypeOptions.find((a) => a.val === this.state.note.repeatType);
 
         return (
             <div className="page-wrapper">
@@ -291,7 +375,7 @@ class Add extends Component {
                                             value={contentItem.checked}
                                         />
                                     )
-                                } else if (contentItem.type === NoteContentItemType.Photo) {
+                                } else if (contentItem.type === NoteContentItemType.Image) {
                                     return (
                                         <RemovableImage 
                                             key={i}
@@ -305,97 +389,147 @@ class Add extends Component {
                                 return null;
                             })
                         }
-                        <div className="add-actions-wrapper">
-                            <button
-                                onTouchStart={this.saveFocusedElement}
-                                onClick={this.addInputContentItem}
-                            >
-                                <img
-                                    src={AddGeryImg} 
-                                    alt="tf"                                                                
-                                />   
-                                <span>{t("list-item-btn")}</span>     
-                            </button>  
-                            <button
-                                onTouchStart={this.saveFocusedElement}
-                                onClick={this.addListItemContentItem}
-                            >
-                                <img 
-                                    src={AddGeryImg} 
-                                    alt="lf"                                
-                                />   
-                                <span>{t("field-btn")}</span>     
-                            </button>  
-
-                            <ModalListItem
-                                ref={(r) => this.photoModal = r}
-                                listItem={(props) => (
-                                    <button
-                                        onTouchStart={this.saveFocusedElement}
-                                        onClick={props.onClick}
-                                        className="camera-button"
-                                    >
-                                        <img 
-                                            src={CameraImg} 
-                                            alt="cam"
-                                        />      
-                                    </button> 
-                                )}
-                            >
-                                <ButtonListItem
-                                    className="no-border"
-                                    text={t("open-galery")}
-                                    onClick={() => {
-                                        this.addCameraShot(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM);
-                                        this.photoModal.trigger();
-                                    }}
-                                />
-
-                                <ButtonListItem
-                                    className="no-border"
-                                    text={t("make-shot")}
-                                    onClick={() => {
-                                        this.addCameraShot(window.navigator.camera.PictureSourceType.CAMERA);
-                                        this.photoModal.trigger();
-                                    }}
-                                />
-                            </ModalListItem>
-                        </div>
                     </div>
-                    <div 
-                        className={`add-additionals-wrapper hide-with-active-keyboard${!this.state.isNoteSettingViewVisible ? " hidden-triggered" : ""}${this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "" : " minified"}`}
-                        style={{borderColor: this.state.tag !== "transparent" ? this.state.tag : ""}}
-                    >
-                        {
-                            (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
-                            <div
-                                className="toggle-icon-wrapper"
-                                onClick={() => this.setState({isNoteSettingViewVisible: !this.state.isNoteSettingViewVisible})}
-                            >
-                                <div className="line"></div>
+                    <div className={`note-actions-wrapper hide-with-active-keyboard${this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "" : " minified"}`}>
+                        <div className="content-items-actions-wrapper">
+                            <div className="label">Добавить:</div>
+                            <div className="content-items-actions">
+                                <button
+                                    onTouchStart={this.saveFocusedElement}
+                                    onClick={this.addInputContentItem}
+                                >
+                                    <img
+                                        src={TextImg}
+                                        alt={t("list-item-btn")}
+                                    />
+                                </button>
+
+                                <button
+                                    onTouchStart={this.saveFocusedElement}
+                                    onClick={this.addListItemContentItem}
+                                >
+                                    <img
+                                        src={ListImg}
+                                        alt={t("field-btn")}
+                                    />
+                                </button>
+
+                                <ModalListItem
+                                    ref={(r) => this.photoModal = r}
+                                    listItem={(props) => (
+                                        <button
+                                            onTouchStart={this.saveFocusedElement}
+                                            onClick={props.onClick}
+                                            className="camera-button"
+                                        >
+                                            <img
+                                                src={ImageImg}
+                                                alt="cam"
+                                            />
+                                        </button>
+                                    )}
+                                >
+                                    <ButtonListItem
+                                        className="no-border"
+                                        text={t("open-galery")}
+                                        onClick={() => {
+                                            this.addImage(window.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM);
+                                            this.photoModal.trigger();
+                                        }}
+                                    />
+
+                                    <ButtonListItem
+                                        className="no-border"
+                                        text={t("make-shot")}
+                                        onClick={() => {
+                                            this.addImage(window.navigator.camera.PictureSourceType.CAMERA);
+                                            this.photoModal.trigger();
+                                        }}
+                                    />
+                                </ModalListItem>
                             </div>
-                        }
+                        </div>
 
-                        {
-                            (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
-                            <TimeSet
-                                isNotificationEnabled={this.state.note.isNotificationEnabled}
-                                startTime={this.state.note.startTime}
-                                endTime={this.state.note.endTime}
-                                settings={this.props.settings}
-                                repeatType={this.state.note.repeatType}
-                                currentDate={this.state.note.date}
-                                repeatDates={this.state.note.repeatDates}
-                                mode={this.props.match.path === "/edit" ? "edit" : "add"}
-                                onStateChange={(time) => this.updateNoteData({...time})}
-                            />
-                        }
+                        <div className="note-settings-wrapper">
+                            <div className="flex flex-align-center flex-justify-space-between">
+                                <div className="repeat-set-wrapper">
+                                    <button
+                                        className="text img-text-button clear"
+                                        onClick={() => this.setState({isRepeatTypeSelectModalOpen: !this.state.isRepeatTypeSelectModalOpen})}
+                                    >
+                                        <img
+                                            src={RepeatImg}
+                                            alt="repeat"
+                                        />
+                                        {t(selectedRepeatTypeOption.translateId)}
+                                    </button>
 
-                        <ColorPicker 
-                            onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}
-                            value={this.state.tag}
-                            colors={this.state.tags}
-                        />
+                                    <RepeatTypeSelectModal
+                                        isOpen={this.state.isRepeatTypeSelectModalOpen}
+                                        defaultDate={moment(this.state.note.date)}
+                                        repeatType={this.state.note.repeatType}
+                                        repeatValues={this.state.note.repeatValues}
+                                        calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                                        onSubmit={(data) => this.updateNoteData({repeatType: data.repeatType, repeatValues: data.repeatValues})}
+                                        onRequestClose={() => this.setState({isRepeatTypeSelectModalOpen: false})}
+                                    />
+                                </div>
+                                <div className="flex flex-align-center">
+                                    <div className="time-set-wrapper">
+                                        <button
+                                            className="text img-text-button clear"
+                                            onClick={() => this.pickTime('startTime')}
+                                        >
+                                            <img
+                                                className={this.state.note.startTime ? "" : "m-0"}
+                                                src={ClockImg}
+                                                alt="time"
+                                            />
+                                            {this.state.note.startTime && this.state.note.startTime.format('HH:mm')}
+                                        </button>
+
+                                        {
+                                            this.state.note.startTime &&
+                                            <Fragment>
+                                                <span>-</span>
+                                                <button
+                                                    className="text img-text-button clear"
+                                                    onClick={() => this.pickTime('endTime')}
+                                                >
+                                                    <img
+                                                        className={this.state.note.endTime ? "" : "m-0"}
+                                                        src={ClockImg}
+                                                        alt="time"
+                                                    />
+                                                    {this.state.note.endTime && this.state.note.endTime.format('HH:mm')}
+                                                </button>
+                                            </Fragment>
+                                        }
+                                    </div>
+
+                                    <div className="notification-switch-wrapper">
+                                        <img
+                                            src={NotificationImg}
+                                            alt="notification"
+                                        />
+
+                                        <Switch
+                                            checked={this.state.note.isNotificationEnabled}
+                                            onChange={this.onNotificationStateChange}
+                                            disabled={!this.state.note.startTime}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="color-picker-wrapper">
+                                <ColorPicker
+                                    onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}
+                                    value={this.state.tag}
+                                    colors={this.tags}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

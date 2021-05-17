@@ -38,7 +38,7 @@ class NotesService {
             let select = await executeSQL(
                 `SELECT t.id, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
                         t.repeatType, t.contentItems, t.isFinished, t.forkFrom, t.date, t.manualOrderIndex, t.mode,
-                        (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = t.id) as repeatDates
+                        (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = t.id) as repeatValues
                         FROM Notes t
                         WHERE
                             t.id IN (${filteredNotesIDs.join(',')})
@@ -69,7 +69,7 @@ class NotesService {
                     isFinished: Boolean(item.isFinished),
                     isNotificationEnabled: Boolean(item.isNotificationEnabled),
                     isShadow: Boolean(item.date === -1),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
+                    repeatValues: item.repeatValues ? item.repeatValues.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
                 };
 
                 if (repeatType === "no-repeat") {
@@ -128,7 +128,7 @@ class NotesService {
                     isFinished: Boolean(item.isFinished),
                     isNotificationEnabled: Boolean(item.isNotificationEnabled),
                     isShadow: Boolean(item.date === -1),
-                    repeatDates: item.repeatDates ? item.repeatDates.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
+                    repeatValues: item.repeatValues ? item.repeatValues.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
                 };
 
                 notes.push(nextItem);
@@ -147,7 +147,7 @@ class NotesService {
             isFinished: Boolean(note.isFinished),
             isNotificationEnabled: Boolean(note.isNotificationEnabled),
             isShadow: Boolean(note.date === -1),
-            repeatDates: note.repeatDates ? note.repeatDates.split(",").map(a => note.repeatType === NoteRepeatType.Any ? +a - utcOffset : +a) : [],
+            repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? +a - utcOffset : +a) : [],
             lastActionTime: moment(note.lastActionTime),
         };
     }
@@ -170,7 +170,7 @@ class NotesService {
                 return executeSQL(
                     `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, 
                         n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
-                    (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatDates
+                    (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
                     FROM Notes n
                     LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
                     WHERE
@@ -285,13 +285,13 @@ class NotesService {
     async addNoteRepeatValues(note) {
         await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [ note.id ]);
 
-        if (note.repeatType === NoteRepeatType.NoRepeat || note.repeatDates.length === 0) {
+        if (note.repeatType === NoteRepeatType.NoRepeat || note.repeatValues.length === 0) {
             return
         }
 
-        let params = note.repeatDates.reduce((acc) => `${acc}, (?, ?)`, "");
+        let params = note.repeatValues.reduce((acc) => `${acc}, (?, ?)`, "");
         params = params.slice(2);
-        let values = note.repeatDates.reduce((acc, item) => {
+        let values = note.repeatValues.reduce((acc, item) => {
             let value = item;
             if (note.repeatType === NoteRepeatType.Any) {
                 value = item + getUTCOffset();

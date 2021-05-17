@@ -25,5 +25,5 @@ export const NoteRepeatType = {
 export const NoteContentItemType = {
     Text: 'text',
     ListItem: 'listItem',
-    Photo: 'snapshot'
+    Image: 'snapshot'
 }
