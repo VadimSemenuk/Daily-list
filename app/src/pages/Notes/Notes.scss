@@ -3,6 +3,26 @@
     flex: 1;
     flex-direction: column;
 
+    .calendar-trigger-wrapper {
+        display: flex;
+        justify-content: center;
+
+        .calendar-trigger {
+            padding: 2px 20px;
+            padding-bottom: 12px;
+            margin-bottom: -10px;
+
+            img {
+                display: block;
+                height: 20px;
+
+                &.rotated {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+    }
+
     .notes-list-swiper {
         flex-grow: 1;
         display: flex;

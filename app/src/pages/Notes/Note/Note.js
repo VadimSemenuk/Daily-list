@@ -6,7 +6,7 @@ import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
-import RepeatImg from "../../../assets/img/two-circling-arrows.svg";
+import RepeatImg from "../../../assets/img/repeat.svg";
 
 import './Note.scss';
 import {NoteRepeatType} from "../../../constants";

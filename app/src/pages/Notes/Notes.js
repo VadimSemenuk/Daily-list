@@ -21,11 +21,11 @@ import deepCopyObject from "../../utils/deepCopyObject";
 import {NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Notes.scss';
-import CalendarImg from "../../assets/img/calendar.svg";
 import AddImg from "../../assets/img/add.svg";
 import SettingsImg from "../../assets/img/settings.svg";
 import ExportImg from "../../assets/img/upload-to-cloud.svg";
 import SearchImg from "../../assets/img/search.svg";
+import ChevronBottomImg from "../../assets/img/bottom-chevron.svg";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -189,13 +189,6 @@ class Notes extends PureComponent {
                             img: SettingsImg
                         },
                         ...(
-                            this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ?
-                                [{
-                                    action: this.triggerCalendar,
-                                    img: CalendarImg
-                                }] : []
-                        ),
-                        ...(
                             this.props.user ?
                                 [{
                                     action: () => this.props.uploadGDBackup("user"),
@@ -229,6 +222,21 @@ class Notes extends PureComponent {
                             onDateSet={this.setDate}
                             onCloseRequest={this.triggerCalendar}
                         />
+                    }
+                    {
+                        this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime &&
+                        <div className="calendar-trigger-wrapper theme-header-background">
+                            <div
+                                className="calendar-trigger calendar-trigger"
+                                onClick={this.triggerCalendar}
+                            >
+                                <img
+                                    className={this.props.settings.calendarMode === 2 ? ' rotated' : ''}
+                                    src={ChevronBottomImg}
+                                    alt="trigger"
+                                />
+                            </div>
+                        </div>
                     }
                     {
                         (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) &&
