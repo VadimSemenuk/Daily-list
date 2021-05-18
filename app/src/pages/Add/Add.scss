@@ -18,41 +18,13 @@
     }
 
     .note-actions-wrapper {
-        //flex-basis: 214px;
         flex-shrink: 0;
-        //height: 214px;
         background: #fafafa;
         border-top: 3px solid #e7e7e7;
         border-bottom: 0;
         position: relative;
         transition: 100ms ease all;
         top: 0;
-
-        &.hidden {
-            display: none;
-        }
-
-        &.hidden-triggered {
-            height: 18px;
-            flex-basis: 18px;
-        }
-
-        &.minified {
-            height: 52px;
-            flex-basis: 52px;
-        }
-
-        .color-picker-list-wrapper {
-            margin-top: 0px;
-        }
-
-        .color-item-wrapper {
-            &:first-child {
-                .color-item {
-                    border: 1px solid #9e9e9e;
-                }
-            }
-        }
     }
 
     .content-items-actions-wrapper {
@@ -114,12 +86,4 @@
             padding: 0 10px;
         }
     }
-}
-
-.time-wrapper {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
 }

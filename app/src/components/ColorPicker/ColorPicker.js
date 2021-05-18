@@ -15,7 +15,7 @@ export default (props) => (
 
                 return (
                     <button 
-                        className={`color-item-wrapper${value === color ? " active" : ""}`}
+                        className={`color-item-wrapper${value === color ? " active" : ""}${color === 'transparent' ? " border" : ""}`}
                         key={i}
                         onClick={() => props.onSelect({color: colorsItem, index: i})}
                     >

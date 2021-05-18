@@ -42,7 +42,8 @@ class Add extends Component {
 
             isCalendarOpen: false,
             isRepeatTypeSelectModalOpen: false,
-            isNotificationWasUnchecked: false
+            isNotificationWasUnchecked: false,
+            mode: 'add'
         };
 
         this.repeatTypeOptions = notesService.getRepeatTypeOptions();
@@ -67,7 +68,10 @@ class Add extends Component {
 
     async componentDidMount() {
         if (this.props.match.path === "/edit") {
-            this.setState({note: deepCopy(this.props.location.state.note)});
+            this.setState({
+                note: deepCopy(this.props.location.state.note),
+                mode: 'edit'
+            });
             this.prevNote = deepCopy(this.props.location.state.note);
         }
 
@@ -251,7 +255,7 @@ class Add extends Component {
             note.date = -1;
         }
 
-        if (this.props.match.path === "/edit") {
+        if (this.state.mode === "edit") {
             await this.props.updateNote(note, this.prevNote);
         } else {
             await this.props.addNote(note);
@@ -405,9 +409,9 @@ class Add extends Component {
                             })
                         }
                     </div>
-                    <div className={`note-actions-wrapper hide-with-active-keyboard${this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "" : " minified"}`}>
+                    <div className="note-actions-wrapper hide-with-active-keyboard">
                         <div className="content-items-actions-wrapper">
-                            <div className="label">{t("add-content-item")}</div>
+                            <div className="label">{t("add-content-item")}:</div>
                             <div className="content-items-actions">
                                 <button
                                     onTouchStart={this.saveFocusedElement}
@@ -465,90 +469,93 @@ class Add extends Component {
                             </div>
                         </div>
 
-                        <div className="note-settings-wrapper">
-                            <div className="flex flex-align-center flex-justify-space-between">
-                                <div className="repeat-set-wrapper">
-                                    <button
-                                        className="text img-text-button clear"
-                                        onClick={() => this.setState({isRepeatTypeSelectModalOpen: !this.state.isRepeatTypeSelectModalOpen})}
-                                    >
-                                        <img
-                                            src={RepeatImg}
-                                            alt="repeat"
-                                        />
-                                        {t(selectedRepeatTypeOption.translateId)}
-                                    </button>
-
-                                    <RepeatTypeSelectModal
-                                        isOpen={this.state.isRepeatTypeSelectModalOpen}
-                                        defaultDate={moment(this.state.note.date)}
-                                        repeatType={this.state.note.repeatType}
-                                        repeatValues={this.state.note.repeatValues}
-                                        calendarNotesCounter={this.props.settings.calendarNotesCounter}
-                                        onSubmit={async (data) => {
-                                            await this.updateNoteData({repeatType: data.repeatType, repeatValues: data.repeatValues});
-
-                                            if (this.state.isCalendarOpen) {
-                                                this.setState({
-                                                    isCalendarOpen: false
-                                                });
-                                            }
-                                        }}
-                                        onRequestClose={() => this.setState({isRepeatTypeSelectModalOpen: false})}
-                                    />
-                                </div>
-                                <div className="flex flex-align-center">
-                                    <div className="time-set-wrapper">
+                        <div className="note-settings-wrapper hide-with-active-keyboard">
+                            {
+                                this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime &&
+                                <div className="flex flex-align-center flex-justify-space-between">
+                                    <div className="repeat-set-wrapper">
                                         <button
                                             className="text img-text-button clear"
-                                            onClick={() => this.pickTime('startTime')}
+                                            onClick={() => this.setState({isRepeatTypeSelectModalOpen: !this.state.isRepeatTypeSelectModalOpen})}
                                         >
                                             <img
-                                                className={this.state.note.startTime ? "" : "m-0"}
-                                                src={ClockImg}
-                                                alt="time"
+                                                src={RepeatImg}
+                                                alt="repeat"
                                             />
-                                            {this.state.note.startTime && this.state.note.startTime.format('HH:mm')}
+                                            {t(selectedRepeatTypeOption.translateId)}
                                         </button>
 
-                                        {
-                                            this.state.note.startTime &&
-                                            <Fragment>
-                                                <span>-</span>
-                                                <button
-                                                    className="text img-text-button clear"
-                                                    onClick={() => this.pickTime('endTime')}
-                                                >
-                                                    <img
-                                                        className={this.state.note.endTime ? "" : "m-0"}
-                                                        src={ClockImg}
-                                                        alt="time"
-                                                    />
-                                                    {this.state.note.endTime && this.state.note.endTime.format('HH:mm')}
-                                                </button>
-                                            </Fragment>
-                                        }
+                                        <RepeatTypeSelectModal
+                                            isOpen={this.state.isRepeatTypeSelectModalOpen}
+                                            defaultDate={moment(this.state.note.date)}
+                                            repeatType={this.state.note.repeatType}
+                                            repeatValues={this.state.note.repeatValues}
+                                            calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                                            onSubmit={async (data) => {
+                                                await this.updateNoteData({repeatType: data.repeatType, repeatValues: data.repeatValues});
+
+                                                if (this.state.isCalendarOpen) {
+                                                    this.setState({
+                                                        isCalendarOpen: false
+                                                    });
+                                                }
+                                            }}
+                                            onRequestClose={() => this.setState({isRepeatTypeSelectModalOpen: false})}
+                                        />
                                     </div>
+                                    <div className="flex flex-align-center">
+                                        <div className="time-set-wrapper">
+                                            <button
+                                                className="text img-text-button clear"
+                                                onClick={() => this.pickTime('startTime')}
+                                            >
+                                                <img
+                                                    className={this.state.note.startTime ? "" : "m-0"}
+                                                    src={ClockImg}
+                                                    alt="time"
+                                                />
+                                                {this.state.note.startTime && this.state.note.startTime.format('HH:mm')}
+                                            </button>
 
-                                    <div className="notification-switch-wrapper">
-                                        <img
-                                            src={NotificationImg}
-                                            alt="notification"
-                                        />
+                                            {
+                                                this.state.note.startTime &&
+                                                <Fragment>
+                                                    <span>-</span>
+                                                    <button
+                                                        className="text img-text-button clear"
+                                                        onClick={() => this.pickTime('endTime')}
+                                                    >
+                                                        <img
+                                                            className={this.state.note.endTime ? "" : "m-0"}
+                                                            src={ClockImg}
+                                                            alt="time"
+                                                        />
+                                                        {this.state.note.endTime && this.state.note.endTime.format('HH:mm')}
+                                                    </button>
+                                                </Fragment>
+                                            }
+                                        </div>
 
-                                        <Switch
-                                            checked={this.state.note.isNotificationEnabled}
-                                            onChange={this.onNotificationStateChange}
-                                            disabled={!this.state.note.startTime}
-                                        />
+                                        <div className="notification-switch-wrapper">
+                                            <img
+                                                src={NotificationImg}
+                                                alt="notification"
+                                            />
+
+                                            <Switch
+                                                checked={this.state.note.isNotificationEnabled}
+                                                onChange={this.onNotificationStateChange}
+                                                disabled={!this.state.note.startTime}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
 
                             <div className="color-picker-wrapper">
                                 <ColorPicker
                                     onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}
-                                    value={this.state.tag}
+                                    value={this.state.note.tag}
                                     colors={this.tags}
                                 />
                             </div>
