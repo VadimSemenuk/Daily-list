@@ -24,7 +24,10 @@ class TrashListItem extends PureComponent {
                         <img src={RestoreImg} alt="restore" />
                     </button>
                 </div>
-                <Note {...this.props} />
+                <Note
+                    {...this.props}
+                    isActionsViewVisible={false}
+                />
             </div>
         )
     }

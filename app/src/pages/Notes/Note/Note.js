@@ -8,8 +8,9 @@ import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
 import RepeatImg from "../../../assets/img/repeat.svg";
 
-import './Note.scss';
 import {NoteRepeatType} from "../../../constants";
+
+import './Note.scss';
 
 class Note extends PureComponent {
     constructor(props) {

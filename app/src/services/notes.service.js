@@ -213,7 +213,7 @@ class NotesService {
 
     async getNotesWithoutTime() {
         let select = await executeSQL(
-            `SELECT id, title, tag, contentItems, manualOrderIndex, mode, isFinished, lastAction, lastActionTime
+            `SELECT id, title, tag, contentItems, manualOrderIndex, mode, isFinished, lastAction, lastActionTime, repeatType, forkFrom
             FROM Notes
             WHERE
                 mode == ?
@@ -368,7 +368,7 @@ class NotesService {
             WHERE id = ?;`,
             [
                 nextNote.title,
-                nextNote.isShadow ? -1 : nextNote.date.valueOf() + utcOffset,
+                nextNote.date ? (nextNote.isShadow ? -1 : nextNote.date.valueOf() + utcOffset) : null,
                 nextNote.startTime ? nextNote.startTime.valueOf() + utcOffset : -1,
                 nextNote.endTime ? nextNote.endTime.valueOf() + utcOffset : -1,
                 Number(nextNote.isNotificationEnabled),

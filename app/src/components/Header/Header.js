@@ -26,7 +26,7 @@ let Header = (props) => (
                 }
             </div>
             {
-                props.isDateViewVisible &&
+                (props.isDateViewVisible && props.dateViewValue) &&
                 <div
                     className="current-date clickable"
                     onClick={props.onDateViewClick}

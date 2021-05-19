@@ -40,7 +40,7 @@ function getReceiveNoteFn(note) {
         }
         default: {
             fn = (list) => {
-                if (list.date.valueOf() === note.date.valueOf()) {
+                if (!list.date || (list.date.valueOf() === note.date.valueOf())) {
                     return assignFn(list)
                 }
                 return list
@@ -84,7 +84,7 @@ function notes (state = init, action) {
                 nextState = nextState
                     .map((list) => ({...list, items: list.items.filter((item) => item.id !== note.id)}))
                     .map((list) => {
-                        if (list.date.valueOf() === note.date.valueOf()) {
+                        if (!list.date || (list.date.valueOf() === note.date.valueOf())) {
                             return {
                                 date: list.date,
                                 items: [...list.items, note]

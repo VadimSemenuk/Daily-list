@@ -294,16 +294,15 @@ class Add extends Component {
     }
 
     pickTime = async (field) => {
-        let dateTime = moment();
-        // let dateTime = await new Promise((resolve, reject) => {
-        //     window.cordova.plugins.DateTimePicker.show({
-        //         mode: 'time',
-        //         date: (this.state.note[field] || moment()).toDate(),
-        //         success: (data) => resolve(moment(data)),
-        //         cancel: () => this.resetTime(field),
-        //         error: (err) => reject(err)
-        //     })
-        // });
+        let dateTime = await new Promise((resolve, reject) => {
+            window.cordova.plugins.DateTimePicker.show({
+                mode: 'time',
+                date: (this.state.note[field] || moment()).toDate(),
+                success: (data) => resolve(moment(data)),
+                cancel: () => this.resetTime(field),
+                error: (err) => reject(err)
+            })
+        });
 
         await this.updateNoteData({[field]: moment(dateTime).startOf("minute")});
 
@@ -353,7 +352,7 @@ class Add extends Component {
                             img: CheckedImg
                         }
                     ]}
-                    isDateViewVisible={true}
+                    isDateViewVisible={this.state.note.mode === NotesScreenMode.WithDateTime}
                     dateViewValue={this.state.note.date}
                 />
                 {

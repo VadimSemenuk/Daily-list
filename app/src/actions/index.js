@@ -60,7 +60,9 @@ export function updateNote(note, prevNote) {
 
             let state = getState();
 
-            state.settings.calendarNotesCounter && dispatch(getFullCount(updatedNote.date.valueOf()));
+            if (updatedNote.mode === NotesScreenMode.WithDateTime) {
+                state.settings.calendarNotesCounter && dispatch(getFullCount(updatedNote.date.valueOf()));
+            }
 
             dispatch(saveBackup());
         } catch(err) {
@@ -96,10 +98,12 @@ export function updateNoteDynamicFields(note, updatedState) {
 
             let state = getState();
 
-            updatedState.hasOwnProperty('isFinished')
-            && state.settings.calendarNotesCounter
-            && !state.settings.calendarNotesCounterIncludeFinished
-            && dispatch(getFullCount(updatedNote.date.valueOf()));
+            if (updatedNote.mode === NotesScreenMode.WithDateTime) {
+                updatedState.hasOwnProperty('isFinished')
+                && state.settings.calendarNotesCounter
+                && !state.settings.calendarNotesCounterIncludeFinished
+                && dispatch(getFullCount(updatedNote.date.valueOf()));
+            }
 
             updatedState.hasOwnProperty('isFinished') && dispatch(renderNotes());
 
@@ -137,7 +141,9 @@ export function deleteNote(note) {
 
             let state = getState();
 
-            state.settings.calendarNotesCounter && dispatch(getFullCount(deletedNote.date.valueOf()));
+            if (deletedNote.mode === NotesScreenMode.WithDateTime) {
+                state.settings.calendarNotesCounter && dispatch(getFullCount(deletedNote.date.valueOf()));
+            }
 
             dispatch(saveBackup());
         } catch(err) {
