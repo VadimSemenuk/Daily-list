@@ -345,6 +345,8 @@ class NotesService {
     }
 
     async updateNote(note, prevNote) {
+        let utcOffset = getUTCOffset();
+
         let nextNote = {
             ...note,
             lastAction: NoteAction.Edit,
@@ -366,9 +368,9 @@ class NotesService {
             WHERE id = ?;`,
             [
                 nextNote.title,
-                nextNote.isShadow ? -1 : nextNote.date.valueOf() + getUTCOffset(),
-                nextNote.startTime ? nextNote.startTime.valueOf() + getUTCOffset() : -1,
-                nextNote.endTime ? nextNote.endTime.valueOf() + getUTCOffset() : -1,
+                nextNote.isShadow ? -1 : nextNote.date.valueOf() + utcOffset,
+                nextNote.startTime ? nextNote.startTime.valueOf() + utcOffset : -1,
+                nextNote.endTime ? nextNote.endTime.valueOf() + utcOffset : -1,
                 Number(nextNote.isNotificationEnabled),
                 nextNote.tag,
                 nextNote.lastAction,
@@ -376,7 +378,7 @@ class NotesService {
                 nextNote.repeatType,
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
-                getUTCOffset(),
+                utcOffset,
                 nextNote.id,
             ]
         );

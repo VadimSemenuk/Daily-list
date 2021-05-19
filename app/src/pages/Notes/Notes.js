@@ -304,37 +304,76 @@ class Notes extends PureComponent {
                     onDateViewClick={this.onHeaderDateViewClick}
                 />
                 <div className="notes-list-wrapper page-content">
-                    {   
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && (this.props.settings.calendarMode === 1) &&
-                        <LightCalendar
-                            calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
-                            currentDate={this.props.currentDate}
-                            onDateSet={this.setDate}
-                        />
-                    }
-                    {
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && (this.props.settings.calendarMode === 2) &&
-                        <Calendar 
-                            currentDate={this.props.currentDate}
-                            calendarNotesCounter={this.props.settings.calendarNotesCounter}                            
-                            onDateSet={this.setDate}
-                            onCloseRequest={this.triggerCalendar}
-                        />
-                    }
                     {
                         this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime &&
-                        <div className="calendar-trigger-wrapper theme-header-background">
-                            <div
-                                className="calendar-trigger calendar-trigger"
-                                onClick={this.triggerCalendar}
-                            >
-                                <img
-                                    className={this.props.settings.calendarMode === 2 ? ' rotated' : ''}
-                                    src={ChevronBottomImg}
-                                    alt="trigger"
+                        <React.Fragment>
+                            {
+                                this.props.settings.calendarMode === 1 &&
+                                <LightCalendar
+                                    calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                                    currentDate={this.props.currentDate}
+                                    onDateSet={this.setDate}
                                 />
+                            }
+                            {
+                                this.props.settings.calendarMode === 2 &&
+                                <Calendar
+                                    currentDate={this.props.currentDate}
+                                    calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                                    onDateSet={this.setDate}
+                                    onCloseRequest={this.triggerCalendar}
+                                />
+                            }
+
+                            <div className="calendar-trigger-wrapper theme-header-background">
+                                <div
+                                    className="calendar-trigger calendar-trigger"
+                                    onClick={this.triggerCalendar}
+                                >
+                                    <img
+                                        className={this.props.settings.calendarMode === 2 ? ' rotated' : ''}
+                                        src={ChevronBottomImg}
+                                        alt="trigger"
+                                    />
+                                </div>
                             </div>
-                        </div>
+
+                            <ReactSwipe
+                                ref={node => {
+                                    if (node) {
+                                        this.swipe = node.swipe;
+                                    }
+                                }}
+                                className="notes-list-swiper"
+                                swipeOptions={{
+                                    continuous: true,
+                                    startSlide: 1,
+                                    callback: this.onSliderChange,
+                                    transitionEnd: this.onTransitionEnd,
+                                    disableScroll: !this.state.isSwipeAvailable,
+                                }}
+                                key={this.props.notes.length}
+                            >
+                                {
+                                    this.props.notes.map((notes, i) => (
+                                        <div
+                                            className="notes-list-item-wrapper"
+                                            key={i}
+                                        >
+                                            <NotesList
+                                                index={i}
+                                                notes={notes.items}
+                                                settings={this.props.settings}
+                                                onDragSortModeTrigger={this.onDragSortModeTrigger}
+                                                onOrderChange={this.onOrderChange}
+                                                onDynamicFieldChange={this.onDynamicFieldChange}
+                                                onDialogRequest={this.onDialogRequest}
+                                            />
+                                        </div>
+                                    ))
+                                }
+                            </ReactSwipe>
+                        </React.Fragment>
                     }
                     {
                         (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) &&
@@ -356,44 +395,6 @@ class Notes extends PureComponent {
                                 </div>
                             </div>
                         </div>
-                    }
-                    {
-                        (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) &&
-                        <ReactSwipe
-                            ref={node => {
-                                if (node) {
-                                    this.swipe = node.swipe;
-                                }
-                            }}
-                            className="notes-list-swiper"
-                            swipeOptions={{
-                                continuous: true,
-                                startSlide: 1,
-                                callback: this.onSliderChange,
-                                transitionEnd: this.onTransitionEnd,
-                                disableScroll: !this.state.isSwipeAvailable,
-                            }}
-                            key={this.props.notes.length}
-                        >
-                            {
-                                this.props.notes.map((notes, i) => (
-                                    <div
-                                        className="notes-list-item-wrapper"
-                                        key={i}
-                                    >
-                                        <NotesList
-                                            index={i}
-                                            notes={notes.items}
-                                            settings={this.props.settings}
-                                            onDragSortModeTrigger={this.onDragSortModeTrigger}
-                                            onOrderChange={this.onOrderChange}
-                                            onDynamicFieldChange={this.onDynamicFieldChange}
-                                            onDialogRequest={this.onDialogRequest}
-                                        />
-                                    </div>
-                                ))
-                            }
-                        </ReactSwipe>
                     }
 
                     {

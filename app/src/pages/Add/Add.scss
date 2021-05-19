@@ -61,20 +61,33 @@
             height: 20px;
         }
 
+        .repeat-set-wrapper {
+            img {
+                margin-right: 5px;
+            }
+        }
+
         .time-set-wrapper {
-            margin-right: 16px;
             display: flex;
             align-items: center;
+
+            img {
+                margin-right: 5px;
+            }
+
+            .separator {
+                margin: 0 -6px;
+            }
         }
 
         .notification-switch-wrapper {
             display: flex;
             align-items: center;
-            margin-right: 5px;
+            margin-right: 4px;
 
             img {
                 display: block;
-                margin-right: 6px;
+                margin-right: 4px;
             }
         }
 

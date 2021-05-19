@@ -294,15 +294,16 @@ class Add extends Component {
     }
 
     pickTime = async (field) => {
-        let dateTime = await new Promise((resolve, reject) => {
-            window.cordova.plugins.DateTimePicker.show({
-                mode: 'time',
-                date: (this.state.note[field] || moment()).toDate(),
-                success: (data) => resolve(moment(data)),
-                cancel: () => this.resetTime(field),
-                error: (err) => reject(err)
-            })
-        });
+        let dateTime = moment();
+        // let dateTime = await new Promise((resolve, reject) => {
+        //     window.cordova.plugins.DateTimePicker.show({
+        //         mode: 'time',
+        //         date: (this.state.note[field] || moment()).toDate(),
+        //         success: (data) => resolve(moment(data)),
+        //         cancel: () => this.resetTime(field),
+        //         error: (err) => reject(err)
+        //     })
+        // });
 
         await this.updateNoteData({[field]: moment(dateTime).startOf("minute")});
 
@@ -318,9 +319,14 @@ class Add extends Component {
         let isNotificationEnabled = this.state.note.isNotificationEnabled;
         if (field === 'startTime') {
             isNotificationEnabled = false;
+            this.updateNoteData({
+                startTime: null,
+                endTime: null,
+                isNotificationEnabled
+            });
+        } else {
+            this.updateNoteData({[field]: null});
         }
-
-        this.updateNoteData({[field]: null, isNotificationEnabled});
     }
 
     render() {
@@ -518,7 +524,6 @@ class Add extends Component {
                                                 }}
                                             >
                                                 <img
-                                                    className={this.state.note.startTime ? "" : "m-0"}
                                                     src={ClockImg}
                                                     alt="time"
                                                 />
@@ -528,7 +533,7 @@ class Add extends Component {
                                             {
                                                 this.state.note.startTime &&
                                                 <Fragment>
-                                                    <span>-</span>
+                                                    <span className="separator">-</span>
                                                     <button
                                                         className="text img-text-button clear"
                                                         onClick={() => {
