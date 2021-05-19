@@ -654,11 +654,11 @@ export function triggerErrorModal(message) {
 }
 
 // search
-export function searchNotes(search, repeatType) {
+export function searchNotes(search) {
     return async (dispatch, getState) => {
         let state = getState();
 
-        let notes = await notesService.searchNotes(state.settings.notesScreenMode, search, repeatType);
+        let notes = await notesService.searchNotes(state.settings.notesScreenMode, search);
 
         dispatch({
             type: "RECEIVE_SEARCH_NOTES",

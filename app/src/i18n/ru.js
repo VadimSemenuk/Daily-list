@@ -172,10 +172,8 @@ export default {
     "default-notification-title": "Уведомление о заметке",
 
     // search
-    "no-search-content": "Ничего не найдено",
     "search-placeholder": "Поиск",
-    "show-repeat-notes": "повторяющиеся",
-    "show-no-repeat-notes": "неповторяющиеся",
+    "search": "Поиск",
 
     // menu
     "show-daily-notes-screen": "Панель Ежедневник",

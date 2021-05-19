@@ -7,7 +7,107 @@ import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
 window.e = executeSQL;
 
 class NotesService {
-    async searchNotes(mode, search, repeatType) {
+    async processSearchResultNotesWithTime(notesIDs) {
+        let utcOffset = getUTCOffset();
+        let currentDate = moment().startOf("day");
+
+        let select = await executeSQL(
+            `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, 
+                        n.repeatType, n.contentItems, n.isFinished, n.forkFrom, n.date, n.manualOrderIndex, n.mode,
+                        (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
+                        FROM Notes n
+                        WHERE
+                            n.id IN (${notesIDs.join(',')})
+                            AND n.mode == ?
+                            AND n.lastAction != ?`
+            , [NoteMode.WithDateTime, NoteAction.Delete]);
+
+        if (!select.rows.length) {
+            return [];
+        }
+
+        let findClosestValue = (initialValue, data) => {
+            let reducer = (prevValue, value, index, array) => {
+                if (
+                    prevValue === null ||
+                    Math.abs(initialValue - value) < Math.abs(initialValue - array[index - 1])
+                ) {
+                    return value;
+                }
+                return prevValue;
+            };
+            return data.reduce(reducer, null);
+        }
+
+        let notes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            let note = this.parseNoteWithTime(select.rows.item(i), utcOffset);
+
+            if (note.repeatType === NoteRepeatType.Day) {
+                note.date = moment(currentDate);
+            } else if (note.repeatType === NoteRepeatType.Week) {
+                note.date = moment().isoWeekday(findClosestValue(moment(currentDate).isoWeekday(), note.repeatValues));
+            } else if (note.repeatType === NoteRepeatType.Any) {
+                note.date = moment(findClosestValue(moment(currentDate).valueOf(), note.repeatValues));
+            }
+            notes.push(note);
+        }
+
+        let closestToCurrentDateNoteDateDiff = null;
+        let closestToCurrentDateNoteIndex = 0;
+        let closestToCurrentDate = null;
+        let msCurrentDate = currentDate.valueOf();
+        notes.forEach((note, index) => {
+            let dateDiff = Math.abs(msCurrentDate - note.date.valueOf());
+            if ((dateDiff < closestToCurrentDateNoteDateDiff) || (closestToCurrentDateNoteDateDiff === null)) {
+                closestToCurrentDateNoteDateDiff = dateDiff;
+                closestToCurrentDateNoteIndex = index;
+                closestToCurrentDate = note.date.valueOf();
+            }
+        });
+
+        notes = notes.slice(closestToCurrentDateNoteIndex - 50, closestToCurrentDateNoteIndex).concat(notes.slice(closestToCurrentDateNoteIndex, closestToCurrentDateNoteIndex + 50));
+
+        let notesByDates = {};
+        notes.forEach((note) => {
+            let msDate = note.date.valueOf();
+            if (!notesByDates[msDate]) {
+                notesByDates[msDate] = [];
+            }
+            notesByDates[msDate].push(note);
+        });
+
+        return Object.keys(notesByDates)
+            .map((date) => ({
+                date: moment(+date),
+                items: notesByDates[date],
+                isClosestToCurrentDate: +date === +closestToCurrentDate
+            }))
+            .sort((a, b) => {
+                return a.date.valueOf() - b.date.valueOf();
+            });
+    }
+
+    async processSearchResultNotesWithoutTime(notesIds) {
+        let select = await executeSQL(
+            `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, 
+                        n.repeatType, n.contentItems, n.isFinished, n.forkFrom, n.date, n.manualOrderIndex, n.mode
+                        FROM Notes n
+                        WHERE
+                            n.id IN (${notesIds.join(',')})
+                            AND n.mode == ?
+                            AND n.lastAction != ?`
+            , [NoteMode.WithoutDateTime, NoteAction.Delete]);
+
+        let notes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            notes.push(this.parseNoteWithoutTime(select.rows.item(i)));
+        }
+
+        return [{items: notes}];
+    }
+
+    async searchNotes(mode, search) {
         search = search.toLowerCase().trim();
 
         if (!search) {
@@ -32,108 +132,10 @@ class NotesService {
             }
         }
 
-        if (mode === 1) {
-            let msCurrentDate = moment().startOf("day").valueOf();
-
-            let select = await executeSQL(
-                `SELECT t.id, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
-                        t.repeatType, t.contentItems, t.isFinished, t.forkFrom, t.date, t.manualOrderIndex, t.mode,
-                        (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = t.id) as repeatValues
-                        FROM Notes t
-                        WHERE
-                            t.id IN (${filteredNotesIDs.join(',')})
-                            AND ${repeatType === 'no-repeat' ? `(t.repeatType == 'no-repeat' OR t.repeatType == 'any')` : `((t.repeatType == 'week' OR t.repeatType == 'day') AND t.forkFrom == -1)`}
-                            AND t.mode == 1
-                            AND t.lastAction != ?
-                        ORDER BY t.date`
-                    , [NoteAction.Delete]);
-
-            if (!select.rows.length) {
-                return [];
-            }
-
-            let notes = [];
-            let closestToCurrentDateNoteDateDiff = null;
-            let closestToCurrentDateNoteIndex = 0;
-            let closestToCurrentDate = null;
-            for(let i = 0; i < select.rows.length; i++) {
-                let item = select.rows.item(i);
-
-                let nextItem = {
-                    ...item,
-                    contentItems: JSON.parse(item.contentItems),
-                    startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
-                    endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
-                    date: moment(item.date - getUTCOffset()),
-                    msAdded: item.date - getUTCOffset(),
-                    isFinished: Boolean(item.isFinished),
-                    isNotificationEnabled: Boolean(item.isNotificationEnabled),
-                    isShadow: Boolean(item.date === -1),
-                    repeatValues: item.repeatValues ? item.repeatValues.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
-                };
-
-                if (repeatType === "no-repeat") {
-                    let dateDiff = Math.abs(msCurrentDate - nextItem.msAdded);
-                    if ((dateDiff < closestToCurrentDateNoteDateDiff) || (closestToCurrentDateNoteDateDiff === null)) {
-                        closestToCurrentDateNoteDateDiff = dateDiff;
-                        closestToCurrentDateNoteIndex = i;
-                        closestToCurrentDate = nextItem.msAdded;
-                    }
-                }
-
-                notes.push(nextItem);
-            }
-
-            if (repeatType === "no-repeat") {
-                notes = notes.slice(closestToCurrentDateNoteIndex - 50, closestToCurrentDateNoteIndex).concat(notes.slice(closestToCurrentDateNoteIndex, closestToCurrentDateNoteIndex + 50));
-
-                let notesByDates = {};
-                notes.forEach((note) => {
-                    if (!notesByDates[note.msAdded]) {
-                        notesByDates[note.msAdded] = [note];
-                    } else {
-                        notesByDates[note.msAdded].push(note);
-                    }
-                });
-
-                return Object.keys(notesByDates).map((date) => ({
-                    date: moment(+date),
-                    items: notesByDates[date],
-                    isClosestToCurrentDate: +date === +closestToCurrentDate
-                }));
-            } else {
-                return [{items: notes}];
-            }
+        if (mode === NoteMode.WithDateTime) {
+            return this.processSearchResultNotesWithTime(filteredNotesIDs);
         } else {
-            let select = await executeSQL(
-                `SELECT t.id, t.title, t.startTime, t.endTime, t.isNotificationEnabled, t.tag, 
-                        t.repeatType, t.contentItems, t.isFinished, t.forkFrom, t.date, t.manualOrderIndex, t.mode
-                        FROM Notes t
-                        WHERE
-                            t.id IN (${filteredNotesIDs.join(',')})
-                            AND t.mode == 2
-                            AND t.lastAction != ?`
-            , [NoteAction.Delete]);
-
-            let notes = [];
-            for(let i = 0; i < select.rows.length; i++) {
-                let item = select.rows.item(i);
-
-                let nextItem = {
-                    ...item,
-                    contentItems: JSON.parse(item.contentItems),
-                    startTime: ~item.startTime ? moment(item.startTime - getUTCOffset()) : false,
-                    endTime: ~item.endTime ? moment(item.endTime - getUTCOffset()) : false,
-                    date: moment(item.date - getUTCOffset()),
-                    isFinished: Boolean(item.isFinished),
-                    isNotificationEnabled: Boolean(item.isNotificationEnabled),
-                    isShadow: Boolean(item.date === -1),
-                    repeatValues: item.repeatValues ? item.repeatValues.split(",").map(a => item.repeatType === NoteRepeatType.Any ? +a - getUTCOffset() : +a) : [],
-                };
-
-                notes.push(nextItem);
-            }
-            return [{items: notes}];
+            return this.processSearchResultNotesWithoutTime(filteredNotesIDs);
         }
     }
 

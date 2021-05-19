@@ -24,14 +24,14 @@ import ListImg from '../../assets/img/list.svg';
 import ClockImg from '../../assets/img/clock.svg';
 import RepeatImg from '../../assets/img/repeat.svg';
 import NotificationImg from '../../assets/img/notification.svg';
+import CalendarImg from "../../assets/img/calendar.svg";
+import CheckedImg from "../../assets/img/checked.svg";
 
 import deepCopy from '../../utils/deepCopyObject'
 
 import {NoteContentItemType, NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Add.scss';
-import CalendarImg from "../../assets/img/calendar.svg";
-import CheckedImg from "../../assets/img/checked.svg";
 
 class Add extends Component {
     constructor(props) {

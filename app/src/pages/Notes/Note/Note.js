@@ -21,10 +21,6 @@ class Note extends PureComponent {
     }
 
     onDynamicFieldChange = (i, v) => {
-        if (this.props.context && (this.props.context === 'search' && this.props.context.params.searchRepeatType !== 'no-repeat')) {
-            return;
-        }
-
         let nextDynamicFields = [
             ...this.props.itemData.contentItems.slice(0, i),
             {
@@ -142,24 +138,23 @@ class Note extends PureComponent {
                     }
 
                     {
-                        (!this.props.context || (this.props.context.name === 'search' && this.props.context.params.searchRepeatType === 'no-repeat')) &&
-                        <div className="more-button">
-                            <button onClick={this.onDialogRequest}>
-                                <img
-                                    src={MoreImg}
-                                    alt="more"
+                        this.props.isActionsViewVisible !== false &&
+                        <React.Fragment>
+                            <div className="more-button">
+                                <button onClick={this.onDialogRequest}>
+                                    <img
+                                        src={MoreImg}
+                                        alt="more"
+                                    />
+                                </button>
+                            </div>
+                            <div className="note-finish-checkbox">
+                                <CustomCheckBox
+                                    checked={this.props.itemData.isFinished}
+                                    onChange={this.onItemFinishChange}
                                 />
-                            </button>
-                        </div>
-                    }
-                    {
-                        (!this.props.context || (this.props.context.name === 'search' && this.props.context.params.searchRepeatType === 'no-repeat')) &&
-                        <div className="note-finish-checkbox">
-                            <CustomCheckBox
-                                checked={this.props.itemData.isFinished}
-                                onChange={this.onItemFinishChange}
-                            />
-                        </div>
+                            </div>
+                        </React.Fragment>
                     }
                 </div>
             </div>

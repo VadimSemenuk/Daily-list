@@ -172,10 +172,8 @@ export default {
     "default-notification-title": "Note Notification",
 
     // search
-    "no-search-content": "Nothing found",
     "search-placeholder": "Search",
-    "show-repeat-notes": "repetitive",
-    "show-no-repeat-notes": "non-repeating",
+    "search": "Search",
 
     // menu
     "show-daily-notes-screen": "Diary screen",

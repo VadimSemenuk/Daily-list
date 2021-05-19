@@ -172,10 +172,8 @@ export default {
     "default-notification-title": "Апавяшчэнне аб нататцы",
 
     // search
-    "no-search-content": "Нічога не знойдзена",
     "search-placeholder": "Пошук",
-    "show-repeat-notes": "Паўтараюцца",
-    "show-no-repeat-notes": "Якiя не паўтараюцца",
+    "search": "Пошук",
 
     // menu
     "show-daily-notes-screen": "Панэль Штодзённік",

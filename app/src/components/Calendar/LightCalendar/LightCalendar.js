@@ -80,7 +80,7 @@ class LightCalendar extends Component {
         const weekEndDayMonthName = endWeekDate.format('MMMM');
         
         if (weekStartDayMonthName !== weekEndDayMonthName) {
-            return `${weekStartDayMonthName}, ${startWeekDate.format('YYYY')} - ${weekEndDayMonthName}, ${startWeekDate.format('YYYY')}`;
+            return `${weekStartDayMonthName}, ${startWeekDate.format('YYYY')} - ${weekEndDayMonthName}, ${endWeekDate.format('YYYY')}`;
         } else {
             return `${weekStartDayMonthName}, ${startWeekDate.format('YYYY')}`;
         }

@@ -32,6 +32,7 @@ import DeleteImg from "../../assets/img/delete.svg";
 import InfoImg from "../../assets/img/info.svg";
 import CalendarImg from "../../assets/img/calendar-black.svg";
 import ListImg from "../../assets/img/list.svg";
+import deepCopy from "../../utils/deepCopyObject";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -42,12 +43,14 @@ class Notes extends PureComponent {
             isListItemDialogVisible: false,
             listItemDialogData: null,
             isSwipeAvailable: true,
-            todayDate: moment()
+            todayDate: moment(),
         };
 
         this.activePageIndex = 1;  
         this.prevPageIndex = 1;
         this.slideChanged = false;
+
+        this.scrollToNote = null;
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -66,6 +69,18 @@ class Notes extends PureComponent {
 
     componentDidMount() {
         this.setupSidenav();
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (
+            this.scrollToNote !== null
+            && prevProps.notes[this.activePageIndex].items !== this.props.notes[this.activePageIndex].items
+        ) {
+            let el = document.querySelector(`[data-id='${this.scrollToNote}']`);
+            el && el.scrollIntoView();
+
+            this.scrollToNote = null;
+        }
     }
 
     setupSidenav() {
@@ -239,6 +254,17 @@ class Notes extends PureComponent {
         this.props.updateNotesManualSortIndex(order);
     };
 
+    onSearchResult = (note) => {
+        if (!note) {
+            return;
+        }
+
+        this.scrollToNote = note.id;
+        if (note.date.valueOf() !== this.props.currentDate.valueOf()) {
+            this.setDate(note.date);
+        }
+    }
+
     render() {
         let {t} = this.props;
 
@@ -253,7 +279,12 @@ class Notes extends PureComponent {
                     ]}
                     buttons={[
                         {
-                            link: "/search",
+                            action: () => {
+                                this.props.history.push({
+                                    pathname: "/search",
+                                    state: { onResult: this.onSearchResult }
+                                });
+                            },
                             img: SearchImg
                         },
                         ...(
