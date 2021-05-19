@@ -22,10 +22,16 @@ import {NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Notes.scss';
 import AddImg from "../../assets/img/add.svg";
-import SettingsImg from "../../assets/img/settings.svg";
 import ExportImg from "../../assets/img/upload-to-cloud.svg";
 import SearchImg from "../../assets/img/search.svg";
 import ChevronBottomImg from "../../assets/img/bottom-chevron.svg";
+import MenuImg from "../../assets/img/menu.svg";
+import SettingsImg from "../../assets/img/settings-black.svg";
+import UserImg from "../../assets/img/user.svg";
+import DeleteImg from "../../assets/img/delete.svg";
+import InfoImg from "../../assets/img/info.svg";
+import CalendarImg from "../../assets/img/calendar-black.svg";
+import ListImg from "../../assets/img/list.svg";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -36,6 +42,7 @@ class Notes extends PureComponent {
             isListItemDialogVisible: false,
             listItemDialogData: null,
             isSwipeAvailable: true,
+            todayDate: moment()
         };
 
         this.activePageIndex = 1;  
@@ -53,8 +60,67 @@ class Notes extends PureComponent {
             this.slideChanged = false;
             this.setState({
                 isSwipeAvailable: true
-            })
+            });
         }
+    }
+
+    componentDidMount() {
+        this.setupSidenav();
+    }
+
+    setupSidenav() {
+        this.props.setSidenavItems([
+            [
+                {
+                    textId: "show-daily-notes-screen",
+                    action: async () => {
+                        await this.setScreenMode(NotesScreenMode.WithDateTime);
+                        this.setupSidenav();
+                    },
+                    isActive: this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime,
+                    img: CalendarImg
+                },
+                {
+                    textId: "show-notes-screen",
+                    action: async () => {
+                        await this.setScreenMode(NotesScreenMode.WithoutDateTime);
+                        this.setupSidenav();
+                    },
+                    isActive: this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime,
+                    img: ListImg
+                }
+            ],
+            [
+                {
+                    textId: "settings",
+                    action: () => this.props.history.push("/settings"),
+                    img: SettingsImg
+                },
+                {
+                    textId: "account",
+                    action: () => this.props.history.push("/backup"),
+                    img: UserImg
+                },
+                {
+                    textId: "trash",
+                    action: () => this.props.history.push("/trash"),
+                    img: DeleteImg
+                },
+                {
+                    textId: "about",
+                    action: () => this.props.history.push("/about"),
+                    img: InfoImg
+                }
+            ]
+        ]);
+    }
+
+    async setScreenMode(mode) {
+        await this.props.setSetting("notesScreenMode", mode);
+
+        let msCurDate = moment().startOf("day");
+        let dates = [moment(msCurDate).add(-1, "day"), msCurDate, moment(msCurDate).add(1, "day")];
+        this.props.setDatesAndUpdateNotes(dates, 1, mode);
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
@@ -179,14 +245,16 @@ class Notes extends PureComponent {
         return (
             <div className="page-wrapper">
                 <Header
+                    leftButtons={[
+                        {
+                            action: () => this.props.triggerSidenav(),
+                            img: MenuImg
+                        }
+                    ]}
                     buttons={[
                         {
                             link: "/search",
                             img: SearchImg
-                        },
-                        {
-                            link: "/settings",
-                            img: SettingsImg
                         },
                         ...(
                             this.props.user ?
@@ -202,7 +270,7 @@ class Notes extends PureComponent {
                     ]}
                     isBackButtonVisible={false}
                     isDateViewVisible={true}
-                    dateViewValue={this.props.currentDate}
+                    dateViewValue={this.state.todayDate}
                     onDateViewClick={this.onHeaderDateViewClick}
                 />
                 <div className="notes-list-wrapper page-content">

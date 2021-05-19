@@ -37,6 +37,14 @@ export let ButtonListItem = (props) => (
         style={props.style}
         onClick={props.onClick}                                
     >
+        {
+            props.leftImg &&
+            <img
+                className="list-item-img"
+                src={props.leftImg}
+                alt="in"
+            />
+        }
         <span className="list-item-text">{props.text || props.children}</span>
         {props.ValElement && <props.ValElement />}
         {

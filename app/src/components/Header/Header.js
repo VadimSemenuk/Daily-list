@@ -7,7 +7,24 @@ import LeftArrowImg from "../../assets/img/left-arrow.svg";
 
 let Header = (props) => (
     <header className="theme-header-background">
-        <div>
+        <div className="left-wrapper">
+            <div className="buttons buttons-left">
+                {
+                    (props.leftButtons || []).map((button, i) => {
+                        return (
+                            <button
+                                key={i}
+                                onClick={button.action}
+                            >
+                                <img
+                                    src={button.img}
+                                    alt="button"
+                                />
+                            </button>
+                        );
+                    })
+                }
+            </div>
             {
                 props.isDateViewVisible &&
                 <div
@@ -23,46 +40,48 @@ let Header = (props) => (
             }
         </div>
 
-        <div className="buttons">
-            {
-                [
-                    ...(
-                        props.isBackButtonVisible !== false ?
-                            [{
-                                img: LeftArrowImg,
-                                action: props.history.goBack
-                            }] : []
-                    ),
-                    ...(props.buttons || [])
-                ].map((button, i) => {
-                    if (button.action) {
-                        return (
-                            <button
-                                key={i}
-                                onClick={button.action}
-                            >
-                                <img
-                                    src={button.img}
-                                    alt="button"
-                                />
-                            </button>
-                        );
-                    } else if (button.link) {
-                        return (
-                            <Link
-                                key={i}
-                                className="button"
-                                to={button.link}
-                            >
-                                <img
-                                    src={button.img}
-                                    alt="button"
-                                />
-                            </Link>
-                        );
-                    }
-                })
-            }
+        <div className="right-wrapper">
+            <div className="buttons">
+                {
+                    [
+                        ...(
+                            props.isBackButtonVisible !== false ?
+                                [{
+                                    img: LeftArrowImg,
+                                    action: props.history.goBack
+                                }] : []
+                        ),
+                        ...(props.buttons || [])
+                    ].map((button, i) => {
+                        if (button.action) {
+                            return (
+                                <button
+                                    key={i}
+                                    onClick={button.action}
+                                >
+                                    <img
+                                        src={button.img}
+                                        alt="button"
+                                    />
+                                </button>
+                            );
+                        } else if (button.link) {
+                            return (
+                                <Link
+                                    key={i}
+                                    className="button"
+                                    to={button.link}
+                                >
+                                    <img
+                                        src={button.img}
+                                        alt="button"
+                                    />
+                                </Link>
+                            );
+                        }
+                    })
+                }
+            </div>
         </div>
     </header>
 );

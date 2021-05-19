@@ -41,9 +41,9 @@ class About extends Component {
                         onClick={this.onLogoClick}
                     />
                     <div className="text-center">
-                        <strong>{t("app-name")}</strong>
-                        <p>&#9400; 2017 Mamindeveloper</p>
-                        <p>mamindeveloper@gmail.com</p>
+                        <div><strong>{t("app-name")}</strong></div>
+                        <div><span>&#9400; 2017 Mamindeveloper</span></div>
+                        <div><a href="mailto:mamindeveloper@gmail.com">mamindeveloper@gmail.com</a></div>
                     </div> 
                     <InsetListItem 
                         text={t("star-app")}
@@ -63,6 +63,9 @@ class About extends Component {
                             <div>Icons made by <a href="https://www.flaticon.com/authors/hanan" title="Hanan">Hanan</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC 3.0 BY</a></div>
                             <div>Icons made by <a href="https://www.flaticon.com/authors/google" title="Google">Google</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank" rel="noopener noreferrer">CC 3.0 BY</a></div>
                             <div>Icons made by <a href="https://www.flaticon.com/authors/vaadin" title="Vaadin" rel="noopener noreferrer">Vaadin</a> from <a href="https://www.flaticon.com/" title="Flaticon" rel="noopener noreferrer">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank" rel="noopener noreferrer">CC 3.0 BY</a></div>
+                            <div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+                            <div>Icons made by <a href="https://www.flaticon.com/authors/iconixar" title="iconixar">iconixar</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+                            <div>Icons made by <a href="https://www.flaticon.com/authors/kiranshastry" title="Kiranshastry">Kiranshastry</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
                         </div>
                     </TriggerListItem>
 

@@ -1,19 +1,14 @@
 export default {
     // settings page
-    "settings": "Settings",
     "view": "Display",
     "interface": "Interface",
     "add-pass": "Add password",
     "remove-pass": "Remove password",
     "issues": "Bug fixing",
-    "about": "About app",
-    "trash": "Trash",
     "default-notification": "Automatically set notification",
     "backup": "Backup",
     "set-setting-error": "Failed to update setting",
-    "show-daily-notes-screen": "Show screen \"Diary\"",
-    "show-notes-screen": "Show screen \"Notes\"",
-  
+
     // view settings page
     "sort": "Sorting",
     "time-sort": "At the specified time",
@@ -65,7 +60,6 @@ export default {
         Make sure the application has permission to notify and work in the background`,
 
     // about page
-    "app-name": "Diary",
     "share-app": "Share app",
     "resources": "Used resources",
     "graphics": "Graphics",
@@ -110,6 +104,7 @@ export default {
     "close": "Close",
     "attention": "Attention",
     "later": "Later",
+    "app-name": "Diary",
 
     // fast-add field
     "description": "Description...",
@@ -181,4 +176,12 @@ export default {
     "search-placeholder": "Search",
     "show-repeat-notes": "repetitive",
     "show-no-repeat-notes": "non-repeating",
+
+    // menu
+    "show-daily-notes-screen": "Diary screen",
+    "show-notes-screen": "Notes screen",
+    "trash": "Trash",
+    "about": "About app",
+    "settings": "Settings",
+    "account": "Account"
 }

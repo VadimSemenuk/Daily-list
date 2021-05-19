@@ -1,19 +1,14 @@
 export default {
     // settings page
-    "settings": "Налады",
     "view": "Адлюстраванне",
     "interface": "Інтэрфейс",
     "add-pass": "Дадаць пароль",
     "remove-pass": "Выдаліць пароль", 
     "issues": "Ліквідацыя няспраўнасцяў",
-    "about": "Аб праграме",
-    "trash": "Кошык",
     "default-notification": "Аўтаматычна дадаваць апавяшчэннеы",
     "backup": "Рэзервовае капіраванне",
     "set-setting-error": "Не атрымалася абнавіць наладу. Перазапусціце праграму і попробуйие зноў",
-    "show-daily-notes-screen": "Паказаць панэль \"Штодзённік\"",
-    "show-notes-screen": "Паказаць панэль \"Нататкі\"",
-    
+
     // view settings page
     "sort": "Сартаванне",
     "time-sort": "Па усталяваным часе",
@@ -65,7 +60,6 @@ export default {
     Пераканайцеся што ў дадатку ёсць дазволу на апавяшчэння і працу ў фоне`,
 
     // about page
-    "app-name": "Штодзённік",
     "share-app": "Падзяліцца праграмай",
     "resources": "Выкарыстаныя рэсурсы",
     "graphics": "Графіка",
@@ -110,6 +104,7 @@ export default {
     "close": "Зачыніць",
     "attention": "Увага",
     "later": "Пазней",
+    "app-name": "Штодзённік",
 
     // fast-add field
     "description": "Тэкст...",
@@ -181,4 +176,12 @@ export default {
     "search-placeholder": "Пошук",
     "show-repeat-notes": "Паўтараюцца",
     "show-no-repeat-notes": "Якiя не паўтараюцца",
+
+    // menu
+    "show-daily-notes-screen": "Панэль Штодзённік",
+    "show-notes-screen": "Панэль Нататкі",
+    "trash": "Кошык",
+    "about": "Аб праграме",
+    "settings": "Налады",
+    "account": "Акаўнт"
 }

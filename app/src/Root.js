@@ -19,6 +19,7 @@ import About from './pages/About/About';
 import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
 import NotesSearch from "./pages/NotesSearch/NotesSearch";
+import SideNav from "./components/SideNav/SideNav";
 
 class Root extends Component {
     componentDidMount() {
@@ -103,12 +104,12 @@ class Root extends Component {
                     />     
                     <Route 
                         exact 
-                        path="/settings/backup" 
+                        path="/backup"
                         component={SettingsBackup} 
                     />
                     <Route 
                         exact 
-                        path="/settings/about" 
+                        path="/about"
                         component={About} 
                     />             
                     <Route 
@@ -116,6 +117,7 @@ class Root extends Component {
                         component={Trash} 
                     />
                     <Loader />
+                    <SideNav />
 
                     <Modal 
                         isOpen={this.props.error}

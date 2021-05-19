@@ -674,3 +674,17 @@ export function resetSearch() {
         type: "RESET_SEARCH_NOTES",
     }
 }
+
+// sidenav
+export function triggerSidenav() {
+    return {
+        type: "TRIGGER_SIDENAV",
+    }
+}
+
+export function setSidenavItems(items) {
+    return {
+        type: "SET_SIDENAV_ITEMS",
+        payload: {items}
+    }
+}

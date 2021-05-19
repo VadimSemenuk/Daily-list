@@ -22,21 +22,6 @@ class Settings extends Component {
             <div className="page-wrapper">
                 <Header title={t("settings")} />
                 <div className="scroll page-content padding">
-                    <ButtonListItem
-                        text={t(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? "show-notes-screen" : "show-daily-notes-screen")}
-                        img={externalLink}
-                        onClick={() => {
-                            let nextNotesScreenMode = this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? NotesScreenMode.WithoutDateTime : NotesScreenMode.WithDateTime;
-                            this.props.setSetting("notesScreenMode", nextNotesScreenMode);
-                            setTimeout(() => {
-                                let msCurDate = moment().startOf("day");
-                                let msPrevDate = moment(msCurDate).add(-1, "day");
-                                let msNextDate = moment(msCurDate).add(1, "day");
-                                this.props.setDatesAndUpdateNotes([msPrevDate, msCurDate, msNextDate], 1, nextNotesScreenMode);
-                                this.props.history.replace("/");
-                            }, 100)
-                        }}
-                    />
                     <InsetListItem 
                         text={t("view")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/sort`)}  
@@ -44,10 +29,6 @@ class Settings extends Component {
                     <InsetListItem 
                         text={t("interface")}
                         onClick={() => this.props.history.push(`${this.props.match.url}/theme`)} 
-                    />
-                    <InsetListItem 
-                        text={t("backup")}
-                        onClick={() => this.props.history.push(`${this.props.match.url}/backup`)}
                     />
                     {
                         this.props.settings.password === null &&
@@ -63,14 +44,6 @@ class Settings extends Component {
                             onClick={() => this.props.setSetting('password', null)}
                         />
                     }
-                    <InsetListItem 
-                        text={t("trash")}
-                        onClick={() => this.props.history.push(`/trash`)}
-                    />
-                    <InsetListItem 
-                        text={t("about")}
-                        onClick={() => this.props.history.push(`${this.props.match.url}/about`)}
-                    />
                 </div>
             </div>
 		);

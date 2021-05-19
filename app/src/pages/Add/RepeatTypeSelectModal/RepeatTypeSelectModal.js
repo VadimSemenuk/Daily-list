@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
 import {translate} from "react-i18next";
+import moment from "moment";
 
 import Radio from "../../../components/Radio/Radio";
-import {NoteRepeatType} from "../../../constants";
-import moment from "moment";
 import TextCheckBox from "../../../components/TextCheckBox/TextCheckBox";
 import Calendar from "../../../components/Calendar/Calendar/Calendar";
 import Modal from "../../../components/Modal/Modal";
+
 import notesService from "../../../services/notes.service";
+
+import {NoteRepeatType} from "../../../constants";
 
 class RepeatTypeSelectModal extends Component {
     constructor(props) {

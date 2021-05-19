@@ -1,18 +1,13 @@
 export default {
     // settings page
-    "settings": "Настройки",
     "view": "Отображение",
     "interface": "Интерфейс",
     "add-pass": "Добавить пароль",
     "remove-pass": "Удалить пароль", 
     "issues": "Устранение неисправностей",
-    "about": "О программе",
-    "trash": "Корзина",
     "default-notification": "Автоматически добавлять уведомление",
     "backup": "Резервное копирование",
     "set-setting-error": "Не удалось обновить настройку. Перезапустите программу и попробуйие снова",
-    "show-daily-notes-screen": "Показать панель \"Ежедневник\"",
-    "show-notes-screen": "Показать панель \"Заметки\"",
 
     // view settings page
     "sort": "Сортировка",
@@ -65,7 +60,6 @@ export default {
     Убедитесь что у приложения есть разрешения на уведомления и работу в фоне`,
 
     // about page
-    "app-name": "Ежедневник",
     "share-app": "Поделиться приложением",
     "resources": "Использованные ресурсы",
     "graphics": "Графика",
@@ -110,6 +104,7 @@ export default {
     "close": "Закрыть",
     "attention": "Внимание",
     "later": "Позже",
+    "app-name": "Ежедневник",
 
     // fast-add field
     "description": "Текст...",
@@ -181,4 +176,12 @@ export default {
     "search-placeholder": "Поиск",
     "show-repeat-notes": "повторяющиеся",
     "show-no-repeat-notes": "неповторяющиеся",
+
+    // menu
+    "show-daily-notes-screen": "Панель Ежедневник",
+    "show-notes-screen": "Панель Заметки",
+    "trash": "Корзина",
+    "about": "О программе",
+    "settings": "Настройки",
+    "account": "Аккаунт"
 }

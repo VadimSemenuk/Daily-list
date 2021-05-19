@@ -3,17 +3,17 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 3px 12px;
+    padding: 3px 7px;
     flex-basis: 48px;
     flex-shrink: 0;
 
-    & > div:first-child {
+    .left-wrapper, .right-wrapper {
         overflow: hidden;
+        display: flex;
+        align-items: center;
     }
 
     .buttons {
-        position: relative;
-        left: 5px;
         display: flex;
         align-items: center;
 
@@ -23,18 +23,26 @@ header {
         }
     }
 
+    .buttons-left {
+        button,
+        .button {
+            margin-left: 0;
+            margin-right: 10px;
+        }
+    }
+
     .current-date {
         display: flex;
         flex-direction: column;
         
         .day {
             font-size: 1.44em;
-            padding: 0px;
+            padding: 0;
             text-transform: capitalize;                                        
         }
         .date {
             font-size: 0.94em;
-            padding: 0px;
+            padding: 0;
         }
     }
 }
