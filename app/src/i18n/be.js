@@ -174,6 +174,7 @@ export default {
     // search
     "search-placeholder": "Пошук",
     "search": "Пошук",
+    "no-search-content": "Нічога не знойдзена",
 
     // menu
     "show-daily-notes-screen": "Панэль Штодзённік",

@@ -78,6 +78,8 @@ let Header = (props) => (
                                     />
                                 </Link>
                             );
+                        } else {
+                            return null;
                         }
                     })
                 }

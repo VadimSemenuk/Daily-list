@@ -2,17 +2,13 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {translate} from "react-i18next";
-import moment from "moment";
 
 import * as AppActions from '../../actions'; 
 
 import Header from '../../components/Header/Header';
-import {InsetListItem, ButtonListItem} from "../../components/ListItem/ListItem";
-
-import {NotesScreenMode} from "../../constants";
+import {InsetListItem} from "../../components/ListItem/ListItem";
 
 import './Settings.scss';
-import externalLink from "../../assets/img/external-link.svg";
 
 class Settings extends Component {
 	render () {	

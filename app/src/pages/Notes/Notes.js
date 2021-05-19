@@ -32,7 +32,6 @@ import DeleteImg from "../../assets/img/delete.svg";
 import InfoImg from "../../assets/img/info.svg";
 import CalendarImg from "../../assets/img/calendar-black.svg";
 import ListImg from "../../assets/img/list.svg";
-import deepCopy from "../../utils/deepCopyObject";
 
 class Notes extends PureComponent {
     constructor(props) {

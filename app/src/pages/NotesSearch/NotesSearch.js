@@ -34,7 +34,7 @@ class NotesSearch extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.needToScrollToClosest && prevProps.search != this.props.search) {
+        if (this.needToScrollToClosest && prevProps.search !== this.props.search) {
             let el = document.querySelector("[data-is-closest-to-current-date='true']");
             el && el.scrollIntoView();
 

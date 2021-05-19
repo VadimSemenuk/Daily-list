@@ -105,6 +105,10 @@ h3 {
     display: none;
 }
 
+.c-gray {
+    color: #868383 !important;
+}
+
 // BUTTON
 button,
 .button {
@@ -354,12 +358,8 @@ button.google-in {
     }
 
     .add-wrapper {
-        .add-additionals-wrapper {
+        .note-actions-wrapper {
             background: #5e5e5e;
-
-            .set-time-wrapper {
-                border-bottom: none;
-            }
         }
 
         .removable-textarea-wrapper .remove-button,
@@ -371,12 +371,6 @@ button.google-in {
     .color-item-wrapper.active {
         .color-item.black-tick {
             background-image: url("./assets/img/tick.svg");
-        }
-    }
-
-    .fast-add-wrapper {
-        button img {
-            filter: none;
         }
     }
 
@@ -414,5 +408,9 @@ button.google-in {
 
     .sidenav {
         background: #383838;
+    }
+
+    .c-gray {
+        color: #ffffff !important;
     }
 }

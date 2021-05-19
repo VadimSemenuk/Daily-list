@@ -174,6 +174,7 @@ export default {
     // search
     "search-placeholder": "Search",
     "search": "Search",
+    "no-search-content": "Nothing found",
 
     // menu
     "show-daily-notes-screen": "Diary screen",

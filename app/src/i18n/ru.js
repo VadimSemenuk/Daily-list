@@ -174,6 +174,7 @@ export default {
     // search
     "search-placeholder": "Поиск",
     "search": "Поиск",
+    "no-search-content": "Ничего не найдено",
 
     // menu
     "show-daily-notes-screen": "Панель Ежедневник",

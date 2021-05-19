@@ -299,14 +299,7 @@ class Add extends Component {
                 mode: 'time',
                 date: (this.state.note[field] || moment()).toDate(),
                 success: (data) => resolve(moment(data)),
-                cancel: () => {
-                    let isNotificationEnabled = this.state.note.isNotificationEnabled;
-                    if (field === 'startTime') {
-                        isNotificationEnabled = false;
-                    }
-
-                    this.updateNoteData({[field]: null, isNotificationEnabled});
-                },
+                cancel: () => this.resetTime(field),
                 error: (err) => reject(err)
             })
         });
@@ -319,6 +312,15 @@ class Add extends Component {
         ) {
             this.updateNoteData({isNotificationEnabled: true});
         }
+    }
+
+    resetTime = (field) => {
+        let isNotificationEnabled = this.state.note.isNotificationEnabled;
+        if (field === 'startTime') {
+            isNotificationEnabled = false;
+        }
+
+        this.updateNoteData({[field]: null, isNotificationEnabled});
     }
 
     render() {
@@ -409,9 +411,9 @@ class Add extends Component {
                             })
                         }
                     </div>
-                    <div className="note-actions-wrapper hide-with-active-keyboard">
+                    <div className="note-actions-wrapper">
                         <div className="content-items-actions-wrapper">
-                            <div className="label">{t("add-content-item")}:</div>
+                            <div className="label c-gray">{t("add-content-item")}:</div>
                             <div className="content-items-actions">
                                 <button
                                     onTouchStart={this.saveFocusedElement}
@@ -475,7 +477,7 @@ class Add extends Component {
                                 <div className="flex flex-align-center flex-justify-space-between">
                                     <div className="repeat-set-wrapper">
                                         <button
-                                            className="text img-text-button clear"
+                                            className="text img-text-button clear c-gray"
                                             onClick={() => this.setState({isRepeatTypeSelectModalOpen: !this.state.isRepeatTypeSelectModalOpen})}
                                         >
                                             <img
@@ -507,7 +509,13 @@ class Add extends Component {
                                         <div className="time-set-wrapper">
                                             <button
                                                 className="text img-text-button clear"
-                                                onClick={() => this.pickTime('startTime')}
+                                                onClick={() => {
+                                                    if (this.state.note.startTime) {
+                                                        this.resetTime('startTime');
+                                                    } else {
+                                                        this.pickTime('startTime');
+                                                    }
+                                                }}
                                             >
                                                 <img
                                                     className={this.state.note.startTime ? "" : "m-0"}
@@ -523,7 +531,13 @@ class Add extends Component {
                                                     <span>-</span>
                                                     <button
                                                         className="text img-text-button clear"
-                                                        onClick={() => this.pickTime('endTime')}
+                                                        onClick={() => {
+                                                            if (this.state.note.endTime) {
+                                                                this.resetTime('endTime');
+                                                            } else {
+                                                                this.pickTime('endTime');
+                                                            }
+                                                        }}
                                                     >
                                                         <img
                                                             className={this.state.note.endTime ? "" : "m-0"}
@@ -554,7 +568,7 @@ class Add extends Component {
 
                             <div className="color-picker-wrapper">
                                 <ColorPicker
-                                    onSelect={(e) => this.setState({tag: notesService.getTagByIndex(e.index)})}
+                                    onSelect={(e) => this.updateNoteData({tag: notesService.getTagByIndex(e.index)})}
                                     value={this.state.note.tag}
                                     colors={this.tags}
                                 />
