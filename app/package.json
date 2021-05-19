@@ -16,7 +16,7 @@
     "bfj": "6.1.1",
     "case-sensitive-paths-webpack-plugin": "2.1.2",
     "chalk": "2.4.1",
-    "com-sarriaroman-photoviewer": "^1.2.5",
+    "com-sarriaroman-photoviewer": "git+https://github.com/sarriaroman/photoviewer.git",
     "cordova-launch-review": "^3.1.1",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-camera": "file:custom_plugins/cordova-plugin-camera",
@@ -166,12 +166,12 @@
       },
       "cordova-sqlite-storage": {},
       "cordova-plugin-splashscreen": {},
-      "com-sarriaroman-photoviewer": {},
       "cordova-plugin-file": {},
       "cordova-plugin-device": {},
       "skwas-cordova-plugin-datetimepicker": {},
       "cordova-plugin-local-notification": {},
-      "cordova-plugin-camera": {}
+      "cordova-plugin-camera": {},
+      "com-sarriaroman-photoviewer": {}
     }
   },
   "devDependencies": {
