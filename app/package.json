@@ -80,7 +80,6 @@
     "swipe-js-iso": "file:custom_node_modules/swipe-js-iso",
     "terser-webpack-plugin": "1.1.0",
     "url-loader": "1.1.1",
-    "uuid": "^3.4.0",
     "webpack": "4.19.1",
     "webpack-dev-server": "3.1.9",
     "webpack-manifest-plugin": "2.0.4",

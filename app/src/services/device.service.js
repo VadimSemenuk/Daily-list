@@ -5,7 +5,7 @@ import executeSQL from '../utils/executeSQL';
 class DeviceService {
     async getMetaInfo() {
         let select = await executeSQL(`
-            SELECT deviceId, isRateDialogShowed, appInstalledDate
+            SELECT isRateDialogShowed, appInstallDate
             FROM MetaInfo;
         `);
 
@@ -14,9 +14,8 @@ class DeviceService {
         if (select.rows) {
             let metaInfo = select.rows.item(0);
             meta = {
-                deviceId: metaInfo.deviceId,
                 isRateDialogShowed: Boolean(metaInfo.isRateDialogShowed),
-                appInstalledDate: moment(metaInfo.appInstalledDate)
+                appInstallDate: moment(metaInfo.appInstallDate)
             }
         }
 

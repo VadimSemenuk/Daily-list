@@ -29,7 +29,6 @@ export function addNote(note) {
             dispatch(saveBackup());
         } catch(err) {
             dispatch(triggerErrorModal("error-note-add"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
@@ -40,7 +39,7 @@ export function addNote(note) {
                         contentItems: !!note.contentItems
                     }
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -67,7 +66,6 @@ export function updateNote(note, prevNote) {
             dispatch(saveBackup());
         } catch(err) {
             dispatch(triggerErrorModal("error-note-update"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
@@ -78,7 +76,7 @@ export function updateNote(note, prevNote) {
                         contentItems: !!note.contentItems
                     },
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -110,7 +108,6 @@ export function updateNoteDynamicFields(note, updatedState) {
             dispatch(saveBackup());
         } catch(err) {
             dispatch(triggerErrorModal("error-note-update"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
@@ -121,7 +118,7 @@ export function updateNoteDynamicFields(note, updatedState) {
                         contentItems: !!note.contentItems
                     },
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -148,7 +145,6 @@ export function deleteNote(note) {
             dispatch(saveBackup());
         } catch(err) {
             dispatch(triggerErrorModal("error-note-delete"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
@@ -159,7 +155,7 @@ export function deleteNote(note) {
                         contentItems: !!note.contentItems
                     }
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -178,13 +174,12 @@ export function getDeletedNotes() {
             });
         } catch(err) {
             dispatch(triggerErrorModal("error-note-get-trash"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> getDeletedNotes()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -211,7 +206,6 @@ export function restoreNote(note) {
             dispatch(saveBackup());
         } catch(err) {
             dispatch(triggerErrorModal("error-note-restore"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
@@ -222,7 +216,7 @@ export function restoreNote(note) {
                         contentItems: !!note.contentItems
                     },
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -240,13 +234,12 @@ export function removeDeletedNotes() {
             dispatch(saveBackup());
         } catch(err) {
             dispatch(triggerErrorModal("clean-trash-error"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> removeDeletedNotes()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -278,13 +271,12 @@ export function updateNotesManualSortIndex(notes) {
             });
         } catch(err) {
             dispatch(triggerErrorModal("reorder-fail"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> updateNotesManualSortIndex()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -311,13 +303,12 @@ export function updateNotes() {
             })
         } catch(err) {
             dispatch(triggerErrorModal("error-get-notes"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> updateNotes()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -337,14 +328,13 @@ export function setDatesAndUpdateNotes(dates, dateIndex, notesScreenMode) {
             })
         } catch(err) {
             dispatch(triggerErrorModal("error-get-notes"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> setDatesAndUpdateNotes()",
                     dates, dateIndex
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -365,13 +355,12 @@ export function updateDatesAndNotes(date, preRenderDate, nextIndex, notesScreenM
             })
         } catch(err) {
             dispatch(triggerErrorModal("error-get-notes"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err, {
                     path: "action/index.js -> updateDatesAndNotes()",
                     date, preRenderDate, nextIndex
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -394,14 +383,13 @@ export function setSetting(settingName, value, fn) {
             fn && fn();
         } catch(err) {
             dispatch(triggerErrorModal("error-common"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> setSetting()",
                     settingName, value
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -441,14 +429,13 @@ export function getCount(date, period) {
                 }
             });
         } catch(err) {
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> getCount()",
                     date, period
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -468,14 +455,13 @@ export function getFullCount(date) {
                 }
             });
         } catch(err) {
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> getFullCount()",
                     date
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -503,13 +489,12 @@ export function googleSignIn() {
             dispatch(triggerLoader(false));
 
             dispatch(triggerErrorModal("error-sign-in", err.description));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> googleSignIn()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -528,13 +513,12 @@ export function googleSignOut() {
             dispatch(triggerLoader(false));
 
             dispatch(triggerErrorModal("error-sign-out"));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> googleSignOut()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -589,11 +573,9 @@ export function uploadGDBackup(actionType) {
         } catch(err) {
             dispatch(triggerLoader(false));
             dispatch(triggerErrorModal("error-backup-upload", err.description));
-            let deviceId = getState().meta.deviceId;
             logsService.logError(err, {
                 path: "action/index.js -> uploadGDBackup()",
-                deviceId
-            });
+            }, window.device.uuid);
         }
     }
 }
@@ -612,13 +594,13 @@ export function restoreGDBackup(file) {
         } catch(err) {
             dispatch(triggerLoader(false));
             dispatch(triggerErrorModal("error-backup-restore", err.description));
-            let deviceId = getState().meta.deviceId;
+
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> restoreGDBackup()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }
@@ -637,13 +619,12 @@ export function updateGDBackupFiles() {
             };
             dispatch(setUser(nextUser));
         } catch(err) {
-            let deviceId = getState().meta.deviceId;
             logsService.logError(
                 err,
                 {
                     path: "action/index.js -> updateGDBackupFiles()",
                 },
-                deviceId
+                window.device.uuid
             );
         }
     }

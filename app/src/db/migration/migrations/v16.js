@@ -1,6 +1,5 @@
 import execureSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
-import uuid from "uuid/v1";
 
 export default {
     name: "1.6",
@@ -167,7 +166,7 @@ export default {
 
             await execureSQL(`
                 INSERT INTO MetaInfo (deviceId) VALUES( ? );
-            `, [uuid()]);
+            `, [window.device.uuid]);
         }
     }
 }

@@ -30,6 +30,10 @@ export default class App extends Component {
 
         this.store = null;
         this.i18n = null;
+
+        if (!window.cordova) {
+            window.device = {uuid: 0};
+        }
     }
 
     async componentWillMount() {
@@ -38,9 +42,7 @@ export default class App extends Component {
 
         setTimeout(() => window.cordova && navigator.splashscreen.hide());
 
-        let state = this.store.getState();
-
-        logsService.logLoad(state.meta.deviceId);
+        logsService.logLoad(window.device.uuid);
         if (deviceService.hasNetworkConnection()) {
             logsService.uploadSavedErrorLogs();
             logsService.uploadSavedLoadLogs();
@@ -54,7 +56,7 @@ export default class App extends Component {
             .catch(err => {
                 logsService.logError(err, {
                     path: "App.js/initDb"
-                });
+                },  window.device.uuid);
             });
 
         let meta = await deviceService.getMetaInfo();

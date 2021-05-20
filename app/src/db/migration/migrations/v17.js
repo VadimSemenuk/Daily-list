@@ -44,18 +44,16 @@ export default {
             await execureSQL(`
                 CREATE TABLE IF NOT EXISTS MetaInfo
                 (   
-                    deviceId TEXT,
                     isRateDialogShowed INTEGER,
-                    appInstalledDate INTEGER
+                    appInstallDate INTEGER
                 );
             `);
 
             await execureSQL(`
-                INSERT INTO MetaInfo (deviceId, isRateDialogShowed, appInstalledDate)
+                INSERT INTO MetaInfo (isRateDialogShowed, appInstallDate)
                 SELECT 
-                    deviceId, 
                     0 as isRateDialogShowed,
-                    ? as appInstalledDate
+                    ? as appInstallDate
                 FROM MetaInfo_OLD
             `, [moment().startOf("day").valueOf()]);
 
