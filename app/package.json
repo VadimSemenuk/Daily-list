@@ -20,7 +20,6 @@
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
-    "cordova-plugin-googleplus": "^7.0.2",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
     "cordova-plugin-network-information": "^2.0.2",
     "cordova-plugin-splashscreen": "^5.0.4",
@@ -83,7 +82,11 @@
     "webpack": "4.19.1",
     "webpack-dev-server": "3.1.9",
     "webpack-manifest-plugin": "2.0.4",
-    "workbox-webpack-plugin": "3.6.3"
+    "workbox-webpack-plugin": "3.6.3",
+    "cordova-plugin-camera": "^5.0.2",
+    "cordova-plugin-googleplus": "^8.5.2",
+    "cordova-plugin-local-notification": "file:custom_plugins/cordova-plugin-local-notifications",
+    "com-sarriaroman-photoviewer": "git+https://github.com/sarriaroman/photoviewer.git"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -157,9 +160,6 @@
       "cordova-plugin-statusbar": {},
       "cordova-launch-review": {},
       "cordova-plugin-network-information": {},
-      "cordova-plugin-googleplus": {
-        "PLAY_SERVICES_VERSION": "11.8.0"
-      },
       "cordova-sqlite-storage": {},
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-file": {},
@@ -169,13 +169,11 @@
         "ANDROID_SUPPORT_V4_VERSION": "26.+"
       },
       "com-sarriaroman-photoviewer": {},
-      "cordova-plugin-camera": {}
+      "cordova-plugin-camera": {},
+      "cordova-plugin-googleplus": {}
     }
   },
   "devDependencies": {
-    "com-sarriaroman-photoviewer": "git+https://github.com/sarriaroman/photoviewer.git",
-    "cordova-android": "^9.1.0",
-    "cordova-plugin-camera": "^5.0.2",
-    "cordova-plugin-local-notification": "file:custom_plugins/cordova-plugin-local-notifications"
+    "cordova-android": "^9.1.0"
   }
 }
