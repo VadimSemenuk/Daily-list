@@ -221,24 +221,29 @@ class Add extends Component {
     }
 
     addImage = async (sourceType) => {
-        window.navigator.camera.getPicture(
-            (a) => {
-                if (a) {
-                    this.addImageContentItem(a);
-                }
-            },
-            (err) => {
-                this.props.triggerErrorModal("error-common");
-            },
-            {
-                sourceType,
-                saveToPhotoAlbum: true,
-                quality: 100,
-                destinationType: window.navigator.camera.DestinationType.FILE_URI,
-                mediaType: window.navigator.camera.MediaType.PICTURE,
-            }
-        );
+        let url = await this.getPicture(sourceType)
+            .catch((err) => this.props.triggerErrorModal("error-common"));
+
+        if (url) {
+            this.addImageContentItem(url);
+        }
     };
+
+    getPicture(sourceType) {
+        return new Promise((resolve, reject) => {
+            window.navigator.camera.getPicture(resolve, reject,
+                {
+                    sourceType,
+                    // saveToPhotoAlbum: true,
+                    // quality: 100,
+                    // destinationType: window.navigator.camera.DestinationType.FILE_URI,
+                    mediaType: window.navigator.camera.MediaType.PICTURE,
+                }
+            );
+        });
+
+        // window.navigator.camera.cleanup();
+    }
 
     getNoteData = () => {
         let contentItems = this.state.note.contentItems.filter((a) => a !== null);

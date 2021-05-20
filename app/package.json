@@ -16,15 +16,12 @@
     "bfj": "6.1.1",
     "case-sensitive-paths-webpack-plugin": "2.1.2",
     "chalk": "2.4.1",
-    "com-sarriaroman-photoviewer": "git+https://github.com/sarriaroman/photoviewer.git",
     "cordova-launch-review": "^3.1.1",
     "cordova-plugin-badge": "^0.8.8",
-    "cordova-plugin-camera": "file:custom_plugins/cordova-plugin-camera",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-googleplus": "^7.0.2",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
-    "cordova-plugin-local-notification": "file:custom_plugins/cordova-plugin-local-notifications",
     "cordova-plugin-network-information": "^2.0.2",
     "cordova-plugin-splashscreen": "^5.0.4",
     "cordova-plugin-statusbar": "^2.4.3",
@@ -169,12 +166,17 @@
       "cordova-plugin-file": {},
       "cordova-plugin-device": {},
       "skwas-cordova-plugin-datetimepicker": {},
-      "cordova-plugin-local-notification": {},
-      "cordova-plugin-camera": {},
-      "com-sarriaroman-photoviewer": {}
+      "cordova-plugin-local-notification": {
+        "ANDROID_SUPPORT_V4_VERSION": "26.+"
+      },
+      "com-sarriaroman-photoviewer": {},
+      "cordova-plugin-camera": {}
     }
   },
   "devDependencies": {
-    "cordova-android": "^9.1.0"
+    "com-sarriaroman-photoviewer": "git+https://github.com/sarriaroman/photoviewer.git",
+    "cordova-android": "^9.1.0",
+    "cordova-plugin-camera": "^5.0.2",
+    "cordova-plugin-local-notification": "file:custom_plugins/cordova-plugin-local-notifications"
   }
 }
