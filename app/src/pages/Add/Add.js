@@ -55,8 +55,8 @@ class Add extends Component {
             title: "",
             contentItems: [],
             isNotificationEnabled: false,
-            startTime: false,
-            endTime: false,
+            startTime: null,
+            endTime: null,
             tag: 'transparent',
             date: this.props.date,
             isFinished: false,
@@ -252,7 +252,7 @@ class Add extends Component {
         let note = this.getNoteData();
 
         if (note.repeatType !== NoteRepeatType.NoRepeat) {
-            note.date = -1;
+            note.date = null;
         }
 
         if (this.state.mode === "edit") {

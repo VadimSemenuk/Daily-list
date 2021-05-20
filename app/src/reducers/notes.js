@@ -73,7 +73,7 @@ function notes (state = init, action) {
             let nextState = state.slice();
 
             action.payload.notes.forEach((note) => {
-                if (note.forkFrom !== -1) {
+                if (note.forkFrom !== null) {
                     nextState = nextState.map((list) => {
                         if (list.date.valueOf() === note.date.valueOf()) {
                             return {...list, items: list.items.filter((item) => item.id !== note.forkFrom)}

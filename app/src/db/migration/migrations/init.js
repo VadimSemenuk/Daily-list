@@ -180,5 +180,5 @@ async function addInitNote() {
         JSON.stringify(initNote.dynamicFields), 
         initNote.added, 
         initNote.finished
-    ])
+    ]);
 }

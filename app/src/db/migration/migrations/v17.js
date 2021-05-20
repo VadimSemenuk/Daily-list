@@ -1,7 +1,7 @@
 import moment from "moment";
 import md5 from "md5";
 
-import execureSQL from "../../../utils/executeSQL";
+import executeSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
 import getUTCOffset from "../../../utils/getUTCOffset";
 import {NoteRepeatType} from "../../../constants";
@@ -21,7 +21,7 @@ export default {
         await addPasswordEncryption();
 
         async function alterTasksRepeatValuesTable () {
-            await execureSQL(`
+            await executeSQL(`
                 CREATE TABLE IF NOT EXISTS NotesRepeatValues
                 (   
                     noteId INTEGER,
@@ -30,18 +30,18 @@ export default {
                 );
             `);
 
-            await execureSQL(`
+            await executeSQL(`
                 INSERT INTO NotesRepeatValues (noteId, value) 
                 SELECT taskId, value FROM TasksRepeatValues;
             `);
 
-            await execureSQL(`DROP TABLE TasksRepeatValues`);
+            await executeSQL(`DROP TABLE TasksRepeatValues`);
         }
 
         async function addMetaTable () {
-            await execureSQL(`ALTER TABLE MetaInfo RENAME TO MetaInfo_OLD;`);
+            await executeSQL(`ALTER TABLE MetaInfo RENAME TO MetaInfo_OLD;`);
 
-            await execureSQL(`
+            await executeSQL(`
                 CREATE TABLE IF NOT EXISTS MetaInfo
                 (   
                     isRateDialogShowed INTEGER,
@@ -49,7 +49,7 @@ export default {
                 );
             `);
 
-            await execureSQL(`
+            await executeSQL(`
                 INSERT INTO MetaInfo (isRateDialogShowed, appInstallDate)
                 SELECT 
                     0 as isRateDialogShowed,
@@ -57,11 +57,11 @@ export default {
                 FROM MetaInfo_OLD
             `, [moment().startOf("day").valueOf()]);
 
-            await execureSQL(`DROP TABLE MetaInfo_OLD;`);
+            await executeSQL(`DROP TABLE MetaInfo_OLD;`);
         }
 
         async function alterTasksTable () {
-            await execureSQL(`                           
+            await executeSQL(`                           
                 CREATE TABLE IF NOT EXISTS Notes
                 (
                     id INTEGER PRIMARY KEY,
@@ -84,7 +84,7 @@ export default {
                 );
             `);
 
-            await execureSQL(`
+            await executeSQL(`
                 INSERT INTO Notes (
                     id,
                     title, 
@@ -105,25 +105,31 @@ export default {
                     id, 
                     title, 
                     added as date,
-                    finished,
+                    finished as isFinished,
                     dynamicFields as contentItems,
-                    startTime, 
-                    endTime, 
+                    CASE
+                        WHEN startTime = -1 THEN null ELSE startTime
+                    END AS startTime,
+                    CASE
+                        WHEN endTime = -1 THEN null ELSE endTime
+                    END AS endTime,
                     notificate as isNotificationEnabled, 
                     tag, 
                     lastAction,
                     lastActionTime,
                     repeatType,
-                    forkFrom,
+                    CASE
+                        WHEN forkFrom = -1 THEN null ELSE forkFrom
+                    END AS forkFrom,
                     1 as mode
                 FROM Tasks;
             `);
 
-            await execureSQL(`DROP TABLE Tasks;`);
+            await executeSQL(`DROP TABLE Tasks;`);
         }
 
         async function alterSettingsTable () {
-            let select = await execureSQL(`SELECT sort FROM Settings;`);
+            let select = await executeSQL(`SELECT sort FROM Settings;`);
             let selectItems = select.rows.item(0);
             let currentSortSettings = (selectItems && selectItems.sort) ? JSON.parse(selectItems.sort) : false;
             if (!currentSortSettings) {
@@ -134,8 +140,8 @@ export default {
                 }
             }
 
-            await execureSQL(`ALTER TABLE Settings RENAME TO Settings_OLD;`);
-            await execureSQL(`                           
+            await executeSQL(`ALTER TABLE Settings RENAME TO Settings_OLD;`);
+            await executeSQL(`                           
                 CREATE TABLE IF NOT EXISTS Settings
                 (
                     defaultNotification INTEGER,
@@ -155,7 +161,7 @@ export default {
                     passwordResetEmail TEXT
                 );
             `);
-            await execureSQL(`
+            await executeSQL(`
                 INSERT INTO Settings (
                     defaultNotification,
                     theme,
@@ -189,11 +195,11 @@ export default {
                     1 as notesScreenMode
                 FROM Settings_OLD;
             `, [currentSortSettings.type, currentSortSettings.direction, currentSortSettings.finSort]);
-            await execureSQL(`DROP TABLE Settings_OLD;`);
+            await executeSQL(`DROP TABLE Settings_OLD;`);
         }
 
         async function addErrorsLogsTable () {
-            await execureSQL(`
+            await executeSQL(`
                 CREATE TABLE IF NOT EXISTS ErrorLogs
                 (
                     date INTEGER,
@@ -204,7 +210,7 @@ export default {
         }
 
         async function addLoadsLogsTable () {
-            await execureSQL(`
+            await executeSQL(`
                 CREATE TABLE IF NOT EXISTS LoadLogs
                 (
                     date INTEGER,
@@ -240,7 +246,7 @@ export default {
         async function convertDatesToUTC() {
             let utcOffset = getUTCOffset();
 
-            await execureSQL(`
+            await executeSQL(`
                 UPDATE Notes
                 SET
                     date = CASE date WHEN -1 THEN -1 ELSE date + ${utcOffset} END,
@@ -249,7 +255,7 @@ export default {
                     utcOffset = ${utcOffset};
             `);
 
-            let anyRepeatTasksSelect = await execureSQL(`SELECT id from Notes WHERE repeatType = ?`, [NoteRepeatType.Any]);
+            let anyRepeatTasksSelect = await executeSQL(`SELECT id from Notes WHERE repeatType = ?`, [NoteRepeatType.Any]);
 
             if (anyRepeatTasksSelect.rows.length) {
                 let anyRepeatTasksIDs = [];
@@ -258,15 +264,15 @@ export default {
                     anyRepeatTasksIDs.push(item.id);
                 }
 
-                await execureSQL(`UPDATE NotesRepeatValues SET value = value + ${utcOffset} WHERE noteId IN (${anyRepeatTasksIDs.join(", ")})`);
+                await executeSQL(`UPDATE NotesRepeatValues SET value = value + ${utcOffset} WHERE noteId IN (${anyRepeatTasksIDs.join(", ")})`);
             }
         }
 
         async function addPasswordEncryption() {
-            let select = await execureSQL('SELECT password FROM Settings');
+            let select = await executeSQL('SELECT password FROM Settings');
             let password = select.rows.item(0).password;
             if (password) {
-                await execureSQL('UPDATE Settings SET password = ?', [md5(password)]);
+                await executeSQL('UPDATE Settings SET password = ?', [md5(password)]);
             }
         }
     }

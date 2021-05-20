@@ -223,9 +223,7 @@ class Notes extends PureComponent {
     pasteCopy = async () => {
         let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
             repeatType: NoteRepeatType.NoRepeat,
-            date: moment(this.props.currentDate),
-            forkFrom: -1,
-            isShadow: false
+            date: moment(this.props.currentDate)
         }));
 
         await this.props.addNote(note);
@@ -526,14 +524,14 @@ function getNotesCompareFn(settings) {
 function getSortByAddedTimeFn(settings) {
     if (settings.sortDirection === 1) {
         return (a, b) => {
-            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.id;
-            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.id;
+            let aVal = a.forkFrom !== null ? a.forkFrom : a.id;
+            let bVal = b.forkFrom !== null ? b.forkFrom : b.id;
             return aVal - bVal;
         }
     } else {
         return (a, b) => {
-            let aVal = a.forkFrom !== -1 ? a.forkFrom : a.id;
-            let bVal = b.forkFrom !== -1 ? b.forkFrom : b.id;
+            let aVal = a.forkFrom !== null ? a.forkFrom : a.id;
+            let bVal = b.forkFrom !== null ? b.forkFrom : b.id;
             return bVal - aVal;
         }
     }

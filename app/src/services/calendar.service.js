@@ -23,9 +23,9 @@ class CalendarService {
             WHERE
                 lastAction != ? 
                 AND (
-                    (repeatType = ? OR forkFrom != -1 AND date >= ? AND date <= ?)
-                    OR (repeatType = ? AND t.forkFrom = -1 AND rep.value >= ? AND rep.value <= ?)
-                    OR (t.forkFrom = -1 AND repeatType != ?)
+                    (repeatType = ? OR forkFrom IS NOT NULL AND date >= ? AND date <= ?)
+                    OR (repeatType = ? AND t.forkFrom IS NULL AND rep.value >= ? AND rep.value <= ?)
+                    OR (t.forkFrom IS NULL AND repeatType != ?)
                 )
                 AND mode = 1;
         `, [NoteAction.Delete, NoteRepeatType.NoRepeat, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any]);
@@ -51,7 +51,7 @@ class CalendarService {
                 continue;
             }
 
-            if (note.date !== -1) {
+            if (note.date !== null) {
                 if (note.repeatType === NoteRepeatType.NoRepeat) {
                     dates[note.date] = (dates[note.date] || 0) + 1;
                 }

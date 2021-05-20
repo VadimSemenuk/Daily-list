@@ -17,7 +17,7 @@ export async function addFakeListItemsData () {
                 `INSERT INTO Notes
                 (title, startTime, endTime, isNotificationEnabled, tag, contentItems, date, lastAction, forkFrom, repeatType, mode)
                 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-                [new Date(date).toDateString(), +new Date(date + (i * 10000)), +new Date(date + (i * 100000)), 0, "transparent", dynamicDataJson, date, "ADD", -1, NoteRepeatType.NoRepeat, 1]
+                [new Date(date).toDateString(), +new Date(date + (i * 10000)), +new Date(date + (i * 100000)), 0, "transparent", dynamicDataJson, date, "ADD", null, NoteRepeatType.NoRepeat, 1]
             );  
         }
     };
