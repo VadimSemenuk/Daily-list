@@ -5,7 +5,7 @@ class Switch extends PureComponent {
   onClick = (e) => {
     e.stopPropagation();
 
-    if (this.props.disabled) {
+    if (this.props.disabled && !this.props.clickEventWhileDisabled) {
       return false;
     }
     this.props.onChange(!this.props.checked)

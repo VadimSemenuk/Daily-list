@@ -7,7 +7,7 @@
 
   &.transition {
     .sidenav {
-      left: 0;
+      transform: translate(0, 0);
     }
 
     .fill {
@@ -26,7 +26,7 @@
     height: 100%;
     background: #FFFFFF;
     transition: all 0.1s linear;
-    left: -230px;
+    transform: translate(-230px, 0);
 
     .logo-wrapper {
       display: flex;

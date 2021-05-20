@@ -234,15 +234,10 @@ class Add extends Component {
             window.navigator.camera.getPicture(resolve, reject,
                 {
                     sourceType,
-                    // saveToPhotoAlbum: true,
-                    // quality: 100,
-                    // destinationType: window.navigator.camera.DestinationType.FILE_URI,
                     mediaType: window.navigator.camera.MediaType.PICTURE,
                 }
             );
         });
-
-        // window.navigator.camera.cleanup();
     }
 
     getNoteData = () => {
@@ -567,8 +562,9 @@ class Add extends Component {
 
                                             <Switch
                                                 checked={this.state.note.isNotificationEnabled}
-                                                onChange={this.onNotificationStateChange}
                                                 disabled={!this.state.note.startTime}
+                                                clickEventWhileDisabled={true}
+                                                onChange={this.onNotificationStateChange}
                                             />
                                         </div>
                                     </div>
