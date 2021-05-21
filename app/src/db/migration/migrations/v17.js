@@ -79,7 +79,6 @@ export default {
                     forkFrom INTEGER,
                     manualOrderIndex INTEGER,
                     mode INTEGER,
-                    utcOffset INTEGER,
                     UNIQUE (id) ON CONFLICT REPLACE
                 );
             `);
@@ -251,8 +250,7 @@ export default {
                 SET
                     date = CASE date WHEN -1 THEN -1 ELSE date + ${utcOffset} END,
                     startTime = CASE startTime WHEN -1 THEN -1 ELSE startTime + ${utcOffset} END,
-                    endTime = CASE endTime WHEN -1 THEN -1 ELSE endTime + ${utcOffset} END,
-                    utcOffset = ${utcOffset};
+                    endTime = CASE endTime WHEN -1 THEN -1 ELSE endTime + ${utcOffset} END;
             `);
 
             let anyRepeatTasksSelect = await executeSQL(`SELECT id from Notes WHERE repeatType = ?`, [NoteRepeatType.Any]);

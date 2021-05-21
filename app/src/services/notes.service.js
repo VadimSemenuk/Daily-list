@@ -261,7 +261,7 @@ class NotesService {
 
         let insert = await executeSQL(
             `INSERT INTO Notes
-            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, utcOffset)
+            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode)
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
@@ -275,7 +275,6 @@ class NotesService {
                 note.date ? note.date.valueOf() + utcOffset : note.date,
                 note.forkFrom,
                 note.mode,
-                utcOffset
             ]
         );
 
@@ -283,6 +282,8 @@ class NotesService {
     }
 
     async addNoteRepeatValues(note) {
+        let utcOffset = getUTCOffset();
+
         await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [ note.id ]);
 
         if (note.repeatType === NoteRepeatType.NoRepeat || note.repeatValues.length === 0) {
@@ -294,7 +295,7 @@ class NotesService {
         let values = note.repeatValues.reduce((acc, item) => {
             let value = item;
             if (note.repeatType === NoteRepeatType.Any) {
-                value = item + getUTCOffset();
+                value = item + utcOffset;
             }
             return [...acc, note.id, value]
         }, []);
@@ -348,7 +349,7 @@ class NotesService {
 
         await executeSQL(
             `UPDATE Notes
-            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, contentItems = ?, isFinished = ?, utcOffset = ?
+            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, contentItems = ?, isFinished = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -360,7 +361,6 @@ class NotesService {
                 nextNote.repeatType,
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
-                utcOffset,
                 nextNote.id,
             ]
         );

@@ -11,6 +11,8 @@ class CalendarService {
     }
 
     async getCount(date, period, includeFinished, halfInterval = 20) {
+        let utcOffset = getUTCOffset();
+
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
         let intervalStartDateUTC = intervalStartDate + getUTCOffset();
@@ -37,11 +39,11 @@ class CalendarService {
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
 
-            if (~note.date) {
-                note.date = note.date - getUTCOffset();
+            if (note.date) {
+                note.date = note.date - utcOffset;
             }
             if (note.repeatType === NoteRepeatType.Any) {
-                note.repeatValue = note.repeatValue - getUTCOffset();
+                note.repeatValue = note.repeatValue - utcOffset;
             }
 
             if (!includeFinished && note.isFinished) {
