@@ -247,8 +247,7 @@ class NotesService {
         let noteId = await this.insertNote(nextNote);
         nextNote.id = noteId;
 
-        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Add, nextNote.id);
-        nextNote = {...nextNote, ...nextLastActionData};
+        nextNote = await this.updateNoteLastAction(NoteAction.Add, nextNote);
 
         await this.addNoteRepeatValues(nextNote);
 
@@ -328,8 +327,7 @@ class NotesService {
             ]
         );
 
-        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Edit, note.id);
-        nextNote = {...nextNote, ...nextLastActionData};
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
         return nextNote;
     }
@@ -369,8 +367,7 @@ class NotesService {
 
         await this.addNoteRepeatValues(nextNote);
 
-        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Edit, nextNote.id);
-        nextNote = {...nextNote, ...nextLastActionData};
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
         notificationService.clear({...prevNote, id: nextNote.id});
         nextNote.isNotificationEnabled && notificationService.set(nextNote);
@@ -384,8 +381,7 @@ class NotesService {
             nextNote = this.fromRealToShadow(nextNote);
         }
 
-        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Delete, nextNote.id);
-        nextNote = {...nextNote, ...nextLastActionData};
+        nextNote = await this.updateNoteLastAction(NoteAction.Delete, nextNote);
 
         notificationService.clear(nextNote);
 
@@ -419,8 +415,7 @@ class NotesService {
             isShadow: note.date === null
         };
 
-        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Edit, nextNote.id);
-        nextNote = {...nextNote, ...nextLastActionData};
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
         nextNote.isNotificationEnabled && notificationService.set(nextNote);
 
@@ -468,8 +463,9 @@ class NotesService {
         return notesInserted;
     }
 
-    async updateNoteLastAction(actionType, noteId) {
-        let lastActionData = {
+    async updateNoteLastAction(actionType, note) {
+        let nextNote = {
+            ...note,
             lastAction: actionType,
             lastActionTime: moment().valueOf()
         };
@@ -482,21 +478,23 @@ class NotesService {
             WHERE id = ? OR forkFrom = ?;
         `,
             [
-                lastActionData.lastAction,
-                lastActionData.lastActionTime,
-                noteId,
-                noteId
+                nextNote.lastAction,
+                nextNote.lastActionTime,
+                note.id,
+                note.id
             ]
         );
 
-        return lastActionData;
+        return nextNote;
     }
 
     async formShadowToReal(note) {
-        let nextNote = {...note};
+        let nextNote = {
+            ...note,
+            forkFrom: note.id,
+            isShadow: false
+        };
 
-        nextNote.forkFrom = note.id;
-        nextNote.isShadow = false;
         let noteId = await this.insertNote(nextNote);
         nextNote.id = noteId;
 
@@ -504,11 +502,12 @@ class NotesService {
     }
 
     fromRealToShadow(note) {
-        let nextNote = {...note};
-
-        nextNote.isShadow = true;
-        nextNote.id = nextNote.forkFrom;
-        nextNote.forkFrom = null;
+        let nextNote = {
+            ...note,
+            id: note.forkFrom,
+            isShadow: true,
+            forkFrom: null
+        };
 
         return nextNote;
     }
