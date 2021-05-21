@@ -436,8 +436,7 @@ export function getFullCount() {
         try {
             let state = getState();
             let date = state.date.valueOf();
-            let includeFinished = state.settings.calendarNotesCounterIncludeFinished;
-            let nextCount = await calendarService.getFullCount(date, includeFinished);
+            let nextCount = await calendarService.getFullCount(date);
             dispatch({
                 type: "GET_COUNT",
                 payload: {

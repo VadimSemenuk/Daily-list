@@ -308,7 +308,7 @@ class Notes extends PureComponent {
                             {
                                 this.props.settings.calendarMode === 1 &&
                                 <LightCalendar
-                                    calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                                    calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                                     currentDate={this.props.currentDate}
                                     onDateSet={this.setDate}
                                 />
@@ -317,7 +317,7 @@ class Notes extends PureComponent {
                                 this.props.settings.calendarMode === 2 &&
                                 <Calendar
                                     currentDate={this.props.currentDate}
-                                    calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                                    calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                                     onDateSet={this.setDate}
                                     onCloseRequest={this.triggerCalendar}
                                 />

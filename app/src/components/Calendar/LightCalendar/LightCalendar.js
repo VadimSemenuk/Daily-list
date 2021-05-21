@@ -37,7 +37,7 @@ class LightCalendar extends Component {
     }
 
     async componentDidMount() {
-        if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(this.state.msSelectedDate, this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+        if (calendarService.checkForCountUpdate(this.state.msSelectedDate, this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
             this.props.getCount(this.state.msSelectedDate, "week");
         }
     }
@@ -62,7 +62,7 @@ class LightCalendar extends Component {
         let nextDate = side === "left" ? moment(this.state.weeks[index][0]).subtract(1, 'week') : moment(this.state.weeks[index][0]).add(1, 'week');
         let weeks = [...this.state.weeks.slice(0, nextIndex), this.generateWeekDates(nextDate), ...this.state.weeks.slice(nextIndex + 1)];
 
-        if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(weeks[nextIndex][0], this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+        if (calendarService.checkForCountUpdate(weeks[nextIndex][0], this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
             this.dispatchedActionName = "GET_COUNT";
             this.props.getCount(weeks[nextIndex][0], "week");
         }
@@ -141,7 +141,7 @@ class LightCalendar extends Component {
                 nextDate = prevWeekStartDate;
             }
 
-            if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+            if (calendarService.checkForCountUpdate(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
                 this.props.getCount(nextDate.valueOf(), "week");
             }
 
@@ -195,7 +195,7 @@ class LightCalendar extends Component {
                                         msSelectedDate={this.state.msSelectedDate}
                                         onSelect={this.setDate} 
                                         count={this.props.calendar.count}
-                                        calendarNotesCounter={this.props.calendarNotesCounter}
+                                        calendarNotesCounterMode={this.props.calendarNotesCounterMode}
                                     />
                                 </div>
                             )

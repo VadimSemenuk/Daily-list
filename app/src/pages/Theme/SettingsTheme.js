@@ -15,6 +15,7 @@ import settingsService from '../../services/settings.service';
 
 import './SettingsTheme.scss';
 import '../../components/ColorPicker/ColorPicker.scss';
+import {CalendarNotesCounterMode} from "../../constants";
 
 let themes = themesService.getThemesList();
 let fontSizeSettings = settingsService.getFontSizeSettings();
@@ -27,7 +28,8 @@ class SettingsTheme extends Component {
         this.state = {
             themeSelectValue: this.props.settings.theme,
             fontSizeSelectedValue: this.props.settings.fontSize,
-            languageSelectedValue: this.props.settings.lang
+            languageSelectedValue: this.props.settings.lang,
+            calendarNotesCounterMode: this.props.settings.calendarNotesCounterMode
         }
     }
 
@@ -123,19 +125,38 @@ class SettingsTheme extends Component {
                         </div>
                     </ModalListItem>
 
-                    <SwitchListItem 
-                        text={t("show-notes-count")}  
-                        checked={this.props.settings.calendarNotesCounter}
-                        onChange={(e) => this.props.setSetting('calendarNotesCounter', e)}
-                    />
-                    {
-                        this.props.settings.calendarNotesCounter &&
-                        <SwitchListItem 
-                            text={t("show-notes-count-include-finished")}
-                            checked={this.props.settings.calendarNotesCounterIncludeFinished}
-                            onChange={(e) => this.props.setSetting('calendarNotesCounterIncludeFinished', e)}
-                        />
-                    }
+                    <ModalListItem
+                        text={t("notes-count")}
+                        value={t(CalendarNotesCounterMode.toTextId(this.props.settings.calendarNotesCounterMode))}
+                        listItem={ValueListItem}
+                        actionItems={[
+                            {
+                                text: t("cancel"),
+                                onClick: () => this.setState({calendarNotesCounterMode: this.props.settings.calendarNotesCounterMode})
+                            },
+                            {
+                                text: t("ok"),
+                                onClick: () => {
+                                    this.props.setSetting('calendarNotesCounterMode', this.state.calendarNotesCounterMode);
+                                }
+                            }
+                        ]}
+                    >
+                        <div className="radio-group">
+                            {
+                                CalendarNotesCounterMode.toList().map((setting, i) => (
+                                    <Radio
+                                        key={i}
+                                        name="lang"
+                                        checked={this.state.calendarNotesCounterMode === setting.value}
+                                        value={setting.value}
+                                        onChange={(value) => this.setState({calendarNotesCounterMode: Number(value)})}
+                                        text={t(setting.textId)}
+                                    />
+                                ))
+                            }
+                        </div>
+                    </ModalListItem>
 
                     <SwitchListItem
                         text={t("minimize-notes")}

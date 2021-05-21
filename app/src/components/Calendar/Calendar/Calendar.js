@@ -14,6 +14,7 @@ import WeekDays from "./WeekDays";
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
 import calendarService from "../../../services/calendar.service";
+import {CalendarNotesCounterMode} from "../../../constants";
 
 class Calendar extends Component {
     constructor(props) {
@@ -39,7 +40,7 @@ class Calendar extends Component {
     }
 
     async componentDidMount() {
-        if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(this.state.msSelectedDate, this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+        if (calendarService.checkForCountUpdate(this.state.msSelectedDate, this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
             this.props.getCount(this.state.msSelectedDate, "month");
         }
     }
@@ -49,7 +50,7 @@ class Calendar extends Component {
         let nextMonthStartDate = side === "left" ? moment(currentMonthStartDate).subtract(1, 'month') : moment(currentMonthStartDate).add(1, 'month');
         let months = [...this.state.months.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.months.slice(nextIndex + 1)];        
 
-        if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+        if (calendarService.checkForCountUpdate(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
             this.dispatchedActionName = "GET_COUNT";
             this.props.getCount(currentMonthStartDate.valueOf(), "month");
         } 
@@ -187,7 +188,7 @@ class Calendar extends Component {
                 nextDate = prevMonthStartDate;
             }        
 
-            if (this.props.calendarNotesCounter && calendarService.checkForCountUpdate(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
+            if (calendarService.checkForCountUpdate(nextDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
                 this.props.getCount(nextDate.valueOf(), "month");
             }
 
@@ -232,7 +233,7 @@ class Calendar extends Component {
                                         onSelect={this.onDateSet}
                                         count={this.props.calendar.count}
                                         mode={this.state.mode}
-                                        calendarNotesCounter={this.props.calendarNotesCounter}
+                                        calendarNotesCounterMode={this.props.calendarNotesCounterMode}
                                     /> 
                                 </div>  
                             )

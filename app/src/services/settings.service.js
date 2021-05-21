@@ -71,8 +71,7 @@ class SettingsService {
                 fontSize, 
                 notesShowInterval, 
                 lang,
-                calendarNotesCounter,
-                calendarNotesCounterIncludeFinished,
+                calendarNotesCounterMode,
                 sortType,
                 sortDirection,
                 sortFinBehaviour,
@@ -89,8 +88,6 @@ class SettingsService {
             ...result,
             defaultNotification: Boolean(result.defaultNotification),
             theme: themesService.getThemeById(result.theme),
-            calendarNotesCounter: Boolean(result.calendarNotesCounter),
-            calendarNotesCounterIncludeFinished: Boolean(result.calendarNotesCounterIncludeFinished),
             minimizeNotes: Boolean(result.minimizeNotes)
         };
     }
@@ -99,8 +96,6 @@ class SettingsService {
         switch(item) {
             case("defaultNotification"): value = Number(value); break;
             case("theme"): value = value.id; break;
-            case("calendarNotesCounter"): value = Number(value); break;
-            case("calendarNotesCounterIncludeFinished"): value = Number(value); break;
             case("minimizeNotes"): value = Number(value); break;
             default: break;
         }

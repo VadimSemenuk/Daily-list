@@ -4,7 +4,7 @@ import md5 from "md5";
 import executeSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
 import getUTCOffset from "../../../utils/getUTCOffset";
-import {NoteRepeatType} from "../../../constants";
+import {NoteRepeatType, CalendarNotesCounterMode} from "../../../constants";
 
 export default {
     name: "1.7",
@@ -149,8 +149,7 @@ export default {
                     fontSize INTEGER,
                     notesShowInterval INTEGER,
                     lang TEXT,
-                    calendarNotesCounter INTEGER,
-                    calendarNotesCounterIncludeFinished INTEGER,
+                    calendarNotesCounterMode INTEGER,
                     sortType INTEGER,
                     sortDirection INTEGER,
                     sortFinBehaviour INTEGER,
@@ -168,8 +167,7 @@ export default {
                     fontSize,
                     notesShowInterval,
                     lang,
-                    calendarNotesCounter,
-                    calendarNotesCounterIncludeFinished,
+                    calendarNotesCounterMode,
                     sortType,
                     sortDirection,
                     sortFinBehaviour,
@@ -183,9 +181,8 @@ export default {
                     password, 
                     fontSize, 
                     notesShowInterval, 
-                    lang, 
-                    calendarNotesCounter,
-                    0 as calendarNotesCounterIncludeFinished,
+                    lang,
+                    ? as calendarNotesCounterMode,
                     ? as sortType,
                     ? as sortDirection,
                     ? as sortFinBehaviour,
@@ -193,7 +190,7 @@ export default {
                     1 as calendarMode,
                     1 as notesScreenMode
                 FROM Settings_OLD;
-            `, [currentSortSettings.type, currentSortSettings.direction, currentSortSettings.finSort]);
+            `, [CalendarNotesCounterMode.All, currentSortSettings.type, currentSortSettings.direction, currentSortSettings.finSort]);
             await executeSQL(`DROP TABLE Settings_OLD;`);
         }
 

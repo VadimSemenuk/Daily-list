@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react';
+import {CalendarNotesCounterMode} from "../../../constants";
 
 export default class MonthDates extends PureComponent {
     render() {
@@ -33,7 +34,25 @@ export default class MonthDates extends PureComponent {
                                                 key={i} 
                                                 onClick={() => this.props.onSelect(weekDay, active)}
                                             >
-                                                {(this.props.calendarNotesCounter && count !== 0) && <span className="count theme-contrasting-color">{count}</span>} 
+                                                {
+                                                    (this.props.calendarNotesCounterMode !== CalendarNotesCounterMode.NotShow && count) &&
+                                                    <span className="count">
+                                                        {
+                                                            this.props.calendarNotesCounterMode === CalendarNotesCounterMode.All &&
+                                                            <React.Fragment>
+                                                                {
+                                                                    count.finished !== 0 &&
+                                                                    <span className="c-success">{count.finished}</span>
+                                                                }
+                                                                {(count.notFinished !== 0 && count.finished !== 0) && "|"}
+                                                            </React.Fragment>
+                                                        }
+                                                        {
+                                                            count.notFinished !== 0 &&
+                                                            <span className="c-warn">{count.notFinished}</span>
+                                                        }
+                                                    </span>
+                                                }
                                                 {weekDay.format('DD')}
                                             </button> 
                                         )

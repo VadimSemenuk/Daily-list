@@ -10,7 +10,7 @@ class CalendarService {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
-    async getCount(date, period, includeFinished, halfInterval = 20) {
+    async getCount(date, period, halfInterval = 20) {
         let utcOffset = getUTCOffset();
 
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
@@ -35,6 +35,10 @@ class CalendarService {
         let repeatableDay = 0;
         let repeatableWeek = {};
         let dates = {};
+        let dateInitial = {
+            finished: 0,
+            notFinished: 0
+        };
 
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
@@ -46,16 +50,21 @@ class CalendarService {
                 note.repeatValue = note.repeatValue - utcOffset;
             }
 
-            if (!includeFinished && note.isFinished) {
+            if (note.date && !dates[note.date]) {
+                dates[note.date] = {...dateInitial};
+            }
+
+            if (note.isFinished) {
                 if (note.repeatType !== NoteRepeatType.NoRepeat) {
-                    dates[note.date] = (dates[note.date] || 0) - 1;
+                    dates[note.date].notFinished = dates[note.date].notFinished - 1;
                 }
+                dates[note.date].finished = dates[note.date].finished + 1;
                 continue;
             }
 
             if (note.date !== null) {
                 if (note.repeatType === NoteRepeatType.NoRepeat) {
-                    dates[note.date] = (dates[note.date] || 0) + 1;
+                    dates[note.date].notFinished = dates[note.date].notFinished + 1;
                 }
             } else {
                 if (note.repeatType === NoteRepeatType.Week) {
@@ -63,14 +72,22 @@ class CalendarService {
                 } else if (note.repeatType === NoteRepeatType.Day) {
                     repeatableDay += 1;
                 } else if (note.repeatType === NoteRepeatType.Any) {
-                    dates[note.repeatValue] = (dates[note.repeatValue] || 0) + 1;
+                    if (!dates[note.repeatValue]) {
+                        dates[note.repeatValue] = {...dateInitial};
+                    }
+                    dates[note.repeatValue].notFinished = dates[note.repeatValue].notFinished + 1;
                 }
             }
         }
 
         let currentWeekDay = moment(date).startOf(period).subtract(halfInterval, period).isoWeekday();
         for (let date = intervalStartDate; date < intervalEndDate; date += 86400000) {
-            dates[date] = (dates[date] || 0) + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
+            if (!dates[date]) {
+                dates[date] = {...dateInitial};
+            }
+
+            dates[date].notFinished = dates[date].notFinished + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
+
             currentWeekDay = (currentWeekDay === 7 ? 1 : currentWeekDay + 1);
         }
 
@@ -83,8 +100,8 @@ class CalendarService {
         };
     }
 
-    async getFullCount(date, includeFinished) {
-        let counts = await Promise.all([this.getCount(date, "week", includeFinished), this.getCount(date, "month", includeFinished)]);
+    async getFullCount(date) {
+        let counts = await Promise.all([this.getCount(date, "week"), this.getCount(date, "month")]);
 
         return {...counts[0], ...counts[1]};
     }

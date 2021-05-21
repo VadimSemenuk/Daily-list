@@ -32,8 +32,10 @@ export default {
     "ru": "Руссский",
     "en": "English",
     "be": "Беларускі",
-    "show-notes-count": "Отображать счетчики на календаре",
-    "show-notes-count-include-finished": "Включать завершенные заметки в счетчик на календаре",
+    "notes-count": "Счетчик заметок на календаре",
+    "notes-count-not-show": "Не отображать",
+    "notes-count-only-finished": "Отображать только завершенные",
+    "notes-count-all": "Отображать все",
     "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
     "minimize-notes": "Сворачивать длинные заметки",
 

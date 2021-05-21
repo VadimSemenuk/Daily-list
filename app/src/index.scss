@@ -108,6 +108,12 @@ h3 {
 .c-gray {
     color: #868383 !important;
 }
+.c-warn {
+    color: #ce4747;
+}
+.c-success {
+    color: #5bce47;
+}
 
 // BUTTON
 button,
@@ -287,9 +293,6 @@ button.google-in {
     }
     .page-content {
         background: #383838;
-    }
-    .theme-contrasting-color {
-        color: #ce4747;
     }
 
     input, textarea {

@@ -110,7 +110,7 @@ class RepeatTypeSelectModal extends Component {
                         mode="multiselect"
                         currentDate={this.props.defaultDate}
                         msSelectedDates={this.state.repeatValues}
-                        calendarNotesCounter={this.props.calendarNotesCounter}
+                        calendarNotesCounterMode={this.props.calendarNotesCounterMode}
                         onDatesSet={(e) => this.setState({repeatValues: e})}
                     />
                 }

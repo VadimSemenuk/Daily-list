@@ -359,7 +359,7 @@ class Add extends Component {
                     this.state.isCalendarOpen &&
                     <Calendar 
                         currentDate={this.state.note.date}
-                        calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                        calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                         onDateSet={(date) => this.updateNoteData({date: date})}
                         onCloseRequest={this.triggerCalendar}
                     />
@@ -497,7 +497,7 @@ class Add extends Component {
                                             defaultDate={moment(this.state.note.date)}
                                             repeatType={this.state.note.repeatType}
                                             repeatValues={this.state.note.repeatValues}
-                                            calendarNotesCounter={this.props.settings.calendarNotesCounter}
+                                            calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                                             onSubmit={async (data) => {
                                                 await this.updateNoteData({repeatType: data.repeatType, repeatValues: data.repeatValues});
 

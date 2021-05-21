@@ -32,8 +32,10 @@ export default {
     "ru": "Русский",
     "en": "English",
     "be": "Беларускі",
-    "show-notes-count": "Display counters on the calendar",
-    "show-notes-count-include-finished": "Include finished notes in calendar's counters",
+    "notes-count": "Calendar notes counter",
+    "notes-count-not-show": "Do not display",
+    "notes-count-only-finished": "Show only completed",
+    "notes-count-all": "Display all",
     "reload-app-note": "Restart the app to apply changes",
     "minimize-notes": "Minimize long notes",
 
