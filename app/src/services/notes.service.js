@@ -240,14 +240,15 @@ class NotesService {
     async addNote(note) {
         let nextNote = {
             ...note,
-            lastAction: NoteAction.Add,
-            lastActionTime: moment().valueOf(),
             forkFrom: null,
             isShadow: note.repeatType !== NoteRepeatType.NoRepeat
         };
 
         let noteId = await this.insertNote(nextNote);
         nextNote.id = noteId;
+
+        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Add, nextNote.id);
+        nextNote = {...nextNote, ...nextLastActionData};
 
         await this.addNoteRepeatValues(nextNote);
 
@@ -261,16 +262,14 @@ class NotesService {
 
         let insert = await executeSQL(
             `INSERT INTO Notes
-            (title, startTime, endTime, isNotificationEnabled, tag, lastAction, lastActionTime, repeatType, contentItems, isFinished, date, forkFrom, mode, utcOffset)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, utcOffset)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
                 note.startTime ? note.startTime.valueOf() + utcOffset : note.startTime,
                 note.endTime ? note.endTime.valueOf() + utcOffset : note.endTime,
                 Number(note.isNotificationEnabled),
                 note.tag,
-                note.lastAction,
-                note.lastActionTime,
                 note.repeatType,
                 JSON.stringify(note.contentItems),
                 Number(note.isFinished),
@@ -312,9 +311,7 @@ class NotesService {
     async updateNoteDynamicFields(note, fieldObj) {
         let nextNote = {
             ...note,
-            ...fieldObj,
-            lastAction: NoteAction.Edit,
-            lastActionTime: moment().valueOf(),
+            ...fieldObj
         };
 
         if (nextNote.isShadow) {
@@ -327,19 +324,18 @@ class NotesService {
                 `UPDATE Notes
                 SET 
                     contentItems = ?,
-                    isFinished = ?,
-                    lastAction = ?,
-                    lastActionTime = ?
+                    isFinished = ?
                 WHERE id = ?;`,
                 [
                     JSON.stringify(nextNote.contentItems),
                     Number(nextNote.isFinished),
-                    nextNote.lastAction,
-                    nextNote.lastActionTime,
                     nextNote.id
                 ]
             )
         }
+
+        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Edit, note.id);
+        nextNote = {...nextNote, ...nextLastActionData};
 
         return nextNote;
     }
@@ -347,11 +343,7 @@ class NotesService {
     async updateNote(note, prevNote) {
         let utcOffset = getUTCOffset();
 
-        let nextNote = {
-            ...note,
-            lastAction: NoteAction.Edit,
-            lastActionTime: moment().valueOf(),
-        };
+        let nextNote = {...note};
         if (prevNote.repeatType !== NoteRepeatType.NoRepeat) {
             if (!nextNote.isShadow) {
                 nextNote.id = nextNote.forkFrom;
@@ -364,7 +356,7 @@ class NotesService {
 
         await executeSQL(
             `UPDATE Notes
-            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, lastAction = ?, lastActionTime = ?, repeatType = ?, contentItems = ?, isFinished = ?, utcOffset = ?
+            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, contentItems = ?, isFinished = ?, utcOffset = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -373,8 +365,6 @@ class NotesService {
                 nextNote.endTime ? nextNote.endTime.valueOf() + utcOffset : nextNote.endTime,
                 Number(nextNote.isNotificationEnabled),
                 nextNote.tag,
-                nextNote.lastAction,
-                nextNote.lastActionTime,
                 nextNote.repeatType,
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
@@ -385,6 +375,9 @@ class NotesService {
 
         await this.addNoteRepeatValues(nextNote);
 
+        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Edit, nextNote.id);
+        nextNote = {...nextNote, ...nextLastActionData};
+
         notificationService.clear({...prevNote, id: nextNote.id});
         nextNote.isNotificationEnabled && notificationService.set(nextNote);
 
@@ -392,30 +385,16 @@ class NotesService {
     }
 
     async deleteNote(note) {
-        let nextNote = {
-            ...note,
-            lastAction: NoteAction.Delete,
-            lastActionTime: moment().valueOf(),
-        };
+        let nextNote = {...note};
         if (nextNote.repeatType !== NoteRepeatType.NoRepeat && !nextNote.isShadow) {
             nextNote.isShadow = true;
             nextNote.id = nextNote.forkFrom;
             nextNote.forkFrom = null;
         }
 
-        await executeSQL(
-            `UPDATE Notes
-            SET 
-                lastAction = ?, 
-                lastActionTime = ?
-            WHERE id = ? OR forkFrom = ?;`,
-            [
-                nextNote.lastAction,
-                nextNote.lastActionTime,
-                nextNote.id,
-                nextNote.id
-            ]
-        );
+        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Delete, nextNote.id);
+        nextNote = {...nextNote, ...nextLastActionData};
+
         notificationService.clear(nextNote);
 
         return nextNote;
@@ -445,22 +424,12 @@ class NotesService {
     async restoreNote(note) {
         let nextNote = {
             ...note,
-            isShadow: note.date === null,
-            lastAction: NoteAction.Edit,
-            lastActionTime: moment().valueOf()
+            isShadow: note.date === null
         };
 
-        await executeSQL(
-            `UPDATE Notes
-            SET lastAction = ?, lastActionTime = ?
-            WHERE id = ? OR forkFrom = ?;`,
-            [
-                nextNote.lastAction,
-                nextNote.lastActionTime,
-                nextNote.id,
-                nextNote.id
-            ]
-        );
+        let nextLastActionData = await this.updateNoteLastAction(NoteAction.Edit, nextNote.id);
+        nextNote = {...nextNote, ...nextLastActionData};
+
         nextNote.isNotificationEnabled && notificationService.set(nextNote);
 
         return nextNote;
@@ -505,6 +474,30 @@ class NotesService {
         await executeSQL(sql, values);
 
         return notesInserted;
+    }
+
+    async updateNoteLastAction(actionType, noteId) {
+        let lastActionData = {
+            lastAction: actionType,
+            lastActionTime: moment().valueOf()
+        };
+
+        await executeSQL(`
+            UPDATE Notes
+            SET
+                lastAction = ?,
+                lastActionTime = ?
+            WHERE id = ? OR forkFrom = ?;
+        `,
+            [
+                lastActionData.lastAction,
+                lastActionData.lastActionTime,
+                noteId,
+                noteId
+            ]
+        );
+
+        return lastActionData;
     }
 
     tags = [
