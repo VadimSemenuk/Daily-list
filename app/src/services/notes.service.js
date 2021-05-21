@@ -309,30 +309,24 @@ class NotesService {
     }
 
     async updateNoteDynamicFields(note, fieldObj) {
-        let nextNote = {
-            ...note,
-            ...fieldObj
-        };
+        let nextNote = {...note, ...fieldObj};
 
         if (nextNote.isShadow) {
-            nextNote.forkFrom = note.id;
-            nextNote.isShadow = false;
-            let noteId = await this.insertNote(nextNote);
-            nextNote.id = noteId;
-        } else {
-            await executeSQL(
-                `UPDATE Notes
-                SET 
-                    contentItems = ?,
-                    isFinished = ?
-                WHERE id = ?;`,
-                [
-                    JSON.stringify(nextNote.contentItems),
-                    Number(nextNote.isFinished),
-                    nextNote.id
-                ]
-            )
+            nextNote = this.formShadowToReal(nextNote);
         }
+
+        await executeSQL(
+            `UPDATE Notes
+            SET 
+                contentItems = ?,
+                isFinished = ?
+            WHERE id = ?;`,
+            [
+                JSON.stringify(nextNote.contentItems),
+                Number(nextNote.isFinished),
+                nextNote.id
+            ]
+        );
 
         let nextLastActionData = await this.updateNoteLastAction(NoteAction.Edit, note.id);
         nextNote = {...nextNote, ...nextLastActionData};
@@ -387,9 +381,7 @@ class NotesService {
     async deleteNote(note) {
         let nextNote = {...note};
         if (nextNote.repeatType !== NoteRepeatType.NoRepeat && !nextNote.isShadow) {
-            nextNote.isShadow = true;
-            nextNote.id = nextNote.forkFrom;
-            nextNote.forkFrom = null;
+            nextNote = this.fromRealToShadow(nextNote);
         }
 
         let nextLastActionData = await this.updateNoteLastAction(NoteAction.Delete, nextNote.id);
@@ -498,6 +490,27 @@ class NotesService {
         );
 
         return lastActionData;
+    }
+
+    async formShadowToReal(note) {
+        let nextNote = {...note};
+
+        nextNote.forkFrom = note.id;
+        nextNote.isShadow = false;
+        let noteId = await this.insertNote(nextNote);
+        nextNote.id = noteId;
+
+        return nextNote;
+    }
+
+    fromRealToShadow(note) {
+        let nextNote = {...note};
+
+        nextNote.isShadow = true;
+        nextNote.id = nextNote.forkFrom;
+        nextNote.forkFrom = null;
+
+        return nextNote;
     }
 
     tags = [
