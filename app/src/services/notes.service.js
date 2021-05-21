@@ -307,8 +307,8 @@ class NotesService {
         `, values);
     }
 
-    async updateNoteDynamicFields(note, fieldObj) {
-        let nextNote = {...note, ...fieldObj};
+    async updateNoteDynamic(note, nextData) {
+        let nextNote = {...note, ...nextData};
 
         if (nextNote.isShadow) {
             nextNote = this.formShadowToReal(nextNote);

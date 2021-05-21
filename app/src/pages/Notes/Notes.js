@@ -184,7 +184,7 @@ class Notes extends PureComponent {
     };
 
     onDynamicFieldChange = (itemData, updatedState) => {
-        this.props.updateNoteDynamicFields(itemData, updatedState);
+        this.props.updateNoteDynamic(itemData, updatedState);
     }
 
     onDialogRequest = (data) => {

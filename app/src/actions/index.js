@@ -82,10 +82,10 @@ export function updateNote(note, prevNote) {
     }
 }
 
-export function updateNoteDynamicFields(note, updatedState) {
+export function updateNoteDynamic(note, nextData) {
     return async (dispatch, getState) => {
         try {
-            let updatedNote = await notesService.updateNoteDynamicFields(note, updatedState);
+            let updatedNote = await notesService.updateNoteDynamic(note, nextData);
 
             dispatch({
                 type: "UPDATE_NOTE_DYNAMIC",
@@ -96,14 +96,14 @@ export function updateNoteDynamicFields(note, updatedState) {
 
             let state = getState();
 
-            if (updatedNote.mode === NotesScreenMode.WithDateTime) {
-                updatedState.hasOwnProperty('isFinished')
-                && state.settings.calendarNotesCounter
-                && !state.settings.calendarNotesCounterIncludeFinished
-                && dispatch(getFullCount(updatedNote.date.valueOf()));
+            if (nextData.hasOwnProperty('isFinished')) {
+                if (updatedNote.mode === NotesScreenMode.WithDateTime) {
+                    state.settings.calendarNotesCounter
+                    && !state.settings.calendarNotesCounterIncludeFinished
+                    && dispatch(getFullCount(updatedNote.date.valueOf()));
+                }
+                dispatch(renderNotes());
             }
-
-            updatedState.hasOwnProperty('isFinished') && dispatch(renderNotes());
 
             dispatch(saveBackup());
         } catch(err) {
@@ -111,7 +111,7 @@ export function updateNoteDynamicFields(note, updatedState) {
             logsService.logError(
                 err,
                 {
-                    path: "action/index.js -> updateNoteDynamicFields()",
+                    path: "action/index.js -> updateNoteDynamic()",
                     note: {
                         ...note,
                         title: !!note.title,
