@@ -1,7 +1,7 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 import getUTCOffset from "../utils/getUTCOffset";
-import {NoteAction, NoteRepeatType} from "../constants";
+import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
 
 window.moment = moment;
 
@@ -29,8 +29,8 @@ class CalendarService {
                     OR (repeatType = ? AND t.forkFrom IS NULL AND rep.value >= ? AND rep.value <= ?)
                     OR (t.forkFrom IS NULL AND repeatType != ?)
                 )
-                AND mode = 1;
-        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any]);
+                AND mode = ?;
+        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, NoteMode.WithDateTime]);
 
         let repeatableDay = 0;
         let repeatableWeek = {};

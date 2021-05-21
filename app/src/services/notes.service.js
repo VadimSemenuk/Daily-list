@@ -198,7 +198,7 @@ class NotesService {
             let notes = [];
             for(let i = 0; i < select.rows.length; i++) {
                 let note = this.parseNoteWithTime(select.rows.item(i), utcOffset);
-                note.date = dates[selectIndex];
+                note.date = moment(dates[selectIndex].valueOf());
                 notes.push(note);
             }
 
@@ -262,7 +262,7 @@ class NotesService {
         let insert = await executeSQL(
             `INSERT INTO Notes
             (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
                 note.startTime ? note.startTime.valueOf() + utcOffset : note.startTime,
@@ -312,7 +312,7 @@ class NotesService {
         let nextNote = {...note, ...nextData};
 
         if (nextNote.isShadow) {
-            nextNote = this.formShadowToReal(nextNote);
+            nextNote = await this.formShadowToReal(nextNote);
         }
 
         await executeSQL(
@@ -480,8 +480,8 @@ class NotesService {
             [
                 nextNote.lastAction,
                 nextNote.lastActionTime,
-                note.id,
-                note.id
+                nextNote.id,
+                nextNote.id
             ]
         );
 
@@ -492,7 +492,7 @@ class NotesService {
         let nextNote = {
             ...note,
             forkFrom: note.id,
-            isShadow: false
+            isShadow: false,
         };
 
         let noteId = await this.insertNote(nextNote);

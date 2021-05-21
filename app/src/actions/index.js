@@ -11,7 +11,7 @@ import {NotesScreenMode} from "../constants";
 
 // notes
 export function addNote(note) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let addedNote = await notesService.addNote(note);
 
@@ -22,9 +22,9 @@ export function addNote(note) {
                 }
             });
 
-            let state = getState();
-
-            state.settings.calendarNotesCounter && dispatch(getFullCount(addedNote.date.valueOf()));
+            if (addedNote.mode === NotesScreenMode.WithDateTime) {
+                dispatch(getFullCount());
+            }
 
             dispatch(saveBackup());
         } catch(err) {
@@ -46,7 +46,7 @@ export function addNote(note) {
 }
 
 export function updateNote(note, prevNote) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let updatedNote = await notesService.updateNote(note, prevNote);
 
@@ -57,10 +57,8 @@ export function updateNote(note, prevNote) {
                 }
             });
 
-            let state = getState();
-
             if (updatedNote.mode === NotesScreenMode.WithDateTime) {
-                state.settings.calendarNotesCounter && dispatch(getFullCount(updatedNote.date.valueOf()));
+                dispatch(getFullCount());
             }
 
             dispatch(saveBackup());
@@ -83,7 +81,7 @@ export function updateNote(note, prevNote) {
 }
 
 export function updateNoteDynamic(note, nextData) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let updatedNote = await notesService.updateNoteDynamic(note, nextData);
 
@@ -94,13 +92,9 @@ export function updateNoteDynamic(note, nextData) {
                 }
             });
 
-            let state = getState();
-
             if (nextData.hasOwnProperty('isFinished')) {
                 if (updatedNote.mode === NotesScreenMode.WithDateTime) {
-                    state.settings.calendarNotesCounter
-                    && !state.settings.calendarNotesCounterIncludeFinished
-                    && dispatch(getFullCount(updatedNote.date.valueOf()));
+                    dispatch(getFullCount());
                 }
                 dispatch(renderNotes());
             }
@@ -125,7 +119,7 @@ export function updateNoteDynamic(note, nextData) {
 }
 
 export function deleteNote(note) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let deletedNote = await notesService.deleteNote(note);
 
@@ -136,10 +130,8 @@ export function deleteNote(note) {
                 }
             });
 
-            let state = getState();
-
             if (deletedNote.mode === NotesScreenMode.WithDateTime) {
-                state.settings.calendarNotesCounter && dispatch(getFullCount(deletedNote.date.valueOf()));
+                dispatch(getFullCount());
             }
 
             dispatch(saveBackup());
@@ -162,7 +154,7 @@ export function deleteNote(note) {
 }
 
 export function getDeletedNotes() {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let items = await notesService.getDeletedNotes();
 
@@ -186,7 +178,7 @@ export function getDeletedNotes() {
 }
 
 export function restoreNote(note) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let restoredNote = await notesService.restoreNote(note);
 
@@ -197,9 +189,7 @@ export function restoreNote(note) {
                 }
             });
 
-            let state = getState();
-
-            state.settings.calendarNotesCounter && dispatch(getFullCount(state.date.valueOf()));
+            dispatch(getFullCount());
 
             dispatch(updateNotes());
 
@@ -223,7 +213,7 @@ export function restoreNote(note) {
 }
 
 export function removeDeletedNotes() {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             await notesService.removeDeletedNotes();
 
@@ -315,7 +305,7 @@ export function updateNotes() {
 }
 
 export function setDatesAndUpdateNotes(dates, dateIndex, notesScreenMode) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let notes = await notesService.getNotes(notesScreenMode, dates);
 
@@ -341,7 +331,7 @@ export function setDatesAndUpdateNotes(dates, dateIndex, notesScreenMode) {
 }
 
 export function updateDatesAndNotes(date, preRenderDate, nextIndex, notesScreenMode) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             let notes = (await notesService.getNotes(notesScreenMode, preRenderDate))[0];
 
@@ -368,7 +358,7 @@ export function updateDatesAndNotes(date, preRenderDate, nextIndex, notesScreenM
 
 // settings
 export function setSetting(settingName, value, fn) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             await settingsService.setSetting(settingName, value);
 
@@ -441,11 +431,11 @@ export function getCount(date, period) {
     }
 }
 
-export function getFullCount(date) {
+export function getFullCount() {
     return async (dispatch, getState) => {
         try {
             let state = getState();
-            date = state.date.valueOf();
+            let date = state.date.valueOf();
             let includeFinished = state.settings.calendarNotesCounterIncludeFinished;
             let nextCount = await calendarService.getFullCount(date, includeFinished);
             dispatch({
@@ -458,8 +448,7 @@ export function getFullCount(date) {
             logsService.logError(
                 err,
                 {
-                    path: "action/index.js -> getFullCount()",
-                    date
+                    path: "action/index.js -> getFullCount()"
                 },
                 window.device.uuid
             );
@@ -469,7 +458,7 @@ export function getFullCount(date) {
 
 // auth
 export function googleSignIn() {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             dispatch(triggerLoader(true));
 
@@ -501,7 +490,7 @@ export function googleSignIn() {
 }
 
 export function googleSignOut() {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             dispatch(triggerLoader(true));
 
@@ -559,7 +548,7 @@ export function saveBackup() {
 }
 
 export function uploadGDBackup(actionType) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             actionType === "user" && dispatch(triggerLoader(true));
 
@@ -583,7 +572,7 @@ export function uploadGDBackup(actionType) {
 export let uploadGDBackupThrottled = throttleAction(uploadGDBackup, 30000);
 
 export function restoreGDBackup(file) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
             dispatch(triggerLoader(true));
 

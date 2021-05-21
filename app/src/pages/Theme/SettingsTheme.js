@@ -126,14 +126,14 @@ class SettingsTheme extends Component {
                     <SwitchListItem 
                         text={t("show-notes-count")}  
                         checked={this.props.settings.calendarNotesCounter}
-                        onChange={(e) => this.props.setSetting('calendarNotesCounter', e, this.props.getFullCount)}     
+                        onChange={(e) => this.props.setSetting('calendarNotesCounter', e)}
                     />
                     {
                         this.props.settings.calendarNotesCounter &&
                         <SwitchListItem 
                             text={t("show-notes-count-include-finished")}
                             checked={this.props.settings.calendarNotesCounterIncludeFinished}
-                            onChange={(e) => this.props.setSetting('calendarNotesCounterIncludeFinished', e, this.props.getFullCount)}
+                            onChange={(e) => this.props.setSetting('calendarNotesCounterIncludeFinished', e)}
                         />
                     }
 
