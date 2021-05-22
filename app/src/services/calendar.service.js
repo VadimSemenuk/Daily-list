@@ -32,13 +32,17 @@ class CalendarService {
                 AND mode = ?;
         `, [NoteAction.Delete, NoteRepeatType.NoRepeat, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, NoteMode.WithDateTime]);
 
-        let repeatableDay = 0;
-        let repeatableWeek = {};
         let dates = {};
         let dateInitial = {
             finished: 0,
             notFinished: 0
         };
+        for (let date = intervalStartDate; date < intervalEndDate; date += 86400000) {
+            dates[date] = {...dateInitial};
+        }
+
+        let repeatableDay = 0;
+        let repeatableWeek = {};
 
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
@@ -48,10 +52,6 @@ class CalendarService {
             }
             if (note.repeatType === NoteRepeatType.Any) {
                 note.repeatValue = note.repeatValue - utcOffset;
-            }
-
-            if (note.date && !dates[note.date]) {
-                dates[note.date] = {...dateInitial};
             }
 
             if (note.isFinished) {
@@ -72,24 +72,17 @@ class CalendarService {
                 } else if (note.repeatType === NoteRepeatType.Day) {
                     repeatableDay += 1;
                 } else if (note.repeatType === NoteRepeatType.Any) {
-                    if (!dates[note.repeatValue]) {
-                        dates[note.repeatValue] = {...dateInitial};
-                    }
                     dates[note.repeatValue].notFinished = dates[note.repeatValue].notFinished + 1;
                 }
             }
         }
 
         let currentWeekDay = moment(date).startOf(period).subtract(halfInterval, period).isoWeekday();
-        for (let date = intervalStartDate; date < intervalEndDate; date += 86400000) {
-            if (!dates[date]) {
-                dates[date] = {...dateInitial};
-            }
-
+        Object.keys(dates).forEach((date) => {
             dates[date].notFinished = dates[date].notFinished + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
 
             currentWeekDay = (currentWeekDay === 7 ? 1 : currentWeekDay + 1);
-        }
+        });
 
         return {
             [period]: {
