@@ -3,24 +3,26 @@ import execureSQL from "../utils/executeSQL";
 import getUTCOffset from "./getUTCOffset";
 import {NoteRepeatType} from "../constants";
 
+import DogImg from "../assets/img/dog.png"
+
 export async function addFakeListItemsData () {
     console.log("Start adding test data");
 
     let dates = generateDates(moment().startOf("day").valueOf() + getUTCOffset(), 100);
     let sequence = generateSequence(10);  
     
-    let dynamicDataJson = `[{"type":"text","value":"Where rt"},{"type":"listItem","value":"Xc","checked":false},{"type":"listItem","value":"Cvvb","checked":false},{"type":"listItem","value":"Cbnjknh","checked":true},{"type":"listItem","value":"Cbbnj","checked":false},{"type":"text","value":"Vhhjhh"},{"type":"snapshot","uri":"/storage/emulated/0/DCIM/P71202-160439.jpg"}]`;
+    let dynamicDataJson = `[{"type":"text","value":"Where rt"},{"type":"listItem","value":"Xc","checked":false},{"type":"listItem","value":"Cvvb","checked":false},{"type":"listItem","value":"Cbnjknh","checked":true},{"type":"listItem","value":"Cbbnj","checked":false},{"type":"text","value":"Vhhjhh"},{"type":"snapshot","value":"${DogImg}"}]`;
 
     for (let date of dates) {
         for (let i of sequence) {     
             await execureSQL(
                 `INSERT INTO Notes
                 (title, startTime, endTime, isNotificationEnabled, tag, contentItems, date, lastAction, forkFrom, repeatType, mode)
-                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
                 [new Date(date).toDateString(), +new Date(date + (i * 10000)), +new Date(date + (i * 100000)), 0, "transparent", dynamicDataJson, date, "ADD", null, NoteRepeatType.NoRepeat, 1]
             );  
         }
-    };
+    }
 
     console.log("Test data added");
 }

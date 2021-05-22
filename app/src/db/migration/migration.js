@@ -47,7 +47,7 @@ class Migration {
         }
 
         if (!isDbExist) {
-            // addFakeListItemsData();
+            addFakeListItemsData();
         }
     }
 }
