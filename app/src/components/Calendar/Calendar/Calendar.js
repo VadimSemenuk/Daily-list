@@ -14,7 +14,6 @@ import WeekDays from "./WeekDays";
 import sliderChangeSide from "../../../utils/sliderChangeSide";
 
 import calendarService from "../../../services/calendar.service";
-import {CalendarNotesCounterMode} from "../../../constants";
 
 class Calendar extends Component {
     constructor(props) {
