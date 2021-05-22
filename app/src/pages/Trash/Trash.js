@@ -35,7 +35,7 @@ class Trash extends Component {
                                 <TrashListItem 
                                     key={a.id}
                                     itemData={a}
-                                    settings={this.props.settings}
+                                    minimize={this.props.settings.minimizeNotes}
                                     onRestore={this.onRestore}
                                 /> 
                             ))

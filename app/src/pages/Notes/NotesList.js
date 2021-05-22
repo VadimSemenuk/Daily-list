@@ -54,9 +54,9 @@ class NotesList extends PureComponent {
     renderItem = (a) => (
         <Note
             key={a.id}
-            itemData={a}
-            settings={this.props.settings}
-            onDynamicFieldChange={this.props.onDynamicFieldChange}
+            data={a}
+            minimize={this.props.settings.minimizeNotes}
+            onNoteChange={this.props.onNoteChange}
             onDialogRequest={this.props.onDialogRequest}
         />
     );

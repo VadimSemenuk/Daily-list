@@ -183,7 +183,7 @@ class Notes extends PureComponent {
         this.setDate(moment().startOf("day"));
     };
 
-    onDynamicFieldChange = (itemData, updatedState) => {
+    onNoteChange = (itemData, updatedState) => {
         this.props.updateNoteDynamic(itemData, updatedState);
     }
 
@@ -364,7 +364,7 @@ class Notes extends PureComponent {
                                                 settings={this.props.settings}
                                                 onDragSortModeTrigger={this.onDragSortModeTrigger}
                                                 onOrderChange={this.onOrderChange}
-                                                onDynamicFieldChange={this.onDynamicFieldChange}
+                                                onNoteChange={this.onNoteChange}
                                                 onDialogRequest={this.onDialogRequest}
                                             />
                                         </div>
@@ -387,7 +387,7 @@ class Notes extends PureComponent {
                                         settings={this.props.settings}
                                         onDragSortModeTrigger={this.onDragSortModeTrigger}
                                         onOrderChange={this.onOrderChange}
-                                        onDynamicFieldChange={this.onDynamicFieldChange}
+                                        onNoteChange={this.onNoteChange}
                                         onDialogRequest={this.onDialogRequest}
                                     />
                                 </div>

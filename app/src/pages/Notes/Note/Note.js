@@ -1,5 +1,4 @@
 import React, {PureComponent} from 'react';
-import {translate} from "react-i18next";
 
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
@@ -7,8 +6,9 @@ import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
 import RepeatImg from "../../../assets/img/repeat.svg";
+import ImageImg from "../../../assets/img/image.svg";
 
-import {NoteRepeatType} from "../../../constants";
+import {NoteContentItemType, NoteRepeatType} from "../../../constants";
 
 import './Note.scss';
 
@@ -21,27 +21,27 @@ class Note extends PureComponent {
         };
     }
 
-    onDynamicFieldChange = (i, v) => {
-        let nextDynamicFields = [
-            ...this.props.itemData.contentItems.slice(0, i),
+    onListItemTrigger = (listItemIndex, nextValue) => {
+        let nextContentItems = [
+            ...this.props.data.contentItems.slice(0, listItemIndex),
             {
-                ...this.props.itemData.contentItems[i],
-                checked: v
+                ...this.props.data.contentItems[listItemIndex],
+                checked: nextValue
             },
-            ...this.props.itemData.contentItems.slice(i + 1)
+            ...this.props.data.contentItems.slice(listItemIndex + 1)
         ];
 
-        this.props.onDynamicFieldChange(this.props.itemData, {contentItems: nextDynamicFields});
+        this.props.onNoteChange(this.props.data, {contentItems: nextContentItems});
     };
 
-    onItemFinishChange = (v) => {
-        this.props.onDynamicFieldChange(this.props.itemData, {isFinished: v});
+    onFinishTrigger = (v) => {
+        this.props.onNoteChange(this.props.data, {isFinished: v});
     };
 
     onDialogRequest = (e) => {
         e.stopPropagation();
 
-        this.props.onDialogRequest(this.props.itemData);
+        this.props.onDialogRequest(this.props.data);
     }
 
     triggerExpanded = () => {
@@ -51,29 +51,27 @@ class Note extends PureComponent {
     showImage = (e) => {
         e.stopPropagation();
         
-        window.PhotoViewer.show(e.target.src, this.props.itemData.title, {share: false});         
+        window.PhotoViewer.show(e.target.src, this.props.data.title, {share: false});         
     };
 
     render () {
-        let {t} = this.props;
-        
         return (
             <div
-                data-id={this.props.itemData.id}
-                className={`note-wrapper ${(this.state.expanded || !this.props.settings.minimizeNotes) && 'expanded'} ${!this.props.settings.minimizeNotes && 'force-expanded'} ${this.props.itemData.isFinished && 'finished'} ${!this.props.itemData.isFinished && 'not-finished'}`}
+                data-id={this.props.data.id}
+                className={`note-wrapper ${(this.state.expanded || !this.props.minimize) && 'expanded'} ${!this.props.minimize && 'force-expanded'} ${this.props.data.isFinished && 'finished'} ${!this.props.data.isFinished && 'not-finished'}`}
                 onClick={this.triggerExpanded}
             >
                 <div
-                    style={{backgroundColor: this.props.itemData.tag}}
+                    style={{backgroundColor: this.props.data.tag}}
                     className="tag"
                 ></div>
                 <div className="note-content">
                     <div className="note-header">
-                        {this.props.itemData.startTime && <span className="note-header-time">{this.props.itemData.startTime.format('HH:mm')}</span>}
-                        {this.props.itemData.endTime && <span className="note-header-time-divider">-</span>}
-                        {this.props.itemData.endTime && <span className="note-header-time">{this.props.itemData.endTime.format('HH:mm')}</span>}
+                        {this.props.data.startTime && <span className="note-header-time">{this.props.data.startTime.format('HH:mm')}</span>}
+                        {this.props.data.endTime && <span className="note-header-time-divider">-</span>}
+                        {this.props.data.endTime && <span className="note-header-time">{this.props.data.endTime.format('HH:mm')}</span>}
                         {
-                            this.props.itemData.isNotificationEnabled &&
+                            this.props.data.isNotificationEnabled &&
                             <div className="notification-identifier-wrapper">
                                 <img
                                     className="notification-identifier"
@@ -83,7 +81,7 @@ class Note extends PureComponent {
                             </div>
                         }
                         {
-                            this.props.itemData.repeatType !== NoteRepeatType.NoRepeat &&
+                            this.props.data.repeatType !== NoteRepeatType.NoRepeat &&
                             <div className="repeat-identifier-wrapper">
                                 <img
                                     className="repeat-identifier"
@@ -94,47 +92,54 @@ class Note extends PureComponent {
                         }
                     </div>
                     <div className="title-wrapper">
-                        {!!this.props.itemData.title && <div className="note-title">{this.props.itemData.title}</div>}
+                        {!!this.props.data.title && <div className="note-title">{this.props.data.title}</div>}
                     </div>
                     {
-                        this.props.itemData.contentItems.map((a, i) => {
-                            if (a && a.type === "text") {
+                        this.props.data.contentItems.map((a, i) => {
+                            if (!a) {
+
+                            } else if (a.type === NoteContentItemType.Text) {
                                 return (
                                     <div
                                         className="item-data-text"
                                         key={i}
                                     >{a.value}</div>
                                 )
-                            } else if (a && a.type === "listItem") {
+                            } else if (a.type === NoteContentItemType.ListItem) {
                                 return (
                                     <TextCheckBox
                                         key={i}
                                         id={i}
                                         textValue={a.value}
                                         checkBoxValue={a.checked}
-                                        onValueChange={this.onDynamicFieldChange}
+                                        onValueChange={this.onListItemTrigger}
                                     />
                                 )
-                            } else if (a && a.type === "snapshot") {
-                                if (this.state.expanded || !this.props.settings.minimizeNotes) {
+                            } else if (a.type === NoteContentItemType.Image) {
+                                if (this.state.expanded || !this.props.minimize) {
                                     return (
-                                        <div key={i}
-                                             className="attached-image-wrapper">
+                                        <div
+                                            key={i}
+                                            className="attached-image-wrapper">
                                             <img
                                                 onClick={this.showImage}
                                                 className="attached-image"
-                                                src={a.uri}
+                                                src={a.value}
                                                 alt="attachment"
                                             />
                                         </div>
                                     )
                                 } else {
                                     return (
-                                        <span key={i} className="attached-image-label">{t("attached-image")}</span>
+                                        <img
+                                            key={i}
+                                            className="attached-image-label"
+                                            src={ImageImg}
+                                        />
                                     )
                                 }
                             }
-                            return null
+                            return null;
                         })
                     }
 
@@ -151,8 +156,8 @@ class Note extends PureComponent {
                             </div>
                             <div className="note-finish-checkbox">
                                 <CustomCheckBox
-                                    checked={this.props.itemData.isFinished}
-                                    onChange={this.onItemFinishChange}
+                                    checked={this.props.data.isFinished}
+                                    onChange={this.onFinishTrigger}
                                 />
                             </div>
                         </React.Fragment>
@@ -163,4 +168,4 @@ class Note extends PureComponent {
     }
 }
 
-export default translate("translations")(Note);
+export default Note;

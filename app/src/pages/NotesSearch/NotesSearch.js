@@ -78,10 +78,8 @@ class NotesSearch extends PureComponent {
             ></div>
             <Note
                 itemData={item}
-                settings={this.props.settings}
+                minimize={this.props.settings.minimizeNotes}
                 isActionsViewVisible={false}
-                onDynamicFieldChange={this.onDynamicFieldChange}
-                onDialogRequest={this.onDialogRequest}
             />
         </div>
     );

@@ -176,7 +176,7 @@ class Add extends Component {
     addImageContentItem = async (url) => {
         let field = {
             type: NoteContentItemType.Image,
-            uri: url
+            value: url
         };
 
         let focusedDynamicFieldIndex = this.getFocusedFieldIndex();
@@ -406,7 +406,7 @@ class Add extends Component {
                                         <RemovableImage 
                                             key={i}
                                             className="add-content-item dynamic-field"
-                                            src={contentItem.uri}
+                                            src={contentItem.value}
                                             onClick={() => this.showImage(i)}
                                             onRemove={() => this.removeContentItem(i)}
                                         />
