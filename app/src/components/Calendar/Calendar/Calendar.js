@@ -162,13 +162,17 @@ class Calendar extends Component {
             
             let nextDate;
 
+            let currentMonthDays = this.getMonthDays(currentMonthStartDate);
+            let nextMonthDays = this.getMonthDays(nextMonthStartDate);
+            let prevMonthDays = this.getMonthDays(prevMonthStartDate);
+
             if (currentMonthStartDate.valueOf() > this.state.currentMonthStartDate.valueOf()) {
                 if (this.activePageIndex === 2) {
-                    months = [this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate)];
+                    months = [currentMonthDays, nextMonthDays, prevMonthDays];
                 } else if (this.activePageIndex === 0) {
-                    months = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
+                    months = [prevMonthDays, currentMonthDays, nextMonthDays];
                 } else {
-                    months = [this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate)];
+                    months = [nextMonthDays, prevMonthDays, currentMonthDays];
                 }
 
                 this.noSlideEventHandle = true;
@@ -176,12 +180,12 @@ class Calendar extends Component {
                 nextDate = nextMonthStartDate;
             } else {
                 if (this.activePageIndex === 2) {
-                    months = [this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate)];
+                    months = [prevMonthDays, currentMonthDays, nextMonthDays];
                 } else if (this.activePageIndex === 0) {
-                    months = [this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate), this.getMonthDays(currentMonthStartDate)];
+                    months = [nextMonthDays, prevMonthDays, currentMonthDays];
                 } else {
-                    months = [this.getMonthDays(currentMonthStartDate), this.getMonthDays(nextMonthStartDate), this.getMonthDays(prevMonthStartDate)];
-                }  
+                    months = [currentMonthDays, nextMonthDays, prevMonthDays];
+                }
 
                 this.noSlideEventHandle = true;
                 this.sliderRef.prev();     

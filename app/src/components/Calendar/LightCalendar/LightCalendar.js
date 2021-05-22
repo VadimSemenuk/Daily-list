@@ -117,24 +117,28 @@ class LightCalendar extends Component {
 
             let nextDate;
 
+            let currentWeekDays = this.generateWeekDates(currentWeekStartDate);
+            let nextWeekDays = this.generateWeekDates(nextWeekStartDate);
+            let prevWeekDays = this.generateWeekDates(prevWeekStartDate);
+
             if (msSelectedWeekStartDate > this.state.weeks[this.activePageIndex][0].valueOf()) {
                 if (this.activePageIndex === 2) {
-                    weeks = [this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate)];
+                    weeks = [currentWeekDays, nextWeekDays, prevWeekDays];
                 } else if (this.activePageIndex === 0) {
-                    weeks = [this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate)];
+                    weeks = [prevWeekDays, currentWeekDays, nextWeekDays];
                 } else {
-                    weeks = [this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate)];
+                    weeks = [nextWeekDays, prevWeekDays, currentWeekDays];
                 }
                 this.noSlideEventHandle = true;
                 this.sliderRef.next();
                 nextDate = nextWeekStartDate;
             } else {
                 if (this.activePageIndex === 2) {
-                    weeks = [this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate)];
+                    weeks = [prevWeekDays, currentWeekDays, nextWeekDays];
                 } else if (this.activePageIndex === 0) {
-                    weeks = [this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate), this.generateWeekDates(currentWeekStartDate)];
+                    weeks = [nextWeekDays, prevWeekDays, currentWeekDays];
                 } else {
-                    weeks = [this.generateWeekDates(currentWeekStartDate), this.generateWeekDates(nextWeekStartDate), this.generateWeekDates(prevWeekStartDate)];
+                    weeks = [currentWeekDays, nextWeekDays, prevWeekDays];
                 }
                 this.noSlideEventHandle = true;
                 this.sliderRef.prev();
