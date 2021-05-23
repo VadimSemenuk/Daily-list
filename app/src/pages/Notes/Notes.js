@@ -2,25 +2,18 @@ import React, {PureComponent} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from "moment";
-import ReactSwipe from 'react-swipe';
-import {translate} from "react-i18next";
 
 import LightCalendar from '../../components/Calendar/LightCalendar/LightCalendar';
 import Calendar from '../../components/Calendar/Calendar/Calendar';
 import Header from '../../components/Header/Header';
-import Fab from '../../components/Fab/Fab';
 import NotesList from "./NotesList";
-import Modal from "../../components/Modal/Modal";
-import {ButtonListItem} from "../../components/ListItem/ListItem";
+import NotesListSwipable from "./NotesListSwipable";
+import NotesActionsHandlerWrapper from "./NotesActionsHandlerWrapper";
 
 import * as AppActions from '../../actions'; 
 
-import getSliderChangeSide from "../../utils/sliderChangeSide";
-import deepCopyObject from "../../utils/deepCopyObject";
+import {NotesScreenMode} from "../../constants";
 
-import {NoteRepeatType, NotesScreenMode} from "../../constants";
-
-import './Notes.scss';
 import AddImg from "../../assets/img/add.svg";
 import ExportImg from "../../assets/img/upload-to-cloud.svg";
 import SearchImg from "../../assets/img/search.svg";
@@ -32,16 +25,14 @@ import DeleteImg from "../../assets/img/delete.svg";
 import InfoImg from "../../assets/img/info.svg";
 import CalendarImg from "../../assets/img/calendar-black.svg";
 import ListImg from "../../assets/img/list.svg";
-import NotesListSwipable from "./NotesListSwipable";
+
+import './Notes.scss';
 
 class Notes extends PureComponent {
     constructor(props) {
         super(props);
 
         this.state = {
-            copyBuffer: null,
-            isListItemDialogVisible: false,
-            listItemDialogData: null,
             todayDate: moment(),
         };
 
@@ -52,17 +43,21 @@ class Notes extends PureComponent {
         this.setupSidenav();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps) {
         if (
             this.scrollToNote !== null
-            && this.notesListSwipable.activePageIndex
-            && prevProps.notes[this.notesListSwipable.activePageIndex].items !== this.props.notes[this.notesListSwipable.activePageIndex].items
+            && this.notesListSwipableRef.activePageIndex
+            && prevProps.notes[this.notesListSwipableRef.activePageIndex].items !== this.props.notes[this.notesListSwipableRef.activePageIndex].items
         ) {
             let el = document.querySelector(`[data-id='${this.scrollToNote}']`);
             el && el.scrollIntoView();
 
             this.scrollToNote = null;
         }
+    }
+
+    setNotesListSwipableRef = (ref) => {
+        this.notesListSwipableRef = ref;
     }
 
     setupSidenav() {
@@ -140,9 +135,9 @@ class Notes extends PureComponent {
         let prev = moment(cur).add(-1, "day");
         let next = moment(cur).add(1, "day");
 
-        if (this.notesListSwipable.activePageIndex === 2) {
+        if (this.notesListSwipableRef.activePageIndex === 2) {
             this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesScreenMode);
-        } else if (this.notesListSwipable.activePageIndex === 0) {
+        } else if (this.notesListSwipableRef.activePageIndex === 0) {
             this.props.setDatesAndUpdateNotes([cur, next, prev], 0, this.props.settings.notesScreenMode);
         } else {
             this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesScreenMode);
@@ -157,68 +152,6 @@ class Notes extends PureComponent {
         this.setDate(moment().startOf("day"));
     };
 
-    onNoteChange = (itemData, updatedState) => {
-        this.props.updateNoteDynamic(itemData, updatedState);
-    }
-
-    onDialogRequest = (data) => {
-        this.openDialog(data);
-    }
-
-    openDialog = (data) => {
-        this.setState({
-            isListItemDialogVisible: true,
-            listItemDialogData: {note: data}
-        });
-    };
-
-    closeDialog = () => {
-        this.setState({
-            isListItemDialogVisible: false,
-            listItemDialogData: null
-        });
-    };
-
-    onEditRequest = () => {
-        this.closeDialog();
-
-        this.props.history.push({
-            pathname: "/edit",
-            state: { note: this.state.listItemDialogData.note }
-        });
-    };
-
-    onListItemRemove = () => {
-        this.closeDialog();
-
-        this.props.deleteNote(this.state.listItemDialogData.note);
-    };
-
-    pasteCopy = async () => {
-        let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
-            repeatType: NoteRepeatType.NoRepeat,
-            date: moment(this.props.currentDate)
-        }));
-
-        await this.props.addNote(note);
-        
-        this.setState({
-            copyBuffer: null
-        });
-    };
-
-    onNoteCopyRequest = () => {
-        this.closeDialog();
-
-        this.setState({
-            copyBuffer: this.state.listItemDialogData.note
-        });
-    };
-
-    onOrderChange = (order) => {
-        this.props.updateNotesManualSortIndex(order);
-    };
-
     onSearchResult = (note) => {
         if (!note) {
             return;
@@ -231,8 +164,6 @@ class Notes extends PureComponent {
     }
 
     render() {
-        let {t} = this.props;
-
         return (
             <div className="page-wrapper">
                 <Header
@@ -304,56 +235,26 @@ class Notes extends PureComponent {
                                 </div>
                             </div>
 
-                            <NotesListSwipable
-                                ref={(node) => node && (this.notesListSwipable = node)}
+                            <NotesActionsHandlerWrapper
+                                listRef={this.setNotesListSwipableRef}
+                                List={NotesListSwipable}
                                 notes={this.props.notes}
                                 settings={this.props.settings}
                                 onSlideChange={this.onSlideChange}
-                                onOrderChange={this.onOrderChange}
-                                onNoteChange={this.onNoteChange}
-                                onDialogRequest={this.onDialogRequest}
                             />
                         </React.Fragment>
                     }
                     {
                         (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) &&
                         <div className="notes-list-without-time-wrapper">
-                            <NotesList
+                            <NotesActionsHandlerWrapper
+                                List={NotesList}
                                 notes={this.props.notes[0].items}
                                 settings={this.props.settings}
-                                onOrderChange={this.onOrderChange}
-                                onNoteChange={this.onNoteChange}
-                                onDialogRequest={this.onDialogRequest}
                             />
                         </div>
                     }
-
-                    {
-                        this.state.copyBuffer && 
-                        <Fab onClick={this.pasteCopy} />
-                    }
                 </div>
-
-                <Modal
-                    isOpen={this.state.isListItemDialogVisible}
-                    onRequestClose={this.closeDialog}
-                >
-                    <ButtonListItem
-                        className="no-border"
-                        text={t("edit")}
-                        onClick={this.onEditRequest}
-                    />
-                    <ButtonListItem
-                        className="no-border"
-                        text={t("delete")}
-                        onClick={this.onListItemRemove}
-                    />
-                    <ButtonListItem
-                        className="no-border"
-                        text={t("do-copy")}
-                        onClick={this.onNoteCopyRequest}
-                    />
-                </Modal>
             </div>
         )
     }
@@ -375,7 +276,7 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(Notes));
+export default connect(mapStateToProps, mapDispatchToProps)(Notes);
 
 function sort (data, settings) {
     let notesCompareFn = getNotesCompareFn(settings);
@@ -410,11 +311,12 @@ function getNotesCompareFn(settings) {
         return getSortByAddedTimeFn(settings);
     } else if (settings.sortType === 2) {
         return (a, b) => {
-            let aManualOrderIndex = (a.manualOrderIndex !== undefined && a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
-            let bManualOrderIndex = (b.manualOrderIndex !== undefined && b.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
+            let aManualOrderIndex = (a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
+            let bManualOrderIndex = (a.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
             if (aManualOrderIndex === bManualOrderIndex) {
                 return getSortByAddedTimeFn(settings)(a, b);
             }
+            return aManualOrderIndex - bManualOrderIndex;
         }
     }
 }

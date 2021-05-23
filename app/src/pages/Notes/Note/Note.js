@@ -135,7 +135,7 @@ class Note extends PureComponent {
                                             key={i}
                                             className="attached-image-label"
                                             src={ImageImg}
-                                            alt="attached image"
+                                            alt="attached"
                                         />
                                     )
                                 }

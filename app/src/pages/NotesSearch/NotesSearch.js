@@ -77,7 +77,7 @@ class NotesSearch extends PureComponent {
                 onClick={() => this.onNoteClick(item)}
             ></div>
             <Note
-                itemData={item}
+                data={item}
                 minimize={this.props.settings.minimizeNotes}
                 isActionsViewVisible={false}
             />

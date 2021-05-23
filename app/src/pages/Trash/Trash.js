@@ -31,10 +31,10 @@ class Trash extends Component {
                             <div className="no-content">{t("no-content")}</div>
                         }
                         {
-                            this.props.trash.map((a) => (
-                                <TrashListItem 
-                                    key={a.id}
-                                    itemData={a}
+                            this.props.trash.map((note) => (
+                                <TrashListItem
+                                    key={note.id}
+                                    data={note}
                                     minimize={this.props.settings.minimizeNotes}
                                     onRestore={this.onRestore}
                                 /> 

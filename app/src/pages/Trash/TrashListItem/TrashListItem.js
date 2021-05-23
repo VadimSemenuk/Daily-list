@@ -8,7 +8,7 @@ import './TrashListItem.scss';
 import RestoreImg from '../../../assets/img/restore.svg';
 
 class TrashListItem extends PureComponent {
-    onRestore = () => this.props.onRestore(this.props.itemData);
+    onRestore = () => this.props.onRestore(this.props.data);
 
     render () {
         let {t} = this.props;
@@ -16,7 +16,7 @@ class TrashListItem extends PureComponent {
         return (
             <div className="trash-list-item">
                 <div className="trash-list-item-header">
-                    <div className="deleted-time">{t('deleted-date')}: {this.props.itemData.lastActionTime.format("MMM Do YYYY, HH:mm")}</div>
+                    <div className="deleted-time">{t('deleted-date')}: {this.props.data.lastActionTime.format("MMM Do YYYY, HH:mm")}</div>
                     <button
                         className="restore-button"
                         onClick={this.onRestore}

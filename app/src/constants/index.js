@@ -49,6 +49,8 @@ export const CalendarNotesCounterMode = {
                 return "notes-count-only-finished";
             case CalendarNotesCounterMode.All:
                 return "notes-count-all";
+            default:
+                return null;
         }
     }
 };

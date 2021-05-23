@@ -241,7 +241,8 @@ class NotesService {
         let nextNote = {
             ...note,
             forkFrom: null,
-            isShadow: note.repeatType !== NoteRepeatType.NoRepeat
+            isShadow: note.repeatType !== NoteRepeatType.NoRepeat,
+            manualOrderIndex: null
         };
 
         let noteId = await this.insertNote(nextNote);
@@ -261,8 +262,8 @@ class NotesService {
 
         let insert = await executeSQL(
             `INSERT INTO Notes
-            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
                 note.startTime ? note.startTime.valueOf() + utcOffset : note.startTime,
@@ -275,6 +276,7 @@ class NotesService {
                 note.date ? note.date.valueOf() + utcOffset : note.date,
                 note.forkFrom,
                 note.mode,
+                note.manualOrderIndex
             ]
         );
 
@@ -347,9 +349,13 @@ class NotesService {
         nextNote.forkFrom = null;
         nextNote.isFinished = false;
 
+        if (!note.isShadow) {
+            nextNote.manualOrderIndex = null;
+        }
+
         await executeSQL(
             `UPDATE Notes
-            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, contentItems = ?, isFinished = ?
+            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, contentItems = ?, isFinished = ?, manualOrderIndex = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -361,6 +367,7 @@ class NotesService {
                 nextNote.repeatType,
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
+                nextNote.manualOrderIndex,
                 nextNote.id,
             ]
         );
@@ -443,10 +450,7 @@ class NotesService {
         let notesInserted = [];
         for (let note of nextNotes) {
             if (note.isShadow) {
-                note.forkFrom = note.id;
-                note.isShadow = false;
-                let noteId = await this.insertNote(note);
-                note.id = noteId;
+                note = await this.formShadowToReal(note);
                 notesInserted.push(note);
             }
         }
@@ -506,7 +510,8 @@ class NotesService {
             ...note,
             id: note.forkFrom,
             isShadow: true,
-            forkFrom: null
+            forkFrom: null,
+            manualOrderIndex: null
         };
 
         return nextNote;

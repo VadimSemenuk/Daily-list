@@ -98,7 +98,8 @@ export default {
                     lastActionTime,
                     repeatType,
                     forkFrom,
-                    mode
+                    mode,
+                    manualOrderIndex
                 ) 
                 SELECT
                     id, 
@@ -120,7 +121,8 @@ export default {
                     CASE
                         WHEN forkFrom = -1 THEN null ELSE forkFrom
                     END AS forkFrom,
-                    1 as mode
+                    1 as mode,
+                    null as manualOrderIndex
                 FROM Tasks;
             `);
 
