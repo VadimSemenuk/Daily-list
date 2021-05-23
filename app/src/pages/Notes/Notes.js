@@ -12,7 +12,7 @@ import NotesActionsHandlerWrapper from "./NotesActionsHandlerWrapper";
 
 import * as AppActions from '../../actions'; 
 
-import {NotesScreenMode} from "../../constants";
+import {NotesScreenMode, SortDirectionType, SortType} from "../../constants";
 
 import AddImg from "../../assets/img/add.svg";
 import ExportImg from "../../assets/img/upload-to-cloud.svg";
@@ -292,7 +292,7 @@ function sort (data, settings) {
 }
 
 function getNotesCompareFn(settings) {
-    if (settings.sortType === 0) {
+    if (settings.sortType === SortType.TimeSort) {
         if (settings.notesScreenMode === NotesScreenMode.WithDateTime) {
             return (a, b) => {
                 let aDayTimeSum = a.startTime ?
@@ -302,7 +302,7 @@ function getNotesCompareFn(settings) {
                     (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
                     : 0;
 
-                if (settings.sortDirection === 1) {
+                if (settings.sortDirection === SortDirectionType.ASC) {
                     return aDayTimeSum - bDayTimeSum;
                 } else {
                     return bDayTimeSum - aDayTimeSum;
@@ -311,9 +311,9 @@ function getNotesCompareFn(settings) {
         } else {
             return getSortByAddedTimeFn(settings);
         }
-    } else if (settings.sortType === 1) {
+    } else if (settings.sortType === SortType.TimeAddSort) {
         return getSortByAddedTimeFn(settings);
-    } else if (settings.sortType === 2) {
+    } else if (settings.sortType === SortType.CustomSort) {
         return (a, b) => {
             let aManualOrderIndex = (a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
             let bManualOrderIndex = (a.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
@@ -326,7 +326,7 @@ function getNotesCompareFn(settings) {
 }
 
 function getSortByAddedTimeFn(settings) {
-    if (settings.sortDirection === 1) {
+    if (settings.sortDirection === SortDirectionType.ASC) {
         return (a, b) => {
             let aVal = a.forkFrom !== null ? a.forkFrom : a.id;
             let bVal = b.forkFrom !== null ? b.forkFrom : b.id;

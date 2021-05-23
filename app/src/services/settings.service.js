@@ -1,23 +1,24 @@
 import executeSQL from '../utils/executeSQL';
 import themesService from './themes.service';
+import {SortDirectionType, SortType} from "../constants";
 
 let sortTypeSettings = [{
     translateId: "time-sort",
-    val: 0
+    val: SortType.TimeSort
 }, {
     translateId: "time-add-sort",
-    val: 1
+    val: SortType.TimeAddSort
 }, {
     translateId: "custom-sort",
-    val: 2
+    val: SortType.CustomSort
 }];
 
 let sortDirectionSettings = [{
     translateId: "view-direction-desc",
-    val: 0
+    val: SortDirectionType.DESC
 }, {
     translateId: "view-direction-asc",
-    val: 1
+    val: SortDirectionType.ASC
 }];
 
 let fontSizeSettings = [12, 13, 14, 15, 16, 17, 18];

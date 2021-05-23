@@ -54,3 +54,14 @@ export const CalendarNotesCounterMode = {
         }
     }
 };
+
+export const SortType = {
+    TimeSort: 0,
+    TimeAddSort: 1,
+    CustomSort: 2
+};
+
+export const SortDirectionType = {
+    DESC: 0,
+    ASC: 1
+};

@@ -50,17 +50,20 @@ class SettingsSort extends Component {
                                 onClick: () => {
                                     this.setState({
                                         sortTypeSelectedValue: activeSortType.val,
+                                        sortDirectionSelectedValue: activeSortDirection.val
                                     })
                                 }
                             },
                             {
                                 text: t("ok"),
-                                onClick: () => {
-                                    this.props.setSetting("sortType", this.state.sortTypeSelectedValue);
+                                onClick: async () => {
+                                    await this.props.setSetting("sortType", this.state.sortTypeSelectedValue);
+                                    this.props.setSetting("sortDirection", this.state.sortDirectionSelectedValue);
                                 }
                             }
                         ]}
                     >
+                        <div>{t("sort")}</div>
                         <div className="radio-group">
                             {
                                 sortTypeSettings.map((setting, i) => (
@@ -80,23 +83,8 @@ class SettingsSort extends Component {
                                 ))
                             }
                         </div>
-                    </ModalListItem>
 
-                    <ModalListItem
-                        text={t("view-direction")} 
-                        value={t(activeSortDirection.translateId)}
-                        listItem={ValueListItem}
-                        actionItems={[
-                            {
-                                text: t("cancel"),
-                                onClick: () => this.setState({sortDirectionSelectedValue: activeSortDirection.val})
-                            },
-                            {
-                                text: t("ok"),
-                                onClick: () => this.props.setSetting("sortDirection", this.state.sortDirectionSelectedValue, this.props.renderNotes)
-                            }
-                        ]}
-                    >
+                        <div style={{marginTop: "5px"}}>{t("view-direction")}</div>
                         <div className="radio-group">
                             {
                                 sortDirectionSettings.map((setting, i) => (
