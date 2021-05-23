@@ -36,7 +36,7 @@ export default class App extends Component {
         }
     }
 
-    async componentWillMount() {
+    async componentDidMount() {
         window.cordova && await new Promise((resolve) => document.addEventListener("deviceready", resolve));
         await this.initApp();
 

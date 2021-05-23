@@ -31,7 +31,7 @@ class RepeatTypeSelectModal extends Component {
         });
     }
 
-    componentWillReceiveProps(nextProps, nextContext) {
+    componentDidUpdate() {
         this.setStateValuesFromProps();
     }
 
