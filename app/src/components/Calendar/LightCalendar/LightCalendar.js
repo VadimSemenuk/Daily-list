@@ -94,7 +94,7 @@ class LightCalendar extends Component {
         this.props.onDateSet(moment(date));
     }
 
-    async UNSAFE_componentWillReceiveProps(nextProps, a) {
+    async componentWillReceiveProps(nextProps, a) {
         if (this.dispatchedActionName) {
             if (this.dispatchedActionName === "GET_COUNT") {
                 this.dispatchedActionName = null;

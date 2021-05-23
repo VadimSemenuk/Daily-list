@@ -138,7 +138,7 @@ class Calendar extends Component {
         this.onSlideChange(action);
     }
 
-    async UNSAFE_componentWillReceiveProps(nextProps) {
+    async componentWillReceiveProps(nextProps) {
         if (this.dispatchedActionName) {
             if (this.dispatchedActionName === "GET_COUNT") {
                 this.dispatchedActionName = null;
