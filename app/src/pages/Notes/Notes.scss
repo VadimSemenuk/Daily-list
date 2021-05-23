@@ -43,20 +43,23 @@
                 overflow-y: auto;
             }
         }
+    }
 
-        .no-content {
-            text-align: center;
-            font-size: 1.1em;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #cac7c7;
-            text-transform: uppercase;
-        }
-        .week-header ~ .no-content {
-            margin: 5px;
-        }
+    .notes-list-without-time-wrapper {
+        flex-grow: 1;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .no-content {
+        text-align: center;
+        font-size: 1.1em;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #cac7c7;
+        text-transform: uppercase;
     }
 
     .week-header {
@@ -78,6 +81,10 @@
             line-height: 1;
             padding-left: 10px;
             text-transform: capitalize;            
+        }
+
+        & ~ .no-content {
+            margin: 5px;
         }
     }
 

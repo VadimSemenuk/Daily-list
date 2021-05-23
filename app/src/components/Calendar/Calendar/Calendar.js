@@ -11,7 +11,7 @@ import './Calendar.scss';
 import MonthDates from "./MonthDates";
 import WeekDays from "./WeekDays";
 
-import sliderChangeSide from "../../../utils/sliderChangeSide";
+import getSliderChangeSide from "../../../utils/sliderChangeSide";
 
 import calendarService from "../../../services/calendar.service";
 
@@ -127,7 +127,7 @@ class Calendar extends Component {
     }
     
     onSliderChange = (e) => {
-        let action = sliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
+        let action = getSliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
         this.prevPageIndex = action.prevPageIndex;
         this.activePageIndex = action.activePageIndex;
 

@@ -15,7 +15,7 @@ import {ButtonListItem} from "../../components/ListItem/ListItem";
 
 import * as AppActions from '../../actions'; 
 
-import sliderChangeSide from "../../utils/sliderChangeSide";
+import getSliderChangeSide from "../../utils/sliderChangeSide";
 import deepCopyObject from "../../utils/deepCopyObject";
 
 import {NoteRepeatType, NotesScreenMode} from "../../constants";
@@ -32,6 +32,7 @@ import DeleteImg from "../../assets/img/delete.svg";
 import InfoImg from "../../assets/img/info.svg";
 import CalendarImg from "../../assets/img/calendar-black.svg";
 import ListImg from "../../assets/img/list.svg";
+import NotesListSwipable from "./NotesListSwipable";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -41,29 +42,10 @@ class Notes extends PureComponent {
             copyBuffer: null,
             isListItemDialogVisible: false,
             listItemDialogData: null,
-            isSwipeAvailable: true,
             todayDate: moment(),
         };
 
-        this.activePageIndex = 1;  
-        this.prevPageIndex = 1;
-        this.slideChanged = false;
-
         this.scrollToNote = null;
-    }
-
-    componentWillUpdate(nextProps, nextState) {
-        if (this.swipe && (nextState.isSwipeAvailable !== this.props.isSwipeAvailable)) {
-            this.swipe.disableScrolling(!nextState.isSwipeAvailable);
-        }
-        if (nextProps.settings.notesScreenMode !== this.props.settings.notesScreenMode) {
-            this.activePageIndex = 1;
-            this.prevPageIndex = 1;
-            this.slideChanged = false;
-            this.setState({
-                isSwipeAvailable: true
-            });
-        }
     }
 
     componentDidMount() {
@@ -73,7 +55,8 @@ class Notes extends PureComponent {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (
             this.scrollToNote !== null
-            && prevProps.notes[this.activePageIndex].items !== this.props.notes[this.activePageIndex].items
+            && this.notesListSwipable.activePageIndex
+            && prevProps.notes[this.notesListSwipable.activePageIndex].items !== this.props.notes[this.notesListSwipable.activePageIndex].items
         ) {
             let el = document.querySelector(`[data-id='${this.scrollToNote}']`);
             el && el.scrollIntoView();
@@ -137,24 +120,15 @@ class Notes extends PureComponent {
         this.props.setDatesAndUpdateNotes(dates, 1, mode);
     }
 
-    onSlideChange = async ({index, nextIndex, side}) => {
+    onSlideChange = async (side, nextIndex) => {
+        let changeValue = 1;
         if (side === "left") {
-            let nextDate = moment(this.props.currentDate).add(-1, "day");
-            this.props.updateDatesAndNotes(
-                nextDate,
-                [moment(nextDate).add(-1, "day")],
-                nextIndex,
-                this.props.settings.notesScreenMode
-            );
-        } else {   
-            let nextDate = moment(this.props.currentDate).add(1, "day");
-            this.props.updateDatesAndNotes(
-                nextDate,
-                [moment(nextDate).add(1, "day")],
-                nextIndex,
-                this.props.settings.notesScreenMode
-            );
+            changeValue = -1;
         }
+
+        let nextDate = moment(this.props.currentDate).add(changeValue, "day");
+        let nextPreRenderDate = [moment(nextDate).add(changeValue, "day")];
+        this.props.updateDatesAndNotes(nextDate, nextPreRenderDate, nextIndex, this.props.settings.notesScreenMode);
     };
 
     setDate = (date) => {
@@ -166,9 +140,9 @@ class Notes extends PureComponent {
         let prev = moment(cur).add(-1, "day");
         let next = moment(cur).add(1, "day");
 
-        if (this.activePageIndex === 2) {
+        if (this.notesListSwipable.activePageIndex === 2) {
             this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesScreenMode);
-        } else if (this.activePageIndex === 0) {
+        } else if (this.notesListSwipable.activePageIndex === 0) {
             this.props.setDatesAndUpdateNotes([cur, next, prev], 0, this.props.settings.notesScreenMode);
         } else {
             this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesScreenMode);
@@ -238,12 +212,6 @@ class Notes extends PureComponent {
 
         this.setState({
             copyBuffer: this.state.listItemDialogData.note
-        });
-    };
-
-    onDragSortModeTrigger = (value) => {
-        this.setState({
-            isSwipeAvailable: !value
         });
     };
 
@@ -336,62 +304,27 @@ class Notes extends PureComponent {
                                 </div>
                             </div>
 
-                            <ReactSwipe
-                                ref={node => {
-                                    if (node) {
-                                        this.swipe = node.swipe;
-                                    }
-                                }}
-                                className="notes-list-swiper"
-                                swipeOptions={{
-                                    continuous: true,
-                                    startSlide: 1,
-                                    callback: this.onSliderChange,
-                                    transitionEnd: this.onTransitionEnd,
-                                    disableScroll: !this.state.isSwipeAvailable,
-                                }}
-                                key={this.props.notes.length}
-                            >
-                                {
-                                    this.props.notes.map((notes, i) => (
-                                        <div
-                                            className="notes-list-item-wrapper"
-                                            key={i}
-                                        >
-                                            <NotesList
-                                                index={i}
-                                                notes={notes.items}
-                                                settings={this.props.settings}
-                                                onDragSortModeTrigger={this.onDragSortModeTrigger}
-                                                onOrderChange={this.onOrderChange}
-                                                onNoteChange={this.onNoteChange}
-                                                onDialogRequest={this.onDialogRequest}
-                                            />
-                                        </div>
-                                    ))
-                                }
-                            </ReactSwipe>
+                            <NotesListSwipable
+                                ref={(node) => node && (this.notesListSwipable = node)}
+                                notes={this.props.notes}
+                                settings={this.props.settings}
+                                onSlideChange={this.onSlideChange}
+                                onOrderChange={this.onOrderChange}
+                                onNoteChange={this.onNoteChange}
+                                onDialogRequest={this.onDialogRequest}
+                            />
                         </React.Fragment>
                     }
                     {
                         (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) &&
-                        <div className="notes-list-swiper">
-                            <div>
-                                <div
-                                    className="notes-list-item-wrapper"
-                                    style={{width: '100%'}}
-                                >
-                                    <NotesList
-                                        index={0}
-                                        notes={this.props.notes[0].items}
-                                        settings={this.props.settings}
-                                        onDragSortModeTrigger={this.onDragSortModeTrigger}
-                                        onOrderChange={this.onOrderChange}
-                                        onNoteChange={this.onNoteChange}
-                                        onDialogRequest={this.onDialogRequest}
-                                    />
-                                </div>
-                            </div>
+                        <div className="notes-list-without-time-wrapper">
+                            <NotesList
+                                notes={this.props.notes[0].items}
+                                settings={this.props.settings}
+                                onOrderChange={this.onOrderChange}
+                                onNoteChange={this.onNoteChange}
+                                onDialogRequest={this.onDialogRequest}
+                            />
                         </div>
                     }
 
@@ -423,32 +356,6 @@ class Notes extends PureComponent {
                 </Modal>
             </div>
         )
-    }
-
-    onTransitionEnd = (a) => {
-        if (this.slideChanged) {
-            let listEls = document.querySelectorAll(".notes-list-item-wrapper");
-            for (let i = 0; i < listEls.length; i++) {
-                listEls[i].scrollTop = 0
-            }
-
-            let activeItemsEls = document.querySelectorAll(".note-wrapper.expanded:not(.force-expanded)");
-            for (let i = 0; i < activeItemsEls.length; i++) {
-                activeItemsEls[i].classList.remove("expanded");
-            }
-
-            this.slideChanged = false;
-        }
-    };
-
-    onSliderChange = (e) => {
-        this.slideChanged = true; 
-
-        const action = sliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
-        this.prevPageIndex = action.prevPageIndex;
-        this.activePageIndex = action.activePageIndex;
-
-        this.onSlideChange(action);
     }
 }
 
@@ -499,23 +406,14 @@ function getNotesCompareFn(settings) {
         } else {
             return getSortByAddedTimeFn(settings);
         }
-    }
-
-    if (settings.sortType === 1) {
+    } else if (settings.sortType === 1) {
         return getSortByAddedTimeFn(settings);
-    }
-
-    if (settings.sortType === 2) {
+    } else if (settings.sortType === 2) {
         return (a, b) => {
             let aManualOrderIndex = (a.manualOrderIndex !== undefined && a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
             let bManualOrderIndex = (b.manualOrderIndex !== undefined && b.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
             if (aManualOrderIndex === bManualOrderIndex) {
                 return getSortByAddedTimeFn(settings)(a, b);
-            }
-            if (settings.sortDirection === 1) {
-                return aManualOrderIndex - bManualOrderIndex;
-            } else {
-                return bManualOrderIndex - aManualOrderIndex;
             }
         }
     }

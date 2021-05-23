@@ -11,7 +11,7 @@ import './LightCalendar.scss';
 import WeekDays from "./WeekDays";
 import WeekDatesRow from "./WeekDatesRow";
 
-import sliderChangeSide from "../../../utils/sliderChangeSide";
+import getSliderChangeSide from "../../../utils/sliderChangeSide";
 
 import calendarService from "../../../services/calendar.service";
 
@@ -164,7 +164,7 @@ class LightCalendar extends Component {
     }
 
     onSliderChange = (e) => {
-        const action = sliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
+        const action = getSliderChangeSide(e, this.activePageIndex, this.prevPageIndex);
         this.prevPageIndex = action.prevPageIndex;
         this.activePageIndex = action.activePageIndex;
 

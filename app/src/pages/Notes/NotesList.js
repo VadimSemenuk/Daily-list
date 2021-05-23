@@ -1,18 +1,17 @@
 import React, {PureComponent} from 'react';
 import {translate} from "react-i18next";
+import {bindActionCreators} from "redux";
+import Sortable from 'react-sortablejs';
+import {connect} from "react-redux";
+
+import * as AppActions from "../../actions";
 
 import Note from './Note/Note';
-
-import Sortable from 'react-sortablejs';
 
 class NotesList extends PureComponent {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.sortable && (this.props.settings.sortType !== prevProps.settings.sortType)) {
             this.sortable.option('disabled', this.props.settings.sortType !== 2);
-        }
-
-        if (this.sortable && (this.props.settings.sortFinBehaviour !== prevProps.settings.sortFinBehaviour)) {
-            this.sortable.option('draggable', this.props.settings.sortFinBehaviour === 1 ? ".not-finished" : ".note-wrapper");
         }
     }
 
@@ -72,7 +71,7 @@ class NotesList extends PureComponent {
             options: {
                 disabled: this.props.settings.sortType !== 2,
                 delay: 300,
-                draggable: this.props.settings.sortFinBehaviour === 1 ? ".not-finished" : ".note-wrapper",
+                draggable: ".not-finished",
                 direction: 'vertical',
                 onStart: this.onDragSortModeEnable,
                 onEnd: this.onDragSortModeDisable
@@ -85,7 +84,10 @@ class NotesList extends PureComponent {
             let finished = this.props.notes.filter((a) => a.isFinished);
 
             return (
-                <Sortable ref={this.setSortableRef} {...sortableOptions}>
+                <Sortable
+                    ref={this.setSortableRef}
+                    {...sortableOptions}
+                >
                     {
                         notFinished.map(this.renderItem)
                     }
@@ -107,4 +109,8 @@ class NotesList extends PureComponent {
     }
 }
 
-export default translate("translations")(NotesList);
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(AppActions, dispatch);
+}
+
+export default translate("translations")(connect(null, mapDispatchToProps)(NotesList));

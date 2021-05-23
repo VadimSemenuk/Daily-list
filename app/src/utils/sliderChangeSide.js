@@ -1,24 +1,24 @@
-const sliderChangeSide = (a, activePageIndex, prevPageIndex) => {             
+const getSliderChangeSide = (a, activePageIndex, prevPageIndex) => {
     return getSlideAction(a, activePageIndex, prevPageIndex);  
 };
 
 const getSlideAction = (index, activePageIndex, prevPageIndex) => {
     if (index === 0 && activePageIndex === 2) {
-        return onSliderRigth(index);
+        return onSliderRight(index);
     } else if (index === 2 && activePageIndex === 0) {
         return onSliderLeft(index);
     } else if (activePageIndex < index) {
-        return onSliderRigth(index);                
+        return onSliderRight(index);
     } else if (activePageIndex > index) {
         return onSliderLeft(index);                
     } else if (prevPageIndex > index) {          
-        return onSliderRigth(index);   
+        return onSliderRight(index);
     } else if (prevPageIndex < index) {                      
         return onSliderLeft(index);            
     }
 };
 
-const onSliderRigth = (index, activePageIndex, prevPageIndex) => {                                                                                             
+const onSliderRight = (index, activePageIndex, prevPageIndex) => {
     let nextIndex = index + 1;
     if (nextIndex > 2) {
         nextIndex = 0;
@@ -50,4 +50,4 @@ const onSliderLeft = (index, activePageIndex, prevPageIndex) => {
     }
 };
 
-export default sliderChangeSide;
+export default getSliderChangeSide;
