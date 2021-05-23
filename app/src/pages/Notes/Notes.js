@@ -46,8 +46,12 @@ class Notes extends PureComponent {
     componentDidUpdate(prevProps) {
         if (
             this.scrollToNote !== null
-            && this.notesListSwipableRef.activePageIndex
-            && prevProps.notes[this.notesListSwipableRef.activePageIndex].items !== this.props.notes[this.notesListSwipableRef.activePageIndex].items
+            &&
+            (
+                (this.notesListSwipableRef && prevProps.notes[this.notesListSwipableRef.activePageIndex].items !== this.props.notes[this.notesListSwipableRef.activePageIndex].items)
+                ||
+                (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime)
+            )
         ) {
             let el = document.querySelector(`[data-id='${this.scrollToNote}']`);
             el && el.scrollIntoView();
