@@ -36,7 +36,7 @@ export default class WeekDatesRow extends PureComponent {
                                         }
                                     </span>
                                 }
-                                <span className="light-calendar-date-number">{date.format("DD")}</span>
+                                <span className="light-calendar-date-value">{date.format("DD")}</span>
                             </button>
                         ) 
                     })

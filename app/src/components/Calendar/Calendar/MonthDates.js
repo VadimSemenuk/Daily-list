@@ -53,7 +53,7 @@ export default class MonthDates extends PureComponent {
                                                         }
                                                     </span>
                                                 }
-                                                {weekDay.format('DD')}
+                                                <span className="calendar-date-value">{weekDay.format('DD')}</span>
                                             </button> 
                                         )
                                     })
