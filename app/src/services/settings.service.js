@@ -8,9 +8,6 @@ let sortTypeSettings = [{
 }, {
     translateId: "time-add-sort",
     val: SortType.TimeAddSort
-}, {
-    translateId: "custom-sort",
-    val: SortType.CustomSort
 }];
 
 let sortDirectionSettings = [{

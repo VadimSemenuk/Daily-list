@@ -292,51 +292,23 @@ function sort (data, settings) {
 }
 
 function getNotesCompareFn(settings) {
-    if (settings.sortType === SortType.TimeSort) {
-        if (settings.notesScreenMode === NotesScreenMode.WithDateTime) {
-            return (a, b) => {
-                let aDayTimeSum = a.startTime ?
-                    (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf())
-                    : 0;
-                let bDayTimeSum = b.startTime ?
-                    (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf())
-                    : 0;
-
-                if (settings.sortDirection === SortDirectionType.ASC) {
-                    return aDayTimeSum - bDayTimeSum;
-                } else {
-                    return bDayTimeSum - aDayTimeSum;
-                }
-            };
-        } else {
-            return getSortByAddedTimeFn(settings);
-        }
-    } else if (settings.sortType === SortType.TimeAddSort) {
-        return getSortByAddedTimeFn(settings);
-    } else if (settings.sortType === SortType.CustomSort) {
+    if (settings.notesScreenMode === NotesScreenMode.WithDateTime && settings.sortType === SortType.TimeSort) {
         return (a, b) => {
-            let aManualOrderIndex = (a.manualOrderIndex !== null) ? a.manualOrderIndex : 999;
-            let bManualOrderIndex = (a.manualOrderIndex !== null) ? b.manualOrderIndex : 999;
-            if (aManualOrderIndex === bManualOrderIndex) {
-                return getSortByAddedTimeFn(settings)(a, b);
-            }
-            return aManualOrderIndex - bManualOrderIndex;
-        }
-    }
-}
+            let aVal = a.startTime ? (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf()) : 0;
+            let bVal = b.startTime ? (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf()) : 0;
 
-function getSortByAddedTimeFn(settings) {
-    if (settings.sortDirection === SortDirectionType.ASC) {
-        return (a, b) => {
-            let aVal = a.forkFrom !== null ? a.forkFrom : a.id;
-            let bVal = b.forkFrom !== null ? b.forkFrom : b.id;
-            return aVal - bVal;
-        }
+            return settings.sortDirection === SortDirectionType.ASC ? aVal - bVal : bVal - aVal;
+        };
     } else {
         return (a, b) => {
-            let aVal = a.forkFrom !== null ? a.forkFrom : a.id;
-            let bVal = b.forkFrom !== null ? b.forkFrom : b.id;
-            return bVal - aVal;
+            if (a.manualOrderIndex === null || b.manualOrderIndex === null) {
+                let aVal = a.forkFrom !== null ? a.forkFrom : a.id;
+                let bVal = b.forkFrom !== null ? b.forkFrom : b.id;
+
+                return settings.sortDirection === SortDirectionType.ASC ? aVal - bVal : bVal - aVal;
+            } else {
+                return a.manualOrderIndex - b.manualOrderIndex;
+            }
         }
     }
 }

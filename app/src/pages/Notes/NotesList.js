@@ -7,11 +7,12 @@ import {connect} from "react-redux";
 import * as AppActions from "../../actions";
 
 import Note from './Note/Note';
+import {SortType} from "../../constants";
 
 class NotesList extends PureComponent {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.sortable && (this.props.settings.sortType !== prevProps.settings.sortType)) {
-            this.sortable.option('disabled', this.props.settings.sortType !== 2);
+            this.sortable.option('disabled', this.props.settings.sortType === SortType.TimeSort);
         }
     }
 
@@ -22,10 +23,11 @@ class NotesList extends PureComponent {
     }
 
     onOrderChange = (order) => {
+        console.log(order);
         order = order.map((key) => +key);
-        if (this.props.settings.sortDirection === 0) {
-            order.reverse();
-        }
+        // if (this.props.settings.sortDirection === 0) {
+        //     order.reverse();
+        // }
 
         let nextOrder = this.props.notes.map((n) => {
             let nextManualOrderIndex = order.indexOf(n.id);
@@ -69,7 +71,7 @@ class NotesList extends PureComponent {
 
         let sortableOptions = {
             options: {
-                disabled: this.props.settings.sortType !== 2,
+                disabled: this.props.settings.sortType === SortType.TimeSort,
                 delay: 300,
                 draggable: ".not-finished",
                 direction: 'vertical',
