@@ -352,8 +352,7 @@ class Add extends Component {
                             img: CheckedImg
                         }
                     ]}
-                    isDateViewVisible={this.state.note.mode === NotesScreenMode.WithDateTime}
-                    dateViewValue={this.state.note.date}
+                    title={this.state.note.date && this.state.note.date.format('DD MMMM YYYY')}
                 />
                 {
                     this.state.isCalendarOpen &&

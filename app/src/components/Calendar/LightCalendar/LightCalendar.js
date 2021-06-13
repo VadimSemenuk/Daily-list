@@ -34,6 +34,14 @@ class LightCalendar extends Component {
         this.noSlideEventHandle = false;
 
         this.dispatchedActionName = null;
+
+        this.props.onPeriodChange(this.state.currentPeriodName);
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.state.currentPeriodName != prevState.currentPeriodName) {
+            this.props.onPeriodChange(this.state.currentPeriodName);
+        }
     }
 
     async componentDidMount() {
@@ -180,10 +188,6 @@ class LightCalendar extends Component {
     render() {
         return (
             <div className="light-calendar-wrapper theme-header-background theme-header-border">
-                <div className="light-calendar-current-period">
-                    <div className="calendar-current-month">{this.state.currentPeriodName.month}</div>
-                    <div className="calendar-current-year">{this.state.currentPeriodName.year}</div>
-                </div>
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}

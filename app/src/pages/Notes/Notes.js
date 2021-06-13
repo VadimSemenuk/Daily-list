@@ -33,7 +33,7 @@ class Notes extends PureComponent {
         super(props);
 
         this.state = {
-            todayDate: moment(),
+            headerMultiFloorTitle: null
         };
 
         this.scrollToNote = null;
@@ -152,7 +152,7 @@ class Notes extends PureComponent {
         this.props.setSetting('calendarMode', this.props.settings.calendarMode === 1 ? 2 : 1);
     };
 
-    onHeaderDateViewClick = () => {
+    setTodayDate = () => {
         this.setDate(moment().startOf("day"));
     };
 
@@ -165,6 +165,15 @@ class Notes extends PureComponent {
         if (note.date.valueOf() !== this.props.currentDate.valueOf()) {
             this.setDate(note.date);
         }
+    }
+
+    onCalendarPeriodChange = (periodName) => {
+        this.setState({
+            headerMultiFloorTitle: {
+                top: periodName.month,
+                bottom: periodName.year
+            }
+        });
     }
 
     render() {
@@ -200,9 +209,8 @@ class Notes extends PureComponent {
                         }
                     ]}
                     isBackButtonVisible={false}
-                    isDateViewVisible={true}
-                    dateViewValue={this.state.todayDate}
-                    onDateViewClick={this.onHeaderDateViewClick}
+                    multiFloorTitle={this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? this.state.headerMultiFloorTitle : null}
+                    onMultiFloorTitleClick={this.setTodayDate}
                 />
                 <div className="notes-list-wrapper page-content">
                     {
@@ -214,6 +222,7 @@ class Notes extends PureComponent {
                                     calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                                     currentDate={this.props.currentDate}
                                     onDateSet={this.setDate}
+                                    onPeriodChange={this.onCalendarPeriodChange}
                                 />
                             }
                             {
@@ -223,6 +232,7 @@ class Notes extends PureComponent {
                                     calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                                     onDateSet={this.setDate}
                                     onCloseRequest={this.triggerCalendar}
+                                    onPeriodChange={this.onCalendarPeriodChange}
                                 />
                             }
 

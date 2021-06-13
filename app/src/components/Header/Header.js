@@ -26,19 +26,20 @@ let Header = (props) => (
                 }
             </div>
             {
-                (props.isDateViewVisible && props.dateViewValue) &&
-                <div
-                    className="current-date clickable"
-                    onClick={props.onDateViewClick}
-                >
-                    <span className="day">{props.dateViewValue.format(props.user ? 'ddd' : 'dddd')}</span>
-                    <span className="date">{props.dateViewValue.format('D MMMM')}</span>
-                </div>
-            }
-            {
                 props.title && <div className="page-title">{props.title}</div>
             }
         </div>
+
+        {
+            props.multiFloorTitle &&
+            <div
+                className="multi-floor-title clickable"
+                onClick={props.onMultiFloorTitleClick}
+            >
+                <div className="top-section">{props.multiFloorTitle.top}</div>
+                <div className="bottom-section">{props.multiFloorTitle.bottom}</div>
+            </div>
+        }
 
         <div className="right-wrapper">
             <div className="buttons">

@@ -27,7 +27,8 @@ class Calendar extends Component {
             currentMonthStartDate,
             msSelectedDate,
             msSelectedDates: (this.props.msSelectedDates && this.props.msSelectedDates.length) ? this.props.msSelectedDates : [msSelectedDate],
-            mode: this.props.mode || "default"
+            mode: this.props.mode || "default",
+            currentPeriodName: this.getPeriodName(currentMonthStartDate)
         }
 
         this.activePageIndex = 1;  
@@ -36,6 +37,8 @@ class Calendar extends Component {
         this.noSlideEventHandle = false;
 
         this.dispatchedActionName = null;
+
+        this.props.onPeriodChange(this.state.currentPeriodName);
     }
 
     async componentDidMount() {
@@ -44,7 +47,20 @@ class Calendar extends Component {
         }
     }
 
-    onSlideChange = async ({index, nextIndex, side}) => {   
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.state.currentPeriodName != prevState.currentPeriodName) {
+            this.props.onPeriodChange(this.state.currentPeriodName);
+        }
+    }
+
+    getPeriodName = (periodStartDate) => {
+        return {
+            month: periodStartDate.format("MMMM"),
+            year: periodStartDate.format("YYYY")
+        }
+    }
+
+    onSlideChange = async ({index, nextIndex, side}) => {
         let currentMonthStartDate = side === "left" ? moment(this.state.currentMonthStartDate).subtract(1, 'month') : moment(this.state.currentMonthStartDate).add(1, 'month');
         let nextMonthStartDate = side === "left" ? moment(currentMonthStartDate).subtract(1, 'month') : moment(currentMonthStartDate).add(1, 'month');
         let months = [...this.state.months.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.months.slice(nextIndex + 1)];        
@@ -56,7 +72,8 @@ class Calendar extends Component {
 
         this.setState({
             months: months,
-            currentMonthStartDate
+            currentMonthStartDate,
+            currentPeriodName: this.getPeriodName(currentMonthStartDate)
         })
     }
 
@@ -198,7 +215,8 @@ class Calendar extends Component {
             this.setState({
                 months,
                 currentMonthStartDate,
-                msSelectedDate
+                msSelectedDate,
+                currentPeriodName: this.getPeriodName(currentMonthStartDate)
             })
         }
     }
@@ -210,10 +228,6 @@ class Calendar extends Component {
     render() {
         return (
             <div className="calendar-wrapper theme-header-background theme-header-border">
-                <div className="calendar-current-period">
-                    <div className="calendar-current-month">{this.state.currentMonthStartDate.format("MMMM")}</div>
-                    <div className="calendar-current-year">{this.state.currentMonthStartDate.format("YYYY")}</div>
-                </div>
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}
