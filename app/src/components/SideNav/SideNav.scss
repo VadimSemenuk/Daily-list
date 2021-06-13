@@ -38,6 +38,11 @@
       img {
         width: 69px;
         filter: invert(1);
+        transition: 100ms ease transform;
+
+        &:active {
+          transform: scale(1.05);
+        }
       }
 
       .logo-text {
