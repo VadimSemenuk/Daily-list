@@ -132,13 +132,23 @@ export default {
         async function alterSettingsTable () {
             let select = await executeSQL(`SELECT sort FROM Settings;`);
             let selectItems = select.rows.item(0);
-            let currentSortSettings = (selectItems && selectItems.sort) ? JSON.parse(selectItems.sort) : false;
-            if (!currentSortSettings) {
-                currentSortSettings = {
-                    type: 2,
-                    direction: 1,
-                    finSort: 1
+
+            let oldSortSettings = (selectItems && selectItems.sort) ? JSON.parse(selectItems.sort) : null;
+            let settingsMatch = {
+                type: {
+                    0: 1,
+                    1: 2
+                },
+                direction: {
+                    0: 1,
+                    1: 2
                 }
+            }
+
+            let sortSettings = {
+                type: oldSortSettings ? settingsMatch.type[oldSortSettings.type] : 2,
+                direction: oldSortSettings ? settingsMatch.direction[oldSortSettings.direction] : 2,
+                finSort: 1
             }
 
             await executeSQL(`ALTER TABLE Settings RENAME TO Settings_OLD;`);
@@ -192,7 +202,7 @@ export default {
                     1 as calendarMode,
                     1 as notesScreenMode
                 FROM Settings_OLD;
-            `, [CalendarNotesCounterMode.All, currentSortSettings.type, currentSortSettings.direction, currentSortSettings.finSort]);
+            `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort]);
             await executeSQL(`DROP TABLE Settings_OLD;`);
         }
 

@@ -56,11 +56,11 @@ export const CalendarNotesCounterMode = {
 };
 
 export const SortType = {
-    TimeSort: 0,
-    TimeAddSort: 1,
+    TimeSort: 1,
+    TimeAddSort: 2,
 };
 
 export const SortDirectionType = {
-    DESC: 0,
-    ASC: 1
+    DESC: 1,
+    ASC: 2
 };
