@@ -63,18 +63,12 @@ class SideNav extends PureComponent {
             <div className={`sidenav-wrapper${this.props.sidenav.isOpen ? " transition visible" : ""}${this.state.hidden ? " hidden" : ""}`}>
                 <div className="sidenav">
                     <div className="logo-wrapper theme-header-background">
-                        <a
-                            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <img
-                                src={LogoImg}
-                                alt="button"
-                            />
-                        </a>
+                        <img
+                            src={LogoImg}
+                            alt="button"
+                        />
 
-                        <div className="logo-text">{t("app-name")} V:1.0.7</div>
+                        <div className="logo-text">v1.0.7</div>
                     </div>
                     <div className="items">
                         {
