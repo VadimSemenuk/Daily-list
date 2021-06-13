@@ -38,6 +38,7 @@ export default {
     "notes-count-all": "Display all",
     "reload-app-note": "Restart the app to apply changes",
     "minimize-notes": "Minimize long notes",
+    "move-control-panels-down": "Move controls down",
 
     // password page
     "password": "Password",

@@ -164,6 +164,12 @@ class SettingsTheme extends Component {
                         onChange={(e) => this.props.setSetting('minimizeNotes', e, this.props.renderNotes)}
                     />
 
+                    <SwitchListItem
+                        text={t("move-control-panels-down")}
+                        checked={this.props.settings.invertHeaderPosition}
+                        onChange={(e) => this.props.setSetting('invertHeaderPosition', e)}
+                    />
+
                     <ModalListItem
                         text={t("language")} 
                         value={t(activeLanguageSettings.translateId)}

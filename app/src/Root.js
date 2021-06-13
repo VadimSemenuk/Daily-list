@@ -55,7 +55,7 @@ class Root extends Component {
 
         return (
             <HashRouter>
-                <div className="app-wrapper">
+                <div className={`app-wrapper${this.props.settings.invertHeaderPosition ? ' inverted' : ''}`}>
                     {
                         !this.props.password &&
                         <Redirect from="/" to="/password"/>           

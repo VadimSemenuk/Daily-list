@@ -40,7 +40,7 @@ header {
         text-align: center;
         position: absolute;
         left: 50%;
-        top: 50%;
+        top: calc(50% - 3px);
         transform: translate(-50%, -50%);
 
         .top-section {

@@ -76,7 +76,8 @@ class SettingsService {
                 minimizeNotes,
                 calendarMode,
                 notesScreenMode,
-                passwordResetEmail
+                passwordResetEmail,
+                invertHeaderPosition
             FROM Settings;`
         );
 
@@ -86,7 +87,8 @@ class SettingsService {
             ...result,
             defaultNotification: Boolean(result.defaultNotification),
             theme: themesService.getThemeById(result.theme),
-            minimizeNotes: Boolean(result.minimizeNotes)
+            minimizeNotes: Boolean(result.minimizeNotes),
+            invertHeaderPosition: Boolean(result.invertHeaderPosition)
         };
     }
 
@@ -95,6 +97,7 @@ class SettingsService {
             case("defaultNotification"): value = Number(value); break;
             case("theme"): value = value.id; break;
             case("minimizeNotes"): value = Number(value); break;
+            case("invertHeaderPosition"): value = Number(value); break;
             default: break;
         }
 

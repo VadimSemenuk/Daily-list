@@ -417,3 +417,15 @@ button.google-in {
         color: #ffffff !important;
     }
 }
+
+.inverted {
+    .page-wrapper {
+        flex-direction: column-reverse;
+    }
+    .notes-list-wrapper {
+        flex-direction: column-reverse;
+    }
+    .calendar-trigger {
+        transform: rotate(180deg) translate(0px, 9px);
+    }
+}

@@ -168,7 +168,8 @@ export default {
                     minimizeNotes INTEGER,
                     calendarMode INTEGER,
                     notesScreenMode INTEGER,
-                    passwordResetEmail TEXT
+                    passwordResetEmail TEXT,
+                    invertHeaderPosition INTEGER
                 );
             `);
             await executeSQL(`
@@ -185,7 +186,8 @@ export default {
                     sortFinBehaviour,
                     minimizeNotes,
                     calendarMode,
-                    notesScreenMode
+                    notesScreenMode,
+                    invertHeaderPosition
                 ) 
                 SELECT 
                     defaultNotification, 
@@ -200,7 +202,8 @@ export default {
                     ? as sortFinBehaviour,
                     1 as minimizeNotes,
                     1 as calendarMode,
-                    1 as notesScreenMode
+                    1 as notesScreenMode,
+                    0 as invertHeaderPosition
                 FROM Settings_OLD;
             `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort]);
             await executeSQL(`DROP TABLE Settings_OLD;`);

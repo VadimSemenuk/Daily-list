@@ -38,6 +38,7 @@ export default {
     "notes-count-all": "Отображать все",
     "reload-app-note": "Перезапустите приложение для вступления изменений в силу",
     "minimize-notes": "Сворачивать длинные заметки",
+    "move-control-panels-down": "Перенести вниз элементы управления",
 
     // password page
     "password": "Пароль",

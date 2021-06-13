@@ -238,11 +238,11 @@ class Notes extends PureComponent {
 
                             <div className="calendar-trigger-wrapper theme-header-background">
                                 <div
-                                    className="calendar-trigger calendar-trigger"
+                                    className="calendar-trigger"
                                     onClick={this.triggerCalendar}
                                 >
                                     <img
-                                        className={this.props.settings.calendarMode === 2 ? ' rotated' : ''}
+                                        className={this.props.settings.calendarMode === 2 ? 'rotated' : ''}
                                         src={ChevronBottomImg}
                                         alt="trigger"
                                     />
