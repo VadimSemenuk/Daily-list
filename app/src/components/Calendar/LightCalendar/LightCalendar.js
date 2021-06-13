@@ -25,7 +25,7 @@ class LightCalendar extends Component {
         this.state = {
             weeks,
             msSelectedDate,
-            monthName: this.getMonthName(weeks[1][0], weeks[1][6])
+            currentPeriodName: this.getPeriodName(weeks[1][0], weeks[1][6])
         }
 
         this.activePageIndex = 1;  
@@ -67,22 +67,24 @@ class LightCalendar extends Component {
             this.props.getCount(weeks[nextIndex][0], "week");
         }
 
-        let monthName = this.getMonthName(weeks[index][0], weeks[index][6]);
+        let currentPeriodName = this.getPeriodName(weeks[index][0], weeks[index][6]);
         
         this.setState({
             weeks,
-            monthName
+            currentPeriodName
         })
     }
 
-    getMonthName(startWeekDate, endWeekDate) {
-        const weekStartDayMonthName = startWeekDate.format('MMMM');   
-        const weekEndDayMonthName = endWeekDate.format('MMMM');
-        
-        if (weekStartDayMonthName !== weekEndDayMonthName) {
-            return `${weekStartDayMonthName} ${startWeekDate.format('YYYY')} - ${weekEndDayMonthName} ${endWeekDate.format('YYYY')}`;
-        } else {
-            return `${weekStartDayMonthName} ${startWeekDate.format('YYYY')}`;
+    getPeriodName(periodStartDate, periodEndDate) {
+        let periodStartMonthName = periodStartDate.format('MMMM');
+        let periodEndMonthName = periodEndDate.format('MMMM');
+
+        let periodStartYearName = periodStartDate.format('YYYY');
+        let periodEndYearName = periodEndDate.format('YYYY');
+
+        return {
+            month: periodStartMonthName !== periodEndMonthName ? `${periodStartMonthName} - ${periodEndMonthName}` : periodEndMonthName,
+            year: periodStartYearName !== periodEndYearName ? `${periodStartYearName} - ${periodEndYearName}` : periodEndYearName,
         }
     }
 
@@ -149,12 +151,12 @@ class LightCalendar extends Component {
                 this.props.getCount(nextDate.valueOf(), "week");
             }
 
-            let monthName = this.getMonthName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);            
+            let currentPeriodName = this.getPeriodName(weeks[this.activePageIndex][0], weeks[this.activePageIndex][6]);
 
             this.setState({
                 weeks,
                 msSelectedDate: nextProps.currentDate.valueOf(),
-                monthName
+                currentPeriodName
             })
         }
     }
@@ -178,7 +180,10 @@ class LightCalendar extends Component {
     render() {
         return (
             <div className="light-calendar-wrapper theme-header-background theme-header-border">
-                <div className="light-calendar-month">{this.state.monthName}</div>
+                <div className="light-calendar-current-period">
+                    <div className="calendar-current-month">{this.state.currentPeriodName.month}</div>
+                    <div className="calendar-current-year">{this.state.currentPeriodName.year}</div>
+                </div>
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}

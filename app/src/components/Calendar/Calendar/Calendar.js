@@ -210,7 +210,10 @@ class Calendar extends Component {
     render() {
         return (
             <div className="calendar-wrapper theme-header-background theme-header-border">
-                <div className="calendar-month-name">{this.state.currentMonthStartDate.format("MMMM")}, {this.state.currentMonthStartDate.format("YYYY")}</div>
+                <div className="calendar-current-period">
+                    <div className="calendar-current-month">{this.state.currentMonthStartDate.format("MMMM")}</div>
+                    <div className="calendar-current-year">{this.state.currentMonthStartDate.format("YYYY")}</div>
+                </div>
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}
