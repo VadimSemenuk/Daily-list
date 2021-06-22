@@ -16,7 +16,7 @@ let CalendarDate = (props) => (
                     props.notesCounterMode === CalendarNotesCounterMode.All && props.count.finished !== 0 &&
                     <React.Fragment>
                         <span className="c-success">{props.count.finished}</span>
-                        {(props.count.notFinished !== 0) && "|"}
+                        {(props.count.notFinished !== 0) && "/"}
                     </React.Fragment>
                 }
                 {
