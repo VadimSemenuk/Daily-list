@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {CalendarNotesCounterMode} from "../../../constants";
+import {CalendarDate, EmptyCalendarDate} from "../Common/Calendar Date/CalendarDate";
 
 export default class MonthDates extends PureComponent {
     render() {
@@ -13,48 +13,28 @@ export default class MonthDates extends PureComponent {
                                 className="calendar-week"
                             >
                                 {
-                                    week.map((weekDay, i) => {
-                                        if (!weekDay) {
-                                            return <div key={i} className="calendar-date"></div>
+                                    week.map((date, i) => {
+                                        if (!date) {
+                                            return <EmptyCalendarDate key={i} />
                                         }
 
-                                        let active;
-                                        let msCurrentDay = weekDay.valueOf();
+                                        let msDate = date.valueOf();
+                                        let isActive;
                                         if (this.props.mode === "multiselect") {
-                                            active = ~this.props.msSelectedDates.findIndex((a) => a === msCurrentDay);
+                                            isActive = ~this.props.msSelectedDates.findIndex((a) => a === msDate);
                                         } else {
-                                            active = msCurrentDay === this.props.msSelectedDate;
+                                            isActive = msDate === this.props.msSelectedDate;
                                         }
-
-                                        let count = this.props.count[msCurrentDay] || 0;
 
                                         return (
-                                            <button 
-                                                className={`calendar-date${active ? ' active' : ''}`}
-                                                key={i} 
-                                                onClick={() => this.props.onSelect(weekDay, active)}
-                                            >
-                                                {
-                                                    (this.props.calendarNotesCounterMode !== CalendarNotesCounterMode.NotShow && count) &&
-                                                    <span className="count">
-                                                        {
-                                                            this.props.calendarNotesCounterMode === CalendarNotesCounterMode.All &&
-                                                            <React.Fragment>
-                                                                {
-                                                                    count.finished !== 0 &&
-                                                                    <span className="c-success">{count.finished}</span>
-                                                                }
-                                                                {(count.notFinished !== 0 && count.finished !== 0) && "|"}
-                                                            </React.Fragment>
-                                                        }
-                                                        {
-                                                            count.notFinished !== 0 &&
-                                                            <span className="c-warn">{count.notFinished}</span>
-                                                        }
-                                                    </span>
-                                                }
-                                                <span className="calendar-date-value">{weekDay.format('DD')}</span>
-                                            </button> 
+                                            <CalendarDate
+                                                key={i}
+                                                isActive={isActive}
+                                                count={this.props.count[msDate]}
+                                                date={date}
+                                                notesCounterMode={this.props.calendarNotesCounterMode}
+                                                onClick={this.props.onSelect}
+                                            />
                                         )
                                     })
                                 }
