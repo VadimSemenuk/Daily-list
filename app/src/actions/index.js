@@ -357,7 +357,7 @@ export function updateDatesAndNotes(date, preRenderDate, nextIndex, notesScreenM
 }
 
 // settings
-export function setSetting(settingName, value, fn) {
+export function setSetting(settingName, value) {
     return async (dispatch) => {
         try {
             await settingsService.setSetting(settingName, value);
@@ -369,8 +369,6 @@ export function setSetting(settingName, value, fn) {
                     value
                 }
             });
-
-            fn && fn();
         } catch(err) {
             dispatch(triggerErrorModal("error-common"));
             logsService.logError(

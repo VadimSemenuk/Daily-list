@@ -161,7 +161,7 @@ class SettingsTheme extends Component {
                     <SwitchListItem
                         text={t("minimize-notes")}
                         checked={this.props.settings.minimizeNotes}
-                        onChange={(e) => this.props.setSetting('minimizeNotes', e, this.props.renderNotes)}
+                        onChange={(e) => this.props.setSetting('minimizeNotes', e)}
                     />
 
                     <SwitchListItem
