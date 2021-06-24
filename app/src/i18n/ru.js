@@ -185,5 +185,9 @@ export default {
     "trash": "Корзина",
     "about": "О программе",
     "settings": "Настройки",
-    "account": "Аккаунт"
+    "account": "Аккаунт",
+
+    // tags
+    "tags": "Теги",
+    "add-tag-placeholder": "Введите название тега"
 }

@@ -416,6 +416,15 @@ button.google-in {
     .c-gray {
         color: #ffffff !important;
     }
+
+    .tag {
+        border-color: #383838;
+        background: #383838;
+
+        &.active {
+            border-color: #cacaca;
+        }
+    }
 }
 
 .inverted {

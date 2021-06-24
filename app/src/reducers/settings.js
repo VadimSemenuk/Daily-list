@@ -1,7 +1,6 @@
 let init = {
     theme: {
         id: 0,
-        statusBar: null,
         header: null,
         body: null,
         realId: 0

@@ -185,5 +185,9 @@ export default {
     "trash": "Кошык",
     "about": "Аб праграме",
     "settings": "Налады",
-    "account": "Акаўнт"
+    "account": "Акаўнт",
+
+    // tags
+    "tags": "Тэгі",
+    "add-tag-placeholder": "Увядзіце назву тэга"
 }

@@ -20,6 +20,7 @@ import Loader from "./components/Loader/Loader";
 import Modal from "./components/Modal/Modal";
 import NotesSearch from "./pages/NotesSearch/NotesSearch";
 import SideNav from "./components/SideNav/SideNav";
+import Tags from "./pages/Tags/Tags";
 
 class Root extends Component {
     componentDidMount() {
@@ -115,6 +116,10 @@ class Root extends Component {
                     <Route 
                         path="/trash" 
                         component={Trash} 
+                    />
+                    <Route
+                        path="/tags"
+                        component={Tags}
                     />
                     <Loader />
                     <SideNav />

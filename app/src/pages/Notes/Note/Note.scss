@@ -9,7 +9,7 @@
         align-items: center;
     }
 
-    .tag {
+    .color-tag {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -37,7 +37,6 @@
 
         .note-header {
             margin-top: -3px;
-            // margin-bottom: 3px;
             display: flex;
             align-items: center;
 
@@ -64,6 +63,18 @@
             .repeat-identifier {
                 height: 12px;
                 display: block;
+            }
+
+            .tags-wrapper {
+                display: flex;
+                margin-right: 5px;
+                overflow: hidden;
+
+                .tag {
+                    padding: 1px 5px;
+                    font-size: 11px;
+                    margin-right: 4px;
+                }
             }
         }
 

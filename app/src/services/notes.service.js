@@ -3,6 +3,7 @@ import moment from 'moment';
 import notificationService from "./notification.service";
 import getUTCOffset from "../utils/getUTCOffset";
 import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
+import tagsService from "./tags.service";
 
 window.e = executeSQL;
 
@@ -12,7 +13,7 @@ class NotesService {
         let currentDate = moment().startOf("day");
 
         let select = await executeSQL(
-            `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, 
+            `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.tags,
                         n.repeatType, n.contentItems, n.isFinished, n.forkFrom, n.date, n.manualOrderIndex, n.mode,
                         (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
                         FROM Notes n
@@ -90,7 +91,7 @@ class NotesService {
 
     async processSearchResultNotesWithoutTime(notesIds) {
         let select = await executeSQL(
-            `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, 
+            `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.tags,
                         n.repeatType, n.contentItems, n.isFinished, n.forkFrom, n.date, n.manualOrderIndex, n.mode
                         FROM Notes n
                         WHERE
@@ -139,27 +140,35 @@ class NotesService {
         }
     }
 
+    parseNoteCommon(note) {
+        return {
+            contentItems: JSON.parse(note.contentItems),
+            isFinished: Boolean(note.isFinished),
+            lastActionTime: moment(note.lastActionTime),
+            tags: (note.tags ? note.tags.split(",") : []).map((id) => {
+
+                return tagsService.tags[id]
+            })
+        }
+    }
+
     parseNoteWithTime(note, utcOffset) {
         return {
             ...note,
-            contentItems: JSON.parse(note.contentItems),
+            ...this.parseNoteCommon(note),
             startTime: note.startTime ? moment(note.startTime - utcOffset) : note.startTime,
             endTime: note.endTime ? moment(note.endTime - utcOffset) : note.endTime,
             date: note.date ? moment(note.date - utcOffset) : note.date,
-            isFinished: Boolean(note.isFinished),
             isNotificationEnabled: Boolean(note.isNotificationEnabled),
             isShadow: Boolean(note.date === null),
             repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? +a - utcOffset : +a) : [],
-            lastActionTime: moment(note.lastActionTime),
         };
     }
 
     parseNoteWithoutTime(note) {
         return {
             ...note,
-            contentItems: JSON.parse(note.contentItems),
-            isFinished: Boolean(note.isFinished),
-            lastActionTime: moment(note.lastActionTime)
+            ...this.parseNoteCommon(note)
         }
     }
 
@@ -170,8 +179,8 @@ class NotesService {
             dates.map((date) => {
                 let msDateUTC = date.valueOf() + utcOffset;
                 return executeSQL(
-                    `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, 
-                        n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
+                    `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags,
+                    n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
                     (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
                     FROM Notes n
                     LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
@@ -213,7 +222,8 @@ class NotesService {
 
     async getNotesWithoutTime() {
         let select = await executeSQL(
-            `SELECT id, title, tag, contentItems, manualOrderIndex, mode, isFinished, lastAction, lastActionTime, repeatType, forkFrom
+            `SELECT id, title, tag, contentItems, manualOrderIndex, mode, isFinished, lastAction, lastActionTime, 
+            repeatType, forkFrom, tags
             FROM Notes
             WHERE
                 mode == ?
@@ -262,8 +272,8 @@ class NotesService {
 
         let insert = await executeSQL(
             `INSERT INTO Notes
-            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
                 note.startTime ? note.startTime.valueOf() + utcOffset : note.startTime,
@@ -276,7 +286,8 @@ class NotesService {
                 note.date ? note.date.valueOf() + utcOffset : note.date,
                 note.forkFrom,
                 note.mode,
-                note.manualOrderIndex
+                note.manualOrderIndex,
+                note.tags.map((tag) => tag.id).join(",")
             ]
         );
 
@@ -355,7 +366,8 @@ class NotesService {
 
         await executeSQL(
             `UPDATE Notes
-            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, contentItems = ?, isFinished = ?, manualOrderIndex = ?
+            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, 
+                contentItems = ?, isFinished = ?, manualOrderIndex = ?, tags = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -368,6 +380,7 @@ class NotesService {
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
                 nextNote.manualOrderIndex,
+                note.tags.map((tag) => tag.id).join(","),
                 nextNote.id,
             ]
         );

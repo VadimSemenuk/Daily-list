@@ -12,6 +12,7 @@ import trash from "./trash";
 import search from "./search";
 import sidenav from "./sidenav";
 import meta from "./meta";
+import tags from "./tags";
 
 let reducers = combineReducers({
     settings,
@@ -25,7 +26,8 @@ let reducers = combineReducers({
     trash,
     search,
     sidenav,
-    meta
+    meta,
+    tags
 });
 
 export default reducers;

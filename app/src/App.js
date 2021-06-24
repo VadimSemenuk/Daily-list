@@ -19,6 +19,7 @@ import notesService from "./services/notes.service";
 import authService from "./services/auth.service";
 import logsService from "./services/logs.service";
 import backupService from "./services/backup.service";
+import tagsService from "./services/tags.service";
 
 export default class App extends Component {
     constructor(props) {
@@ -60,16 +61,25 @@ export default class App extends Component {
             });
 
         let meta = await deviceService.getMetaInfo();
+
         let settings = await settingsService.getSettings();
         this.applyInitSettings(settings);
 
         let password = !settings.password;
+
+        let tags = await tagsService.getTags();
+        await tagsService.updateCache();
+
         let date = moment().startOf("day");
+
         let notes = await notesService.getNotes(settings.notesScreenMode, [moment(date).add(-1, "day"), moment(date), moment(date).add(1, "day")]);
+
         let user = authService.getUser();
         authService.initAuthorizationToken();
+
         backupService.setDatabasesDirectory();
-        this.store = initStore({settings, password, notes, date, user, meta});
+
+        this.store = initStore({settings, password, notes, date, user, meta, tags});
 
         this.setState({isAppReady: true});
     }

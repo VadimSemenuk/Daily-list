@@ -19,6 +19,7 @@ export default {
         await updateToken();
         await convertDatesToUTC();
         await addPasswordEncryption();
+        await addTagsPage();
 
         async function alterTasksRepeatValuesTable () {
             await executeSQL(`
@@ -79,6 +80,7 @@ export default {
                     forkFrom INTEGER,
                     manualOrderIndex INTEGER,
                     mode INTEGER,
+                    tags TEXT,
                     UNIQUE (id) ON CONFLICT REPLACE
                 );
             `);
@@ -99,7 +101,8 @@ export default {
                     repeatType,
                     forkFrom,
                     mode,
-                    manualOrderIndex
+                    manualOrderIndex,
+                    tags
                 ) 
                 SELECT
                     id, 
@@ -122,7 +125,8 @@ export default {
                         WHEN forkFrom = -1 THEN null ELSE forkFrom
                     END AS forkFrom,
                     1 as mode,
-                    null as manualOrderIndex
+                    null as manualOrderIndex,
+                    "" as tags
                 FROM Tasks;
             `);
 
@@ -284,6 +288,25 @@ export default {
             if (password) {
                 await executeSQL('UPDATE Settings SET password = ?', [md5(password)]);
             }
+        }
+
+        async function addTagsPage() {
+            await executeSQL(`
+                CREATE TABLE IF NOT EXISTS Tags
+                (
+                    id INTEGER PRIMARY KEY,
+                    name Text
+                );
+            `);
+
+            await executeSQL(`
+                INSERT INTO Tags (name)
+                VALUES 
+                (?),
+                (?),
+                (?),
+                (?);
+            `, ['test tag 1', 'test tag 2', 'test tag 3 long name', 'test']);
         }
     }
 }

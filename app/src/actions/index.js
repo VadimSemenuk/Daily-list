@@ -8,6 +8,7 @@ import logsService from "../services/logs.service";
 import {throttleAction} from "../utils/throttle";
 
 import {NotesScreenMode} from "../constants";
+import tagsService from "../services/tags.service";
 
 // notes
 export function addNote(note) {
@@ -659,5 +660,48 @@ export function setSidenavItems(items) {
     return {
         type: "SET_SIDENAV_ITEMS",
         payload: {items}
+    }
+}
+
+// tags
+export function addTag(tag) {
+    return async (dispatch) => {
+        let id = await tagsService.addTag(tag);
+
+        dispatch({
+            type: "TAG_ADD",
+            payload: {
+                tag: {
+                    ...tag,
+                    id
+                }
+            }
+        });
+    }
+}
+
+export function updateTag(tag) {
+    return async (dispatch) => {
+        await tagsService.updateTag(tag);
+
+        dispatch({
+            type: "TAG_UPDATE",
+            payload: {
+                tag
+            }
+        });
+    }
+}
+
+export function deleteTag(id) {
+    return async (dispatch) => {
+        await tagsService.deleteTag(id);
+
+        dispatch({
+            type: "TAG_DELETE",
+            payload: {
+                id
+            }
+        });
     }
 }

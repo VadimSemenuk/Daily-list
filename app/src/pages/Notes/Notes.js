@@ -25,6 +25,7 @@ import DeleteImg from "../../assets/img/delete.svg";
 import InfoImg from "../../assets/img/info.svg";
 import CalendarImg from "../../assets/img/calendar-black.svg";
 import ListImg from "../../assets/img/list.svg";
+import TagImg from "../../assets/img/price-tag.svg";
 
 import './Notes.scss';
 
@@ -91,6 +92,11 @@ class Notes extends PureComponent {
                     textId: "settings",
                     action: () => this.props.history.push("/settings"),
                     img: SettingsImg
+                },
+                {
+                    textId: "tags",
+                    action: () => this.props.history.push("/tags"),
+                    img: TagImg
                 },
                 {
                     textId: "account",

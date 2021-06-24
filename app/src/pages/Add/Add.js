@@ -15,6 +15,7 @@ import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
 import Switch from "../../components/Switch/Switch";
 import RepeatTypeSelectModal from "./RepeatTypeSelectModal/RepeatTypeSelectModal";
+import Tag from "../../components/Tag/Tag";
 
 import notesService from '../../services/notes.service';
 
@@ -63,6 +64,7 @@ class Add extends Component {
             repeatType: NoteRepeatType.NoRepeat,
             repeatValues: [],
             mode: this.props.settings.notesScreenMode,
+            tags: []
         }
     }
 
@@ -328,6 +330,21 @@ class Add extends Component {
         }
     }
 
+    triggerNoteTag = (tag) => {
+        let nextNoteTags;
+        if (this.isNoteHasTag(tag.id)) {
+            nextNoteTags = this.state.note.tags.filter((_tag) => _tag.id !== tag.id);
+        } else {
+            nextNoteTags = [...this.state.note.tags, tag];
+        }
+
+        this.updateNoteData({tags: nextNoteTags});
+    }
+
+    isNoteHasTag = (tagId) => {
+        return Boolean(~this.state.note.tags.findIndex((tag) => tag.id === tagId));
+    }
+
     render() {
         let {t} = this.props;
 
@@ -577,6 +594,19 @@ class Add extends Component {
                                     colors={this.tags}
                                 />
                             </div>
+
+                            <div className="tag-picker-wrapper">
+                                {
+                                    this.props.tags.map((tag, i) => (
+                                        <Tag
+                                            key={i}
+                                            name={tag.name}
+                                            isActive={this.isNoteHasTag(tag.id)}
+                                            onClick={() => this.triggerNoteTag(tag)}
+                                        />
+                                    ))
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -588,7 +618,8 @@ class Add extends Component {
 function mapStateToProps(state) {
     return {
         date: state.date,
-        settings: state.settings      
+        settings: state.settings,
+        tags: state.tags
     }
 }
 

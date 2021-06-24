@@ -185,5 +185,9 @@ export default {
     "trash": "Trash",
     "about": "About app",
     "settings": "Settings",
-    "account": "Account"
+    "account": "Account",
+
+    // tags
+    "tags": "Tags",
+    "add-tag-placeholder": "Enter tag name"
 }

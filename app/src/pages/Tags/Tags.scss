@@ -1,0 +1,21 @@
+.tag-edit-wrapper, .tag-add-wrapper {
+  display: flex;
+}
+
+.tag-edit-wrapper {
+  .remove-button{
+    img {
+      height: 11px;
+    }
+  }
+}
+
+.tag-add-wrapper {
+  margin-top: 40px;
+
+  .add-button {
+    img {
+      height: 20px;
+    }
+  }
+}

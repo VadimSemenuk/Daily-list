@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react';
 
 import TextCheckBox from '../../../components/TextCheckBox/TextCheckBox';
 import CustomCheckBox from '../../../components/CustomCheckBox/CustomCheckBox';
+import Tag from "../../../components/Tag/Tag";
 
 import AlarmImg from '../../../assets/img/alarm.svg';
 import MoreImg from "../../../assets/img/more.svg";
@@ -63,10 +64,23 @@ class Note extends PureComponent {
             >
                 <div
                     style={{backgroundColor: this.props.data.tag}}
-                    className="tag"
+                    className="color-tag"
                 ></div>
                 <div className="note-content">
                     <div className="note-header">
+                        {
+                            this.props.data.tags.length !== 0 &&
+                            <div className="tags-wrapper">
+                                {
+                                    this.props.data.tags.map((tag, i) => (
+                                        <Tag
+                                            key={i}
+                                            name={tag.name}
+                                        />
+                                    ))
+                                }
+                            </div>
+                        }
                         {this.props.data.startTime && <span className="note-header-time">{this.props.data.startTime.format('HH:mm')}</span>}
                         {this.props.data.endTime && <span className="note-header-time-divider">-</span>}
                         {this.props.data.endTime && <span className="note-header-time">{this.props.data.endTime.format('HH:mm')}</span>}
