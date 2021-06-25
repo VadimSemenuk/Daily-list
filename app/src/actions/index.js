@@ -358,16 +358,15 @@ export function updateDatesAndNotes(date, preRenderDate, nextIndex, notesScreenM
 }
 
 // settings
-export function setSetting(name, value) {
+export function setSetting(nextSettings) {
     return async (dispatch) => {
         try {
-            await settingsService.setSetting(name, value);
+            await settingsService.setSetting(nextSettings);
 
-            await dispatch({
+            dispatch({
                 type: "SET_SETTING",
                 payload: {
-                    name,
-                    value
+                    nextSettings
                 }
             });
         } catch(err) {
@@ -376,7 +375,7 @@ export function setSetting(name, value) {
                 err,
                 {
                     path: "action/index.js -> setSetting()",
-                    name, value
+                    nextSettings
                 },
                 window.device.uuid
             );
@@ -707,8 +706,9 @@ export function deleteTag(id) {
         await dispatch({
             type: "SET_SETTING",
             payload: {
-                name: "noteFilters",
-                value: nextNoteFilters
+                nextSettings: {
+                    noteFilters: nextNoteFilters
+                }
             }
         });
 

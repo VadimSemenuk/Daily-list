@@ -123,7 +123,7 @@ class Notes extends PureComponent {
     }
 
     async setScreenMode(mode) {
-        await this.props.setSetting("notesScreenMode", mode);
+        await this.props.setSetting({notesScreenMode: mode});
 
         let msCurDate = moment().startOf("day");
         let dates = [moment(msCurDate).add(-1, "day"), msCurDate, moment(msCurDate).add(1, "day")];
@@ -160,7 +160,7 @@ class Notes extends PureComponent {
     };
 
     triggerCalendar = () => {
-        this.props.setSetting('calendarMode', this.props.settings.calendarMode === 1 ? 2 : 1);
+        this.props.setSetting({calendarMode: this.props.settings.calendarMode === 1 ? 2 : 1});
     };
 
     setTodayDate = () => {

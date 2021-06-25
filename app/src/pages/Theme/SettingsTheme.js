@@ -65,7 +65,7 @@ class SettingsTheme extends Component {
                             {
                                 text: t("ok"),
                                 onClick: () => {
-                                    this.props.setSetting('theme', this.state.themeSelectValue);
+                                    this.props.setSetting({theme: this.state.themeSelectValue});
                                     themesService.applyTheme(this.state.themeSelectValue);
                                 }
                             }
@@ -103,7 +103,7 @@ class SettingsTheme extends Component {
                             {
                                 text: t("ok"),
                                 onClick: () => {
-                                    this.props.setSetting('fontSize', this.state.fontSizeSelectedValue);
+                                    this.props.setSetting({fontSize: this.state.fontSizeSelectedValue});
                                     document.querySelector("body").style.fontSize = this.state.fontSizeSelectedValue + "px"; 
                                 }
                             }
@@ -137,7 +137,7 @@ class SettingsTheme extends Component {
                             {
                                 text: t("ok"),
                                 onClick: () => {
-                                    this.props.setSetting('calendarNotesCounterMode', this.state.calendarNotesCounterMode);
+                                    this.props.setSetting({calendarNotesCounterMode: this.state.calendarNotesCounterMode});
                                 }
                             }
                         ]}
@@ -161,13 +161,13 @@ class SettingsTheme extends Component {
                     <SwitchListItem
                         text={t("minimize-notes")}
                         checked={this.props.settings.minimizeNotes}
-                        onChange={(e) => this.props.setSetting('minimizeNotes', e)}
+                        onChange={(e) => this.props.setSetting({minimizeNotes: e})}
                     />
 
                     <SwitchListItem
                         text={t("move-control-panels-down")}
                         checked={this.props.settings.invertHeaderPosition}
-                        onChange={(e) => this.props.setSetting('invertHeaderPosition', e)}
+                        onChange={(e) => this.props.setSetting({invertHeaderPosition: e})}
                     />
 
                     <ModalListItem
@@ -182,7 +182,7 @@ class SettingsTheme extends Component {
                             {
                                 text: t("ok"),
                                 onClick: () => {
-                                    this.props.setSetting('lang', this.state.languageSelectedValue);
+                                    this.props.setSetting({lang: this.state.languageSelectedValue});
                                     window.location.reload(true);
                                 }
                             }

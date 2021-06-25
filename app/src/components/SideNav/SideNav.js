@@ -103,7 +103,7 @@ class SideNav extends PureComponent {
                                                                 tags={this.props.tags}
                                                                 activeTags={this.props.settings.noteFilters.tags}
                                                                 onActiveTagsChange={(value) => {
-                                                                    this.props.setSetting("noteFilters", {...this.props.settings.noteFilters, tags: value.map((tag) => tag.id)})
+                                                                    this.props.setSetting({noteFilters: {...this.props.settings.noteFilters, tags: value.map((tag) => tag.id)}})
                                                                 }}
                                                                 onItemRender={(itemEl, key) => (
                                                                     <div

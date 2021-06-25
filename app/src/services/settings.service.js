@@ -96,20 +96,27 @@ class SettingsService {
         };
     }
 
-    async setSetting(item, value) {
-        switch(item) {
-            case("defaultNotification"): value = Number(value); break;
-            case("theme"): value = value.id; break;
-            case("minimizeNotes"): value = Number(value); break;
-            case("invertHeaderPosition"): value = Number(value); break;
-            case("noteFilters"): value = JSON.stringify(value); break;
-            case("isSidenavTagsListExpanded"): value = Number(value); break;
-            default: break;
-        }
+    async setSetting(nextSettings) {
+        let nextSettingsFormatted = Object.keys(nextSettings).map((name) => {
+            let value = nextSettings[name];
+
+            switch(name) {
+                case("defaultNotification"): value = Number(value); break;
+                case("theme"): value = value.id; break;
+                case("minimizeNotes"): value = Number(value); break;
+                case("invertHeaderPosition"): value = Number(value); break;
+                case("noteFilters"): value = JSON.stringify(value); break;
+                case("isSidenavTagsListExpanded"): value = Number(value); break;
+                default: break;
+            }
+
+            return {name, value};
+        });
 
         return executeSQL(
-            `UPDATE Settings 
-            SET ${item} = ?;`, [value]
+            `UPDATE Settings
+            SET ${nextSettingsFormatted.map((setting) => `${setting.name} = ?`).join(",")};`,
+            nextSettingsFormatted.map((setting) => setting.value)
         );
     }
 
@@ -121,7 +128,7 @@ class SettingsService {
             tags: settings.noteFilters.tags.filter((_id) => _id !== id)
         };
 
-        await this.setSetting("noteFilters", nextNoteFilters);
+        await this.setSetting({noteFilters: nextNoteFilters});
 
         return nextNoteFilters;
     }

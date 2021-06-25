@@ -49,7 +49,7 @@ class Password extends Component {
         let response = await apiService.post("local-password/reset", {lang: this.props.settings.lang, email: emailTo});
         this.props.triggerLoader(false);
         let newPassword = await response.text();
-        this.props.setSetting('password', newPassword);
+        this.props.setSetting({password: newPassword});
         window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset").replace("{{email}}", emailTo));
     }
 

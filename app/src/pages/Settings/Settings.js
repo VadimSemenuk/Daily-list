@@ -37,7 +37,7 @@ class Settings extends Component {
                         this.props.settings.password !== null &&
                         <InsetListItem
                             text={t("remove-pass")}
-                            onClick={() => this.props.setSetting('password', null)}
+                            onClick={() => this.props.setSetting({password: null})}
                         />
                     }
                 </div>

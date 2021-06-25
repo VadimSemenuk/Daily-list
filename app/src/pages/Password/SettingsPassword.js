@@ -38,8 +38,10 @@ class SettingsPassword extends Component {
 
     onPassSet = () => {
         if (this.validatePassword()) {
-            this.props.setSetting('password', md5(this.state.password0));
-            this.props.setSetting('passwordResetEmail', this.props.user.email);
+            this.props.setSetting({
+                password: md5(this.state.password0),
+                passwordResetEmail: this.props.user.email
+            });
             this.props.history.goBack();
         }
     }

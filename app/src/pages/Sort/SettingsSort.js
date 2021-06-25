@@ -57,8 +57,10 @@ class SettingsSort extends Component {
                             {
                                 text: t("ok"),
                                 onClick: async () => {
-                                    await this.props.setSetting("sortType", this.state.sortTypeSelectedValue);
-                                    this.props.setSetting("sortDirection", this.state.sortDirectionSelectedValue);
+                                    await this.props.setSetting({
+                                        sortType: this.state.sortTypeSelectedValue,
+                                        sortDirection: this.state.sortDirectionSelectedValue
+                                    });
                                 }
                             }
                         ]}
@@ -104,7 +106,7 @@ class SettingsSort extends Component {
                     <SwitchListItem 
                         text={t("fin-sort")}  
                         checked={this.props.settings.sortFinBehaviour}
-                        onChange={(e) => this.props.setSetting("sortFinBehaviour", +e)}
+                        onChange={(e) => this.props.setSetting({sortFinBehaviour: +e})}
                     />   
 
                     {
@@ -122,7 +124,7 @@ class SettingsSort extends Component {
                                             name="sort-direction"
                                             checked={this.props.settings.notesShowInterval === setting.val}
                                             value={setting.val}
-                                            onChange={(e) => this.props.setSetting("notesShowInterval", e)}
+                                            onChange={(e) => this.props.setSetting({notesShowInterval: e})}
                                             text={t(setting.translateId)}
                                         />
                                     ))
@@ -134,7 +136,7 @@ class SettingsSort extends Component {
                     <SwitchListItem
                         text={t("default-notification")}
                         checked={this.props.settings.defaultNotification}
-                        onChange={(e) => this.props.setSetting('defaultNotification', e)}
+                        onChange={(e) => this.props.setSetting({defaultNotification: e})}
                     />
                 </div>
             </div>
