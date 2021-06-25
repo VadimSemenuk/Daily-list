@@ -33,6 +33,7 @@ import deepCopy from '../../utils/deepCopyObject'
 import {NoteContentItemType, NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Add.scss';
+import TagList from "../../components/TagList/TagList";
 
 class Add extends Component {
     constructor(props) {
@@ -330,21 +331,6 @@ class Add extends Component {
         }
     }
 
-    triggerNoteTag = (tag) => {
-        let nextNoteTags;
-        if (this.isNoteHasTag(tag.id)) {
-            nextNoteTags = this.state.note.tags.filter((_tag) => _tag.id !== tag.id);
-        } else {
-            nextNoteTags = [...this.state.note.tags, tag];
-        }
-
-        this.updateNoteData({tags: nextNoteTags});
-    }
-
-    isNoteHasTag = (tagId) => {
-        return Boolean(~this.state.note.tags.findIndex((tag) => tag.id === tagId));
-    }
-
     render() {
         let {t} = this.props;
 
@@ -596,16 +582,11 @@ class Add extends Component {
                             </div>
 
                             <div className="tag-picker-wrapper">
-                                {
-                                    this.props.tags.map((tag, i) => (
-                                        <Tag
-                                            key={i}
-                                            name={tag.name}
-                                            isActive={this.isNoteHasTag(tag.id)}
-                                            onClick={() => this.triggerNoteTag(tag)}
-                                        />
-                                    ))
-                                }
+                                <TagList
+                                    tags={this.props.tags}
+                                    activeTags={this.state.note.tags.map((tag) => tag.id)}
+                                    onActiveTagsChange={(tags) => this.updateNoteData({tags})}
+                                />
                             </div>
                         </div>
                     </div>

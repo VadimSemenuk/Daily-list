@@ -188,6 +188,7 @@ export default {
     "account": "Аккаунт",
 
     // tags
-    "tags": "Теги",
-    "add-tag-placeholder": "Введите название тега"
+    "tags": "Ярлыки",
+    "edit-tags": "Редактировать ярлыки",
+    "add-tag-placeholder": "Введите название ярлыка"
 }

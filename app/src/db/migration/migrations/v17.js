@@ -155,6 +155,10 @@ export default {
                 finSort: 1
             }
 
+            let noteFiltersSettings = {
+                tags: []
+            }
+
             await executeSQL(`ALTER TABLE Settings RENAME TO Settings_OLD;`);
             await executeSQL(`                           
                 CREATE TABLE IF NOT EXISTS Settings
@@ -173,7 +177,9 @@ export default {
                     calendarMode INTEGER,
                     notesScreenMode INTEGER,
                     passwordResetEmail TEXT,
-                    invertHeaderPosition INTEGER
+                    invertHeaderPosition INTEGER,
+                    noteFilters TEXT,
+                    isSidenavTagsListExpanded INTEGER
                 );
             `);
             await executeSQL(`
@@ -191,7 +197,9 @@ export default {
                     minimizeNotes,
                     calendarMode,
                     notesScreenMode,
-                    invertHeaderPosition
+                    invertHeaderPosition,
+                    noteFilters,
+                    isSidenavTagsListExpanded
                 ) 
                 SELECT 
                     defaultNotification, 
@@ -207,9 +215,11 @@ export default {
                     1 as minimizeNotes,
                     1 as calendarMode,
                     1 as notesScreenMode,
-                    0 as invertHeaderPosition
+                    0 as invertHeaderPosition,
+                    ? as noteFilters,
+                    1 as isSidenavTagsListExpanded
                 FROM Settings_OLD;
-            `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort]);
+            `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort, JSON.stringify(noteFiltersSettings)]);
             await executeSQL(`DROP TABLE Settings_OLD;`);
         }
 

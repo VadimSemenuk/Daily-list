@@ -1,0 +1,11 @@
+.tags-list-wrapper {
+  display: flex;
+
+  .tag-wrapper {
+    flex-shrink: 0;
+
+    .tag {
+      margin-right: 5px;
+    }
+  }
+}

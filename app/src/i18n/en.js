@@ -189,5 +189,6 @@ export default {
 
     // tags
     "tags": "Tags",
+    "edit-tags": "Edit tags",
     "add-tag-placeholder": "Enter tag name"
 }

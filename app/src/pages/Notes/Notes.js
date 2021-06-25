@@ -9,13 +9,13 @@ import Header from '../../components/Header/Header';
 import NotesList from "./NotesList";
 import NotesListSwipable from "./NotesListSwipable";
 import NotesActionsHandlerWrapper from "./NotesActionsHandlerWrapper";
+import Tag from "../../components/Tag/Tag";
 
 import * as AppActions from '../../actions'; 
 
 import {NotesScreenMode, SortDirectionType, SortType} from "../../constants";
 
 import AddImg from "../../assets/img/add.svg";
-import ExportImg from "../../assets/img/upload-to-cloud.svg";
 import SearchImg from "../../assets/img/search.svg";
 import ChevronBottomImg from "../../assets/img/bottom-chevron.svg";
 import MenuImg from "../../assets/img/menu.svg";
@@ -28,6 +28,7 @@ import ListImg from "../../assets/img/list.svg";
 import TagImg from "../../assets/img/price-tag.svg";
 
 import './Notes.scss';
+import TagList from "../../components/TagList/TagList";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -85,7 +86,13 @@ class Notes extends PureComponent {
                     },
                     isActive: this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime,
                     img: ListImg
-                }
+                },
+                {
+                    textId: "edit-tags",
+                    action: () => this.props.history.push("/tags"),
+                    img: TagImg,
+                    showTags: true
+                },
             ],
             [
                 {
@@ -194,21 +201,13 @@ class Notes extends PureComponent {
                     ]}
                     buttons={[
                         {
-                            action: () => {
-                                this.props.history.push({
-                                    pathname: "/search",
-                                    state: { onResult: this.onSearchResult }
-                                });
-                            },
+                            textId: "search",
+                            action: () => this.props.history.push({
+                                pathname: "/search",
+                                state: { onResult: this.onSearchResult }
+                            }),
                             img: SearchImg
                         },
-                        ...(
-                            this.props.user ?
-                                [{
-                                    action: () => this.props.uploadGDBackup("user"),
-                                    img: ExportImg
-                                }] : []
-                        ),
                         {
                             link: "/add",
                             img: AddImg
@@ -288,7 +287,8 @@ function mapStateToProps(state) {
         currentDate: state.date,
         settings: state.settings,
         search: state.search,
-        user: state.user
+        user: state.user,
+        tags: state.tags
     }
 }
 

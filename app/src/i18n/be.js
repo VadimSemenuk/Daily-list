@@ -188,6 +188,7 @@ export default {
     "account": "Акаўнт",
 
     // tags
-    "tags": "Тэгі",
-    "add-tag-placeholder": "Увядзіце назву тэга"
+    "tags": "Цэтлікі",
+    "edit-tags": "Рэдагаваць цэтлікі",
+    "add-tag-placeholder": "Увядзіце назву цэтліку"
 }

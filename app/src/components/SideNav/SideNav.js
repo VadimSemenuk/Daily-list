@@ -4,12 +4,14 @@ import {connect} from 'react-redux';
 import {translate} from "react-i18next";
 
 import {ButtonListItem} from "../ListItem/ListItem";
+import Expandable from "../Expandable/Expandable";
+import TagList from "../TagList/TagList";
+
+import LogoImg from "../../assets/img/logo.svg";
 
 import * as AppActions from '../../actions';
 
 import './SideNav.scss';
-
-import LogoImg from "../../assets/img/logo.svg";
 
 class SideNav extends PureComponent {
     constructor(props) {
@@ -68,7 +70,7 @@ class SideNav extends PureComponent {
                             alt="button"
                         />
 
-                        <div className="logo-text">v1.0.7</div>
+                        <div className="logo-text">{t("app-name")} <br/>v1.0.7</div>
                     </div>
                     <div className="items">
                         {
@@ -80,7 +82,7 @@ class SideNav extends PureComponent {
                                     >
                                         {
                                             contentItems.map((contentItem, contentItemIndex) => {
-                                                return (
+                                                let listEl = (
                                                     <ButtonListItem
                                                         key={contentItemIndex}
                                                         className={`content-item no-border${contentItem.isActive ? " active" : ""}`}
@@ -93,6 +95,28 @@ class SideNav extends PureComponent {
                                                         }}
                                                     />
                                                 );
+
+                                                if (contentItem.showTags) {
+                                                    return (
+                                                        <Expandable
+                                                            key={contentItemIndex}
+                                                            isExpanded={this.props.settings.isSidenavTagsListExpanded}
+                                                            component={listEl}
+                                                            expandableComponent={
+                                                                <TagList
+                                                                    tags={this.props.tags}
+                                                                    activeTags={this.props.settings.noteFilters.tags}
+                                                                    onActiveTagsChange={(value) => {
+                                                                        this.props.setSetting("noteFilters", {...this.props.settings.noteFilters, tags: value.map((tag) => tag.id)})
+                                                                    }}
+                                                                />
+                                                            }
+                                                            onExpandTrigger={(state) => this.props.setSetting("isSidenavTagsListExpanded", state)}
+                                                        />
+                                                    )
+                                                } else {
+                                                    return listEl;
+                                                }
                                             })
                                         }
                                     </div>
@@ -112,7 +136,9 @@ class SideNav extends PureComponent {
 
 function mapStateToProps(state) {
     return {
-        sidenav: state.sidenav
+        sidenav: state.sidenav,
+        settings: state.settings,
+        tags: state.tags
     }
 }
 

@@ -46,7 +46,7 @@ class Settings extends Component {
 	}
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {
         settings: state.settings
     }

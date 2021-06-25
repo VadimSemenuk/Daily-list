@@ -77,7 +77,9 @@ class SettingsService {
                 calendarMode,
                 notesScreenMode,
                 passwordResetEmail,
-                invertHeaderPosition
+                invertHeaderPosition,
+                noteFilters,
+                isSidenavTagsListExpanded
             FROM Settings;`
         );
 
@@ -88,7 +90,9 @@ class SettingsService {
             defaultNotification: Boolean(result.defaultNotification),
             theme: themesService.getThemeById(result.theme),
             minimizeNotes: Boolean(result.minimizeNotes),
-            invertHeaderPosition: Boolean(result.invertHeaderPosition)
+            invertHeaderPosition: Boolean(result.invertHeaderPosition),
+            noteFilters: JSON.parse(result.noteFilters),
+            isSidenavTagsListExpanded: Boolean(result.isSidenavTagsListExpanded)
         };
     }
 
@@ -98,6 +102,8 @@ class SettingsService {
             case("theme"): value = value.id; break;
             case("minimizeNotes"): value = Number(value); break;
             case("invertHeaderPosition"): value = Number(value); break;
+            case("noteFilters"): value = JSON.stringify(value); break;
+            case("isSidenavTagsListExpanded"): value = Number(value); break;
             default: break;
         }
 
