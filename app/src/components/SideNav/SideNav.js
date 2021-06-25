@@ -4,10 +4,10 @@ import {connect} from 'react-redux';
 import {translate} from "react-i18next";
 
 import {ButtonListItem} from "../ListItem/ListItem";
-import Expandable from "../Expandable/Expandable";
 import TagList from "../TagList/TagList";
 
 import LogoImg from "../../assets/img/logo.svg";
+import TagImg from "../../assets/img/tag.svg";
 
 import * as AppActions from '../../actions';
 
@@ -98,21 +98,27 @@ class SideNav extends PureComponent {
 
                                                 if (contentItem.showTags) {
                                                     return (
-                                                        <Expandable
-                                                            key={contentItemIndex}
-                                                            isExpanded={this.props.settings.isSidenavTagsListExpanded}
-                                                            component={listEl}
-                                                            expandableComponent={
-                                                                <TagList
-                                                                    tags={this.props.tags}
-                                                                    activeTags={this.props.settings.noteFilters.tags}
-                                                                    onActiveTagsChange={(value) => {
-                                                                        this.props.setSetting("noteFilters", {...this.props.settings.noteFilters, tags: value.map((tag) => tag.id)})
-                                                                    }}
-                                                                />
-                                                            }
-                                                            onExpandTrigger={(state) => this.props.setSetting("isSidenavTagsListExpanded", state)}
-                                                        />
+                                                        <div key={contentItemIndex}>
+                                                            <TagList
+                                                                tags={this.props.tags}
+                                                                activeTags={this.props.settings.noteFilters.tags}
+                                                                onActiveTagsChange={(value) => {
+                                                                    this.props.setSetting("noteFilters", {...this.props.settings.noteFilters, tags: value.map((tag) => tag.id)})
+                                                                }}
+                                                                onItemRender={(itemEl, key) => (
+                                                                    <div
+                                                                        key={key}
+                                                                        className="sidenav-tag-wrapper"
+                                                                    >
+                                                                        <img
+                                                                            src={TagImg}
+                                                                            alt="tag"
+                                                                        />
+                                                                        {itemEl}
+                                                                    </div>
+                                                                )}
+                                                            />
+                                                        </div>
                                                     )
                                                 } else {
                                                     return listEl;

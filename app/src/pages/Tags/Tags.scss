@@ -10,9 +10,11 @@
   }
 }
 
-.tag-add-wrapper {
+.tag-edit-wrapper + .tag-add-wrapper {
   margin-top: 40px;
+}
 
+.tag-add-wrapper {
   .add-button {
     img {
       height: 20px;

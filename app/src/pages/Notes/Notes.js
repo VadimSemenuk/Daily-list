@@ -9,7 +9,6 @@ import Header from '../../components/Header/Header';
 import NotesList from "./NotesList";
 import NotesListSwipable from "./NotesListSwipable";
 import NotesActionsHandlerWrapper from "./NotesActionsHandlerWrapper";
-import Tag from "../../components/Tag/Tag";
 
 import * as AppActions from '../../actions'; 
 
@@ -25,10 +24,9 @@ import DeleteImg from "../../assets/img/delete.svg";
 import InfoImg from "../../assets/img/info.svg";
 import CalendarImg from "../../assets/img/calendar-black.svg";
 import ListImg from "../../assets/img/list.svg";
-import TagImg from "../../assets/img/price-tag.svg";
+import TagImg from "../../assets/img/tag.svg";
 
 import './Notes.scss';
-import TagList from "../../components/TagList/TagList";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -281,6 +279,23 @@ class Notes extends PureComponent {
 
 function mapStateToProps(state) {
     let notes = sort(state.notes, state.settings);
+
+    if (state.settings.noteFilters.tags.length) {
+        notes = notes.map((list) => {
+            let items = list.items.filter((note) => {
+                return note.tags.filter((tag) => {
+                    return state.settings.noteFilters.tags.filter((tagId) => {
+                        return tagId === tag.id
+                    }).length !== 0
+                }).length !== 0
+            });
+
+            return {
+                ...list,
+                items
+            }
+        });
+    }
 
     return {
         notes,

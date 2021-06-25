@@ -28,18 +28,26 @@ class TagList extends PureComponent {
         return (
             <div className="tags-list-wrapper">
                 {
-                    this.props.tags.map((tag, i) => (
-                        <div
-                            key={i}
-                            className="tag-wrapper"
-                        >
-                            <Tag
-                                name={tag.name}
-                                isActive={this.iaTagActive(tag.id)}
-                                onClick={() => this.triggerTagActiveState(tag.id)}
-                            />
-                        </div>
-                    ))
+                    this.props.tags.map((tag, i) => {
+                        let el = (
+                            <div
+                                key={i}
+                                className="tag-wrapper"
+                            >
+                                <Tag
+                                    name={tag.name}
+                                    isActive={this.iaTagActive(tag.id)}
+                                    onClick={() => this.triggerTagActiveState(tag.id)}
+                                />
+                            </div>
+                        );
+
+                        if (this.props.onItemRender) {
+                            return this.props.onItemRender(el, i);
+                        } else {
+                            return el;
+                        }
+                    })
                 }
             </div>
         )

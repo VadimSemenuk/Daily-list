@@ -90,8 +90,16 @@
     .tags-list-wrapper {
       flex-direction: column;
 
-      .tag {
+      .sidenav-tag-wrapper {
+        display: flex;
+        align-items: center;
         margin-bottom: 5px;
+
+        img {
+          height: 17px;
+          width: 17px;
+          margin-right: 11px;
+        }
       }
     }
   }

@@ -44,13 +44,34 @@ class Tags extends PureComponent {
         });
     }
 
-    onTagChange = (nextTag) => {
-        this.props.updateTag(nextTag);
+    onTagChange = (tag, nextName) => {
+        let tagIndex = this.state.tags.findIndex((_tag) => _tag.id === tag.id)
+        let nextTag = {...this.state.tags[tagIndex], name: nextName}
+        this.setState({
+            tags: [...this.state.tags.slice(0, tagIndex), nextTag, ...this.state.tags.slice(tagIndex + 1)]
+        });
+
+        this.throttledUpdateTag(nextTag);
     }
-    throttledOnTagChange = throttle(this.onTagChange, 1000)
+    throttledUpdateTag = throttle(this.props.updateTag, 1000)
 
     onTagDelete = (id) => {
         this.props.deleteTag(id);
+    }
+
+    onKeyPress = (e) => {
+        if (e.key === "Enter") {
+            this.onTagAdd();
+        }
+    }
+
+    onNewTagChange = (nextName) => {
+        this.setState({
+            newTag: {
+                ...this.state.newTag,
+                name: nextName
+            }
+        });
     }
 
     render() {
@@ -70,15 +91,7 @@ class Tags extends PureComponent {
                                     type="text"
                                     className="content-input"
                                     value={tag.name}
-                                    onChange={(e) => {
-                                        let tagIndex = this.state.tags.findIndex((_tag) => _tag.id === tag.id)
-                                        let nextTag = {...this.state.tags[tagIndex], name: e.target.value}
-                                        this.setState({
-                                            tags: [...this.state.tags.slice(0, tagIndex), nextTag, ...this.state.tags.slice(tagIndex + 1)]
-                                        });
-
-                                        this.throttledOnTagChange(nextTag);
-                                    }}
+                                    onChange={(e) => this.onTagChange(tag, e.target.value)}
                                 />
 
                                 <button
@@ -100,14 +113,8 @@ class Tags extends PureComponent {
                             className="content-input"
                             placeholder={t("add-tag-placeholder")}
                             value={this.state.newTag.name}
-                            onChange={(e) => {
-                                this.setState({
-                                    newTag: {
-                                        ...this.state.newTag,
-                                        name: e.target.value
-                                    }
-                                });
-                            }}
+                            onChange={(e) => this.onNewTagChange(e.target.value)}
+                            onKeyPress={this.onKeyPress}
                         />
 
                         <button
