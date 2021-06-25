@@ -18,7 +18,7 @@ let init = {
 function settings (state = init, action) {
     switch(action.type) {   
         case 'SET_SETTING':
-            return Object.assign({}, state, { [action.payload.settingName]: action.payload.value})
+            return Object.assign({}, state, { [action.payload.name]: action.payload.value})
         default:        
             return state;
     }

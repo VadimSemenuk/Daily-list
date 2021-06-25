@@ -60,7 +60,7 @@ class SettingsService {
         return [...languageSettings];
     }
 
-    async getSettings () {
+    async getSettings() {
         let select = await executeSQL(
             `SELECT 
                 defaultNotification, 
@@ -96,7 +96,7 @@ class SettingsService {
         };
     }
 
-    async setSetting (item, value) {
+    async setSetting(item, value) {
         switch(item) {
             case("defaultNotification"): value = Number(value); break;
             case("theme"): value = value.id; break;
@@ -111,6 +111,19 @@ class SettingsService {
             `UPDATE Settings 
             SET ${item} = ?;`, [value]
         );
+    }
+
+    async deleteFilterTag(id) {
+        let settings = await this.getSettings();
+
+        let nextNoteFilters = {
+            ...settings.noteFilters,
+            tags: settings.noteFilters.tags.filter((_id) => _id !== id)
+        };
+
+        await this.setSetting("noteFilters", nextNoteFilters);
+
+        return nextNoteFilters;
     }
 }
 

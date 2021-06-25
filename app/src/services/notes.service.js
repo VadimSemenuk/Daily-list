@@ -145,10 +145,7 @@ class NotesService {
             contentItems: JSON.parse(note.contentItems),
             isFinished: Boolean(note.isFinished),
             lastActionTime: moment(note.lastActionTime),
-            tags: (note.tags ? note.tags.split(",") : []).map((id) => {
-
-                return tagsService.tags[id]
-            })
+            tags: (note.tags ? note.tags.split(",") : []).map((id) => tagsService.tags[id])
         }
     }
 
@@ -478,6 +475,30 @@ class NotesService {
         await executeSQL(sql, values);
 
         return notesInserted;
+    }
+
+    async deleteNotesTag(tagId) {
+        let select = await executeSQL(`SELECT id, tags FROM Notes;`);
+
+        let nextNotes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            let note = select.rows.item(i);
+            if (note.tags && note.tags.split(",").filter((_tagId) => Number(_tagId) === tagId).length > 0) {
+                note.tags = note.tags.split(",").filter((_tagId) => Number(_tagId) !== tagId).join(",");
+                nextNotes.push(note);
+            }
+        }
+
+        if (nextNotes.length) {
+            await executeSQL(`
+                UPDATE Notes
+                SET tags = CASE id
+                    ${nextNotes.map((note) => `WHEN ${note.id} THEN "${note.tags}"`).join(",")}
+                    ELSE tags
+                END
+                WHERE id IN(${nextNotes.map((note) => note.id).join(",")});
+            `);
+        }
     }
 
     async updateNoteLastAction(actionType, note) {
