@@ -398,6 +398,18 @@ class NotesService {
             nextNote = this.fromRealToShadow(nextNote);
         }
 
+        await executeSQL(`
+            UPDATE Notes
+            SET manualOrderIndex = ?
+            WHERE id = ? OR forkFrom = ?;
+        `,
+            [
+                null,
+                nextNote.id,
+                nextNote.id
+            ]
+        );
+
         nextNote = await this.updateNoteLastAction(NoteAction.Delete, nextNote);
 
         notificationService.clear(nextNote);

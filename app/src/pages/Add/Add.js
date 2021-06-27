@@ -581,13 +581,16 @@ class Add extends Component {
                                 />
                             </div>
 
-                            <div className="tag-picker-wrapper">
-                                <TagList
-                                    tags={this.props.tags}
-                                    activeTags={this.state.note.tags.map((tag) => tag.id)}
-                                    onActiveTagsChange={(tags) => this.updateNoteData({tags})}
-                                />
-                            </div>
+                            {
+                                this.props.tags.length !== 0 &&
+                                <div className="tag-picker-wrapper">
+                                    <TagList
+                                        tags={this.props.tags}
+                                        activeTags={this.state.note.tags.map((tag) => tag.id)}
+                                        onActiveTagsChange={(tags) => this.updateNoteData({tags})}
+                                    />
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
