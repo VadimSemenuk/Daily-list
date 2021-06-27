@@ -23,7 +23,6 @@ class NotesList extends PureComponent {
     }
 
     onOrderChange = (order) => {
-        console.log(order);
         order = order.map((key) => +key);
         // if (this.props.settings.sortDirection === 0) {
         //     order.reverse();
@@ -52,15 +51,20 @@ class NotesList extends PureComponent {
         this.props.onDragSortModeTrigger(false);
     }
 
-    renderItem = (a) => (
-        <Note
-            key={a.id}
-            data={a}
-            minimize={this.props.settings.minimizeNotes}
-            onNoteChange={this.props.onNoteChange}
-            onDialogRequest={this.props.onDialogRequest}
-        />
-    );
+    renderNote = (note) => (
+        <div
+            key={note.id}
+            data-id={note.id}
+            className={`note-wrapper${note.isVisible ? '' : ' hidden'}${note.isFinished ? '' : ' draggable'}`}
+        >
+            <Note
+                data={note}
+                minimize={this.props.settings.minimizeNotes}
+                onNoteChange={this.props.onNoteChange}
+                onDialogRequest={this.props.onDialogRequest}
+            />
+        </div>
+    )
 
     render() {
         let {t} = this.props;
@@ -73,7 +77,7 @@ class NotesList extends PureComponent {
             options: {
                 disabled: this.props.settings.sortType === SortType.TimeSort,
                 delay: 300,
-                draggable: ".not-finished",
+                draggable: ".draggable",
                 direction: 'vertical',
                 onStart: this.onDragSortModeEnable,
                 onEnd: this.onDragSortModeDisable
@@ -91,20 +95,20 @@ class NotesList extends PureComponent {
                     {...sortableOptions}
                 >
                     {
-                        notFinished.map(this.renderItem)
+                        notFinished.map(this.renderNote)
                     }
                     {
                         finished.length !== 0 && <div className="finished-split"><span className="finished-split-content">{t("finished-split")}</span></div>
                     }
                     {
-                        finished.map(this.renderItem)
+                        finished.map(this.renderNote)
                     }
                 </Sortable>
             )
         } else {
             return (
                 <Sortable {...sortableOptions}>
-                    {this.props.notes.map(this.renderItem)}
+                    {this.props.notes.map(this.renderNote)}
                 </Sortable>
             )
         }

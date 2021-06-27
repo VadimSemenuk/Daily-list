@@ -278,27 +278,14 @@ class Notes extends PureComponent {
 }
 
 function mapStateToProps(state) {
-    let notes = sort(state.notes, state.settings);
+    let notes = state.notes.slice((list) => ({...list, items: list.items.slice()}));
 
-    if (state.settings.noteFilters.tags.length) {
-        notes = notes.map((list) => {
-            let items = list.items.filter((note) => {
-                return note.tags.filter((tag) => {
-                    return state.settings.noteFilters.tags.filter((tagId) => {
-                        return tagId === tag.id
-                    }).length !== 0
-                }).length !== 0
-            });
+    filter(notes, state.settings);
 
-            return {
-                ...list,
-                items
-            }
-        });
-    }
+    sort(notes, state.settings);
 
     return {
-        notes,
+        notes: notes,
         currentDate: state.date,
         settings: state.settings,
         search: state.search,
@@ -313,13 +300,25 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(Notes);
 
-function sort (data, settings) {
-    let notesCompareFn = getNotesCompareFn(settings);
+function filter(data, settings) {
+    if (settings.noteFilters.tags.length) {
+        data.forEach((list) => {
+            list.items.forEach((note) => {
+                note.isVisible = note.tags.filter((tag) => settings.noteFilters.tags.filter((tagId) => tagId === tag.id).length !== 0).length !== 0;
+            });
+        });
+    } else {
+        data.forEach((list) => {
+            list.items.forEach((note) => {
+                note.isVisible = true;
+            });
+        });
+    }
+}
 
-    return data.map((list) => {
-        list.items.sort((a, b) => notesCompareFn(a, b));
-        return list;
-    });
+function sort(data, settings) {
+    let notesCompareFn = getNotesCompareFn(settings);
+    data.forEach((list) => list.items.sort(notesCompareFn));
 }
 
 function getNotesCompareFn(settings) {
