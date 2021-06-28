@@ -10,8 +10,9 @@ class CalendarService {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
-    async getCount(date, period, halfInterval = 20) {
+    async getCount(date, period, noteFilters) {
         let utcOffset = getUTCOffset();
+        let halfInterval = 20;
 
         let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
@@ -19,17 +20,17 @@ class CalendarService {
         let intervalEndDateUTC = intervalEndDate + getUTCOffset();
 
         let select = await executeSQL(`
-            SELECT t.date, t.repeatType, rep.value as repeatValue, t.isFinished
-            FROM Notes t
-            LEFT JOIN NotesRepeatValues rep ON t.id = rep.noteId
+            SELECT n.date, n.repeatType, rep.value as repeatValue, n.isFinished, n.tags
+            FROM Notes n
+            LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
             WHERE
-                lastAction != ? 
+                n.lastAction != ? 
                 AND (
-                    (repeatType = ? OR forkFrom IS NOT NULL AND date >= ? AND date <= ?)
-                    OR (repeatType = ? AND t.forkFrom IS NULL AND rep.value >= ? AND rep.value <= ?)
-                    OR (t.forkFrom IS NULL AND repeatType != ?)
+                    (n.repeatType = ? OR n.forkFrom IS NOT NULL AND n.date >= ? AND n.date <= ?)
+                    OR (n.repeatType = ? AND n.forkFrom IS NULL AND rep.value >= ? AND rep.value <= ?)
+                    OR (n.forkFrom IS NULL AND n.repeatType != ?)
                 )
-                AND mode = ?;
+                AND n.mode = ?;
         `, [NoteAction.Delete, NoteRepeatType.NoRepeat, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, NoteMode.WithDateTime]);
 
         let dates = {};
@@ -46,6 +47,13 @@ class CalendarService {
 
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
+
+            if (
+                noteFilters.tags.length
+                && (note.tags ? note.tags.split(",").map(Number) : []).filter((tagId) => noteFilters.tags.filter((_tagId) => _tagId === tagId).length !== 0).length === 0
+            ) {
+                continue;
+            }
 
             if (note.date) {
                 note.date = note.date - utcOffset;
@@ -93,9 +101,8 @@ class CalendarService {
         };
     }
 
-    async getFullCount(date) {
-        let counts = await Promise.all([this.getCount(date, "week"), this.getCount(date, "month")]);
-
+    async getFullCount(date, noteFilters) {
+        let counts = await Promise.all([this.getCount(date, "week", noteFilters), this.getCount(date, "month", noteFilters)]);
         return {...counts[0], ...counts[1]};
     }
 }

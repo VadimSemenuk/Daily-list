@@ -363,12 +363,16 @@ export function setSetting(nextSettings) {
         try {
             await settingsService.setSetting(nextSettings);
 
-            dispatch({
+            await dispatch({
                 type: "SET_SETTING",
                 payload: {
                     nextSettings
                 }
             });
+
+            if (nextSettings.noteFilters) {
+                dispatch(getFullCount());
+            }
         } catch(err) {
             dispatch(triggerErrorModal("error-common"));
             logsService.logError(
@@ -384,7 +388,7 @@ export function setSetting(nextSettings) {
 }
 
 // password
-export function setPasswordCheckState(value) {
+export function setPasswordCheckState() {
     return {
         type: "SET_PASSWORD_CHECK_STATE",
         payload: {
@@ -407,8 +411,9 @@ export function triggerLoader(state) {
 export function getCount(date, period) {
     return async (dispatch, getState) => {
         try {
-            let includeFinished = getState().settings.calendarNotesCounterIncludeFinished;
-            let nextCount = await calendarService.getCount(date, period, includeFinished);
+            let state = getState();
+            let noteFilters = state.settings.noteFilters;
+            let nextCount = await calendarService.getCount(date, period, noteFilters);
 
             dispatch({
                 type: "GET_COUNT",
@@ -434,7 +439,8 @@ export function getFullCount() {
         try {
             let state = getState();
             let date = state.date.valueOf();
-            let nextCount = await calendarService.getFullCount(date);
+            let noteFilters = state.settings.noteFilters;
+            let nextCount = await calendarService.getFullCount(date, noteFilters);
             dispatch({
                 type: "GET_COUNT",
                 payload: {
@@ -694,14 +700,6 @@ export function updateTag(tag) {
 
 export function deleteTag(id) {
     return async (dispatch) => {
-        await tagsService.deleteTag(id);
-        dispatch({
-            type: "TAG_DELETE",
-            payload: {
-                id
-            }
-        });
-
         let nextNoteFilters = await settingsService.deleteFilterTag(id);
         await dispatch({
             type: "SET_SETTING",
@@ -713,6 +711,16 @@ export function deleteTag(id) {
         });
 
         await notesService.deleteNotesTag(id);
-        dispatch(updateNotes());
+        await dispatch(updateNotes());
+
+        await tagsService.deleteTag(id);
+        dispatch({
+            type: "TAG_DELETE",
+            payload: {
+                id
+            }
+        });
+
+        dispatch(getFullCount());
     }
 }

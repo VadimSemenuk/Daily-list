@@ -505,7 +505,7 @@ class NotesService {
             await executeSQL(`
                 UPDATE Notes
                 SET tags = CASE id
-                    ${nextNotes.map((note) => `WHEN ${note.id} THEN "${note.tags}"`).join(",")}
+                    ${nextNotes.map((note) => `WHEN ${note.id} THEN "${note.tags}"`).join(" ")}
                     ELSE tags
                 END
                 WHERE id IN(${nextNotes.map((note) => note.id).join(",")});
