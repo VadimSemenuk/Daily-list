@@ -204,8 +204,10 @@ export default {
                 SELECT 
                     defaultNotification, 
                     theme, 
-                    password, 
-                    fontSize, 
+                    password,
+                    CASE
+                        WHEN fontSize = 14 THEN 15 ELSE fontSize
+                    END AS fontSize, 
                     notesShowInterval, 
                     lang,
                     ? as calendarNotesCounterMode,
