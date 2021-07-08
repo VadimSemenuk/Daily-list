@@ -104,7 +104,6 @@ class SettingsTheme extends Component {
                                 text: t("ok"),
                                 onClick: () => {
                                     this.props.setSetting({fontSize: this.state.fontSizeSelectedValue});
-                                    document.querySelector("body").style.fontSize = this.state.fontSizeSelectedValue + "px"; 
                                 }
                             }
                         ]}

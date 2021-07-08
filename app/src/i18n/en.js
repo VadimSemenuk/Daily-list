@@ -25,8 +25,8 @@ export default {
     // interface page
     "theme": "Theme",
     "random-theme": "Random theme",
-    "font-size": "Font size",
-    "fast-add": "Qick add",
+    "font-size": "Note font size",
+    "fast-add": "Quick add",
     "show-mini-calendar": "Show mini-callendar",
     "language": "Language",
     "ru": "Русский",
@@ -153,7 +153,7 @@ export default {
     "sunday": "Sunday",
     "error-notification-permission": "You have no permission to set notifications",
     "night-mode": "Night mode",
-    "add-content-item": "Добавить",
+    "add-content-item": "Add",
 
     // note-item
     "attached-image": "Attached image",

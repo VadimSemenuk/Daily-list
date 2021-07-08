@@ -90,7 +90,6 @@ export default class App extends Component {
     }
 
     applyInitSettings(settings) {
-        document.querySelector("body").style.fontSize = settings.fontSize + "px";
         themesService.applyTheme(settings.theme);
         moment.locale(settings.lang);
         this.i18n = lang.init(settings.lang);

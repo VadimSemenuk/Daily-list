@@ -60,6 +60,7 @@ class NotesList extends PureComponent {
             <Note
                 data={note}
                 minimize={this.props.settings.minimizeNotes}
+                fontSize={this.props.settings.fontSize}
                 onNoteChange={this.props.onNoteChange}
                 onDialogRequest={this.props.onDialogRequest}
             />

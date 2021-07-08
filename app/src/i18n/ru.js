@@ -25,7 +25,7 @@ export default {
     // interface page
     "theme": "Тема",
     "random-theme": "Случайная тема",
-    "font-size": "Размер шрифта",
+    "font-size": "Размер шрифта заметки",
     "fast-add": "Поле быстрого добавления",
     "show-mini-calendar": "Показывать мини-календарь",
     "language": "Язык",

@@ -63,6 +63,7 @@ class Note extends PureComponent {
                     + ((this.state.expanded || !this.props.minimize) ? ' expanded' : '')
                     + (this.props.minimize ? '' : ' force-expanded')
                 }
+                style={{fontSize: this.props.fontSize}}
                 onClick={this.triggerExpanded}
             >
                 <div

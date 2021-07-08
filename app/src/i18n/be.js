@@ -25,7 +25,7 @@ export default {
     // interface page
     "theme": "Тэма",
     "random-theme": "Выпадковая тэма",
-    "font-size": "Памер шрыфта",
+    "font-size": "Памер шрыфта нататкі",
     "fast-add": "Поле хуткага дадання",
     "show-mini-calendar": "Паказваць міні-каляндар",
     "language": "Мова",
@@ -37,7 +37,7 @@ export default {
     "notes-count-only-finished": "Адлюстроўваць толькі завершаныя",
     "notes-count-all": "Адлюстроўваць усе",
     "reload-app-note": "Перазапусціце праграму для ўступлення змяненняў у сілу",
-    "minimize-notes": "Сворачивать длинные заметки",
+    "minimize-notes": "Згортваць доўгія нататкі",
     "move-control-panels-down": "Перанесці ўніз элементы кіравання",
 
     // password page
