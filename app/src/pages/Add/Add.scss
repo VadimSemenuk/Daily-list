@@ -1,104 +1,111 @@
 .add-wrapper {
-    background: #fff;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    padding: 10px 0;
-    padding-bottom: 0px;
-
-    .add-content-wrapper {
-        padding: 0 10px;
-        flex-grow: 1;
-        overflow-y: auto;  
-
-        input.title {
-            font-size: 1.2em;
-            border: none;
-        }
+    .calendar-period {
+        color: #fff;
+        text-align: center;
+        padding-bottom: 10px;
     }
 
-    .note-actions-wrapper {
-        flex-shrink: 0;
-        background: #fafafa;
-        border-top: 3px solid #e7e7e7;
-        border-bottom: 0;
-        position: relative;
-        transition: 100ms ease all;
-        top: 0;
-    }
-
-    .content-items-actions-wrapper {
+    .page-content {
+        background: #fff;
         display: flex;
-        align-items: center;
-        border-bottom: 1px solid #e7e7e7;
-        padding: 0 10px;
+        flex: 1;
+        flex-direction: column;
+        padding-top: 10px;
 
-        .content-items-actions {
+        .add-content-wrapper {
+            padding: 0 10px;
+            flex-grow: 1;
+            overflow-y: auto;
+
+            input.title {
+                font-size: 1.2em;
+                border: none;
+            }
+        }
+
+        .note-actions-wrapper {
+            flex-shrink: 0;
+            background: #fafafa;
+            border-top: 3px solid #e7e7e7;
+            border-bottom: 0;
+            position: relative;
+            transition: 100ms ease all;
+            top: 0;
+        }
+
+        .content-items-actions-wrapper {
             display: flex;
-            margin-left: 10px;
+            align-items: center;
+            border-bottom: 1px solid #e7e7e7;
+            padding: 0 10px;
 
-            button {
-                margin-right: 10px;
+            .content-items-actions {
+                display: flex;
+                margin-left: 10px;
 
-                img {
-                    height: 20px;
+                button {
+                    margin-right: 10px;
+
+                    img {
+                        height: 20px;
+                    }
                 }
             }
         }
-    }
 
-    .note-settings-wrapper {
-        .img-text-button {
-            padding: 10px;
-            color: #868383;
+        .note-settings-wrapper {
+            .img-text-button {
+                padding: 10px;
+                color: #868383;
 
-            img {
-                margin-right: 10px;
-            }
-        }
-
-        img {
-            height: 20px;
-        }
-
-        .repeat-set-wrapper {
-            img {
-                margin-right: 5px;
-            }
-        }
-
-        .time-set-wrapper {
-            display: flex;
-            align-items: center;
-
-            img {
-                margin-right: 5px;
+                img {
+                    margin-right: 10px;
+                }
             }
 
-            .separator {
-                margin: 0 -6px;
-            }
-        }
-
-        .notification-switch-wrapper {
-            display: flex;
-            align-items: center;
-            margin-right: 4px;
-
             img {
-                display: block;
+                height: 20px;
+            }
+
+            .repeat-set-wrapper {
+                img {
+                    margin-right: 5px;
+                }
+            }
+
+            .time-set-wrapper {
+                display: flex;
+                align-items: center;
+
+                img {
+                    margin-right: 5px;
+                }
+
+                .separator {
+                    margin: 0 -6px;
+                }
+            }
+
+            .notification-switch-wrapper {
+                display: flex;
+                align-items: center;
                 margin-right: 4px;
+
+                img {
+                    display: block;
+                    margin-right: 4px;
+                }
+            }
+
+            .color-picker-wrapper {
+                padding: 0 10px;
             }
         }
 
-        .color-picker-wrapper {
-            padding: 0 10px;
+        .tag-picker-wrapper {
+            padding-bottom: 5px;
+            padding-left: 5px;
+            overflow-x: auto;
         }
-    }
-
-    .tag-picker-wrapper {
-        padding-bottom: 5px;
-        padding-left: 5px;
-        overflow-x: auto;
     }
 }

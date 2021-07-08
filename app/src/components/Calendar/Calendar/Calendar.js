@@ -47,7 +47,7 @@ class Calendar extends Component {
         }
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps, prevState) {
         if (this.state.currentPeriodName != prevState.currentPeriodName) {
             this.props.onPeriodChange(this.state.currentPeriodName);
         }

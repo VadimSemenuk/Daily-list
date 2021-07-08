@@ -45,7 +45,8 @@ class Add extends Component {
             isCalendarOpen: false,
             isRepeatTypeSelectModalOpen: false,
             isNotificationWasUnchecked: false,
-            mode: 'add'
+            mode: 'add',
+            calendarPeriod: null
         };
 
         this.repeatTypeOptions = notesService.getRepeatTypeOptions();
@@ -331,13 +332,34 @@ class Add extends Component {
         }
     }
 
+    onCalendarPeriodChange = (periodName) => {
+        this.setState({
+            calendarPeriod: {
+                month: periodName.month,
+                year: periodName.year
+            }
+        });
+    }
+
+    onDateSet = (date) => {
+        this.updateNoteData({date})
+    }
+
+    onContentWrapperClick = (e) => {
+        if (e.target.classList.contains("add-content-wrapper")) {
+            if (this.state.note.contentItems.length > 0) {
+                this.focusDynamicField(this.state.note.contentItems.length - 1);
+            }
+        }
+    }
+
     render() {
         let {t} = this.props;
 
         let selectedRepeatTypeOption = this.repeatTypeOptions.find((a) => a.val === this.state.note.repeatType);
 
         return (
-            <div className="page-wrapper">
+            <div className="add-wrapper page-wrapper">
                 <Header
                     buttons={[
                         ...(
@@ -359,15 +381,26 @@ class Add extends Component {
                 />
                 {
                     this.state.isCalendarOpen &&
-                    <Calendar 
-                        currentDate={this.state.note.date}
-                        calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
-                        onDateSet={(date) => this.updateNoteData({date: date})}
-                        onCloseRequest={this.triggerCalendar}
-                    />
+                    <React.Fragment>
+                        {
+                            this.state.calendarPeriod &&
+                            <div className="calendar-period theme-header-background">{this.state.calendarPeriod.month} {this.state.calendarPeriod.year}</div>
+                        }
+
+                        <Calendar
+                            currentDate={this.state.note.date}
+                            calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
+                            onDateSet={this.onDateSet}
+                            onCloseRequest={this.triggerCalendar}
+                            onPeriodChange={this.onCalendarPeriodChange}
+                        />
+                    </React.Fragment>
                 }
-                <div className="add-wrapper page-content">
-                    <div className="add-content-wrapper">
+                <div className="page-content">
+                    <div
+                        className="add-content-wrapper"
+                        onClick={this.onContentWrapperClick}
+                    >
                         <input
                             className="title add-content-item"
                             type="text" 
