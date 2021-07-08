@@ -8,7 +8,7 @@ import * as AppActions from '../../../actions';
 
 import './LightCalendar.scss';
 
-import WeekDays from "./WeekDays";
+import WeekDays from "../Common/WeekDays/WeekDays";
 import WeekDatesRow from "./WeekDatesRow";
 
 import getSliderChangeSide from "../../../utils/sliderChangeSide";

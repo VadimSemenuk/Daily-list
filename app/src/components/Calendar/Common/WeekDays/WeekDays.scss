@@ -1,0 +1,10 @@
+.calendar-week-days {
+  display: flex;
+  color: #fff;
+  text-align: center;
+
+  span {
+    font-size: 12px;
+    flex: 1
+  }
+}

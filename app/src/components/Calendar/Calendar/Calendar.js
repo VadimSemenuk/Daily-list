@@ -9,7 +9,7 @@ import * as AppActions from '../../../actions';
 import './Calendar.scss';
 
 import MonthDates from "./MonthDates";
-import WeekDays from "./WeekDays";
+import WeekDays from "../Common/WeekDays/WeekDays";
 
 import getSliderChangeSide from "../../../utils/sliderChangeSide";
 
