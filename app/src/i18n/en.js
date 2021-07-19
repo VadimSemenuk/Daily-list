@@ -190,5 +190,28 @@ export default {
     // tags
     "tags": "Tags",
     "edit-tags": "Edit tags",
-    "add-tag-placeholder": "Enter tag name"
+    "add-tag-placeholder": "Enter tag name",
+
+    // initial note
+    "initial-note-title": "Hey! Some useful information for working with the program",
+    "initial-note-ci-1": "Welcome to the Diary app. Click on a note to see the full content.",
+    "initial-note-ci-2": "A note can contain:",
+    "initial-note-ci-3": "plain text",
+    "initial-note-ci-4": "list",
+    "initial-note-ci-5": "Item 1",
+    "initial-note-ci-6": "Item 2",
+    "initial-note-ci-7": "Item 3",
+    "initial-note-ci-8": "picture",
+    "initial-note-ci-9": "Also, for a note, you can add:",
+    "initial-note-ci-10": "Color label",
+    "initial-note-ci-11": "Tag",
+    "initial-note-ci-12": "Notification",
+    "initial-note-ci-13": "Automatic repeat",
+    "initial-note-ci-14": "To move a note, hold it for a short time and then drag it to the target position",
+    "initial-note-ci-15": "The application has two panels.",
+    "initial-note-ci-16": "In the \"Diary\" panel, notes are created with reference to the date and are displayed for the date selected on the calendar. \n"
+        + "To change the day, tap a date on the calendar, or swipe left or right on the panel with a list of notes. Click on the arrow to display the expanded calendar. \n"
+        + "Swipe the calendar to show other dates",
+    "initial-note-ci-17": "In the Notes panel, notes are created without reference to a date.",
+    "initial-note-ci-18": "Enjoy your use!"
 }

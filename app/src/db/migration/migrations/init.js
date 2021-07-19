@@ -1,7 +1,10 @@
 import moment from "moment";
 import config from "../../../config/config";
+import i18n from "../../../i18n/index"
 
 import execureSQL from "../../../utils/executeSQL";
+
+import DogImg from "../../../assets/img/dog.png"
 
 export default {
     name: "init",
@@ -65,106 +68,101 @@ async function addInitNote() {
         lang = config.defaultLang;
     }
 
-    let initNote = null;
+    let translator = i18n.init(lang);
 
-    if (lang === "ru") {
-        initNote = {
-            endTime: -1,
-            finished: 0,
-            notificate: 0,
-            startTime: -1,
-            tag: "#c5282f",
-            title: "Привет",
-            added: moment().startOf("day").valueOf(),
-            dynamicFields: [
-                {
-                    type: "text",
-                    value: "Это - пример того, как выглядит заметка в Ежедневнике. Нажмите на заметку что-бы увидеть полное содержание.\nЗаметка может содержать в себе:"
-                },
-                {
-                    type: "listItem",
-                    value: "Обычный текст",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "Списки",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "Цветовую метку",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "Фото",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "Напоминание",
-                    checked: false
-                },
-                {
-                    type: "text",
-                    value: "Можно настроить автоматическое повторение заметок."
-                },
-                {
-                    type: "text",
-                    value: "Приятного пользования!"
-                }
-            ]            
-        };
-    } else {
-        initNote = {
-            endTime: -1,
-            finished: 0,
-            notificate: 0,
-            startTime: -1,
-            tag: "#c5282f",
-            title: "Hello",
-            added: moment().startOf("day").valueOf(),
-            dynamicFields: [
-                {
-                    type: "text",
-                    value: "This is an example of the note in the Diary. Tap on the note to look the full content.\nThe note might consist:"
-                },
-                {
-                    type: "listItem",
-                    value: "Default text",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "Lists",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "Color mark",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "Photo",
-                    checked: false
-                },
-                {
-                    type: "listItem",
-                    value: "A remind",
-                    checked: false
-                },
-                {
-                    type: "text",
-                    value: "You can setup automatic repetition of notes ."
-                },
-                {
-                    type: "text",
-                    value: "Pleasant enjoyment!"
-                }
-            ]           
-        }       
+    let initNote = {
+        endTime: -1,
+        finished: 0,
+        notificate: 0,
+        startTime: -1,
+        tag: "#c5282f",
+        title: translator.t("initial-note-title"),
+        added: moment().startOf("day").valueOf(),
+        dynamicFields: [
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-1")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-2")
+            },
+            {
+                type: "text",
+                value: `  ${translator.t("initial-note-ci-3")}`
+            },
+            {
+                type: "text",
+                value: `  ${translator.t("initial-note-ci-4")}`
+            },
+            {
+                type: "listItem",
+                value: translator.t("initial-note-ci-5"),
+                checked: false
+            },
+            {
+                type: "listItem",
+                value: translator.t("initial-note-ci-6"),
+                checked: true
+            },
+            {
+                type: "listItem",
+                value: translator.t("initial-note-ci-7"),
+                checked: false
+            },
+            {
+                type: "text",
+                value: `  ${translator.t("initial-note-ci-8")}`
+            },
+            {
+                type: "snapshot",
+                value: DogImg
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-9")
+            },
+            {
+                type: "listItem",
+                value: translator.t("initial-note-ci-10"),
+                checked: false
+            },
+            {
+                type: "listItem",
+                value: translator.t("initial-note-ci-11"),
+                checked: false
+            },
+            {
+                type: "listItem",
+                value: translator.t("initial-note-ci-12"),
+                checked: false
+            },
+            {
+                type: "listItem",
+                value: translator.t("initial-note-ci-13"),
+                checked: false
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-14")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-15")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-16")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-17")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-18")
+            }
+        ]
     }
 
     return execureSQL(`
