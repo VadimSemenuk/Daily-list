@@ -79,6 +79,10 @@ class Add extends Component {
         }
 
         if (this.props.match.path === "/add") {
+            if (this.props.location.state.props.tagsSelected.length && this.props.location.state.props.tagsSelected.length) {
+                await this.updateNoteData({tags: this.props.location.state.props.tagsSelected.map((id) => this.props.tags.find((tag) => tag.id === id))});
+            }
+
             this.addInputContentItem();
         }
     }

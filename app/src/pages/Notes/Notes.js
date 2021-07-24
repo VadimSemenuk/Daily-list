@@ -210,7 +210,7 @@ class Notes extends PureComponent {
                                 pathname: "/add",
                                 state: {
                                     props: {
-                                        tagsSelected: []
+                                        tagsSelected: this.props.settings.noteFilters.tags
                                     }
                                 }
                             }),
