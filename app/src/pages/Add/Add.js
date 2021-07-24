@@ -303,15 +303,20 @@ class Add extends Component {
     }
 
     pickTime = async (field) => {
-        let dateTime = await new Promise((resolve, reject) => {
-            window.cordova.plugins.DateTimePicker.show({
-                mode: 'time',
-                date: (this.state.note[field] || moment()).toDate(),
-                success: (data) => resolve(moment(data)),
-                cancel: () => this.resetTime(field),
-                error: (err) => reject(err)
-            })
-        });
+        let dateTime = null;
+        if (window.cordova) {
+            dateTime = await new Promise((resolve, reject) => {
+                window.cordova.plugins.DateTimePicker.show({
+                    mode: 'time',
+                    date: (this.state.note[field] || moment()).toDate(),
+                    success: (data) => resolve(moment(data)),
+                    cancel: () => this.resetTime(field),
+                    error: (err) => reject(err)
+                })
+            });
+        } else {
+            dateTime = moment();
+        }
 
         await this.updateNoteData({[field]: moment(dateTime).startOf("minute")});
 
