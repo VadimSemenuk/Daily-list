@@ -35,7 +35,11 @@ class NotesActionsHandlerWrapper extends PureComponent {
 
         this.props.history.push({
             pathname: "/edit",
-            state: { note: this.state.listItemDialogData.note }
+            state: {
+                props: {
+                    note: this.state.listItemDialogData.note
+                }
+            }
         });
     };
 

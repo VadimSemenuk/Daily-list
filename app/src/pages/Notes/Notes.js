@@ -199,7 +199,6 @@ class Notes extends PureComponent {
                     ]}
                     buttons={[
                         {
-                            textId: "search",
                             action: () => this.props.history.push({
                                 pathname: "/search",
                                 state: { onResult: this.onSearchResult }
@@ -207,7 +206,14 @@ class Notes extends PureComponent {
                             img: SearchImg
                         },
                         {
-                            link: "/add",
+                            action: () => this.props.history.push({
+                                pathname: "/add",
+                                state: {
+                                    props: {
+                                        tagsSelected: []
+                                    }
+                                }
+                            }),
                             img: AddImg
                         }
                     ]}

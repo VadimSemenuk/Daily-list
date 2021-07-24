@@ -15,7 +15,6 @@ import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
 import Switch from "../../components/Switch/Switch";
 import RepeatTypeSelectModal from "./RepeatTypeSelectModal/RepeatTypeSelectModal";
-import Tag from "../../components/Tag/Tag";
 
 import notesService from '../../services/notes.service';
 
@@ -73,10 +72,10 @@ class Add extends Component {
     async componentDidMount() {
         if (this.props.match.path === "/edit") {
             this.setState({
-                note: deepCopy(this.props.location.state.note),
+                note: deepCopy(this.props.location.state.props.note),
                 mode: 'edit'
             });
-            this.prevNote = deepCopy(this.props.location.state.note);
+            this.prevNote = deepCopy(this.props.location.state.props.note);
         }
 
         if (this.props.match.path === "/add") {
