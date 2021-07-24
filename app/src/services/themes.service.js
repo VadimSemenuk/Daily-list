@@ -125,12 +125,6 @@ class ThemesService {
                 .button.text.block {
                     background: ${theme.header};
                 }
-                
-                ._theme-tag {
-                    background: ${theme.header}38;
-                    border-color: ${theme.header};
-                    color: ${theme.header};
-                }
                 .theme-tag {
                     background: ${theme.header}60;
                 }

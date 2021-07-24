@@ -50,6 +50,8 @@ class Add extends Component {
 
         this.repeatTypeOptions = notesService.getRepeatTypeOptions();
         this.tags = notesService.getTags();
+
+        this.ignoreContentItemChangeEvent = false;
     }
 
     getDefaultNoteData = () => {
@@ -79,7 +81,7 @@ class Add extends Component {
         }
 
         if (this.props.match.path === "/add") {
-            if (this.props.location.state.props.tagsSelected.length && this.props.location.state.props.tagsSelected.length) {
+            if (this.props.location.state && this.props.location.state.props.tagsSelected.length && this.props.location.state.props.tagsSelected.length) {
                 await this.updateNoteData({tags: this.props.location.state.props.tagsSelected.map((id) => this.props.tags.find((tag) => tag.id === id))});
             }
 
@@ -356,6 +358,53 @@ class Add extends Component {
         }
     }
 
+    onTextAreaEnterPressed = async (event, contentItemIndex) => {
+        let rows = this.state.note.contentItems[contentItemIndex].value.split("\n");
+        let cursorPos = event.target.selectionStart;
+
+        let charCounter = 0;
+        let targetRowIndex = null;
+        for (let i = 0; i < rows.length; i++) {
+            let row = rows[i];
+
+            charCounter += row.length + 1;
+            if (charCounter >= cursorPos) {
+                targetRowIndex = i;
+                break;
+            }
+        }
+
+        if (targetRowIndex !== null) {
+            if (rows[targetRowIndex][0] === "-") {
+                this.ignoreContentItemChangeEvent = true;
+
+                let nextTargetRow = rows[targetRowIndex];
+                if (/^-\S+/.test(nextTargetRow)) {
+                    nextTargetRow = nextTargetRow.replace("-", "- ");
+                } else {
+                    nextTargetRow = nextTargetRow.replace(/^-\s+/, "- ");
+                }
+                nextTargetRow += "\n- ";
+
+                let nextValue = [
+                    ...rows.slice(0, targetRowIndex),
+                    nextTargetRow,
+                    ...rows.slice(targetRowIndex + 1)
+                ].join("\n");
+
+                this.updateNoteContentItem(contentItemIndex, {value: nextValue});
+                setImmediate(() => {
+                    let nextCursorPosition = [
+                        ...rows.slice(0, targetRowIndex),
+                        nextTargetRow
+                    ].reduce((acc, item) => acc += item.length + 1, 0) - 1;
+                    let el = this.getDynamicFiledElements()[contentItemIndex];
+                    el.querySelector('textarea').setSelectionRange(nextCursorPosition, nextCursorPosition);
+                });
+            }
+        }
+    }
+
     render() {
         let {t} = this.props;
 
@@ -422,7 +471,15 @@ class Add extends Component {
                                             className="add-content-item dynamic-field"
                                             placeholder={t("input-placeholder-text")}
                                             value={contentItem.value}
-                                            onChange={(value) => this.updateNoteContentItem(i, {value})}
+                                            onChange={(value) => {
+                                                if (this.ignoreContentItemChangeEvent) {
+                                                    this.ignoreContentItemChangeEvent = false;
+                                                    return;
+                                                }
+
+                                                this.updateNoteContentItem(i, {value})
+                                            }}
+                                            onEnterPressed={(e) => this.onTextAreaEnterPressed(e, i)}
                                             onListItemRemove={() => this.removeContentItem(i)}
                                         />
                                     )
