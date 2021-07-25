@@ -6,9 +6,7 @@ import RemoveImg from '../../assets/img/remove.png';
 import './RemovableTextArea.scss';
 
 export default class RemovableTextArea extends PureComponent {
-    onChange = (e) => this.props.onChange(e.target.value);
-
-    onKeyDown = (e) => e.key === "Enter" && this.props.onEnterPressed(e)
+    onChange = (e) => this.props.onChange(e.target.value, e);
 
     render () {
         return (
@@ -19,7 +17,6 @@ export default class RemovableTextArea extends PureComponent {
                     placeholder={this.props.placeholder}
                     value={this.props.value}
                     onChange={this.onChange}
-                    onKeyDown={this.onKeyDown}
                 />
                 <button
                     className='remove-button'
