@@ -5,7 +5,7 @@ import Modal from "../../components/Modal/Modal";
 
 import './ListItem.scss';
 
-import arrowRight from '../../assets/img/right-grey.svg';
+import arrowRight from '../../assets/img/right-arrow.svg';
 
 export let SwitchListItem = (props) => (
     <div className={`list-item switch-list-item ${props.className || ""} ${props.disabled ? "disabled" : ""}`}>

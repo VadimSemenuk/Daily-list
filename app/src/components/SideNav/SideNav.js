@@ -70,7 +70,10 @@ class SideNav extends PureComponent {
                             alt="button"
                         />
 
-                        <div className="logo-text">{t("app-name")} <br/>v1.0.7</div>
+                        <div className="logo-text">
+                            <div className="app-name">{t("app-name")}</div>
+                            <div>v1.0.7</div>
+                        </div>
                     </div>
                     <div className="items">
                         {
