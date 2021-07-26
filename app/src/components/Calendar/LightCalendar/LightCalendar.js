@@ -187,7 +187,7 @@ class LightCalendar extends Component {
 
     render() {
         return (
-            <div className="light-calendar-wrapper theme-header-background theme-header-border">
+            <div className="light-calendar theme-header-background theme-header-border">
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}

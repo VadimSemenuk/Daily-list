@@ -15,6 +15,7 @@ import Calendar from '../../components/Calendar/Calendar/Calendar';
 import RemovableImage from "../../components/RemovableImage/RemovableImage";
 import Switch from "../../components/Switch/Switch";
 import RepeatTypeSelectModal from "./RepeatTypeSelectModal/RepeatTypeSelectModal";
+import TagList from "../../components/TagList/TagList";
 
 import notesService from '../../services/notes.service';
 
@@ -32,7 +33,6 @@ import deepCopy from '../../utils/deepCopyObject'
 import {NoteContentItemType, NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Add.scss';
-import TagList from "../../components/TagList/TagList";
 
 class Add extends Component {
     constructor(props) {
@@ -422,6 +422,7 @@ class Add extends Component {
         return (
             <div className="add-wrapper page-wrapper">
                 <Header
+                    noBorderRadius={this.state.isCalendarOpen}
                     buttons={[
                         ...(
                             (

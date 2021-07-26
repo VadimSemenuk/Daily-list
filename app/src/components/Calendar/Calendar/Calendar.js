@@ -227,7 +227,7 @@ class Calendar extends Component {
 
     render() {
         return (
-            <div className="calendar-wrapper theme-header-background theme-header-border">
+            <div className="calendar theme-header-background theme-header-border">
                 <WeekDays />
                 <ReactSwipe
                     ref={this.setSliderRef}

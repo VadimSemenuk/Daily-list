@@ -11,13 +11,16 @@ import notesService from "../../../services/notes.service";
 
 import {NoteRepeatType} from "../../../constants";
 
+import './RepeatTypeSelectModal.scss';
+
 class RepeatTypeSelectModal extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             repeatType: NoteRepeatType.NoRepeat,
-            repeatValues: []
+            repeatValues: [],
+            calendarPeriod: null
         };
 
         this.repeatTypeOptions = notesService.getRepeatTypeOptions();
@@ -35,11 +38,25 @@ class RepeatTypeSelectModal extends Component {
         this.setStateValuesFromProps();
     }
 
+    onCalendarPeriodChange = (periodName) => {
+        this.setState({
+            calendarPeriod: {
+                month: periodName.month,
+                year: periodName.year
+            }
+        });
+    }
+
+    onDateSet = (date) => {
+        this.setState({repeatValues: date});
+    }
+
     render() {
         let {t} = this.props;
 
         return (
             <Modal
+                className="repeat-type-select"
                 isOpen={this.props.isOpen}
                 onRequestClose={() => {this.setStateValuesFromProps(); this.props.onRequestClose();}}
                 actionItems={[
@@ -106,13 +123,21 @@ class RepeatTypeSelectModal extends Component {
 
                 {
                     this.state.repeatType === NoteRepeatType.Any &&
-                    <Calendar
-                        mode="multiselect"
-                        currentDate={this.props.defaultDate}
-                        msSelectedDates={this.state.repeatValues}
-                        calendarNotesCounterMode={this.props.calendarNotesCounterMode}
-                        onDatesSet={(e) => this.setState({repeatValues: e})}
-                    />
+                    <div className="calendar-wrapper">
+                        {
+                            this.state.calendarPeriod &&
+                            <div className="calendar-period theme-header-background">{this.state.calendarPeriod.month} {this.state.calendarPeriod.year}</div>
+                        }
+
+                        <Calendar
+                            mode="multiselect"
+                            currentDate={this.props.defaultDate}
+                            msSelectedDates={this.state.repeatValues}
+                            calendarNotesCounterMode={this.props.calendarNotesCounterMode}
+                            onDatesSet={this.onDateSet}
+                            onPeriodChange={this.onCalendarPeriodChange}
+                        />
+                    </div>
                 }
             </Modal>
         )
