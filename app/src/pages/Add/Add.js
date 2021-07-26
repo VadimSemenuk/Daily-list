@@ -331,7 +331,7 @@ class Add extends Component {
 
     showImage = (i) => {
         let field = this.state.note.contentItems[i];
-        window.PhotoViewer.show(field.uri, this.state.note.title, {share: false});
+        window.PhotoViewer.show(field.value, this.state.note.title, {share: false});
     };
 
     triggerCalendar = () => {
