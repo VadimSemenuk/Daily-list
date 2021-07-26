@@ -22,7 +22,11 @@
   .sidenav {
     position: absolute;
     z-index: 2;
-    width: 270px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: hidden;
+    min-width: 240px;
+    width: 75%;
     height: 100%;
     background: #FFFFFF;
     transition: all 0.1s linear;
@@ -36,9 +40,11 @@
       align-items: center;
       border-bottom: 1px solid #e7e7e7;
       flex-shrink: 0;
-      height: 70px;
+      height: 78px;
       position: relative;
       overflow: hidden;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
 
       img {
         position: absolute;

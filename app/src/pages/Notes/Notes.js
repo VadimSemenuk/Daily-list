@@ -191,6 +191,7 @@ class Notes extends PureComponent {
         return (
             <div className="page-wrapper">
                 <Header
+                    noBorderRadius={this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime}
                     leftButtons={[
                         {
                             action: () => this.props.triggerSidenav(),

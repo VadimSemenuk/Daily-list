@@ -6,7 +6,7 @@ import './Header.scss';
 import LeftArrowImg from "../../assets/img/left-arrow.svg";
 
 let Header = (props) => (
-    <header className="theme-header-background">
+    <header className={`theme-header-background${props.noBorderRadius ? ' no-border-radius' : ''}`}>
         <div className="left-wrapper">
             <div className="buttons buttons-left">
                 {
