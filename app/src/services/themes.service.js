@@ -137,7 +137,7 @@ class ThemesService {
                 .page-content {
                     background: ${theme.body}
                 }
-                .button.text.block {
+                button.text {
                     background: ${theme.header};
                 }
                 .theme-tag {
