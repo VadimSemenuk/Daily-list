@@ -43,11 +43,20 @@
         }
     }
 
-    .backup-files {
+    .backup-files-wrapper {
         margin-top: 20px;
 
-        li {
-            padding: 5px 0;
+        .backup-files-title {
+            font-size: 18px;
+        }
+
+        .list-item {
+            img {
+                filter: invert(1);
+                width: 20px;
+                height: 20px;
+                margin: 0 6px;
+            }
         }
     }
 
@@ -63,5 +72,12 @@
         button:not(:last-of-type) {
             margin-right: 10px;
         }
+    }
+}
+
+.restore-backup-confirmation-modal {
+    .restore-backup-confirmation {
+        display: inline-block;
+        margin-top: 10px;
     }
 }

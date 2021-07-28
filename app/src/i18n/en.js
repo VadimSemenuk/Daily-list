@@ -8,6 +8,7 @@ export default {
     "default-notification": "Automatically set notification",
     "backup": "Backup",
     "set-setting-error": "Failed to update setting",
+    "restore-backup-confirmation": "Restore a backup?",
 
     // view settings page
     "sort": "Sorting",

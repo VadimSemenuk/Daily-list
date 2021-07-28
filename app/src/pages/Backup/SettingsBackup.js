@@ -14,14 +14,16 @@ import ExportImg from '../../assets/img/upload-to-cloud.svg';
 import ImportImg from '../../assets/img/cloud-computing.svg';
 import LogoutImg from '../../assets/img/logout.svg';
 import Modal from "../../components/Modal/Modal";
-import {ButtonListItem, SwitchListItem} from "../../components/ListItem/ListItem";
+import {ButtonListItem, IconListItem, SwitchListItem} from "../../components/ListItem/ListItem";
+import themesService from "../../services/themes.service";
 
 class SettingsBackup extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isSelectFileToRestoreModalVisible: false,
+            isRestoreBackupConfirmationModalVisible: false,
+            backupToRestore: null
         }
     }
 
@@ -31,9 +33,10 @@ class SettingsBackup extends Component {
         }
     }
 
-    restoreBackup = () => {
+    showRestoreBackupConfirmation = (backup) => {
         this.setState({
-            isSelectFileToRestoreModalVisible: true
+            isRestoreBackupConfirmationModalVisible: true,
+            backupToRestore: backup
         });
     }
 
@@ -84,20 +87,12 @@ class SettingsBackup extends Component {
                                     type="button"
                                     onClick={() => this.props.uploadGDBackup("user")}
                                 ><img src={ExportImg} alt="export"/>{t("create-backup")}</button>
-
-                                {   this.props.user.gdBackup.backupFiles.length > 0 &&
-                                    <button
-                                        className={`text block img-text-button`}
-                                        type="button"
-                                        onClick={this.restoreBackup}
-                                    ><img src={ImportImg} alt="import" />{t("restore-backup")}</button>
-                                }
                             </div>
                             {
                                 (this.props.user && this.props.user.gdBackup.backupFiles.length > 0) &&
-                                <div className="backup-files">
-                                    {t("available-copies")}:
-                                    <ul>
+                                <div className="backup-files-wrapper">
+                                    <span className="backup-files-title">{t("available-copies")}:</span>
+                                    <div className="backup-files">
                                         {
                                             [...this.props.user.gdBackup.backupFiles]
                                                 .sort((a, b) => {
@@ -110,54 +105,58 @@ class SettingsBackup extends Component {
                                                     return -(a.modifiedTime.diff(b.modifiedTime))
                                                 })
                                                 .map((f, i) => {
-                                                    return <li key={i}>
-                                                        {
-                                                            f.name === "DailyListSqliteDBFile_auto" &&
-                                                            <span>{t('copy-auto-created-google-drive')} {f.properties.manufacturer} {f.properties.model}, </span>
-                                                        }
-                                                        <strong>{f.modifiedTime.format('LLL')}</strong>
-                                                    </li>
+                                                    return (
+                                                        <IconListItem
+                                                            key={i}
+                                                            textElement={
+                                                                <div className="backup-file">
+                                                                    {
+                                                                        f.name === "DailyListSqliteDBFile_auto" &&
+                                                                        <span>{t('copy-auto-created-google-drive')} {f.properties.manufacturer} {f.properties.model}<br/></span>
+                                                                    }
+                                                                    <strong>{f.modifiedTime.format('LLL')}</strong>
+                                                                </div>
+                                                            }
+                                                            icon={ImportImg}
+                                                            onClick={() => this.showRestoreBackupConfirmation(f)}
+                                                        />
+                                                    )
                                                 })
                                         }
-                                    </ul>
+                                    </div>
                                 </div>
                             }
                         </div>
                     }
 
                     <Modal
-                        isOpen={this.state.isSelectFileToRestoreModalVisible}
-                        onRequestClose={() => this.setState({isSelectFileToRestoreModalVisible: false})}
+                        isOpen={this.state.isRestoreBackupConfirmationModalVisible}
+                        className="restore-backup-confirmation-modal"
+                        onRequestClose={() => this.setState({isRestoreBackupConfirmationModalVisible: false})}
                         actionItems={[
                             {
                                 text: t("close")
+                            },
+                            {
+                                text: t("ok"),
+                                onClick: () => {
+                                    this.props.restoreGDBackup(this.state.backupToRestore)
+                                }
                             }
                         ]}
                     >
                         {
-                            this.props.user && [...this.props.user.gdBackup.backupFiles]
-                                .sort((a, b) => {
-                                    if (a.name === "DailyListSqliteDBFile") {
-                                        return -1;
+                            this.state.backupToRestore &&
+                            <React.Fragment>
+                                <div className="backup-file">
+                                    {
+                                        this.state.backupToRestore.name === "DailyListSqliteDBFile_auto" &&
+                                        <span>{t('copy-auto-created-google-drive')} {this.state.backupToRestore.properties.manufacturer} {this.state.backupToRestore.properties.model}<br/></span>
                                     }
-                                    if (b.name === "DailyListSqliteDBFile") {
-                                        return 1;
-                                    }
-                                    return -(a.modifiedTime.diff(b.modifiedTime))
-                                })
-                                .map((f, i) => {
-                                    return <ButtonListItem
-                                        key={i}
-                                        className="no-border"
-                                        onClick={() => this.props.restoreGDBackup(f)}
-                                    >
-                                        {
-                                            f.name === "DailyListSqliteDBFile_auto" &&
-                                            <span>{t('copy-auto-created-google-drive')} {f.properties.manufacturer} {f.properties.model}, </span>
-                                        }
-                                        <strong>{f.modifiedTime.format('LLL')}</strong>
-                                    </ButtonListItem>
-                                })
+                                    <strong>{this.state.backupToRestore.modifiedTime.format('LLL')}</strong>
+                                </div>
+                                <span className="restore-backup-confirmation">{t("restore-backup-confirmation")}</span>
+                            </React.Fragment>
                         }
                     </Modal>
                 </div>

@@ -8,6 +8,7 @@ export default {
     "default-notification": "Автоматически добавлять уведомление",
     "backup": "Резервное копирование",
     "set-setting-error": "Не удалось обновить настройку. Перезапустите программу и попробуйие снова",
+    "restore-backup-confirmation": "Восстановить резервную копию?",
 
     // view settings page
     "sort": "Сортировка",

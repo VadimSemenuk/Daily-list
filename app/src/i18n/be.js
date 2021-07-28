@@ -8,6 +8,7 @@ export default {
     "default-notification": "Аўтаматычна дадаваць апавяшчэннеы",
     "backup": "Рэзервовае капіраванне",
     "set-setting-error": "Не атрымалася абнавіць наладу. Перазапусціце праграму і попробуйие зноў",
+    "restore-backup-confirmation": "Аднавіць рэзервовую копію?",
 
     // view settings page
     "sort": "Сартаванне",
