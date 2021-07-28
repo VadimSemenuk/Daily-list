@@ -17,19 +17,28 @@ export let SwitchListItem = (props) => (
     </div>
 );
 
-export let InsetListItem = (props) => (
-    <button 
-        className="list-item inset-list-item"
-        onClick={props.onClick}                                
+export let IconListItem = (props) => (
+    <button
+        className="list-item"
+        onClick={props.onClick}
     >
-        <span className="list-item-text">{props.text}</span>
-        <img 
+        <span className="list-item-text">
+            {props.text || props.textElement}
+        </span>
+        <img
             className="list-item-img"
-            src={arrowRight} 
+            src={props.icon}
             alt="in"
-        /> 
+        />
     </button>
-);
+)
+
+export let InsetListItem = (props) => (
+    <IconListItem
+        {...props}
+        icon={arrowRight}
+    />
+)
 
 export let ButtonListItem = (props) => (
     <button 
