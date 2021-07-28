@@ -186,7 +186,7 @@ export default {
     "trash": "Кошык",
     "about": "Аб праграме",
     "settings": "Налады",
-    "account": "Акаўнт",
+    "backups": "Рэзервовае капіраванне",
 
     // tags
     "tags": "Цэтлікі",

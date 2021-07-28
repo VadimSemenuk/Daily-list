@@ -186,7 +186,7 @@ export default {
     "trash": "Корзина",
     "about": "О программе",
     "settings": "Настройки",
-    "account": "Аккаунт",
+    "backups": "Резервное копирование",
 
     // tags
     "tags": "Ярлыки",

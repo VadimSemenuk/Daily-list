@@ -186,7 +186,7 @@ export default {
     "trash": "Trash",
     "about": "About app",
     "settings": "Settings",
-    "account": "Account",
+    "backups": "Backups",
 
     // tags
     "tags": "Tags",

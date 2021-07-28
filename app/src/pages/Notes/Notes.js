@@ -19,12 +19,12 @@ import SearchImg from "../../assets/img/search.svg";
 import ChevronBottomImg from "../../assets/img/bottom-chevron.svg";
 import MenuImg from "../../assets/img/menu.svg";
 import SettingsImg from "../../assets/img/settings-black.svg";
-import UserImg from "../../assets/img/user.svg";
 import DeleteImg from "../../assets/img/delete.svg";
 import InfoImg from "../../assets/img/info.svg";
 import CalendarImg from "../../assets/img/calendar-black.svg";
 import ListImg from "../../assets/img/list.svg";
 import TagImg from "../../assets/img/tag.svg";
+import BackupImg from "../../assets/img/upload-to-cloud-black.svg";
 
 import './Notes.scss';
 
@@ -104,9 +104,9 @@ class Notes extends PureComponent {
                     img: TagImg
                 },
                 {
-                    textId: "account",
+                    textId: "backup",
                     action: () => this.props.history.push("/backup"),
-                    img: UserImg
+                    img: BackupImg
                 },
                 {
                     textId: "trash",
