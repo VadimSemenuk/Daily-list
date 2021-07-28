@@ -528,6 +528,28 @@ export function setUser(user) {
     }
 }
 
+export function updateUserSettings(nextValue) {
+    return (dispatch, getState) => {
+        let state = getState();
+
+        let nextUser = {
+            ...state.user,
+            settings: {
+                ...state.user.settings,
+                ...nextValue
+            }
+        };
+
+        authService.setUser(nextUser);
+        return dispatch({
+            type: "RECEIVE_USER",
+            payload: {
+                user: authService.getUser()
+            }
+        });
+    }
+}
+
 export function resetUser() {
     return (dispatch) => {
         authService.resetUser();

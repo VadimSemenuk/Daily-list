@@ -14,7 +14,7 @@ import ExportImg from '../../assets/img/upload-to-cloud.svg';
 import ImportImg from '../../assets/img/cloud-computing.svg';
 import LogoutImg from '../../assets/img/logout.svg';
 import Modal from "../../components/Modal/Modal";
-import {ButtonListItem} from "../../components/ListItem/ListItem";
+import {ButtonListItem, SwitchListItem} from "../../components/ListItem/ListItem";
 
 class SettingsBackup extends Component {
     constructor(props) {
@@ -69,7 +69,15 @@ class SettingsBackup extends Component {
                                     onClick={this.props.googleSignOut}
                                 ><img src={LogoutImg} alt="logout"/></button>
                             </div>
-                            
+
+                            <div className="profile-settings-wrapper">
+                                <SwitchListItem
+                                    text={t("auto-backup")}
+                                    checked={this.props.user.settings.autoBackup}
+                                    onChange={(value) => this.props.updateUserSettings({autoBackup: value})}
+                                />
+                            </div>
+
                             <div className="backup-actions-buttons-wrapper">
                                 <button 
                                     className="text block img-text-button"
