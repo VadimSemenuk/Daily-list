@@ -82,17 +82,10 @@ class BackupService {
         let user = authService.getUser();
         let token = authService.getAuthorizationToken();
 
-        let backupFile = null;
-        if (user.gdBackup.backupFiles.length) {
-            if (params.actionType === 'user') {
-                backupFile = user.gdBackup.backupFiles.find((f) => f.name === 'DailyListSqliteDBFile');
-            } else if (params.actionType === 'auto') {
-                let files = user.gdBackup.backupFiles.filter((f) => f.name === 'DailyListSqliteDBFile_auto').sort((a, b) => -(a.modifiedTime.diff(b.modifiedTime)));
-                backupFile = files[2];
-            }
-        }
+        let targetBackupFileName = params.actionType === 'user' ? "DailyListSqliteDBFile" : "DailyListSqliteDBFile_auto";
+        let backupFile = user.gdBackup.backupFiles.find((f) => f.name === targetBackupFileName);
         if (!backupFile) {
-            backupFile = await this.createGDBackupFile(params.actionType === 'user' ? "DailyListSqliteDBFile" : "DailyListSqliteDBFile_auto");
+            backupFile = await this.createGDBackupFile(targetBackupFileName);
             user.gdBackup.backupFiles = [...user.gdBackup.backupFiles, backupFile];
         }
 
