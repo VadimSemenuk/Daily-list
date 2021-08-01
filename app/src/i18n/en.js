@@ -53,8 +53,10 @@ export default {
     "password-reset-email": "Password reset email",
     "reset-password-email-no-user": "Login to bind reset password email",
     "reset-password": "Reset the password",
-    "password-has-been-reset": "New password sent to {{email}}",
+    "password-has-been-reset": "New password sent to {{email}}. Check your \"Spam\" folder if the email is not found",
     "reset-password-notification": "Add your email address to reset your password. To do this, enter the account in the 'Backup' or 'Add password' sections",
+    "password-reset-email-subject": "Password reset",
+    "password-reset-email-content": "New password: ",
 
     //troubleshooting page
     "help": "Help",

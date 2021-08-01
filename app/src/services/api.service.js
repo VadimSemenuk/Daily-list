@@ -163,6 +163,22 @@ class ApiService {
             headers: headers
         });
     }
+
+    async sendMail(props) {
+        let body = new FormData();
+        body.append("from", props.from + " <dailylist@sandboxdafa6483faba4421b8c92270835be699.mailgun.org>")
+        body.append("to", props.to)
+        body.append("subject", props.subject)
+        body.append("text", props.text)
+
+        return fetch("https://api.mailgun.net/v3/sandboxdafa6483faba4421b8c92270835be699.mailgun.org/messages", {
+            method: "POST",
+            body,
+            headers: {
+                Authorization: "Basic YXBpOjFhZmNjZWE4NzI0YTVhMzI3ZmVkZGFiNjg0Y2ExZWI4LWY2OTZiZWI0LTU2NTZjYjYx",
+            }
+        })
+    }
 }
 
 let apiService = new ApiService();

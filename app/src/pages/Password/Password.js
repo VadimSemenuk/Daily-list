@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as AppActions from '../../actions'; 
 import {getGreeting} from "../../utils/dayPart"
+import {generatePassword} from "../../utils/passwordGenerator"
 import {translate} from "react-i18next";
 import md5 from "md5";
 
@@ -43,14 +44,30 @@ class Password extends Component {
             return
         }
 
-	    let emailTo = this.props.user ? this.props.user.email : this.props.settings.passwordResetEmail;
-
 	    this.props.triggerLoader(true);
-        let response = await apiService.post("local-password/reset", {lang: this.props.settings.lang, email: emailTo});
+
+        let nextPassword = generatePassword();
+        let emailTo = this.props.user ? this.props.user.email : this.props.settings.passwordResetEmail;
+
+        let result = await apiService.sendMail({
+            from: this.props.t("app-name"),
+            to: emailTo,
+            subject: this.props.t("password-reset-email-subject"),
+            text: this.props.t("password-reset-email-content") + nextPassword
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    return res.json();
+                }
+            });
+
+        if (result) {
+            this.props.setSetting({password: md5(nextPassword)});
+        }
+
         this.props.triggerLoader(false);
-        let newPassword = await response.text();
-        this.props.setSetting({password: newPassword});
-        window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset").replace("{{email}}", emailTo));
+
+        window.cordova && window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset").replace("{{email}}", emailTo));
     }
 
     render () {
