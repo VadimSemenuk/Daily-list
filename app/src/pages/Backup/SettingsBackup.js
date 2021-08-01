@@ -14,8 +14,7 @@ import ExportImg from '../../assets/img/upload-to-cloud.svg';
 import ImportImg from '../../assets/img/cloud-computing.svg';
 import LogoutImg from '../../assets/img/logout.svg';
 import Modal from "../../components/Modal/Modal";
-import {ButtonListItem, IconListItem, SwitchListItem} from "../../components/ListItem/ListItem";
-import themesService from "../../services/themes.service";
+import {IconListItem, SwitchListItem} from "../../components/ListItem/ListItem";
 
 class SettingsBackup extends Component {
     constructor(props) {

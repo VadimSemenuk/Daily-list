@@ -7,10 +7,19 @@ import * as AppActions from '../../actions';
 
 import Header from '../../components/Header/Header';
 import TrashListItem from './TrashListItem/TrashListItem';
+import Modal from "../../components/Modal/Modal";
 
 import './Trash.scss';
 
 class Trash extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isCleanTrashConfirmationOpen: false,
+        }
+    }
+
     async componentDidMount() {
         this.props.getDeletedNotes();
     }
@@ -46,11 +55,28 @@ class Trash extends Component {
                         <div className="clean-trash-button-wrapper">
                             <button 
                                 className="text block"
-                                onClick={this.props.removeDeletedNotes}
+                                onClick={() => this.setState({isCleanTrashConfirmationOpen: true})}
                             >{t("clean-trash")}</button>
                         </div>
                     }
                 </div>
+
+                <Modal
+                    isOpen={this.state.isCleanTrashConfirmationOpen}
+                    className="clean-trash-confirmation-modal"
+                    onRequestClose={() => this.setState({isCleanTrashConfirmationOpen: false})}
+                    actionItems={[
+                        {
+                            text: t("close")
+                        },
+                        {
+                            text: t("ok"),
+                            onClick: () => this.props.removeDeletedNotes()
+                        }
+                    ]}
+                >
+                    {t("clean-trash-confirmation")}
+                </Modal>
             </div>
         );
     }
