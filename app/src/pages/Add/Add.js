@@ -329,9 +329,8 @@ class Add extends Component {
         el.scrollTop = el.scrollHeight;
     }
 
-    showImage = (i) => {
-        let field = this.state.note.contentItems[i];
-        window.PhotoViewer.show(window.location.host + field.value, this.state.note.title, {share: false});
+    showImage = (e) => {
+        window.PhotoViewer.show(e.target.src, this.state.note.title, {share: false});
     };
 
     triggerCalendar = () => {
@@ -504,7 +503,7 @@ class Add extends Component {
                                             key={i}
                                             className="add-content-item dynamic-field"
                                             src={contentItem.value}
-                                            onClick={() => this.showImage(i)}
+                                            onClick={this.showImage}
                                             onRemove={() => this.removeContentItem(i)}
                                         />
                                     )
