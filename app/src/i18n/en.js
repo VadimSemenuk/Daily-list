@@ -216,5 +216,10 @@ export default {
         + "To change the day, tap a date on the calendar, or swipe left or right on the panel with a list of notes. Click on the arrow to display the expanded calendar. \n"
         + "Swipe the calendar to show other dates",
     "initial-note-ci-17": "In the Notes panel, notes are created without reference to a date.",
-    "initial-note-ci-18": "Enjoy your use!"
+    "initial-note-ci-18": "Enjoy your use!",
+
+    // initial tags
+    "initial-tag-1": "Work",
+    "initial-tag-2": "Purchases",
+    "initial-tag-3": "Ideas"
 }

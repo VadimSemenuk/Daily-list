@@ -5,6 +5,7 @@ import i18n from "../../../i18n/index"
 import execureSQL from "../../../utils/executeSQL";
 
 import DogImg from "../../../assets/img/dog.png"
+import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 
 export default {
     name: "init",
@@ -57,17 +58,7 @@ async function fillDb () {
 }
 
 async function addInitNote() {
-    let lang = navigator.language || navigator.userLanguage || config.defaultLang;
-    if (lang.indexOf("-") !== -1) {
-        lang = lang.split("-")[0];
-        let availableLangs = ["en", "ru", "be"];
-        if (!availableLangs.find((l) => l === lang.toLowerCase())) {
-            lang = config.defaultLang;
-        }
-    } else {
-        lang = config.defaultLang;
-    }
-
+    let lang = getDefaultLanguage();
     let translator = i18n.init(lang);
 
     let initNote = {

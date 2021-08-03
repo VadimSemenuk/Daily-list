@@ -5,6 +5,8 @@ import executeSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
 import getUTCOffset from "../../../utils/getUTCOffset";
 import {NoteRepeatType, CalendarNotesCounterMode} from "../../../constants";
+import getDefaultLanguage from "../../../utils/getDefaultLanguage";
+import i18n from "../../../i18n";
 
 export default {
     name: "1.7",
@@ -311,14 +313,16 @@ export default {
                 );
             `);
 
+            let lang = getDefaultLanguage();
+            let translator = i18n.init(lang);
+
             await executeSQL(`
                 INSERT INTO Tags (name)
                 VALUES 
                 (?),
                 (?),
-                (?),
                 (?);
-            `, ['Работа', 'Покупки', 'Идеи']);
+            `, [translator.t("initial-tag-1"), translator.t("initial-tag-2"), translator.t("initial-tag-3")]);
         }
     }
 }

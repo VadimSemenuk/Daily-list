@@ -1,5 +1,5 @@
 import execureSQL from "../../../utils/executeSQL";
-import config from "../../../config/config";
+import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 
 export default {
     name: "1.6",
@@ -49,16 +49,7 @@ export default {
                 finSort: 1
             };
 
-            let lang = navigator.language || navigator.userLanguage || config.defaultLang;
-            if (lang.indexOf("-") !== -1) {
-                lang = lang.split("-")[0];
-                let availableLangs = ["en", "ru", "be"];
-                if (!availableLangs.find((l) => l === lang.toLowerCase())) {
-                    lang = config.defaultLang;
-                }
-            } else {
-                lang = config.defaultLang;
-            }
+            let lang = getDefaultLanguage();
 
             await execureSQL(`
                 UPDATE Settings 
