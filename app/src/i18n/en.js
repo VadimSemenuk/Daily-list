@@ -37,7 +37,6 @@ export default {
     "notes-count-not-show": "Do not display",
     "notes-count-only-finished": "Show only completed",
     "notes-count-all": "Display all",
-    "reload-app-note": "Restart the app to apply changes",
     "minimize-notes": "Minimize long notes",
     "move-control-panels-down": "Move controls down",
 

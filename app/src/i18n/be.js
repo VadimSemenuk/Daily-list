@@ -37,7 +37,6 @@ export default {
     "notes-count-not-show": "Не адлюстроўваць",
     "notes-count-only-finished": "Адлюстроўваць толькі завершаныя",
     "notes-count-all": "Адлюстроўваць усе",
-    "reload-app-note": "Перазапусціце праграму для ўступлення змяненняў у сілу",
     "minimize-notes": "Згортваць доўгія нататкі",
     "move-control-panels-down": "Перанесці ўніз элементы кіравання",
 

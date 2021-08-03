@@ -72,7 +72,7 @@ class SideNav extends PureComponent {
 
                         <div className="logo-text">
                             <div className="app-name">{t("app-name")}</div>
-                            <div>v1.0.7</div>
+                            <div className="app-version">v1.0.7</div>
                         </div>
                     </div>
                     <div className="items">
