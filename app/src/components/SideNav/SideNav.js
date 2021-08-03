@@ -6,7 +6,7 @@ import {translate} from "react-i18next";
 import {ButtonListItem} from "../ListItem/ListItem";
 import TagList from "../TagList/TagList";
 
-import LogoImg from "../../assets/img/logo.svg";
+import LogoImg from "../../assets/img/app-icon-no-background.svg";
 import TagImg from "../../assets/img/tag.svg";
 
 import * as AppActions from '../../actions';
