@@ -318,7 +318,7 @@ export default {
                 (?),
                 (?),
                 (?);
-            `, ['test tag 1', 'test tag 2', 'test tag 3 long name', 'test']);
+            `, ['Работа', 'Покупки', 'Идеи']);
         }
     }
 }
