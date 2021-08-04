@@ -3,7 +3,7 @@ import execureSQL from "../utils/executeSQL";
 import getUTCOffset from "./getUTCOffset";
 import {NoteRepeatType} from "../constants";
 
-import DogImg from "../assets/img/dog.png"
+import DogImg from "../assets/img/initial-note-example-image.jpg"
 
 export async function addFakeListItemsData () {
     console.log("Start adding test data");
