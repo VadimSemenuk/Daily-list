@@ -575,7 +575,7 @@ class Add extends Component {
                         <div className="note-settings-wrapper hide-with-active-keyboard">
                             {
                                 this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime &&
-                                <div className="flex flex-align-center flex-justify-space-between">
+                                <div className="notification-settings">
                                     <div className="repeat-set-wrapper">
                                         <button
                                             className="text img-text-button clear c-gray"

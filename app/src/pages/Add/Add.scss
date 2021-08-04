@@ -15,7 +15,6 @@
         display: flex;
         flex: 1;
         flex-direction: column;
-        padding-top: 10px;
 
         .add-content-wrapper {
             padding: 0 10px;
@@ -71,6 +70,12 @@
                 height: 20px;
             }
 
+            .notification-settings {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
             .repeat-set-wrapper {
                 img {
                     margin-right: 5px;
@@ -110,6 +115,25 @@
             padding-bottom: 5px;
             padding-left: 5px;
             overflow-x: auto;
+        }
+    }
+}
+
+@media screen and (orientation: landscape) {
+    .add-wrapper .page-content {
+        flex-direction: row;
+
+        .note-actions-wrapper {
+            width: 32%;
+            max-width: 300px;
+            min-width: 240px;
+            border-top: none;
+            border-left: 3px solid #e7e7e7;
+
+            .notification-settings {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     }
 }
