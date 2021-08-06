@@ -264,7 +264,9 @@ class Add extends Component {
         let nextContentItems = [...this.state.note.contentItems.slice(0, contentItemIndex), ...this.state.note.contentItems.slice(contentItemIndex + 1)];
         await this.updateNoteData({contentItems: nextContentItems});
 
-        if (!this.canFocusDynamicField(contentItemIndex)) {
+        if (this.canFocusDynamicField(contentItemIndex)) {
+            this.focusDynamicField(contentItemIndex);
+        } else if (this.canFocusDynamicField(contentItemIndex - 1)) {
             this.focusDynamicField(contentItemIndex - 1);
         }
     };
