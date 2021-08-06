@@ -196,15 +196,15 @@ export default {
     "add-tag-placeholder": "Enter tag name",
 
     // initial note
-    "initial-note-title": "Hey! Some useful information for working with the program",
-    "initial-note-ci-1": "Welcome to the Diary app. Click on a note to see the full content.",
+    "initial-note-title": "Welcome! Some useful information for working with the program",
+    "initial-note-ci-1": "Click on a note to see the full content.",
     "initial-note-ci-2": "A note can contain:",
     "initial-note-ci-3": "Plain text",
     "initial-note-ci-4": "List",
     "initial-note-ci-5": "Item 1",
     "initial-note-ci-6": "Item 2",
     "initial-note-ci-7": "Item 3",
-    "initial-note-ci-8": "Picture",
+    "initial-note-ci-8": "Image. To enlarge the image, click on it",
     "initial-note-ci-9": "Also, for a note, you can add:",
     "initial-note-ci-10": "Color label",
     "initial-note-ci-11": "Tag",
@@ -216,7 +216,8 @@ export default {
         + "To change the day, tap a date on the calendar, or swipe left or right on the panel with a list of notes. Click on the arrow to display the expanded calendar. \n"
         + "Swipe the calendar to show other dates",
     "initial-note-ci-17": "In the Notes panel, notes are created without reference to a date.",
-    "initial-note-ci-18": "Enjoy your use!",
+    "initial-note-ci-18": "Click on the date above the calendar to go to the current day.",
+    "initial-note-ci-19": "Enjoy your use!",
 
     // initial tags
     "initial-tag-1": "Work",

@@ -152,6 +152,10 @@ async function addInitNote() {
             {
                 type: "text",
                 value: translator.t("initial-note-ci-18")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-19")
             }
         ]
     }
