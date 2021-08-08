@@ -119,6 +119,7 @@ class Tags extends PureComponent {
 
                         <button
                             className='add-button'
+                            disabled={this.state.newTag.name.length === 0}
                             onClick={this.onTagAdd}
                         >
                             <img
