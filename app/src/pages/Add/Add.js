@@ -297,6 +297,11 @@ class Add extends Component {
                 {
                     sourceType,
                     mediaType: window.navigator.camera.MediaType.PICTURE,
+                    correctOrientation: true,
+                    saveToPhotoAlbum: true,
+                    cameraDirection: 0,
+                    destinationType: window.navigator.camera.DestinationType.FILE_URI,
+                    encodingType: window.navigator.camera.EncodingType.JPEG
                 }
             );
         });
