@@ -318,11 +318,16 @@ class NotesService {
         `, values);
     }
 
-    async updateNoteDynamic(note, nextData) {
+    async updateNoteDynamic(note, nextData, settings) {
         let nextNote = {...note, ...nextData};
 
         if (nextNote.isShadow) {
             nextNote = await this.formShadowToReal(nextNote);
+        }
+
+        let resetManualOrderIndex = false;
+        if (nextData.hasOwnProperty('isFinished') && settings.sortFinBehaviour === 1) {
+            resetManualOrderIndex = true;
         }
 
         await executeSQL(
@@ -330,10 +335,12 @@ class NotesService {
             SET 
                 contentItems = ?,
                 isFinished = ?
+                ${resetManualOrderIndex ? ", manualOrderIndex = ?" : ""}
             WHERE id = ?;`,
             [
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
+                ...(resetManualOrderIndex ? [null] : []),
                 nextNote.id
             ]
         );

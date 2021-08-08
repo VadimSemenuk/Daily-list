@@ -82,9 +82,9 @@ export function updateNote(note, prevNote) {
 }
 
 export function updateNoteDynamic(note, nextData) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         try {
-            let updatedNote = await notesService.updateNoteDynamic(note, nextData);
+            let updatedNote = await notesService.updateNoteDynamic(note, nextData, getState().settings);
 
             dispatch({
                 type: "UPDATE_NOTE_DYNAMIC",
