@@ -215,12 +215,20 @@ export default {
     "initial-note-ci-16": "In the \"Diary\" panel, notes are created with reference to the date and are displayed for the date selected on the calendar. \n"
         + "To change the day, tap a date on the calendar, or swipe left or right on the panel with a list of notes. Click on the arrow to display the expanded calendar. \n"
         + "Swipe the calendar to show other dates",
-    "initial-note-ci-17": "In the Notes panel, notes are created without reference to a date.",
+    "initial-note-ci-17": "In the \"Notes panel\", notes are created without reference to a date.",
     "initial-note-ci-18": "Click on the date above the calendar to go to the current day.",
     "initial-note-ci-19": "Enjoy your use!",
 
     // initial tags
     "initial-tag-1": "Work",
     "initial-tag-2": "Purchases",
-    "initial-tag-3": "Ideas"
+    "initial-tag-3": "Ideas",
+
+    // updates note
+    "updates-note-title": "Version 1.7. Updates.",
+    "updates-note-ci-1": "Added tags.",
+    "updates-note-ci-2": "Added moving notes manually. To move a note, hold it for a short time and then drag it to the desired position.",
+    "updates-note-ci-3": "Added panels \"Diary \" and \"Notes \". \n"
+        + "In the \"Diary\" panel, notes are created with reference to the date and are displayed for the date selected on the calendar. \n"
+        + "In the \"Notes\" panel, notes are created without reference to a date.",
 }

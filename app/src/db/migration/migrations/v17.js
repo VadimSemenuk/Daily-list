@@ -4,14 +4,14 @@ import md5 from "md5";
 import executeSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
 import getUTCOffset from "../../../utils/getUTCOffset";
-import {NoteRepeatType, CalendarNotesCounterMode} from "../../../constants";
+import {NoteRepeatType, CalendarNotesCounterMode, NotesScreenMode, NoteAction} from "../../../constants";
 import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 import i18n from "../../../i18n";
 
 export default {
     name: "1.7",
 
-    async run() {
+    async run(isUpdate) {
         await alterTasksRepeatValuesTable();
         await addMetaTable();
         await alterTasksTable();
@@ -22,6 +22,10 @@ export default {
         await convertDatesToUTC();
         await addPasswordEncryption();
         await addTagsPage();
+
+        if (isUpdate) {
+            await addUpdatesNote();
+        }
 
         async function alterTasksRepeatValuesTable () {
             await executeSQL(`
@@ -323,6 +327,64 @@ export default {
                 (?),
                 (?);
             `, [translator.t("initial-tag-1"), translator.t("initial-tag-2"), translator.t("initial-tag-3")]);
+        }
+
+        async function addUpdatesNote() {
+            let lang = getDefaultLanguage();
+            let translator = i18n.init(lang);
+
+            let note = {
+                isNotificationEnabled: false,
+                startTime: null,
+                endTime: null,
+                date: moment().startOf("day").valueOf() + getUTCOffset(),
+                isFinished: false,
+                repeatType: NoteRepeatType.NoRepeat,
+                mode: NotesScreenMode.WithDateTime,
+                tags: [],
+                tag: "#c5282f",
+                forkFrom: null,
+                isShadow: false,
+                manualOrderIndex: null,
+                title: translator.t("updates-note-title"),
+                contentItems: [
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-1")
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-2")
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-3")
+                    }
+                ],
+            }
+
+            await executeSQL(
+                `INSERT INTO Notes
+            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags, lastAction, lastActionTime)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                [
+                    note.title,
+                    note.startTime,
+                    note.endTime,
+                    Number(note.isNotificationEnabled),
+                    note.tag,
+                    note.repeatType,
+                    JSON.stringify(note.contentItems),
+                    Number(note.isFinished),
+                    note.date,
+                    note.forkFrom,
+                    note.mode,
+                    note.manualOrderIndex,
+                    note.tags.map((tag) => tag.id).join(","),
+                    NoteAction.Add,
+                    moment().valueOf()
+                ]
+            );
         }
     }
 }

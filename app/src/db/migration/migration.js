@@ -41,7 +41,7 @@ class Migration {
         let newMigrations = await this.getNewMigrations();
         if (newMigrations) {
             for (let migration of newMigrations) {
-                await migration.run();
+                await migration.run(isDbExist);
                 await this.acceptMigration(migration);
             }
         }
