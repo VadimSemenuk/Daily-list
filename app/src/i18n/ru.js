@@ -22,6 +22,7 @@ export default {
     "notes-show-interval": "Отображать за период",
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
+    "time-sort-notification": "При сортировке по указанному времени не доступна сортировка перетягиваением",
 
     // interface page
     "theme": "Тема",

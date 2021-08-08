@@ -22,6 +22,7 @@ export default {
     "notes-show-interval": "Display for the period",
     "notes-show-interval-week": "Week",
     "notes-show-interval-day": "Day",
+    "time-sort-notification": "When sorting by the specified time, drag and drop sorting is not available",
 
     // interface page
     "theme": "Theme",

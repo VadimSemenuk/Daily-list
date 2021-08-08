@@ -22,6 +22,7 @@ export default {
     "notes-show-interval": "Адлюстроўваць за перыяд",
     "notes-show-interval-week": "Тыдзень",
     "notes-show-interval-day": "Дзень",
+    "time-sort-notification": "Пры сартаванні па згаданага часу не даступная сартаванне перетягиваением",
 
     // interface page
     "theme": "Тэма",

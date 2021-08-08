@@ -12,6 +12,7 @@ import Header from '../../components/Header/Header';
 import {SwitchListItem, ModalListItem, ValueListItem} from "../../components/ListItem/ListItem";
 
 import './SettingsSort.scss';
+import {SortType} from "../../constants";
 
 let sortTypeSettings = settingsService.getSortTypeSettings();
 let sortDirectionSettings = settingsService.getSortDirectionSettings();
@@ -83,6 +84,11 @@ class SettingsSort extends Component {
                                         text={t(setting.translateId)}
                                     />
                                 ))
+                            }
+
+                            {
+                                this.state.sortTypeSelectedValue === SortType.TimeSort &&
+                                <div className="c-warn">{t("time-sort-notification")}</div>
                             }
                         </div>
 
