@@ -457,14 +457,14 @@ class NotesService {
             WHERE noteId IN (
                 SELECT noteId FROM NotesRepeatValues
                 LEFT JOIN Notes ON NotesRepeatValues.noteId = Notes.id
-                WHERE lastAction = ? AND lastActionTime <= ?
+                WHERE lastAction = ?${untilDate ? ' AND lastActionTime <= ?' : ''}
             );
-        `, [NoteAction.Delete, untilDate]);
+        `, [NoteAction.Delete, ...(untilDate ? [untilDate] : [])]);
 
         return executeSQL(`
             DELETE FROM Notes 
-            WHERE lastAction = ? AND lastActionTime <= ?
-        `, [NoteAction.Delete, untilDate]);
+            WHERE lastAction = ?${untilDate ? ' AND lastActionTime <= ?' : ''}
+        `, [NoteAction.Delete, ...(untilDate ? [untilDate] : [])]);
     }
 
     async updateNotesManualSortIndex(notes) {
