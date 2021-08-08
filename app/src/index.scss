@@ -324,14 +324,18 @@ button.google-in {
     }
 
     button {
-        img {
-            filter: invert(1);
-        }
         &.text:not(.clear) {
             background: #5e5e5e;
         }
         &.text {
             color: #eee;
+        }
+        &.fab img {
+            filter: none;
+        }
+
+        img {
+            filter: invert(1);
         }
     }
 
