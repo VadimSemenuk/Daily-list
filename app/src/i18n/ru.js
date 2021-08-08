@@ -168,7 +168,7 @@ export default {
     // trash
     "remove-old": "Заметки будут удалены через 30 дней",
     "clean-trash": "Очистить корзину",
-    "clean-trash-confirmation": "Очистить корзину ?",
+    "clean-trash-confirmation": "Очистить корзину?",
     "clean-trash-error": "Не удалось очистить корзину",
     "error-note-get-trash": "Не удалось получить удаленные заметки",
     "error-note-restore": "Не удалось восстановить заметку",

@@ -168,7 +168,7 @@ export default {
     // trash
     "remove-old": "Нататкі будуць выдаленыя праз 30 дзён",
     "clean-trash": "Ачысціць кошык",
-    "clean-trash-confirmation": "Ачысціць кошык ?",
+    "clean-trash-confirmation": "Ачысціць кошык?",
     "clean-trash-error": "Не атрымалася ачысціць кошык",
     "error-note-get-trash": "Не атрымалася атрымаць аддаленыя нататкі",
     "error-note-restore": "Не атрымалася аднавіць заметку",

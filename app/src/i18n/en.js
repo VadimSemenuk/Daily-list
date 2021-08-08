@@ -168,7 +168,7 @@ export default {
     // trash
     "remove-old": "Notes will be removed after 30 days",
     "clean-trash": "Clean trash",
-    "clean-trash-confirmation": "Clean trash ?",
+    "clean-trash-confirmation": "Clean trash?",
     "clean-trash-error": "Failed to clean trash",
     "error-note-get-trash": "Failed to get deleted notes",
     "error-note-restore": "Failed to restore note",
