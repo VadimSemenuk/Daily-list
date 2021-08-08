@@ -180,9 +180,11 @@ class SettingsTheme extends Component {
                             },
                             {
                                 text: t("ok"),
-                                onClick: () => {
-                                    this.props.setSetting({lang: this.state.languageSelectedValue});
-                                    window.location.reload(true);
+                                onClick: async () => {
+                                    await this.props.setSetting({lang: this.state.languageSelectedValue});
+                                    setTimeout(() => {
+                                        window.location.reload(true);
+                                    });
                                 }
                             }
                         ]}
