@@ -26,7 +26,8 @@ class NotificationService {
             title: note.title || i18next.t("default-notification-title"),
             text: this.getMessage(note),
             sound: true,
-            priority: 2
+            priority: 2,
+            smallIcon: 'res://ic_launcher',
         };
 
         switch(note.repeatType) {
