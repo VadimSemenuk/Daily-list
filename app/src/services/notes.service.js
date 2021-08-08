@@ -364,14 +364,10 @@ class NotesService {
         nextNote.forkFrom = null;
         nextNote.isFinished = false;
 
-        if (!note.isShadow) {
-            nextNote.manualOrderIndex = null;
-        }
-
         await executeSQL(
             `UPDATE Notes
             SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, 
-                contentItems = ?, isFinished = ?, manualOrderIndex = ?, tags = ?
+                contentItems = ?, isFinished = ?, tags = ?
             WHERE id = ?;`,
             [
                 nextNote.title,
@@ -383,7 +379,6 @@ class NotesService {
                 nextNote.repeatType,
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
-                nextNote.manualOrderIndex,
                 note.tags.map((tag) => tag.id).join(","),
                 nextNote.id,
             ]
