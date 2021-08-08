@@ -33,30 +33,23 @@ class Notes extends PureComponent {
         super(props);
 
         this.state = {
-            headerMultiFloorTitle: null
+            headerMultiFloorTitle: null,
+            scrollToNote: null
         };
-
-        this.scrollToNote = null;
     }
 
     componentDidMount() {
         this.setupSidenav();
     }
 
-    componentDidUpdate(prevProps) {
-        if (
-            this.scrollToNote !== null
-            &&
-            (
-                (this.notesListSwipableRef && prevProps.notes[this.notesListSwipableRef.activePageIndex].items !== this.props.notes[this.notesListSwipableRef.activePageIndex].items)
-                ||
-                (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime)
-            )
-        ) {
-            let el = document.querySelector(`[data-id='${this.scrollToNote}']`);
+    componentDidUpdate() {
+        if (this.state.scrollToNote) {
+            let el = document.querySelector(`[data-id='${this.state.scrollToNote}']`);
             el && el.scrollIntoView();
 
-            this.scrollToNote = null;
+            this.setState({
+                scrollToNote: null
+            });
         }
     }
 
@@ -141,7 +134,7 @@ class Notes extends PureComponent {
         this.props.updateDatesAndNotes(nextDate, nextPreRenderDate, nextIndex, this.props.settings.notesScreenMode);
     };
 
-    setDate = (date) => {
+    setDate = async (date) => {
         if (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) {
             return;
         }
@@ -151,11 +144,11 @@ class Notes extends PureComponent {
         let next = moment(cur).add(1, "day");
 
         if (this.notesListSwipableRef.activePageIndex === 2) {
-            this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesScreenMode);
+            return this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesScreenMode);
         } else if (this.notesListSwipableRef.activePageIndex === 0) {
-            this.props.setDatesAndUpdateNotes([cur, next, prev], 0, this.props.settings.notesScreenMode);
+            return this.props.setDatesAndUpdateNotes([cur, next, prev], 0, this.props.settings.notesScreenMode);
         } else {
-            this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesScreenMode);
+            return this.props.setDatesAndUpdateNotes([prev, cur, next], 1, this.props.settings.notesScreenMode);
         }
     };
 
@@ -167,15 +160,20 @@ class Notes extends PureComponent {
         this.setDate(moment().startOf("day"));
     };
 
-    onSearchResult = (note) => {
+    onSearchResult = async (note) => {
         if (!note) {
             return;
         }
 
-        this.scrollToNote = note.id;
         if (note.date.valueOf() !== this.props.currentDate.valueOf()) {
-            this.setDate(note.date);
+            await this.setDate(note.date);
         }
+
+        setTimeout(() => {
+            this.setState({
+                scrollToNote: note.id
+            });
+        });
     }
 
     onCalendarPeriodChange = (periodName) => {
