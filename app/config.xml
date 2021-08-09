@@ -41,6 +41,11 @@
         <splash density="port-xhdpi" src="res/screen/android/drawable-port-xhdpi-screen.png" />
         <splash density="port-xxhdpi" src="res/screen/android/drawable-port-xxhdpi-screen.png" />
         <splash density="port-xxxhdpi" src="res/screen/android/drawable-port-xxxhdpi-screen.png" />
+        <resource-file src="res/notification/drawable-mdpi.png" target="app/src/main/res/mipmap-mdpi/notification.png" />
+        <resource-file src="res/notification/drawable-hdpi.png" target="app/src/main/res/mipmap-hdpi/notification.png" />
+        <resource-file src="res/notification/drawable-xhdpi.png" target="app/src/main/res/mipmap-xhdpi/notification.png" />
+        <resource-file src="res/notification/drawable-xxhdpi.png" target="app/src/main/res/mipmap-xxhdpi/notification.png" />
+        <resource-file src="res/notification/drawable-xxxhdpi.png" target="app/src/main/res/mipmap-xxxhdpi/notification.png" />
     </platform>
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.1.2" />
     <plugin name="cordova-plugin-x-toast" spec="^2.6.2" />

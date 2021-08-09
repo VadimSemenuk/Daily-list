@@ -27,7 +27,7 @@ class NotificationService {
             text: this.getMessage(note),
             sound: true,
             priority: 2,
-            smallIcon: 'res://ic_launcher',
+            smallIcon: 'res://notification',
         };
 
         switch(note.repeatType) {
