@@ -284,7 +284,12 @@ class Add extends Component {
 
     addImage = async (sourceType) => {
         let url = await this.getPicture(sourceType)
-            .catch((err) => this.props.triggerErrorModal("error-common"));
+            .catch((err) => {
+                if (err === "No Image Selected") {
+                    return null;
+                }
+                this.props.triggerErrorModal("error-common")
+            });
 
         if (url) {
             this.addImageContentItem(url);
@@ -298,10 +303,8 @@ class Add extends Component {
                     sourceType,
                     mediaType: window.navigator.camera.MediaType.PICTURE,
                     correctOrientation: true,
-                    saveToPhotoAlbum: true,
-                    cameraDirection: 0,
                     destinationType: window.navigator.camera.DestinationType.FILE_URI,
-                    encodingType: window.navigator.camera.EncodingType.JPEG
+                    encodingType: window.navigator.camera.EncodingType.JPEG,
                 }
             );
         });
