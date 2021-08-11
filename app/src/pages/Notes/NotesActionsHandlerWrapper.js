@@ -58,10 +58,15 @@ class NotesActionsHandlerWrapper extends PureComponent {
     };
 
     pasteCopy = async () => {
-        let note = deepCopyObject(Object.assign(this.state.copyBuffer, {
-            repeatType: NoteRepeatType.NoRepeat,
-            date: moment(this.props.date)
-        }));
+        let note = deepCopyObject(
+            {
+                ...this.state.copyBuffer,
+                ...{
+                    repeatType: NoteRepeatType.NoRepeat,
+                    date: moment(this.props.date)
+                }
+            }
+        );
 
         await this.props.addNote(note);
 
