@@ -26,7 +26,7 @@ import ClockImg from '../../assets/img/clock.svg';
 import RepeatImg from '../../assets/img/repeat.svg';
 import NotificationImg from '../../assets/img/notification.svg';
 import CalendarImg from "../../assets/img/calendar.svg";
-import CheckedImg from "../../assets/img/checked.svg";
+import CheckedImg from "../../assets/img/tick.svg";
 
 import deepCopy from '../../utils/deepCopyObject'
 
