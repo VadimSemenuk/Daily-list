@@ -60,7 +60,7 @@ class Add extends Component {
             startTime: null,
             endTime: null,
             tag: 'transparent',
-            date: this.props.date,
+            date: moment(this.props.date),
             isFinished: false,
             repeatType: NoteRepeatType.NoRepeat,
             repeatValues: [],

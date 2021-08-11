@@ -235,5 +235,8 @@ export default {
     "updates-note-ci-4": "Added trash",
     "updates-note-ci-5": "Added search for notes",
     "updates-note-ci-6": "Added automatic backup",
-    "updates-note-ci-7": "Added the ability to reset password"
+    "updates-note-ci-7": "Added the ability to reset password",
+
+    // fast add
+    "fast-add-placeholder": "New note...",
 }

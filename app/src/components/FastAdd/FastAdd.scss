@@ -1,0 +1,15 @@
+.fast-add {
+  display: flex;
+
+  .textarea {
+    flex: 1;
+  }
+  .actions-wrapper {
+    flex-shrink: 0;
+    display: flex;
+
+    button {
+      flex-shrink: 0;
+    }
+  }
+}

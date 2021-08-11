@@ -9,6 +9,7 @@ import Header from '../../components/Header/Header';
 import NotesList from "./NotesList";
 import NotesListSwipable from "./NotesListSwipable";
 import NotesActionsHandlerWrapper from "./NotesActionsHandlerWrapper";
+import FastAdd from "../../components/FastAdd/FastAdd";
 
 import * as AppActions from '../../actions'; 
 
@@ -277,6 +278,7 @@ class Notes extends PureComponent {
                         </div>
                     }
                 </div>
+                <FastAdd/>
             </div>
         )
     }
