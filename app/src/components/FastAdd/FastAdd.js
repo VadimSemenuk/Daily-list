@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {withRouter} from "react-router-dom";
+import moment from "moment";
 
 import Textarea from "react-textarea-autosize";
 
@@ -40,13 +41,17 @@ class FastAdd extends PureComponent {
         }
     }
 
-    add() {
+    add = () => {
         let note = this.getDefaultNoteData();
         note.tags = this.props.settings.noteFilters.tags.map((id) => this.props.tags.find((tag) => tag.id === id));
         note.contentItems.push({
             type: NoteContentItemType.Text,
             value: this.state.value
         });
+
+        this.props.addNote(note);
+
+        this.setState({value: ""});
     }
 
     render() {
@@ -63,7 +68,7 @@ class FastAdd extends PureComponent {
                 />
 
                 <div className="actions-wrapper">
-                    <button onClick={() => {}}>
+                    <button onClick={this.add}>
                         <img
                             src={CheckedImg}
                             alt="button"
@@ -92,6 +97,7 @@ function mapStateToProps(state) {
     return {
         settings: state.settings,
         date: state.date,
+        tags: state.tags
     }
 }
 
