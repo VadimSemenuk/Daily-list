@@ -140,16 +140,11 @@ class AuthService {
             }
         };
         localStorage.setItem(config.LSUserKey, JSON.stringify(tokenToSave));
-        this.user = this.getFormattedUser(user);
     }
 
     getUser() {
-        if (this.user) {
-            return this.user;
-        } else {
-            let user = JSON.parse(localStorage.getItem(config.LSUserKey));
-            return this.getFormattedUser(user);
-        }
+        let user = JSON.parse(localStorage.getItem(config.LSUserKey));
+        return this.getFormattedUser(user);
     }
 
     getFormattedUser(user) {
@@ -168,7 +163,6 @@ class AuthService {
 
     resetUser() {
         localStorage.removeItem(config.LSUserKey);
-        this.user = null;
         this.resetAuthorizationToken();
     }
 

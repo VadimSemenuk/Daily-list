@@ -86,7 +86,13 @@ class BackupService {
         let backupFile = user.gdBackup.backupFiles.find((f) => f.name === targetBackupFileName);
         if (!backupFile) {
             backupFile = await this.createGDBackupFile(targetBackupFileName);
-            user.gdBackup.backupFiles = [...user.gdBackup.backupFiles, backupFile];
+            authService.setUser({
+                ...user,
+                gdBackup: {
+                    ...user.gdBackup,
+                    backupFiles: [...user.gdBackup.backupFiles, backupFile]
+                }
+            });
         }
 
         let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);
