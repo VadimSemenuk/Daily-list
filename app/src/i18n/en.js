@@ -232,4 +232,8 @@ export default {
     "updates-note-ci-3": "Added panels \"Diary \" and \"Notes \". \n"
         + "In the \"Diary\" panel, notes are created with reference to the date and are displayed for the date selected on the calendar. \n"
         + "In the \"Notes\" panel, notes are created without reference to a date.",
+    "updates-note-ci-4": "Added trash",
+    "updates-note-ci-5": "Added search for notes",
+    "updates-note-ci-6": "Added automatic backup",
+    "updates-note-ci-7": "Added the ability to reset password"
 }
