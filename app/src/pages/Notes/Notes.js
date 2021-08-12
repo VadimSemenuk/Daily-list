@@ -278,7 +278,11 @@ class Notes extends PureComponent {
                         </div>
                     }
                 </div>
-                <FastAdd/>
+
+                {
+                    this.props.settings.isFastAddPanelVisible &&
+                    <FastAdd/>
+                }
             </div>
         )
     }

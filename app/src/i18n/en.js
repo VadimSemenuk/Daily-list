@@ -23,6 +23,7 @@ export default {
     "notes-show-interval-week": "Week",
     "notes-show-interval-day": "Day",
     "time-sort-notification": "When sorting by the specified time, drag and drop sorting is not available",
+    "fast-add-panel": "Quick add panel",
 
     // interface page
     "theme": "Theme",

@@ -185,7 +185,8 @@ export default {
                     passwordResetEmail TEXT,
                     invertHeaderPosition INTEGER,
                     noteFilters TEXT,
-                    isSidenavTagsListExpanded INTEGER
+                    isSidenavTagsListExpanded INTEGER,
+                    isFastAddPanelVisible INTEGER
                 );
             `);
             await executeSQL(`
@@ -205,7 +206,8 @@ export default {
                     notesScreenMode,
                     invertHeaderPosition,
                     noteFilters,
-                    isSidenavTagsListExpanded
+                    isSidenavTagsListExpanded,
+                    isFastAddPanelVisible
                 ) 
                 SELECT 
                     defaultNotification, 
@@ -225,7 +227,8 @@ export default {
                     1 as notesScreenMode,
                     0 as invertHeaderPosition,
                     ? as noteFilters,
-                    1 as isSidenavTagsListExpanded
+                    1 as isSidenavTagsListExpanded,
+                    fastAdd as isFastAddPanelVisible
                 FROM Settings_OLD;
             `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort, JSON.stringify(noteFiltersSettings)]);
             await executeSQL(`DROP TABLE Settings_OLD;`);

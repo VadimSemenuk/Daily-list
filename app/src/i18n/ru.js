@@ -23,6 +23,7 @@ export default {
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
     "time-sort-notification": "При сортировке по указанному времени не доступна сортировка перетягиваением",
+    "fast-add-panel": "Панель быстрого добавления",
 
     // interface page
     "theme": "Тема",

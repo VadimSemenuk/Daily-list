@@ -169,6 +169,12 @@ class SettingsTheme extends Component {
                         onChange={(e) => this.props.setSetting({invertHeaderPosition: e})}
                     />
 
+                    <SwitchListItem
+                        text={t("fast-add-panel")}
+                        checked={this.props.settings.isFastAddPanelVisible}
+                        onChange={(e) => this.props.setSetting({isFastAddPanelVisible: e})}
+                    />
+
                     <ModalListItem
                         text={t("language")} 
                         value={t(activeLanguageSettings.translateId)}
