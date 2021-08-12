@@ -79,7 +79,8 @@ class SettingsService {
                 passwordResetEmail,
                 invertHeaderPosition,
                 noteFilters,
-                isSidenavTagsListExpanded
+                isSidenavTagsListExpanded,
+                isQuickAddPanelVisible
             FROM Settings;`
         );
 
@@ -92,7 +93,8 @@ class SettingsService {
             minimizeNotes: Boolean(result.minimizeNotes),
             invertHeaderPosition: Boolean(result.invertHeaderPosition),
             noteFilters: JSON.parse(result.noteFilters),
-            isSidenavTagsListExpanded: Boolean(result.isSidenavTagsListExpanded)
+            isSidenavTagsListExpanded: Boolean(result.isSidenavTagsListExpanded),
+            isQuickAddPanelVisible: Boolean(result.isQuickAddPanelVisible)
         };
     }
 
@@ -107,6 +109,7 @@ class SettingsService {
                 case("invertHeaderPosition"): value = Number(value); break;
                 case("noteFilters"): value = JSON.stringify(value); break;
                 case("isSidenavTagsListExpanded"): value = Number(value); break;
+                case("isQuickAddPanelVisible"): value = Number(value); break;
                 default: break;
             }
 

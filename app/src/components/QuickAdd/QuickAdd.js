@@ -78,7 +78,8 @@ class QuickAdd extends PureComponent {
                             alt="button"
                         />
                     </button>
-                    <button onClick={() => this.props.history.push({
+                    <button onClick={() => {
+                        this.props.history.push({
                             pathname: "/add",
                             state: {
                                 props: {
@@ -86,7 +87,12 @@ class QuickAdd extends PureComponent {
                                     initialContentItems: [this.getContentItem(this.state.value)]
                                 }
                             }
-                        })}>
+                        });
+
+                        this.setState({
+                            value: ""
+                        });
+                    }}>
                         <img
                             src={AddImg}
                             alt="button"
