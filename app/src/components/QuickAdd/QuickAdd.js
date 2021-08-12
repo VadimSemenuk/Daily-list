@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {withRouter} from "react-router-dom";
 import moment from "moment";
-
+import {translate} from "react-i18next";
 import Textarea from "react-textarea-autosize";
 
 import AddImg from "../../assets/img/add-gray.svg";
@@ -11,11 +11,11 @@ import CheckedImg from "../../assets/img/tick-black.svg";
 
 import * as AppActions from '../../actions';
 
-import './FastAdd.scss';
-import {translate} from "react-i18next";
 import {NoteContentItemType, NoteRepeatType} from "../../constants";
 
-class FastAdd extends PureComponent {
+import './QuickAdd.scss';
+
+class QuickAdd extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -62,11 +62,11 @@ class FastAdd extends PureComponent {
         let {t} = this.props;
 
         return (
-            <div className="fast-add">
+            <div className="quick-add">
                 <Textarea
                     className="textarea"
                     type="text"
-                    placeholder={t("fast-add-placeholder")}
+                    placeholder={t("quick-add-placeholder")}
                     value={this.state.value}
                     onChange={(e) => this.setState({value: e.target.value})}
                 />
@@ -110,4 +110,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(withRouter(FastAdd)));
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(withRouter(QuickAdd)));

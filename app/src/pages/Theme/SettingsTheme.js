@@ -170,9 +170,9 @@ class SettingsTheme extends Component {
                     />
 
                     <SwitchListItem
-                        text={t("fast-add-panel")}
-                        checked={this.props.settings.isFastAddPanelVisible}
-                        onChange={(e) => this.props.setSetting({isFastAddPanelVisible: e})}
+                        text={t("quick-add-panel")}
+                        checked={this.props.settings.isQuickAddPanelVisible}
+                        onChange={(e) => this.props.setSetting({isQuickAddPanelVisible: e})}
                     />
 
                     <ModalListItem

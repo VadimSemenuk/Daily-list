@@ -9,7 +9,7 @@ import Header from '../../components/Header/Header';
 import NotesList from "./NotesList";
 import NotesListSwipable from "./NotesListSwipable";
 import NotesActionsHandlerWrapper from "./NotesActionsHandlerWrapper";
-import FastAdd from "../../components/FastAdd/FastAdd";
+import QuickAdd from "../../components/QuickAdd/QuickAdd";
 
 import * as AppActions from '../../actions'; 
 
@@ -280,8 +280,8 @@ class Notes extends PureComponent {
                 </div>
 
                 {
-                    this.props.settings.isFastAddPanelVisible &&
-                    <FastAdd/>
+                    this.props.settings.isQuickAddPanelVisible &&
+                    <QuickAdd/>
                 }
             </div>
         )

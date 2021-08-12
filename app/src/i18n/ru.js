@@ -23,13 +23,11 @@ export default {
     "notes-show-interval-week": "Неделя",
     "notes-show-interval-day": "День",
     "time-sort-notification": "При сортировке по указанному времени не доступна сортировка перетягиваением",
-    "fast-add-panel": "Панель быстрого добавления",
 
     // interface page
     "theme": "Тема",
     "random-theme": "Случайная тема",
     "font-size": "Размер шрифта заметки",
-    "fast-add": "Поле быстрого добавления",
     "show-mini-calendar": "Показывать мини-календарь",
     "language": "Язык",
     "ru": "Руссский",
@@ -41,6 +39,7 @@ export default {
     "notes-count-all": "Отображать все",
     "minimize-notes": "Сворачивать длинные заметки",
     "move-control-panels-down": "Перенести вниз элементы управления",
+    "quick-add-panel": "Панель быстрого добавления",
 
     // password page
     "password": "Пароль",
@@ -112,9 +111,6 @@ export default {
     "attention": "Внимание",
     "later": "Позже",
     "app-name": "Ежедневник",
-
-    // fast-add field
-    "description": "Текст...",
  
     // notes list page
     "no-content": "Нет записей",
@@ -238,6 +234,6 @@ export default {
     "updates-note-ci-6": "Добавлено автоматическое резервное копирование",
     "updates-note-ci-7": "Добавлена возможность сбросса пароля",
 
-    // fast add
-    "fast-add-placeholder": "Новая заметка...",
+    // quick add
+    "quick-add-placeholder": "Новая заметка...",
 }

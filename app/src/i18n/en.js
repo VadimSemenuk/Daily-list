@@ -23,13 +23,11 @@ export default {
     "notes-show-interval-week": "Week",
     "notes-show-interval-day": "Day",
     "time-sort-notification": "When sorting by the specified time, drag and drop sorting is not available",
-    "fast-add-panel": "Quick add panel",
 
     // interface page
     "theme": "Theme",
     "random-theme": "Random theme",
     "font-size": "Note font size",
-    "fast-add": "Quick add",
     "show-mini-calendar": "Show mini-callendar",
     "language": "Language",
     "ru": "Русский",
@@ -41,6 +39,7 @@ export default {
     "notes-count-all": "Display all",
     "minimize-notes": "Minimize long notes",
     "move-control-panels-down": "Move controls down",
+    "quick-add-panel": "Quick add panel",
 
     // password page
     "password": "Password",
@@ -112,9 +111,6 @@ export default {
     "attention": "Attention",
     "later": "Later",
     "app-name": "Diary",
-
-    // fast-add field
-    "description": "Description...",
     
     // notes list page
     "no-content": "No notes yet",
@@ -238,6 +234,6 @@ export default {
     "updates-note-ci-6": "Added automatic backup",
     "updates-note-ci-7": "Added the ability to reset password",
 
-    // fast add
-    "fast-add-placeholder": "New note...",
+    // quick add
+    "quick-add-placeholder": "New note...",
 }

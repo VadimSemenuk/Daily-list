@@ -186,7 +186,7 @@ export default {
                     invertHeaderPosition INTEGER,
                     noteFilters TEXT,
                     isSidenavTagsListExpanded INTEGER,
-                    isFastAddPanelVisible INTEGER
+                    isQuickAddPanelVisible INTEGER
                 );
             `);
             await executeSQL(`
@@ -207,7 +207,7 @@ export default {
                     invertHeaderPosition,
                     noteFilters,
                     isSidenavTagsListExpanded,
-                    isFastAddPanelVisible
+                    isQuickAddPanelVisible
                 ) 
                 SELECT 
                     defaultNotification, 
@@ -228,7 +228,7 @@ export default {
                     0 as invertHeaderPosition,
                     ? as noteFilters,
                     1 as isSidenavTagsListExpanded,
-                    fastAdd as isFastAddPanelVisible
+                    fastAdd as isQuickAddPanelVisible
                 FROM Settings_OLD;
             `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort, JSON.stringify(noteFiltersSettings)]);
             await executeSQL(`DROP TABLE Settings_OLD;`);

@@ -23,13 +23,11 @@ export default {
     "notes-show-interval-week": "Тыдзень",
     "notes-show-interval-day": "Дзень",
     "time-sort-notification": "Пры сартаванні па згаданага часу не даступная сартаванне перетягиваением",
-    "fast-add-panel": "Панэль хуткага дадання",
 
     // interface page
     "theme": "Тэма",
     "random-theme": "Выпадковая тэма",
     "font-size": "Памер шрыфта нататкі",
-    "fast-add": "Поле хуткага дадання",
     "show-mini-calendar": "Паказваць міні-каляндар",
     "language": "Мова",
     "ru": "Руссский",
@@ -41,6 +39,7 @@ export default {
     "notes-count-all": "Адлюстроўваць усе",
     "minimize-notes": "Згортваць доўгія нататкі",
     "move-control-panels-down": "Перанесці ўніз элементы кіравання",
+    "quick-add-panel": "Панэль хуткага дадання",
 
     // password page
     "password": "Пароль",
@@ -112,9 +111,6 @@ export default {
     "attention": "Увага",
     "later": "Пазней",
     "app-name": "Штодзённік",
-
-    // fast-add field
-    "description": "Тэкст...",
  
     // notes list page
     "no-content": "Няма запісаў",
@@ -238,6 +234,6 @@ export default {
     "updates-note-ci-6": "Дададзена аўтаматычнае рэзервовае капіраванне",
     "updates-note-ci-7": "Дададзеная магчымасць сбросса пароля",
 
-    // fast add
-    "fast-add-placeholder": "Новая нататка...",
+    // quick add
+    "quick-add-placeholder": "Новая нататка...",
 }
