@@ -79,11 +79,30 @@ class Add extends Component {
         }
 
         if (this.props.match.path === "/add") {
-            if (this.props.location.state && this.props.location.state.props.tagsSelected.length && this.props.location.state.props.tagsSelected.length) {
-                await this.updateNoteData({tags: this.props.location.state.props.tagsSelected.map((id) => this.props.tags.find((tag) => tag.id === id))});
+            if (this.props.location.state && this.props.location.state.props) {
+                let initialData = {};
+                if (this.props.location.state.props.tagsSelected && this.props.location.state.props.tagsSelected.length) {
+                    initialData.tags = this.props.location.state.props.tagsSelected.map((id) => this.props.tags.find((tag) => tag.id === id));
+                }
+                if (this.props.location.state.props.initialContentItems && this.props.location.state.props.initialContentItems.length) {
+                    initialData.contentItems = this.props.location.state.props.initialContentItems;
+                }
+
+                await this.updateNoteData(initialData);
+
+                if (initialData.contentItems && initialData.contentItems.length) {
+                    setTimeout(() => {
+                        this.focusDynamicField(0);
+
+                        let el = this.getDynamicFiledElements()[0];
+                        el.querySelector('textarea').setSelectionRange(initialData.contentItems[0].value.length, initialData.contentItems[0].value.length);
+                    });
+                }
             }
 
-            this.addInputContentItem();
+            if (this.state.note.contentItems.length === 0) {
+                this.addInputContentItem();
+            }
         }
     }
 

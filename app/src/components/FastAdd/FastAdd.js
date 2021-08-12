@@ -44,14 +44,18 @@ class FastAdd extends PureComponent {
     add = () => {
         let note = this.getDefaultNoteData();
         note.tags = this.props.settings.noteFilters.tags.map((id) => this.props.tags.find((tag) => tag.id === id));
-        note.contentItems.push({
-            type: NoteContentItemType.Text,
-            value: this.state.value
-        });
+        note.contentItems.push(this.getContentItem(this.state.value));
 
         this.props.addNote(note);
 
         this.setState({value: ""});
+    }
+
+    getContentItem = (value) => {
+        return {
+            type: NoteContentItemType.Text,
+            value: value
+        }
     }
 
     render() {
@@ -78,7 +82,8 @@ class FastAdd extends PureComponent {
                             pathname: "/add",
                             state: {
                                 props: {
-                                    tagsSelected: this.props.settings.noteFilters.tags
+                                    tagsSelected: this.props.settings.noteFilters.tags,
+                                    initialContentItems: [this.getContentItem(this.state.value)]
                                 }
                             }
                         })}>
