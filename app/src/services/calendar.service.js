@@ -4,6 +4,7 @@ import getUTCOffset from "../utils/getUTCOffset";
 import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
 
 window.moment = moment;
+window.getUTCOffset = getUTCOffset;
 
 class CalendarService {
     checkForCountUpdate(nextDate, intervalStartDate, intervalEndDate) {
@@ -11,13 +12,12 @@ class CalendarService {
     }
 
     async getCount(date, period, noteFilters) {
-        let utcOffset = getUTCOffset();
-        let halfInterval = 20;
+        let halfInterval = period === "month" ? 10 : 20;
 
-        let intervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
-        let intervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
-        let intervalStartDateUTC = intervalStartDate + getUTCOffset();
-        let intervalEndDateUTC = intervalEndDate + getUTCOffset();
+        let msIntervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
+        let msIntervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
+        let msIntervalStartDateUTC = msIntervalStartDate + getUTCOffset(msIntervalStartDate);
+        let msIntervalEndDateUTC = msIntervalEndDate + getUTCOffset(msIntervalEndDate);
 
         let select = await executeSQL(`
             SELECT n.date, n.repeatType, rep.value as repeatValue, n.isFinished, n.tags
@@ -31,15 +31,15 @@ class CalendarService {
                     OR (n.forkFrom IS NULL AND n.repeatType != ?)
                 )
                 AND n.mode = ?;
-        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, intervalStartDateUTC, intervalEndDateUTC, NoteRepeatType.Any, NoteMode.WithDateTime]);
+        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Any, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Any, NoteMode.WithDateTime]);
 
         let dates = {};
         let dateInitial = {
             finished: 0,
             notFinished: 0
         };
-        for (let date = intervalStartDate; date < intervalEndDate; date += 86400000) {
-            dates[date] = {...dateInitial};
+        for (let date = moment(msIntervalStartDate); moment(msIntervalEndDate).isAfter(date); date = moment(date).startOf("day").add(1, 'day')) {
+            dates[date.valueOf()] = {...dateInitial};
         }
 
         let repeatableDay = 0;
@@ -56,10 +56,10 @@ class CalendarService {
             }
 
             if (note.date) {
-                note.date = note.date - utcOffset;
+                note.date = note.date - getUTCOffset(note.date);
             }
             if (note.repeatType === NoteRepeatType.Any) {
-                note.repeatValue = note.repeatValue - utcOffset;
+                note.repeatValue = note.repeatValue - getUTCOffset(note.repeatValue);
             }
 
             if (note.isFinished) {
@@ -94,8 +94,8 @@ class CalendarService {
 
         return {
             [period]: {
-                intervalStartDate,
-                intervalEndDate,
+                intervalStartDate: msIntervalStartDate,
+                intervalEndDate: msIntervalEndDate,
                 count: dates
             }
         };
