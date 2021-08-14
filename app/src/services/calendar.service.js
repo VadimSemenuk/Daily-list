@@ -26,19 +26,19 @@ class CalendarService {
             WHERE
                 n.lastAction != ? 
                 AND (
-                    (n.repeatType = ? OR n.forkFrom IS NOT NULL AND n.date >= ? AND n.date <= ?)
+                    ((n.repeatType = ? OR n.forkFrom IS NOT NULL) AND n.date >= ? AND n.date <= ?)
                     OR (n.repeatType = ? AND n.forkFrom IS NULL AND rep.value >= ? AND rep.value <= ?)
-                    OR (n.forkFrom IS NULL AND n.repeatType != ?)
+                    OR (n.forkFrom IS NULL AND n.repeatType IN (?, ?))
                 )
                 AND n.mode = ?;
-        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Any, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Any, NoteMode.WithDateTime]);
+        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Any, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, NoteMode.WithDateTime]);
 
         let dates = {};
         let dateInitial = {
             finished: 0,
             notFinished: 0
         };
-        for (let date = moment(msIntervalStartDate); moment(msIntervalEndDate).isAfter(date); date = moment(date).startOf("day").add(1, 'day')) {
+        for (let date = moment(msIntervalStartDate); moment(msIntervalEndDate).isSameOrAfter(date); date = moment(date).startOf("day").add(1, 'day')) {
             dates[date.valueOf()] = {...dateInitial};
         }
 
