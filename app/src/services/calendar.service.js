@@ -1,28 +1,20 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
-import getUTCOffset from "../utils/getUTCOffset";
 import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
-
-window.moment = moment;
-window.getUTCOffset = getUTCOffset;
+import {convertLocalDateTimeToUTC, convertUTCDateTimeToLocal} from "../utils/convertDateTimeLocale";
 
 class CalendarService {
     checkForCountUpdate(nextDate, intervalStartDate, intervalEndDate) {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
-    convertDateTimeToLocal(msUtcDateTime) {
-        let utcDateTime = moment.utc(msUtcDateTime)
-        return moment({year: utcDateTime.year(), month: utcDateTime.month(), date: utcDateTime.date(), hour: utcDateTime.hour(), minute: utcDateTime.minute(), second: 0, millisecond: 0});
-    }
-
     async getCount(date, period, noteFilters) {
-        let halfInterval = period === "month" ? 10 : 20;
+        let halfInterval = period === "month" ? 10 : 10;
 
         let msIntervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
         let msIntervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
-        let msIntervalStartDateUTC = msIntervalStartDate + getUTCOffset(msIntervalStartDate);
-        let msIntervalEndDateUTC = msIntervalEndDate + getUTCOffset(msIntervalEndDate);
+        let msIntervalStartDateUTC = convertLocalDateTimeToUTC(msIntervalStartDate).valueOf();
+        let msIntervalEndDateUTC = convertLocalDateTimeToUTC(msIntervalEndDate).valueOf();
 
         let select = await executeSQL(`
             SELECT n.date, n.repeatType, rep.value as repeatValue, n.isFinished, n.tags
@@ -43,15 +35,17 @@ class CalendarService {
             finished: 0,
             notFinished: 0
         };
-        for (let date = moment(msIntervalStartDate); moment(msIntervalEndDate).isSameOrAfter(date); date = moment(date).startOf("day").add(1, 'day')) {
+        for (let date = moment(msIntervalStartDate); moment(msIntervalEndDate).isSameOrAfter(date); date = moment(date).add(1, 'day').startOf("day")) {
             dates[date.valueOf()] = {...dateInitial};
         }
+        // console.log(Object.keys(dates).map((date) => moment(+date).format("MMMM DD HH")));
 
         let repeatableDay = 0;
         let repeatableWeek = {};
 
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
+            // let date = note.date;
 
             if (
                 noteFilters.tags.length
@@ -61,10 +55,10 @@ class CalendarService {
             }
 
             if (note.date) {
-                note.date = this.convertDateTimeToLocal(note.date).valueOf();
+                note.date = convertUTCDateTimeToLocal(note.date).valueOf();
             }
             if (note.repeatType === NoteRepeatType.Any) {
-                note.repeatValue = this.convertDateTimeToLocal(note.repeatValue).valueOf();
+                note.repeatValue = convertUTCDateTimeToLocal(note.repeatValue).valueOf();
             }
 
             if (note.isFinished) {
@@ -77,6 +71,11 @@ class CalendarService {
 
             if (note.date !== null) {
                 if (note.repeatType === NoteRepeatType.NoRepeat) {
+                    // try {
+                    //     dates[note.date].notFinished = dates[note.date].notFinished + 1;
+                    // } catch(err) {
+                    //     console.log(note, date);
+                    // }
                     dates[note.date].notFinished = dates[note.date].notFinished + 1;
                 }
             } else {

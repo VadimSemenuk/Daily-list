@@ -1,15 +1,12 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 import notificationService from "./notification.service";
-import getUTCOffset from "../utils/getUTCOffset";
 import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
 import tagsService from "./tags.service";
-
-window.e = executeSQL;
+import {convertUTCDateTimeToLocal, convertLocalDateTimeToUTC} from "../utils/convertDateTimeLocale";
 
 class NotesService {
     async processSearchResultNotesWithTime(notesIDs) {
-        let utcOffset = getUTCOffset();
         let currentDate = moment().startOf("day");
 
         let select = await executeSQL(
@@ -42,7 +39,7 @@ class NotesService {
 
         let notes = [];
         for(let i = 0; i < select.rows.length; i++) {
-            let note = this.parseNoteWithTime(select.rows.item(i), utcOffset);
+            let note = this.parseNoteWithTime(select.rows.item(i));
 
             if (note.repeatType === NoteRepeatType.Day) {
                 note.date = moment(currentDate);
@@ -149,16 +146,16 @@ class NotesService {
         }
     }
 
-    parseNoteWithTime(note, utcOffset) {
+    parseNoteWithTime(note) {
         return {
             ...note,
             ...this.parseNoteCommon(note),
-            startTime: note.startTime ? moment(note.startTime - utcOffset) : note.startTime,
-            endTime: note.endTime ? moment(note.endTime - utcOffset) : note.endTime,
-            date: note.date ? moment(note.date - utcOffset) : note.date,
+            startTime: note.startTime ? convertUTCDateTimeToLocal(note.startTime, "second") : note.startTime,
+            endTime: note.endTime ? convertUTCDateTimeToLocal(note.endTime, "second") : note.endTime,
+            date: note.date ? convertUTCDateTimeToLocal(note.date) : note.date,
             isNotificationEnabled: Boolean(note.isNotificationEnabled),
             isShadow: Boolean(note.date === null),
-            repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? +a - utcOffset : +a) : [],
+            repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? convertUTCDateTimeToLocal(Number(a)).valueOf() : Number(a)) : [],
         };
     }
 
@@ -170,11 +167,9 @@ class NotesService {
     }
 
     async getNotesWithTime(dates) {
-        let utcOffset = getUTCOffset();
-
         let selects = await Promise.all(
             dates.map((date) => {
-                let msDateUTC = date.valueOf() + utcOffset;
+                let msDateUTC = convertLocalDateTimeToUTC(date).valueOf();
                 return executeSQL(
                     `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags,
                     n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
@@ -203,7 +198,7 @@ class NotesService {
         let result = selects.map((select, selectIndex) => {
             let notes = [];
             for(let i = 0; i < select.rows.length; i++) {
-                let note = this.parseNoteWithTime(select.rows.item(i), utcOffset);
+                let note = this.parseNoteWithTime(select.rows.item(i));
                 note.date = moment(dates[selectIndex].valueOf());
                 notes.push(note);
             }
@@ -265,22 +260,20 @@ class NotesService {
     }
 
     async insertNote(note) {
-        let utcOffset = getUTCOffset();
-
         let insert = await executeSQL(
             `INSERT INTO Notes
             (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags)
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
-                note.startTime ? note.startTime.valueOf() + utcOffset : note.startTime,
-                note.endTime ? note.endTime.valueOf() + utcOffset : note.endTime,
+                note.startTime ? convertLocalDateTimeToUTC(note.startTime, "second").valueOf() : note.startTime,
+                note.endTime ? convertLocalDateTimeToUTC(note.endTime, "second").valueOf() : note.endTime,
                 Number(note.isNotificationEnabled),
                 note.tag,
                 note.repeatType,
                 JSON.stringify(note.contentItems),
                 Number(note.isFinished),
-                note.date ? note.date.valueOf() + utcOffset : note.date,
+                note.date ? convertLocalDateTimeToUTC(note.date).valueOf() : note.date,
                 note.forkFrom,
                 note.mode,
                 note.manualOrderIndex,
@@ -292,8 +285,6 @@ class NotesService {
     }
 
     async addNoteRepeatValues(note) {
-        let utcOffset = getUTCOffset();
-
         await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [ note.id ]);
 
         if (note.repeatType === NoteRepeatType.NoRepeat || note.repeatValues.length === 0) {
@@ -302,10 +293,9 @@ class NotesService {
 
         let params = note.repeatValues.reduce((acc) => `${acc}, (?, ?)`, "");
         params = params.slice(2);
-        let values = note.repeatValues.reduce((acc, item) => {
-            let value = item;
+        let values = note.repeatValues.reduce((acc, value) => {
             if (note.repeatType === NoteRepeatType.Any) {
-                value = item + utcOffset;
+                value = convertLocalDateTimeToUTC(value).valueOf();
             }
             return [...acc, note.id, value]
         }, []);
@@ -351,8 +341,6 @@ class NotesService {
     }
 
     async updateNote(note, prevNote) {
-        let utcOffset = getUTCOffset();
-
         let nextNote = {...note};
         if (prevNote.repeatType !== NoteRepeatType.NoRepeat) {
             if (!nextNote.isShadow) {
@@ -371,9 +359,9 @@ class NotesService {
             WHERE id = ?;`,
             [
                 nextNote.title,
-                nextNote.date ? (nextNote.isShadow ? null : nextNote.date.valueOf() + utcOffset) : null,
-                nextNote.startTime ? nextNote.startTime.valueOf() + utcOffset : nextNote.startTime,
-                nextNote.endTime ? nextNote.endTime.valueOf() + utcOffset : nextNote.endTime,
+                nextNote.date ? (nextNote.isShadow ? null : convertLocalDateTimeToUTC(nextNote.date).valueOf()) : null,
+                nextNote.startTime ? convertLocalDateTimeToUTC(nextNote.startTime, "second").valueOf() : nextNote.startTime,
+                nextNote.endTime ? convertLocalDateTimeToUTC(nextNote.endTime, "second").valueOf() : nextNote.endTime,
                 Number(nextNote.isNotificationEnabled),
                 nextNote.tag,
                 nextNote.repeatType,
@@ -420,8 +408,6 @@ class NotesService {
     }
 
     async getDeletedNotes() {
-        let utcOffset = getUTCOffset();
-
         let select = await executeSQL(
             `SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
                 contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date
@@ -434,7 +420,7 @@ class NotesService {
 
         let notes = [];
         for(let i = 0; i < select.rows.length; i++) {
-            notes.push(this.parseNoteWithTime(select.rows.item(i), utcOffset));
+            notes.push(this.parseNoteWithTime(select.rows.item(i)));
         }
 
         return notes;

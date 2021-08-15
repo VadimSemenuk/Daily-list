@@ -21,6 +21,11 @@ import logsService from "./services/logs.service";
 import backupService from "./services/backup.service";
 import tagsService from "./services/tags.service";
 
+import executeSQL from "./utils/executeSQL";
+
+window.moment = moment;
+window.executeSQL = executeSQL;
+
 export default class App extends Component {
     constructor(props) {
         super(props);
