@@ -4,6 +4,7 @@
   .textarea {
     flex: 1;
     max-height: 150px;
+    min-height: 44px;
   }
   .actions-wrapper {
     flex-shrink: 0;
