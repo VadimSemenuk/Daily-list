@@ -3,10 +3,10 @@ import md5 from "md5";
 
 import executeSQL from "../../../utils/executeSQL";
 import config from "../../../config/config";
-import getUTCOffset from "../../../utils/getUTCOffset";
 import {NoteRepeatType, CalendarNotesCounterMode, NotesScreenMode, NoteAction} from "../../../constants";
 import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 import i18n from "../../../i18n";
+import {convertLocalDateTimeToUTC} from "../../../utils/convertDateTimeLocale";
 
 export default {
     name: "1.7",
@@ -280,7 +280,7 @@ export default {
         }
 
         async function convertDatesToUTC() {
-            let utcOffset = getUTCOffset();
+            let utcOffset = moment().utcOffset() * 60 * 1000;
 
             await executeSQL(`
                 UPDATE Notes
@@ -340,7 +340,7 @@ export default {
                 isNotificationEnabled: false,
                 startTime: null,
                 endTime: null,
-                date: moment().startOf("day").valueOf() + getUTCOffset(),
+                date: convertLocalDateTimeToUTC(moment().startOf("day").valueOf()),
                 isFinished: false,
                 repeatType: NoteRepeatType.NoRepeat,
                 mode: NotesScreenMode.WithDateTime,

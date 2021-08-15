@@ -46,8 +46,9 @@ class Migration {
             }
         }
 
-        if (!isDbExist) {
-            // addFakeListItemsData();
+        let addFakeData = false;
+        if (!isDbExist && addFakeData) {
+            await addFakeListItemsData();
         }
     }
 }

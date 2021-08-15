@@ -1,14 +1,14 @@
 import moment from "moment";
 import execureSQL from "../utils/executeSQL";
-import getUTCOffset from "./getUTCOffset";
 import {NoteRepeatType} from "../constants";
 
 import DogImg from "../assets/img/initial-note-example-image.jpg"
+import {convertLocalDateTimeToUTC} from "./convertDateTimeLocale";
 
 export async function addFakeListItemsData () {
     console.log("Start adding test data");
 
-    let dates = generateDates(moment().startOf("day").valueOf() + getUTCOffset(), 100);
+    let dates = generateDates(convertLocalDateTimeToUTC(moment().startOf("day").valueOf()), 100);
     let sequence = generateSequence(10);  
     
     let dynamicDataJson = `[{"type":"text","value":"Where rt"},{"type":"listItem","value":"Xc","checked":false},{"type":"listItem","value":"Cvvb","checked":false},{"type":"listItem","value":"Cbnjknh","checked":true},{"type":"listItem","value":"Cbbnj","checked":false},{"type":"text","value":"Vhhjhh"},{"type":"snapshot","value":"${DogImg}"}]`;
