@@ -14,5 +14,9 @@ export default {
     google: {
         webClientId: "390152836612-5rcub6svcoico5lterd17i6fog3pg9lg.apps.googleusercontent.com",
         webClientSecret: "tkIoyxSHt8YgAl6bZ4HfOxeC",
+    },
+    logs: {
+        load: false,
+        error: false
     }
 }

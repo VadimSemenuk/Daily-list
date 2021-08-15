@@ -1,9 +1,14 @@
 import executeSQL from '../utils/executeSQL';
 import apiService from "./api.service";
 import deviceService from "./device.service";
+import config from "../config/config";
 
 class LogsService {
     async logLoad(deviceId) {
+        if (!config.logs.load) {
+            return;
+        }
+
         if (!deviceService.hasNetworkConnection()) {
             return executeSQL(`INSERT INTO LoadLogs (date, deviceId) VALUES (?, ?)`, [+new Date(), deviceId]);
         } else {
@@ -13,6 +18,10 @@ class LogsService {
     }
 
     async uploadSavedLoadLogs() {
+        if (!config.logs.load) {
+            return;
+        }
+
         if (!deviceService.hasNetworkConnection()) {
             return null;
         }
@@ -39,6 +48,10 @@ class LogsService {
     }
 
     logError(err, additionalInto, deviceId) {
+        if (!config.logs.error) {
+            return;
+        }
+
         console.warn(err);
 
         if (err.constructor && err.constructor.name === "SQLError") {
@@ -66,6 +79,10 @@ class LogsService {
     }
 
     async uploadSavedErrorLogs() {
+        if (!config.logs.error) {
+            return;
+        }
+
         if (!deviceService.hasNetworkConnection()) {
             return false;
         }
