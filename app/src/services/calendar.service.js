@@ -11,8 +11,8 @@ class CalendarService {
     async getCount(date, period, noteFilters) {
         let halfInterval = period === "month" ? 10 : 10;
 
-        let msIntervalStartDate = moment(date).startOf(period).subtract(halfInterval, period).valueOf();
-        let msIntervalEndDate = moment(date).endOf(period).add(halfInterval, period).valueOf();
+        let msIntervalStartDate = moment(date).subtract(halfInterval, period).startOf(period).valueOf();
+        let msIntervalEndDate = moment(date).add(halfInterval, period).endOf(period).valueOf();
         let msIntervalStartDateUTC = convertLocalDateTimeToUTC(msIntervalStartDate).valueOf();
         let msIntervalEndDateUTC = convertLocalDateTimeToUTC(msIntervalEndDate).valueOf();
 
@@ -89,7 +89,7 @@ class CalendarService {
             }
         }
 
-        let currentWeekDay = moment(date).startOf(period).subtract(halfInterval, period).isoWeekday();
+        let currentWeekDay = moment(date).subtract(halfInterval, period).startOf(period).isoWeekday();
         Object.keys(dates).forEach((date) => {
             dates[date].notFinished = dates[date].notFinished + repeatableDay + (repeatableWeek[currentWeekDay] || 0);
 

@@ -61,8 +61,8 @@ class Calendar extends Component {
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {
-        let currentMonthStartDate = side === "left" ? moment(this.state.currentMonthStartDate).subtract(1, 'month') : moment(this.state.currentMonthStartDate).add(1, 'month');
-        let nextMonthStartDate = side === "left" ? moment(currentMonthStartDate).subtract(1, 'month') : moment(currentMonthStartDate).add(1, 'month');
+        let currentMonthStartDate = side === "left" ? moment(this.state.currentMonthStartDate).subtract(1, 'month').startOf("day") : moment(this.state.currentMonthStartDate).add(1, 'month').startOf("day");
+        let nextMonthStartDate = side === "left" ? moment(currentMonthStartDate).subtract(1, 'month').startOf("day") : moment(currentMonthStartDate).add(1, 'month').startOf("day");
         let months = [...this.state.months.slice(0, nextIndex), this.getMonthDays(nextMonthStartDate), ...this.state.months.slice(nextIndex + 1)];        
 
         if (calendarService.checkForCountUpdate(currentMonthStartDate.valueOf(), this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
@@ -79,9 +79,9 @@ class Calendar extends Component {
 
     getMonths = (startMonthDate) => {
         return [
-            this.getMonthDays(moment(startMonthDate).subtract(1, 'month')),
+            this.getMonthDays(moment(startMonthDate).subtract(1, 'month').startOf("day")),
             this.getMonthDays(moment(startMonthDate)),
-            this.getMonthDays(moment(startMonthDate).add(1, "month"))
+            this.getMonthDays(moment(startMonthDate).add(1, "month").startOf("day"))
         ]
     }
 
@@ -173,8 +173,8 @@ class Calendar extends Component {
         } else {
             let months;
 
-            let prevMonthStartDate = moment(currentMonthStartDate).subtract(1, 'month');
-            let nextMonthStartDate = moment(currentMonthStartDate).add(1, 'month');
+            let prevMonthStartDate = moment(currentMonthStartDate).subtract(1, 'month').startOf("day");
+            let nextMonthStartDate = moment(currentMonthStartDate).add(1, 'month').startOf("day");
             
             let nextDate;
 

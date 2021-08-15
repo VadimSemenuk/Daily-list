@@ -60,14 +60,14 @@ class LightCalendar extends Component {
 
     generateWeeksSequence(weekStartDate) {
         return [
-            this.generateWeekDates(moment(weekStartDate).subtract(1, 'week')),
+            this.generateWeekDates(moment(weekStartDate).subtract(1, 'week').startOf("day")),
             this.generateWeekDates(moment(weekStartDate)),
-            this.generateWeekDates(moment(weekStartDate).add(1, 'week'))         
+            this.generateWeekDates(moment(weekStartDate).add(1, 'week').startOf("day"))
         ]
     }
 
     onSlideChange = async ({index, nextIndex, side}) => {   
-        let nextDate = side === "left" ? moment(this.state.weeks[index][0]).subtract(1, 'week') : moment(this.state.weeks[index][0]).add(1, 'week');
+        let nextDate = side === "left" ? moment(this.state.weeks[index][0]).subtract(1, 'week').startOf("day") : moment(this.state.weeks[index][0]).add(1, 'week').startOf("day");
         let weeks = [...this.state.weeks.slice(0, nextIndex), this.generateWeekDates(nextDate), ...this.state.weeks.slice(nextIndex + 1)];
 
         if (calendarService.checkForCountUpdate(weeks[nextIndex][0], this.props.calendar.intervalStartDate, this.props.calendar.intervalEndDate)) {
@@ -122,8 +122,8 @@ class LightCalendar extends Component {
             let weeks;
 
             let currentWeekStartDate = moment(msSelectedWeekStartDate);
-            let prevWeekStartDate = moment(msSelectedWeekStartDate).subtract(1, 'week');
-            let nextWeekStartDate = moment(msSelectedWeekStartDate).add(1, 'week');
+            let prevWeekStartDate = moment(msSelectedWeekStartDate).subtract(1, 'week').startOf("day");
+            let nextWeekStartDate = moment(msSelectedWeekStartDate).add(1, 'week').startOf("day");
 
             let nextDate;
 

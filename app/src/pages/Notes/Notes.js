@@ -120,7 +120,7 @@ class Notes extends PureComponent {
         await this.props.setSetting({notesScreenMode: mode});
 
         let msCurDate = moment().startOf("day");
-        let dates = [moment(msCurDate).add(-1, "day"), msCurDate, moment(msCurDate).add(1, "day")];
+        let dates = [moment(msCurDate).add(-1, "day").startOf("day"), msCurDate, moment(msCurDate).add(1, "day").startOf("day")];
         this.props.setDatesAndUpdateNotes(dates, 1, mode);
     }
 
@@ -130,8 +130,8 @@ class Notes extends PureComponent {
             changeValue = -1;
         }
 
-        let nextDate = moment(this.props.currentDate).add(changeValue, "day");
-        let nextPreRenderDate = [moment(nextDate).add(changeValue, "day")];
+        let nextDate = moment(this.props.currentDate).add(changeValue, "day").startOf("day");
+        let nextPreRenderDate = [moment(nextDate).add(changeValue, "day").startOf("day")];
         this.props.updateDatesAndNotes(nextDate, nextPreRenderDate, nextIndex, this.props.settings.notesScreenMode);
     };
 
@@ -140,9 +140,9 @@ class Notes extends PureComponent {
             return;
         }
 
-        let cur = moment(date).startOf("day");
-        let prev = moment(cur).add(-1, "day");
-        let next = moment(cur).add(1, "day");
+        let cur = moment(date).startOf("day").startOf("day");
+        let prev = moment(cur).add(-1, "day").startOf("day");
+        let next = moment(cur).add(1, "day").startOf("day");
 
         if (this.notesListSwipableRef.activePageIndex === 2) {
             return this.props.setDatesAndUpdateNotes([next, prev, cur], 2, this.props.settings.notesScreenMode);

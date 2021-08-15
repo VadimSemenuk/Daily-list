@@ -54,7 +54,7 @@ export default class App extends Component {
             logsService.uploadSavedLoadLogs();
         }
 
-        notesService.removeDeletedNotes(moment().subtract(30, "day").valueOf());
+        notesService.removeDeletedNotes(moment().subtract(30, "day").startOf("day").valueOf());
     }
 
     async initApp() {
@@ -77,7 +77,7 @@ export default class App extends Component {
 
         let date = moment().startOf("day");
 
-        let notes = await notesService.getNotes(settings.notesScreenMode, [moment(date).add(-1, "day"), moment(date), moment(date).add(1, "day")]);
+        let notes = await notesService.getNotes(settings.notesScreenMode, [moment(date).add(-1, "day").startOf("day"), moment(date), moment(date).add(1, "day").startOf("day")]);
 
         let user = authService.getUser();
         authService.initAuthorizationToken();
