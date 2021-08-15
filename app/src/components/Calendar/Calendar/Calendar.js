@@ -170,7 +170,7 @@ class Calendar extends Component {
             this.setState({
                 msSelectedDate
             });
-        } else {
+        } else if (!this.props.msSelectedDates) {
             let months;
 
             let prevMonthStartDate = moment(currentMonthStartDate).subtract(1, 'month').startOf("day");
