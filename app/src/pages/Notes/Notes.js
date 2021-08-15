@@ -205,17 +205,20 @@ class Notes extends PureComponent {
                             }),
                             img: SearchImg
                         },
-                        {
-                            action: () => this.props.history.push({
-                                pathname: "/add",
-                                state: {
-                                    props: {
-                                        tagsSelected: this.props.settings.noteFilters.tags
-                                    }
-                                }
-                            }),
-                            img: AddImg
-                        }
+                        ...(
+                            !this.props.settings.isQuickAddPanelVisible ?
+                                [{
+                                    action: () => this.props.history.push({
+                                        pathname: "/add",
+                                        state: {
+                                            props: {
+                                                tagsSelected: this.props.settings.noteFilters.tags
+                                            }
+                                        }
+                                    }),
+                                    img: AddImg
+                                }] : []
+                        )
                     ]}
                     isBackButtonVisible={false}
                     multiFloorTitle={this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime ? this.state.headerMultiFloorTitle : null}
