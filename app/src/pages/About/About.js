@@ -44,7 +44,7 @@ class About extends Component {
                         <div><strong>{t("app-name")}</strong></div>
                         <div><span>&#9400; 2017 Mamindeveloper</span></div>
                         <div><a href="mailto:mamindeveloper@gmail.com">mamindeveloper@gmail.com</a></div>
-                        <div><a href="https://t.me/VadimSemenyuk" target="_blank">t.me/VadimSemenyuk</a></div>
+                        <div><a href="https://t.me/VadimSemenyuk" target="_blank" rel="noopener noreferrer">t.me/VadimSemenyuk</a></div>
                     </div>
                     <InsetListItem 
                         text={t("star-app")}

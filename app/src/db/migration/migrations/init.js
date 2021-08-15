@@ -1,5 +1,4 @@
 import moment from "moment";
-import config from "../../../config/config";
 import i18n from "../../../i18n/index"
 
 import execureSQL from "../../../utils/executeSQL";

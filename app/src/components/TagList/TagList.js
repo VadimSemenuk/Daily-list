@@ -5,10 +5,6 @@ import Tag from "../Tag/Tag";
 import './TagList.scss';
 
 class TagList extends PureComponent {
-    constructor(props) {
-        super(props);
-    }
-
     triggerTagActiveState = (tagId) => {
         let nextActiveTags;
         if (this.iaTagActive(tagId)) {
