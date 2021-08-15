@@ -11,6 +11,11 @@ class CalendarService {
         return !intervalStartDate || !intervalEndDate || nextDate >= intervalEndDate || nextDate <= intervalStartDate
     }
 
+    convertDateTimeToLocal(msUtcDateTime) {
+        let utcDateTime = moment.utc(msUtcDateTime)
+        return moment({year: utcDateTime.year(), month: utcDateTime.month(), date: utcDateTime.date(), hour: utcDateTime.hour(), minute: utcDateTime.minute(), second: 0, millisecond: 0});
+    }
+
     async getCount(date, period, noteFilters) {
         let halfInterval = period === "month" ? 10 : 20;
 
@@ -56,10 +61,10 @@ class CalendarService {
             }
 
             if (note.date) {
-                note.date = note.date - getUTCOffset(note.date);
+                note.date = this.convertDateTimeToLocal(note.date).valueOf();
             }
             if (note.repeatType === NoteRepeatType.Any) {
-                note.repeatValue = note.repeatValue - getUTCOffset(note.repeatValue);
+                note.repeatValue = this.convertDateTimeToLocal(note.repeatValue).valueOf();
             }
 
             if (note.isFinished) {
