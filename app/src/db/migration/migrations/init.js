@@ -50,7 +50,7 @@ async function fillDb () {
     await execureSQL(
         `INSERT INTO Settings
         (defaultNotification, sort, fastAdd, colorTheme, fontSize, finishedSort, autoBackup)
-        VALUES (1, 3, 0, 0, 14, 1, 0);`
+        VALUES (1, 3, 1, 0, 14, 1, 0);`
     );
 
     await addInitNote();
