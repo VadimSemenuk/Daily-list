@@ -33,6 +33,7 @@ import deepCopy from '../../utils/deepCopyObject'
 import {NoteContentItemType, NoteRepeatType, NotesScreenMode} from "../../constants";
 
 import './Add.scss';
+import i18next from "i18next";
 
 class Add extends Component {
     constructor(props) {
@@ -105,6 +106,26 @@ class Add extends Component {
             }
         }
     }
+
+    componentWillUnmount() {
+        if (!this.props.settings.isNoteSubmitButtonAvailable) {
+            if (!this.isNoteEmpty()) {
+                this.submit();
+            } else {
+                if (window.cordova) {
+                    window.plugins.toast.showLongBottom(i18next.t("empty-note-has-not-been-added"));
+                }
+            }
+        }
+    }
+
+    isNoteEmpty = () => {
+        return this.state.note.title.length === 0
+            && (
+                this.state.note.contentItems.length === 0
+                || this.state.note.contentItems.every((ci) => (ci.type === NoteContentItemType.Text) && (ci.value.length === 0))
+            )
+     }
 
     getDynamicFiledElements = () => {
         return Array.prototype.slice.call(document.querySelectorAll(".dynamic-field"));
@@ -442,6 +463,26 @@ class Add extends Component {
         }
     }
 
+    getHeaderButtons = () => {
+        let buttons = [];
+
+        if ((this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && (this.state.note.repeatType === NoteRepeatType.NoRepeat)) {
+            buttons.push({
+                action: this.triggerCalendar,
+                img: CalendarImg
+            });
+        }
+
+        if (this.props.settings.isNoteSubmitButtonAvailable) {
+            buttons.push({
+                action: this.submit,
+                img: CheckedImg
+            });
+        }
+
+        return buttons;
+    }
+
     render() {
         let {t} = this.props;
 
@@ -451,22 +492,7 @@ class Add extends Component {
             <div className="add-wrapper page-wrapper">
                 <Header
                     noBorderRadius={this.state.isCalendarOpen}
-                    buttons={[
-                        ...(
-                            (
-                                (this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime)
-                                && (this.state.note.repeatType === NoteRepeatType.NoRepeat)
-                            ) ?
-                                [{
-                                    action: this.triggerCalendar,
-                                    img: CalendarImg
-                                }] : []
-                        ),
-                        {
-                            action: this.submit,
-                            img: CheckedImg
-                        }
-                    ]}
+                    buttons={this.getHeaderButtons()}
                     title={this.state.note.date && this.state.note.date.format('DD MMMM YYYY')}
                 />
                 {

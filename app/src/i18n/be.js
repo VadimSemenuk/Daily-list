@@ -40,6 +40,7 @@ export default {
     "minimize-notes": "Згортваць доўгія нататкі",
     "move-control-panels-down": "Перанесці ўніз элементы кіравання",
     "quick-add-panel": "Панэль хуткага дадання",
+    "submit-button": "Кнопка пацверджання дадання нататкі",
 
     // password page
     "password": "Пароль",
@@ -154,6 +155,7 @@ export default {
     "error-notification-permission": "У вас няма правоў, каб дадаваць апавяшчэння",
     "night-mode": "Начны рэжым",
     "add-content-item": "Дадаць",
+    "empty-note-has-not-been-added": "Пустая нататка не была дададзеная",
 
     // note-item
     "attached-image": "Прымацаванаы малюнак",
