@@ -27,6 +27,7 @@ import RepeatImg from '../../assets/img/repeat.svg';
 import NotificationImg from '../../assets/img/notification.svg';
 import CalendarImg from "../../assets/img/calendar.svg";
 import CheckedImg from "../../assets/img/tick.svg";
+import WarningImg from "../../assets/img/warning.svg";
 
 import deepCopy from '../../utils/deepCopyObject'
 
@@ -46,7 +47,8 @@ class Add extends Component {
             isRepeatTypeSelectModalOpen: false,
             isNotificationWasUnchecked: false,
             mode: 'add',
-            calendarPeriod: null
+            calendarPeriod: null,
+            busyTimePeriods: []
         };
 
         this.repeatTypeOptions = notesService.getRepeatTypeOptions();
@@ -105,6 +107,12 @@ class Add extends Component {
                 this.addInputContentItem();
             }
         }
+
+        if (this.state.note.repeatType === NoteRepeatType.NoRepeat) {
+            this.setState({
+                busyTimePeriods: await this.getBusyTimePeriods()
+            });
+        }
     }
 
     componentWillUnmount() {
@@ -125,7 +133,14 @@ class Add extends Component {
                 this.state.note.contentItems.length === 0
                 || this.state.note.contentItems.every((ci) => (ci.type === NoteContentItemType.Text) && (ci.value.length === 0))
             )
-     }
+    }
+
+    getBusyTimePeriods = async () => {
+        let notes = (await notesService.getNotesWithTime([this.state.note.date]))[0].items;
+        return notes
+            .filter((note) => note.startTime && note.endTime && (note.id !== this.state.note.id))
+            .map((note) => [moment(note.startTime), moment(note.endTime)]);
+    }
 
     getDynamicFiledElements = () => {
         return Array.prototype.slice.call(document.querySelectorAll(".dynamic-field"));
@@ -415,7 +430,10 @@ class Add extends Component {
                 })
             });
         } else {
-            dateTime = moment();
+            dateTime = moment()
+            if (field === 'endTime') {
+                dateTime.add(1, 'hour');
+            }
         }
 
         await this.updateNoteData({[field]: moment(dateTime).startOf("minute")});
@@ -451,8 +469,13 @@ class Add extends Component {
         });
     }
 
-    onDateSet = (date) => {
-        this.updateNoteData({date})
+    onDateSet = async (date) => {
+        await this.updateNoteData({date});
+        if (this.state.note.repeatType === NoteRepeatType.NoRepeat) {
+            this.setState({
+                busyTimePeriods: await this.getBusyTimePeriods()
+            });
+        }
     }
 
     onContentWrapperClick = (e) => {
@@ -481,6 +504,15 @@ class Add extends Component {
         }
 
         return buttons;
+    }
+
+    getExistingPeriodCrossedWithCurrent = () => {
+        return this.state.busyTimePeriods
+            .find((period) => (
+                ((period[0].isSameOrBefore(this.state.note.startTime)) && (period[1].isSameOrAfter(this.state.note.startTime)))
+                || (this.state.note.endTime && (period[0].isSameOrBefore(this.state.note.endTime)) && (period[1].isSameOrAfter(this.state.note.endTime)))
+                || ((period[0].isSameOrAfter(this.state.note.startTime)) && this.state.note.endTime && (period[1].isSameOrBefore(this.state.note.endTime)))
+            ));
     }
 
     render() {
@@ -719,6 +751,17 @@ class Add extends Component {
                                             />
                                         </div>
                                     </div>
+                                </div>
+                            }
+
+                            {
+                                this.getExistingPeriodCrossedWithCurrent() &&
+                                <div className="busy-period-notification">
+                                    <img
+                                        src={WarningImg}
+                                        alt="info"
+                                    />
+                                    {t("busy-period-notification")} {this.getExistingPeriodCrossedWithCurrent()[0].format("HH:MM")} - {this.getExistingPeriodCrossedWithCurrent()[1].format("HH:MM")}
                                 </div>
                             }
 

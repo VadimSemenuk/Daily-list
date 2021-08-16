@@ -109,6 +109,18 @@
             .color-picker-wrapper {
                 padding: 0 10px;
             }
+
+            .busy-period-notification {
+                display: flex;
+                align-items: center;
+                color: #e6be30;
+                padding: 0 10px;
+
+                img {
+                    height: 16px;
+                    margin-right: 6px;
+                }
+            }
         }
 
         .tag-picker-wrapper {

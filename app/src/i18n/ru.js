@@ -156,6 +156,7 @@ export default {
     "night-mode": "Ночной режим",
     "add-content-item": "Добавить",
     "empty-note-has-not-been-added": "Пустая заметка не была добавлена",
+    "busy-period-notification": "На эту дату есть заметка с временем",
 
     // note-item
     "attached-image": "Прикрепленное изображение",

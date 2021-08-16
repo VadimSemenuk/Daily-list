@@ -156,6 +156,7 @@ export default {
     "night-mode": "Night mode",
     "add-content-item": "Add",
     "empty-note-has-not-been-added": "An empty note has not been added",
+    "busy-period-notification": "There is a note for this date with time",
 
     // note-item
     "attached-image": "Attached image",

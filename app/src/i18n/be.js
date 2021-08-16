@@ -156,6 +156,7 @@ export default {
     "night-mode": "Начны рэжым",
     "add-content-item": "Дадаць",
     "empty-note-has-not-been-added": "Пустая нататка не была дададзеная",
+    "busy-period-notification": "На гэтую дату ёсць нататка з часам",
 
     // note-item
     "attached-image": "Прымацаванаы малюнак",
