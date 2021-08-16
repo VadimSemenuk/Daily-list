@@ -80,8 +80,7 @@ class SettingsService {
                 invertHeaderPosition,
                 noteFilters,
                 isSidenavTagsListExpanded,
-                isQuickAddPanelVisible,
-                isNoteSubmitButtonAvailable
+                isQuickAddPanelVisible
             FROM Settings;`
         );
 
@@ -95,8 +94,7 @@ class SettingsService {
             invertHeaderPosition: Boolean(result.invertHeaderPosition),
             noteFilters: JSON.parse(result.noteFilters),
             isSidenavTagsListExpanded: Boolean(result.isSidenavTagsListExpanded),
-            isQuickAddPanelVisible: Boolean(result.isQuickAddPanelVisible),
-            isNoteSubmitButtonAvailable: Boolean(result.isNoteSubmitButtonAvailable)
+            isQuickAddPanelVisible: Boolean(result.isQuickAddPanelVisible)
         };
     }
 
@@ -112,7 +110,6 @@ class SettingsService {
                 case("noteFilters"): value = JSON.stringify(value); break;
                 case("isSidenavTagsListExpanded"): value = Number(value); break;
                 case("isQuickAddPanelVisible"): value = Number(value); break;
-                case("isNoteSubmitButtonAvailable"): value = Number(value); break;
                 default: break;
             }
 

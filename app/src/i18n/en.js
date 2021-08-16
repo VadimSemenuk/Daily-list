@@ -40,7 +40,6 @@ export default {
     "minimize-notes": "Minimize long notes",
     "move-control-panels-down": "Move controls down",
     "quick-add-panel": "Quick add panel",
-    "submit-button": "Add note confirmation button",
 
     // password page
     "password": "Password",
@@ -155,7 +154,6 @@ export default {
     "error-notification-permission": "You have no permission to set notifications",
     "night-mode": "Night mode",
     "add-content-item": "Add",
-    "empty-note-has-not-been-added": "An empty note has not been added",
     "busy-period-notification": "There is a note for this date with time",
 
     // note-item

@@ -175,12 +175,6 @@ class SettingsTheme extends Component {
                         onChange={(e) => this.props.setSetting({isQuickAddPanelVisible: e})}
                     />
 
-                    <SwitchListItem
-                        text={t("submit-button")}
-                        checked={this.props.settings.isNoteSubmitButtonAvailable}
-                        onChange={(e) => this.props.setSetting({isNoteSubmitButtonAvailable: e})}
-                    />
-
                     <ModalListItem
                         text={t("language")} 
                         value={t(activeLanguageSettings.translateId)}

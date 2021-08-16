@@ -40,7 +40,6 @@ export default {
     "minimize-notes": "Сворачивать длинные заметки",
     "move-control-panels-down": "Перенести вниз элементы управления",
     "quick-add-panel": "Панель быстрого добавления",
-    "submit-button": "Кнопка подтверждения добавления заметки",
 
     // password page
     "password": "Пароль",
@@ -155,7 +154,6 @@ export default {
     "error-notification-permission": "У вас нет прав для добавления уведомления",
     "night-mode": "Ночной режим",
     "add-content-item": "Добавить",
-    "empty-note-has-not-been-added": "Пустая заметка не была добавлена",
     "busy-period-notification": "На эту дату есть заметка с временем",
 
     // note-item
