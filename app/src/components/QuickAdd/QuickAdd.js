@@ -1,12 +1,10 @@
 import React, {PureComponent} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {withRouter} from "react-router-dom";
 import moment from "moment";
 import {translate} from "react-i18next";
 import Textarea from "react-textarea-autosize";
 
-import AddImg from "../../assets/img/add-gray.svg";
 import CheckedImg from "../../assets/img/tick-black.svg";
 
 import * as AppActions from '../../actions';
@@ -74,25 +72,6 @@ class QuickAdd extends PureComponent {
                             alt="button"
                         />
                     </button>
-                    <button onClick={() => {
-                        this.props.history.push({
-                            pathname: "/add",
-                            state: {
-                                props: {
-                                    tagsSelected: this.props.settings.noteFilters.tags
-                                }
-                            }
-                        });
-
-                        this.setState({
-                            value: ""
-                        });
-                    }}>
-                        <img
-                            src={AddImg}
-                            alt="button"
-                        />
-                    </button>
                 </div>
             </div>
         )
@@ -111,4 +90,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(AppActions, dispatch);
 }
 
-export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(withRouter(QuickAdd)));
+export default translate("translations")(connect(mapStateToProps, mapDispatchToProps)(QuickAdd));
