@@ -257,15 +257,21 @@ class Notes extends PureComponent {
                                     />
                                 </div>
                             </div>
-
-                            <NotesActionsHandlerWrapper
-                                listRef={this.setNotesListSwipableRef}
-                                List={NotesListSwipable}
-                                notes={this.props.notes}
-                                settings={this.props.settings}
-                                onSlideChange={this.onSlideChange}
-                            />
                         </React.Fragment>
+                    }
+                    {
+                        (this.props.settings.isQuickAddPanelVisible && this.props.settings.invertHeaderPosition) &&
+                        <QuickAdd/>
+                    }
+                    {
+                        this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime &&
+                        <NotesActionsHandlerWrapper
+                            listRef={this.setNotesListSwipableRef}
+                            List={NotesListSwipable}
+                            notes={this.props.notes}
+                            settings={this.props.settings}
+                            onSlideChange={this.onSlideChange}
+                        />
                     }
                     {
                         (this.props.settings.notesScreenMode === NotesScreenMode.WithoutDateTime) &&
@@ -280,7 +286,7 @@ class Notes extends PureComponent {
                 </div>
 
                 {
-                    this.props.settings.isQuickAddPanelVisible &&
+                    (this.props.settings.isQuickAddPanelVisible && !this.props.settings.invertHeaderPosition) &&
                     <QuickAdd/>
                 }
             </div>
