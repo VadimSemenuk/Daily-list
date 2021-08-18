@@ -180,8 +180,12 @@ public final class Notification {
 
         cancelScheduledAlarms();
 
+        long timezoneOffset = 0;
+
         do {
             Date date = request.getTriggerDate();
+
+            timezoneOffset = TimeZone.getDefault().getOffset(date.getTime());
 
             Log.d("local-notification", "Next trigger at: " + date);
 
@@ -205,7 +209,7 @@ public final class Notification {
 
         try {
             JSONObject _trigger = options.getTrigger();
-            _trigger.put("timezone-offset", TimeZone.getDefault().getRawOffset());
+            _trigger.put("timezone-offset", timezoneOffset);
         } catch(JSONException e) {
             Log.d("local-notification", e.toString());
         }

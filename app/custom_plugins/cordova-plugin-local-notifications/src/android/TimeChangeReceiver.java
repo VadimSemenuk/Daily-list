@@ -9,8 +9,11 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 import de.appplant.cordova.plugin.notification.Builder;
@@ -42,9 +45,22 @@ public class TimeChangeReceiver extends BroadcastReceiver {
                     JSONObject trigger = options.getTrigger();
 
                     if (trigger.optLong("at", -1) != -1 && trigger.optInt("timezone-offset", -1) != -1) {
-                        trigger.put("at", trigger.optLong("at", 0) + trigger.optInt("timezone-offset", 0) - TimeZone.getDefault().getRawOffset());
+                        Calendar utc = Calendar.getInstance();
+                        utc.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        utc.setTimeInMillis(trigger.optLong("at", 0) + trigger.optInt("timezone-offset", 0));
+
+                        int utcYear = utc.get(Calendar.YEAR);
+                        int utcMonth = utc.get(Calendar.MONTH);
+                        int utcDate = utc.get(Calendar.DATE);
+                        int utcHour = utc.get(Calendar.HOUR_OF_DAY);
+                        int utcMinute = utc.get(Calendar.MINUTE);
+
+                        Calendar currentTimeZone = Calendar.getInstance();
+                        currentTimeZone.setTimeZone(TimeZone.getDefault());
+                        currentTimeZone.set(utcYear, utcMonth, utcDate, utcHour, utcMinute, 0);
+
+                        trigger.put("at", currentTimeZone.getTimeInMillis());
                     }
-                    trigger.put("timezone-offset", TimeZone.getDefault().getRawOffset());
                 } catch(JSONException e) {
                     Log.d("local-notification", e.toString());
                 }
