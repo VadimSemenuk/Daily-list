@@ -318,6 +318,7 @@ class NotesService {
         let resetManualOrderIndex = false;
         if (nextData.hasOwnProperty('isFinished') && settings.sortFinBehaviour === 1) {
             resetManualOrderIndex = true;
+            nextNote.manualOrderIndex = null;
         }
 
         await executeSQL(
