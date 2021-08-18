@@ -586,7 +586,9 @@ export function uploadGDBackup(actionType) {
             actionType === "user" && dispatch(triggerLoader(false));
         } catch(err) {
             dispatch(triggerLoader(false));
-            dispatch(triggerErrorModal("error-backup-upload", err.description));
+            if (actionType === "user") {
+                dispatch(triggerErrorModal("error-backup-upload", err.description));
+            }
             logsService.logError(err, {
                 path: "action/index.js -> uploadGDBackup()",
             }, window.device.uuid);
