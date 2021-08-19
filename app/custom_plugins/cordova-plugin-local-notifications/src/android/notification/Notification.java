@@ -44,7 +44,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 
 import static android.app.AlarmManager.RTC;
 import static android.app.AlarmManager.RTC_WAKEUP;
@@ -180,12 +179,8 @@ public final class Notification {
 
         cancelScheduledAlarms();
 
-        long timezoneOffset = 0;
-
         do {
             Date date = request.getTriggerDate();
-
-            timezoneOffset = TimeZone.getDefault().getOffset(date.getTime());
 
             Log.d("local-notification", "Next trigger at: " + date);
 
@@ -205,13 +200,6 @@ public final class Notification {
         if (intents.isEmpty()) {
             unpersist();
             return;
-        }
-
-        try {
-            JSONObject _trigger = options.getTrigger();
-            _trigger.put("timezone-offset", timezoneOffset);
-        } catch(JSONException e) {
-            Log.d("local-notification", e.toString());
         }
 
         persist(ids);

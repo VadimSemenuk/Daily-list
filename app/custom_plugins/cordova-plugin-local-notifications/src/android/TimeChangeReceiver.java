@@ -41,30 +41,6 @@ public class TimeChangeReceiver extends BroadcastReceiver {
 
                 mgr.cancel(options.getId());
 
-                try {
-                    JSONObject trigger = options.getTrigger();
-
-                    if (trigger.optLong("at", -1) != -1 && trigger.optInt("timezone-offset", -1) != -1) {
-                        Calendar utc = Calendar.getInstance();
-                        utc.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        utc.setTimeInMillis(trigger.optLong("at", 0) + trigger.optInt("timezone-offset", 0));
-
-                        int utcYear = utc.get(Calendar.YEAR);
-                        int utcMonth = utc.get(Calendar.MONTH);
-                        int utcDate = utc.get(Calendar.DATE);
-                        int utcHour = utc.get(Calendar.HOUR_OF_DAY);
-                        int utcMinute = utc.get(Calendar.MINUTE);
-
-                        Calendar currentTimeZone = Calendar.getInstance();
-                        currentTimeZone.setTimeZone(TimeZone.getDefault());
-                        currentTimeZone.set(utcYear, utcMonth, utcDate, utcHour, utcMinute, 0);
-
-                        trigger.put("at", currentTimeZone.getTimeInMillis());
-                    }
-                } catch(JSONException e) {
-                    Log.d("local-notification", e.toString());
-                }
-
                 Request request    = new Request(options);
                 Builder builder    = new Builder(options);
                 Notification toast = buildNotification(builder);

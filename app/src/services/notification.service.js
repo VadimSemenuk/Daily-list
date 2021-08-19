@@ -32,10 +32,28 @@ class NotificationService {
 
         switch(note.repeatType) {
             case NoteRepeatType.NoRepeat: {
-                let atDate = moment(note.date).hour(note.startTime.hour()).minute(note.startTime.minute());
-                atDate = new Date(atDate.valueOf());
-                notificationConfig.trigger = { at: atDate };
-                notificationConfig.id = note.id;
+                let atDate = moment(note.date).startOf("day").hour(note.startTime.hour()).minute(note.startTime.minute());
+                let now = moment().startOf("minute");
+
+                if (atDate.isBefore(now)) {
+                    return;
+                }
+
+                notificationConfig.trigger = {
+                    id: note.id
+                };
+
+                if (!atDate.isSame(now)) {
+                    notificationConfig.every = {
+                        year: atDate.year(),
+                        month: atDate.month() + 1,
+                        day: atDate.date(),
+                        hour: atDate.hour(),
+                        minute: atDate.minute()
+                    };
+                    notificationConfig.count = 1
+                }
+
                 window.cordova.plugins.notification.local.schedule(notificationConfig);
                 break;
             }
@@ -71,15 +89,32 @@ class NotificationService {
             case NoteRepeatType.Any: {
                 let notificationConfigs = note.repeatValues.map((date) => {
                     let atDate = moment(date).startOf("day").hour(note.startTime.hour()).minute(note.startTime.minute());
-                    atDate = new Date(atDate.valueOf());
+                    let now = moment().startOf("minute");
 
-                    return {
+                    if (atDate.isBefore(now)) {
+                        return;
+                    }
+
+                    let _notificationConfig = {
                         ...notificationConfig,
                         id: +`${note.id}${date}`,
-                        trigger: { at: atDate }
                     }
+
+                    if (!atDate.isSame(now)) {
+                        _notificationConfig.every = {
+                            year: atDate.year(),
+                            month: atDate.month() + 1,
+                            day: atDate.date(),
+                            hour: atDate.hour(),
+                            minute: atDate.minute()
+                        };
+                        _notificationConfig.count = 1;
+                    }
+
+                    return _notificationConfig;
                 });
-                window.cordova.plugins.notification.local.schedule(notificationConfigs);
+
+                window.cordova.plugins.notification.local.schedule(notificationConfigs.filter((notificationConfig) => Boolean(notificationConfig)));
                 break;
             }
             default: break;
