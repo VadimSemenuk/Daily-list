@@ -25,14 +25,14 @@ class NotesService {
         }
 
         let findClosestValue = (initialValue, data) => {
-            let reducer = (prevValue, value, index, array) => {
+            let reducer = (closest, value) => {
                 if (
-                    prevValue === null ||
-                    Math.abs(initialValue - value) < Math.abs(initialValue - array[index - 1])
+                    closest === null ||
+                    Math.abs(initialValue - value) < Math.abs(initialValue - closest)
                 ) {
                     return value;
                 }
-                return prevValue;
+                return closest;
             };
             return data.reduce(reducer, null);
         }
@@ -44,9 +44,9 @@ class NotesService {
             if (note.repeatType === NoteRepeatType.Day) {
                 note.date = moment(currentDate);
             } else if (note.repeatType === NoteRepeatType.Week) {
-                note.date = moment().isoWeekday(findClosestValue(moment(currentDate).isoWeekday(), note.repeatValues));
+                note.date = moment().startOf("day").isoWeekday(findClosestValue(moment(currentDate).isoWeekday(), note.repeatValues));
             } else if (note.repeatType === NoteRepeatType.Any) {
-                note.date = moment(findClosestValue(moment(currentDate).valueOf(), note.repeatValues));
+                note.date = findClosestValue(currentDate.valueOf(), note.repeatValues);
             }
             notes.push(note);
         }
@@ -112,7 +112,11 @@ class NotesService {
             return [];
         }
 
-        let allNotesSelect = await executeSQL(`SELECT t.id, t.title, t.contentItems FROM Notes t;`);
+        let allNotesSelect = await executeSQL(
+            `SELECT n.id, n.title, n.contentItems 
+            FROM Notes n
+            WHERE n.forkFrom IS NULL;`,
+        );
         let filteredNotesIDs = [];
         for(let i = 0; i < allNotesSelect.rows.length; i++) {
             let item = allNotesSelect.rows.item(i);
