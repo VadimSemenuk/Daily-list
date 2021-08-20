@@ -113,7 +113,9 @@ export default {
                 SELECT
                     id, 
                     title, 
-                    added as date,
+                    CASE
+                        WHEN repeatType != ? THEN null ELSE added
+                    END AS date,
                     finished as isFinished,
                     dynamicFields as contentItems,
                     CASE
@@ -134,7 +136,7 @@ export default {
                     null as manualOrderIndex,
                     "" as tags
                 FROM Tasks;
-            `);
+            `, [NoteRepeatType.NoRepeat]);
 
             await executeSQL(`DROP TABLE Tasks;`);
         }
@@ -340,7 +342,7 @@ export default {
                 isNotificationEnabled: false,
                 startTime: null,
                 endTime: null,
-                date: convertLocalDateTimeToUTC(moment().startOf("day").valueOf()),
+                date: convertLocalDateTimeToUTC(moment().startOf("day").valueOf()).valueOf(),
                 isFinished: false,
                 repeatType: NoteRepeatType.NoRepeat,
                 mode: NotesScreenMode.WithDateTime,
