@@ -542,6 +542,8 @@ class NotesService {
         let noteId = await this.insertNote(nextNote);
         nextNote.id = noteId;
 
+        nextNote = await this.updateNoteLastAction(NoteAction.Add, nextNote);
+
         return nextNote;
     }
 
