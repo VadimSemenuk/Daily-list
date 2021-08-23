@@ -63,7 +63,8 @@ class NotesActionsHandlerWrapper extends PureComponent {
                 ...this.state.copyBuffer,
                 ...{
                     repeatType: NoteRepeatType.NoRepeat,
-                    date: moment(this.props.date)
+                    date: moment(this.props.date),
+                    repeatValues: []
                 }
             }
         );
