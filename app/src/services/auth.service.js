@@ -98,7 +98,17 @@ class AuthService {
         if (!window.cordova) {
             return Promise.resolve()
         }
-        return new Promise((resolve) => window.plugins.googleplus.logout(resolve, resolve));
+        return new Promise((resolve, reject) => {
+            window.plugins.googleplus.trySilentLogin(
+                {
+                    scopes: 'https://www.googleapis.com/auth/drive.appfolder',
+                    webClientId: config.google.webClientId,
+                    offline: true
+                },
+                () => window.plugins.googleplus.logout(resolve, reject),
+                () => window.plugins.googleplus.logout(resolve, reject),
+            );
+        });
     }
 
     async gRefreshAccessToken() {
