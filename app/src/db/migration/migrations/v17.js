@@ -160,7 +160,7 @@ export default {
             let sortSettings = {
                 type: oldSortSettings ? settingsMatch.type[oldSortSettings.type] : 2,
                 direction: oldSortSettings ? settingsMatch.direction[oldSortSettings.direction] : 2,
-                finSort: 1
+                finSort: oldSortSettings ? oldSortSettings.finSort : 1,
             }
 
             let noteFiltersSettings = {
@@ -195,7 +195,7 @@ export default {
                 INSERT INTO Settings (
                     defaultNotification,
                     theme,
-                    password,    
+                    password,
                     fontSize,
                     notesShowInterval,
                     lang,
@@ -230,7 +230,7 @@ export default {
                     0 as invertHeaderPosition,
                     ? as noteFilters,
                     1 as isSidenavTagsListExpanded,
-                    fastAdd as isQuickAddPanelVisible
+                    1 as isQuickAddPanelVisible
                 FROM Settings_OLD;
             `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort, JSON.stringify(noteFiltersSettings)]);
             await executeSQL(`DROP TABLE Settings_OLD;`);

@@ -415,7 +415,8 @@ class NotesService {
     async getDeletedNotes() {
         let select = await executeSQL(
             `SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
-                contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date
+                contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date,
+                (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
             FROM Notes n
             WHERE lastAction = ? AND
             forkFrom IS NULL
