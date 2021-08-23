@@ -296,10 +296,8 @@ class Notes extends PureComponent {
 
 function mapStateToProps(state) {
     let notes = state.notes.slice((list) => ({...list, items: list.items.slice()}));
-
-    filter(notes, state.settings);
-
-    sort(notes, state.settings);
+    notes.forEach((list) => filter(list.items, state.settings));
+    notes.forEach((list) => sort(list.items, state.settings));
 
     return {
         notes: notes,
@@ -317,45 +315,40 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(Notes);
 
-function filter(data, settings) {
+function filter(items, settings) {
     if (settings.noteFilters.tags.length) {
-        data.forEach((list) => {
-            list.items.forEach((note) => {
-                note.isVisible = note.tags.filter((tag) => settings.noteFilters.tags.filter((tagId) => tagId === tag.id).length !== 0).length !== 0;
-            });
+        items.forEach((note) => {
+            note.isVisible = note.tags.filter((tag) => settings.noteFilters.tags.filter((tagId) => tagId === tag.id).length !== 0).length !== 0;
         });
     } else {
-        data.forEach((list) => {
-            list.items.forEach((note) => {
-                note.isVisible = true;
-            });
+        items.forEach((note) => {
+            note.isVisible = true;
         });
     }
 }
 
-function sort(data, settings) {
-    let notesCompareFn = getNotesCompareFn(settings);
-    data.forEach((list) => list.items.sort(notesCompareFn));
-}
-
-function getNotesCompareFn(settings) {
+function sort(items, settings) {
     if (settings.notesScreenMode === NotesScreenMode.WithDateTime && settings.sortType === SortType.TimeSort) {
-        return (a, b) => {
+        items.sort((a, b) => {
             let aVal = a.startTime ? (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf()) : 0;
             let bVal = b.startTime ? (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf()) : 0;
 
             return settings.sortDirection === SortDirectionType.ASC ? aVal - bVal : bVal - aVal;
-        };
+        });
     } else {
-        return (a, b) => {
-            if (a.manualOrderIndex === null || b.manualOrderIndex === null) {
+        items.sort((a, b) => {
+            if (a.manualOrderIndex === null && b.manualOrderIndex === null) {
                 let aVal = a.forkFrom !== null ? a.forkFrom : a.id;
                 let bVal = b.forkFrom !== null ? b.forkFrom : b.id;
 
                 return settings.sortDirection === SortDirectionType.ASC ? aVal - bVal : bVal - aVal;
+            } else if (a.manualOrderIndex === null && b.manualOrderIndex !== null) {
+                return 1;
+            } else if (a.manualOrderIndex !== null && b.manualOrderIndex === null) {
+                return -1;
             } else {
                 return a.manualOrderIndex - b.manualOrderIndex;
             }
-        }
+        });
     }
 }
