@@ -316,10 +316,9 @@ class Add extends Component {
             window.navigator.camera.getPicture(resolve, reject,
                 {
                     sourceType,
+                    saveToPhotoAlbum: true,
+                    quality: 100,
                     mediaType: window.navigator.camera.MediaType.PICTURE,
-                    correctOrientation: true,
-                    destinationType: window.navigator.camera.DestinationType.FILE_URI,
-                    encodingType: window.navigator.camera.EncodingType.JPEG,
                 }
             );
         });
