@@ -7,6 +7,7 @@ import {NoteRepeatType, CalendarNotesCounterMode, NotesScreenMode, NoteAction} f
 import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 import i18n from "../../../i18n";
 import {convertLocalDateTimeToUTC} from "../../../utils/convertDateTimeLocale";
+import authService from "../../../services/auth.service";
 
 export default {
     name: "1.7",
@@ -26,6 +27,8 @@ export default {
         if (isUpdate) {
             await addUpdatesNote();
         }
+
+        await authService.googleSignOut()
 
         async function alterTasksRepeatValuesTable () {
             await executeSQL(`
