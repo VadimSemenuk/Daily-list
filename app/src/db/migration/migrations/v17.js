@@ -114,7 +114,7 @@ export default {
                     id, 
                     title, 
                     CASE
-                        WHEN repeatType != ? THEN null ELSE added
+                        WHEN added = -1 THEN null ELSE added
                     END AS date,
                     finished as isFinished,
                     dynamicFields as contentItems,
@@ -136,7 +136,7 @@ export default {
                     null as manualOrderIndex,
                     "" as tags
                 FROM Tasks;
-            `, [NoteRepeatType.NoRepeat]);
+            `);
 
             await executeSQL(`DROP TABLE Tasks;`);
         }
