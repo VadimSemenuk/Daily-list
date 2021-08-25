@@ -131,7 +131,7 @@
     }
 }
 
-@media screen and (orientation: landscape) {
+@media screen and (min-aspect-ratio: 8/5) {
     .add-wrapper .page-content {
         flex-direction: row;
 
