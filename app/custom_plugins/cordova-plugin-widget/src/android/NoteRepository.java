@@ -112,28 +112,43 @@ public class NoteRepository {
     public ArrayList<Note> getNotes(NoteTypes type, Calendar date) {
         ArrayList<Note> notes = new ArrayList<>();
 
-        String sql = "SELECT id, tag, startTime, endTime, isFinished, title, contentItems"
-                + " FROM Notes n"
-                + " LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId"
-                + " WHERE"
-                + " n.lastAction != ?"
-                + " AND ("
-                + "     n.date = ?"
-                + "     OR ("
-                + "         n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND date = ?)"
-                + "         AND ("
-                + "             n.repeatType = ?"
-                + "             OR (n.repeatType = ? AND rep.value = ?)"
-                + "             OR (n.repeatType = ? AND rep.value = ?)"
-                + "         )"
-                + "     )"
-                + " )"
-                + " AND n.mode == ?;";
+        Cursor cursor = null;
 
-        Cursor cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(
-                sql,
-                new String[] {"DELETE", String.valueOf(date.getTimeInMillis()), String.valueOf(date.getTimeInMillis()), "day", "week", String.valueOf(date.get(Calendar.DAY_OF_WEEK)), "any", String.valueOf(date.getTimeInMillis()), "1"}
-                );
+        if (type == NoteTypes.Diary) {
+            String sql = "SELECT id, tag, startTime, endTime, isFinished, title, contentItems"
+                    + " FROM Notes n"
+                    + " LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId"
+                    + " WHERE"
+                    + " n.lastAction != ?"
+                    + " AND ("
+                    + "     n.date = ?"
+                    + "     OR ("
+                    + "         n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND date = ?)"
+                    + "         AND ("
+                    + "             n.repeatType = ?"
+                    + "             OR (n.repeatType = ? AND rep.value = ?)"
+                    + "             OR (n.repeatType = ? AND rep.value = ?)"
+                    + "         )"
+                    + "     )"
+                    + " )"
+                    + " AND n.mode = ?;";
+
+            cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(
+                    sql,
+                    new String[] {"DELETE", String.valueOf(date.getTimeInMillis()), String.valueOf(date.getTimeInMillis()), "day", "week", String.valueOf(date.get(Calendar.DAY_OF_WEEK)), "any", String.valueOf(date.getTimeInMillis()), Integer.toString(NoteTypes.Diary.getValue())}
+            );
+        } else {
+            String sql = "SELECT id, tag, isFinished, title, contentItems"
+                    + " FROM Notes"
+                    + " WHERE"
+                    + " lastAction != ?"
+                    + " AND mode = ?;";
+
+            cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(
+                    sql,
+                    new String[] {Integer.toString(NoteTypes.Note.getValue()), "DELETE"}
+            );
+        }
 
         if(cursor.moveToFirst()){
             do {

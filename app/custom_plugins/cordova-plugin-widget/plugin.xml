@@ -5,7 +5,7 @@
         version="1.0.0">
     <name>Widget</name>
     <js-module src="www/widget.js" name="widget">
-        <clobbers target="widget" />
+        <clobbers target="cordova.plugins.widget" />
     </js-module>
 
     <!-- android -->
@@ -20,7 +20,7 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <receiver android:name=".widget.WidgetProvider" android:icon="@mipmap/ic_launcher" android:label="label">
+            <receiver android:name=".widget.WidgetProvider" android:icon="@mipmap/ic_launcher" android:label="@string/app_name">
                 <intent-filter>
                     <action android:name="android.appwidget.action.APPWIDGET_UPDATE">
                     </action>
@@ -56,5 +56,6 @@
         <source-file src="src/android/res/drawable/checkbox.png" target-dir="res/drawable" />
         <source-file src="src/android/res/drawable/checkbox_checked.png" target-dir="res/drawable" />
         <source-file src="src/android/res/drawable/list.png" target-dir="res/drawable" />
+        <source-file src="src/android/res/drawable/app_icon_no_background.png" target-dir="res/drawable" />
     </platform>
 </plugin>

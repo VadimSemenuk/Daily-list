@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -67,6 +68,8 @@ public class WidgetListFactory implements RemoteViewsFactory {
 
             remoteView.setTextViewText(R.id.start_time, note.startDateTime != null ? timeFormatter.format(note.startDateTime.getTime()) : "");
             remoteView.setTextViewText(R.id.end_time, note.endDateTime != null ? " - " + timeFormatter.format(note.endDateTime.getTime()) : "");
+
+            remoteView.setTextViewText(R.id.start_time, note.startDateTime != null ? SimpleDateFormat.getTimeInstance().format(note.startDateTime.getTime()) : "");
         } else {
             remoteView.setInt(R.id.meta, "setVisibility", View.GONE);
         }
@@ -106,7 +109,7 @@ public class WidgetListFactory implements RemoteViewsFactory {
         }
 
         Intent clickIntent = new Intent();
-        clickIntent.putExtra(WidgetProvider.ITEM_POSITION, position);
+        clickIntent.putExtra(WidgetProvider.ITEM_ID, note.id);
         remoteView.setOnClickFillInIntent(R.id.note, clickIntent);
 
         return remoteView;
@@ -130,11 +133,15 @@ public class WidgetListFactory implements RemoteViewsFactory {
         int date = dateLocal.get(Calendar.DATE);
 
         Calendar dateUTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        dateUTC.set(year, month, date - 1, 0, 0, 0);
+        dateUTC.set(year, month, date - 2, 0, 0, 0);
         dateUTC.set(Calendar.MILLISECOND, 0);
 
-        ArrayList<Note> notes = NoteRepository.getInstance().getNotes(NoteTypes.Diary, dateUTC);
-        data.addAll(notes);
+        SharedPreferences sp = context.getSharedPreferences(WidgetProvider.WIDGET_SP, Context.MODE_PRIVATE);
+        int _type = sp.getInt(WidgetProvider.WIDGET_SP_LIST_TYPE + "_" + widgetID,  1);
+        NoteTypes type = NoteTypes.valueOf(_type);
+
+        ArrayList<Note> notes = NoteRepository.getInstance().getNotes(type, dateUTC);
+        data = notes;
     }
 
     @Override
