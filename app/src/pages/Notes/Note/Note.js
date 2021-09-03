@@ -46,7 +46,17 @@ class Note extends PureComponent {
     }
 
     triggerExpanded = () => {
-        this.setState({expanded: !this.state.expanded});
+        let isExpanded = this.state.expanded;
+
+        let noteEl = document.querySelector(`.note-wrapper[data-id='${this.props.data.id}'] .note`);
+        if (noteEl) {
+            if (noteEl.classList.contains("expanded") !== isExpanded) {
+                noteEl.classList.remove("expanded");
+                return;
+            }
+        }
+
+        this.setState({expanded: !isExpanded});
     };
 
     showImage = (e) => {

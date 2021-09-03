@@ -35,31 +35,71 @@ class Notes extends PureComponent {
 
         this.state = {
             headerMultiFloorTitle: null,
-            scrollToNote: null
         };
     }
 
     componentDidMount() {
         this.setupSidenav();
+
+        if (window.cordova) {
+            window.cordova.plugins.widget.addEventListener("addClick", this.onWidgetAddClick);
+            window.cordova.plugins.widget.addEventListener("noteClick", this.onWidgetNoteClick);
+        }
     }
 
-    componentDidUpdate() {
-        if (this.state.scrollToNote) {
-            let el = document.querySelector(`[data-id='${this.state.scrollToNote}']`);
-            el && el.scrollIntoView();
+    componentWillUnmount() {
+        window.cordova.plugins.widget.removeEventListener(this.onAddClick);
+    }
 
-            this.setState({
-                scrollToNote: null
-            });
+    scrollToNote = (id) => {
+        let el = document.querySelector(`[data-id='${id}']`);
+        el && el.scrollIntoView();
+    }
+
+    expandNote = (id) => {
+        let el = document.querySelector(`.note-wrapper[data-id='${id}'] .note`);
+        el && el.classList.add("expanded");
+    }
+
+    onWidgetAddClick = async (props) => {
+        if (props.type !== this.props.settings.notesScreenMode) {
+            await this.setScreenMode(props.type);
+            await this.setupSidenav();
         }
+
+        setTimeout(() => {
+            this.props.history.push({
+                pathname: "/add",
+                state: {
+                    props: {
+                        tagsSelected: this.props.settings.noteFilters.tags
+                    }
+                }
+            });
+        });
+    }
+
+    onWidgetNoteClick = async (props) => {
+        if (props.type !== this.props.settings.notesScreenMode) {
+            await this.setScreenMode(props.type);
+            await this.setupSidenav();
+        } else if (!moment().startOf("day").isSame(this.props.currentDate)) {
+            let today = moment().startOf("day");
+            await this.setDate(today);
+        }
+
+        setTimeout(() => {
+            this.scrollToNote(props.id);
+            this.expandNote(props.id);
+        });
     }
 
     setNotesListSwipableRef = (ref) => {
         this.notesListSwipableRef = ref;
     }
 
-    setupSidenav() {
-        this.props.setSidenavItems([
+    async setupSidenav() {
+        return this.props.setSidenavItems([
             [
                 {
                     textId: "show-daily-notes-screen",
@@ -121,7 +161,7 @@ class Notes extends PureComponent {
 
         let msCurDate = moment().startOf("day");
         let dates = [moment(msCurDate).add(-1, "day").startOf("day"), msCurDate, moment(msCurDate).add(1, "day").startOf("day")];
-        this.props.setDatesAndUpdateNotes(dates, 1, mode);
+        await this.props.setDatesAndUpdateNotes(dates, 1, mode);
     }
 
     onSlideChange = async (side, nextIndex) => {
@@ -170,11 +210,7 @@ class Notes extends PureComponent {
             await this.setDate(note.date);
         }
 
-        setTimeout(() => {
-            this.setState({
-                scrollToNote: note.id
-            });
-        });
+        setTimeout(() => this.scrollToNote(note.id));
     }
 
     onCalendarPeriodChange = (periodName) => {

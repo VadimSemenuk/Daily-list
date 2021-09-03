@@ -31,10 +31,20 @@ public class NoteRepository {
         }
 
         public int compare(Object a, Object b) {
-            if (direction == SortDirection.ASC) {
-                return ((Note) a).id - ((Note) b).id;
+            Note noteA = (Note) a;
+            Note noteB = (Note) b;
+
+            if (noteA.manualOrderIndex == null && noteB.manualOrderIndex == null) {
+                int aVal = noteA.forkFrom != null ? noteA.forkFrom : noteA.id;
+                int bVal = noteB.forkFrom != null ? noteB.forkFrom : noteB.id;
+
+                return direction == SortDirection.ASC ? aVal - bVal : bVal - aVal;
+            } else if (noteA.manualOrderIndex == null && noteB.manualOrderIndex != null) {
+                return 1;
+            } else if (noteA.manualOrderIndex != null && noteB.manualOrderIndex == null) {
+                return -1;
             } else {
-                return ((Note) b).id - ((Note) a).id;
+                return noteA.manualOrderIndex - noteB.manualOrderIndex;
             }
         }
     }
@@ -115,7 +125,7 @@ public class NoteRepository {
         Cursor cursor = null;
 
         if (type == NoteTypes.Diary) {
-            String sql = "SELECT id, tag, startTime, endTime, isFinished, title, contentItems"
+            String sql = "SELECT id, tag, startTime, endTime, isFinished, title, contentItems, manualOrderIndex, forkFrom"
                     + " FROM Notes n"
                     + " LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId"
                     + " WHERE"
@@ -138,7 +148,7 @@ public class NoteRepository {
                     new String[] {"DELETE", String.valueOf(date.getTimeInMillis()), String.valueOf(date.getTimeInMillis()), "day", "week", String.valueOf(date.get(Calendar.DAY_OF_WEEK)), "any", String.valueOf(date.getTimeInMillis()), Integer.toString(NoteTypes.Diary.getValue())}
             );
         } else {
-            String sql = "SELECT id, tag, isFinished, title, contentItems"
+            String sql = "SELECT id, tag, isFinished, title, contentItems, manualOrderIndex, forkFrom"
                     + " FROM Notes"
                     + " WHERE"
                     + " lastAction != ?"
@@ -146,7 +156,7 @@ public class NoteRepository {
 
             cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(
                     sql,
-                    new String[] {Integer.toString(NoteTypes.Note.getValue()), "DELETE"}
+                    new String[] {"DELETE", Integer.toString(NoteTypes.Note.getValue())}
             );
         }
 
@@ -197,6 +207,10 @@ public class NoteRepository {
                     }
                 }
                 note.contentItems = contentItems;
+
+                note.manualOrderIndex = cursor.isNull(cursor.getColumnIndex("manualOrderIndex")) ? null : cursor.getInt(cursor.getColumnIndex("manualOrderIndex"));
+
+                note.forkFrom = cursor.isNull(cursor.getColumnIndex("forkFrom")) ? null : cursor.getInt(cursor.getColumnIndex("forkFrom"));
 
                 notes.add(note);
             }

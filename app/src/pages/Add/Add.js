@@ -479,7 +479,7 @@ class Add extends Component {
                             img: CheckedImg
                         }
                     ]}
-                    title={this.state.note.date && this.state.note.date.format('DD MMMM YYYY')}
+                    title={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && this.state.note.date && this.state.note.date.format('DD MMMM YYYY')}
                 />
                 {
                     this.state.isCalendarOpen &&

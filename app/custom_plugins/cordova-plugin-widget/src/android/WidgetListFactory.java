@@ -68,8 +68,6 @@ public class WidgetListFactory implements RemoteViewsFactory {
 
             remoteView.setTextViewText(R.id.start_time, note.startDateTime != null ? timeFormatter.format(note.startDateTime.getTime()) : "");
             remoteView.setTextViewText(R.id.end_time, note.endDateTime != null ? " - " + timeFormatter.format(note.endDateTime.getTime()) : "");
-
-            remoteView.setTextViewText(R.id.start_time, note.startDateTime != null ? SimpleDateFormat.getTimeInstance().format(note.startDateTime.getTime()) : "");
         } else {
             remoteView.setInt(R.id.meta, "setVisibility", View.GONE);
         }
@@ -133,7 +131,7 @@ public class WidgetListFactory implements RemoteViewsFactory {
         int date = dateLocal.get(Calendar.DATE);
 
         Calendar dateUTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        dateUTC.set(year, month, date - 2, 0, 0, 0);
+        dateUTC.set(year, month, date, 0, 0, 0);
         dateUTC.set(Calendar.MILLISECOND, 0);
 
         SharedPreferences sp = context.getSharedPreferences(WidgetProvider.WIDGET_SP, Context.MODE_PRIVATE);

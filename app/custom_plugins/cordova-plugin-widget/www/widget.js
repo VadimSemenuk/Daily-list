@@ -4,43 +4,39 @@ Widget.update = function(success, error) {
     cordova.exec(success, error, 'Widget', 'update');
 };
 
-Widget.isEventsAllowed = false;
-Widget.eventListeners = [];
+Widget.events = {};
 
-Widget.addEventListener = function(event, callback, scope) {
-    if (!Widget.isEventsAllowed) {
-        Widget.isEventsAllowed = true;
-        cordova.exec(null, null, 'Widget', 'fireEvents');
+Widget.addEventListener = function(event, callback) {
+    if (!Widget.events[event]) {
+        Widget.events[event] = {
+            listeners: []
+        };
     }
 
-    Widget.eventListeners.push({
-        event: event,
-        callback: callback,
-        scope: scope
-    });
+    Widget.events[event].listeners.push(callback);
+    cordova.exec(null, null, 'Widget', 'eventAdded', [event]);
 };
 
 Widget.removeEventListener = function(event, callback) {
-    var nextEventListeners = [];
+    var nextListeners = [];
 
-    for (var i = 0; i < Widget.eventListeners.length; i++) {
-        var eventListener = Widget.eventListeners[i];
-        if (eventListener.event !== event && eventListener.callback != callback) {
-            nextEventListeners.push(eventListener);
+    for (var i = 0; i < Widget.events[event].listeners.length; i++) {
+        var eventListener = Widget.events[event].listeners[i];
+        if (eventListener != callback) {
+            nextListeners.push(eventListener);
         }
     }
+
+    Widget.events[event].listeners = nextListeners;
 };
 
-Widget.removeEventListeners = function() {
-    Widget.eventListeners = [];
+Widget.removeEvents = function() {
+    Widget.events = {};
 };
 
 Widget.fireEvent = function(event, props) {
-    for (var i = 0; i < Widget.eventListeners.length; i++) {
-        var eventListener = Widget.eventListeners[i];
-        if (eventListener.event === event) {
-            eventListener.callback(props)
-        }
+    for (var i = 0; i < Widget.events[event].listeners.length; i++) {
+        Widget.events[event].listeners[i](props);
     }
 };
 

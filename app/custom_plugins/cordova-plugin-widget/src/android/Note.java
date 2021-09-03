@@ -13,6 +13,8 @@ public class Note implements Serializable {
     public Boolean isFinished;
     public String title;
     public ArrayList<NoteContentItem> contentItems;
+    public Integer manualOrderIndex;
+    public Integer forkFrom;
 
     public Note() {}
 }
