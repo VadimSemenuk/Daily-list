@@ -9,7 +9,6 @@ import apiService from "./api.service";
 import {convertLocalDateTimeToUTC, convertUTCDateTimeToLocal} from "../utils/convertDateTimeLocale";
 import executeSQL from "../utils/executeSQL";
 import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
-import tagsService from "./tags.service";
 import notificationService from "./notification.service";
 
 class BackupService {
@@ -88,7 +87,9 @@ class BackupService {
         let token = authService.getAuthorizationToken();
 
         let targetBackupFileName = params.actionType === 'user' ? "DailyListSqliteDBFile" : "DailyListSqliteDBFile_auto";
-        let backupFile = user.gdBackup.backupFiles.find((f) => f.name === targetBackupFileName);
+        let backupFile = user.gdBackup.backupFiles.find((f) => {
+            return (f.name === targetBackupFileName) && (f.properties && f.properties.deviceUUID === window.device.uuid);
+        });
         if (!backupFile) {
             backupFile = await this.createGDBackupFile(targetBackupFileName);
             authService.setUser({
