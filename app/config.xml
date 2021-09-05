@@ -23,12 +23,15 @@
         <preference name="ShowSplashScreenSpinner" value="false" />
         <preference name="SplashMaintainAspectRatio" value="true" />
         <allow-intent href="market:*" />
-        <icon density="ldpi" src="res/icon/android/drawable-ldpi-icon.png" />
-        <icon density="mdpi" src="res/icon/android/drawable-mdpi-icon.png" />
-        <icon density="hdpi" src="res/icon/android/drawable-hdpi-icon.png" />
-        <icon density="xhdpi" src="res/icon/android/drawable-xhdpi-icon.png" />
-        <icon density="xxhdpi" src="res/icon/android/drawable-xxhdpi-icon.png" />
-        <icon density="xxxhdpi" src="res/icon/android/drawable-xxxhdpi-icon.png" />
+
+        <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="app/src/main/res/values/ic_launcher_background.xml" />
+        <resource-file src="res/icon/android/mipmap-anydpi-v26/ic_launcher.xml" target="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" />
+        <resource-file src="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" target="app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png" />
+        <resource-file src="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" target="app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png" />
+        <resource-file src="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" target="app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png" />
+        <resource-file src="res/icon/android/mipmap-xxhdpi/ic_launcher_foreground.png" target="app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png" />
+        <resource-file src="res/icon/android/mipmap-xxxhdpi/ic_launcher_foreground.png" target="app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png" />
+
         <splash density="land-ldpi" src="res/screen/android/drawable-land-ldpi-screen.png" />
         <splash density="land-mdpi" src="res/screen/android/drawable-land-mdpi-screen.png" />
         <splash density="land-hdpi" src="res/screen/android/drawable-land-hdpi-screen.png" />
@@ -41,6 +44,7 @@
         <splash density="port-xhdpi" src="res/screen/android/drawable-port-xhdpi-screen.png" />
         <splash density="port-xxhdpi" src="res/screen/android/drawable-port-xxhdpi-screen.png" />
         <splash density="port-xxxhdpi" src="res/screen/android/drawable-port-xxxhdpi-screen.png" />
+
         <resource-file src="res/notification/drawable-mdpi.png" target="app/src/main/res/mipmap-mdpi/notification.png" />
         <resource-file src="res/notification/drawable-hdpi.png" target="app/src/main/res/mipmap-hdpi/notification.png" />
         <resource-file src="res/notification/drawable-xhdpi.png" target="app/src/main/res/mipmap-xhdpi/notification.png" />
