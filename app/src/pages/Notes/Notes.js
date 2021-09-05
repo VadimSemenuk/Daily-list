@@ -49,6 +49,7 @@ class Notes extends PureComponent {
 
     componentWillUnmount() {
         window.cordova.plugins.widget.removeEventListener(this.onAddClick);
+        window.cordova.plugins.widget.removeEventListener(this.onWidgetNoteClick);
     }
 
     scrollToNote = (id) => {
