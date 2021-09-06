@@ -18,21 +18,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class WidgetProvider extends AppWidgetProvider {
-    final static String ACTION_ON_CLICK = "com.dailylist.vadimsemenyk.widget.list_item_click";
+    final static String ACTION_LIST_ITEM_LICK = "com.dailylist.vadimsemenyk.widget.list_item_click";
     final static String ACTION_OPEN_ADD = "com.dailylist.vadimsemenyk.widget.open_add";
     final static String ACTION_OPEN_APP = "com.dailylist.vadimsemenyk.widget.open_app";
-    final static String ACTION_LIST_WITH_TIME = "com.dailylist.vadimsemenyk.widget.set_list_with_time";
+    final static String ACTION_LIST_WITH_TIME = "cosetNoteFinishStatem.dailylist.vadimsemenyk.widget.set_list_with_time";
     final static String ACTION_LIST_WITHOUT_TIME = "com.dailylist.vadimsemenyk.widget.set_list_without_time";
     final static String ACTION_UPDATE = "com.dailylist.vadimsemenyk.widget.update";
     final static String ACTION_UPDATE_RESCHEDULE = "com.dailylist.vadimsemenyk.widget.update_reschedule";
 
     final static String WIDGET_SP = "com.dailylist.vadimsemenyk.widget";
     final static String WIDGET_SP_LIST_TYPE = "list_type";
-
-    final static String ITEM_ID = "item_id";
 
     @Override
     public void onEnabled(Context context) {
@@ -115,7 +114,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     private void setListClick(RemoteViews rv, Context context, int appWidgetId) {
         Intent listClickIntent = new Intent(context, WidgetProvider.class);
-        listClickIntent.setAction(ACTION_ON_CLICK);
+        listClickIntent.setAction(ACTION_LIST_ITEM_LICK);
         listClickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         PendingIntent listClickPIntent = PendingIntent.getBroadcast(context, appWidgetId, listClickIntent, 0);
         rv.setPendingIntentTemplate(R.id.list, listClickPIntent);
@@ -146,7 +145,7 @@ public class WidgetProvider extends AppWidgetProvider {
                 || intent.getAction().equalsIgnoreCase(Intent.ACTION_LOCKED_BOOT_COMPLETED)
         ) {
             scheduleUpdateEvent(context);
-        } else if (intent.getAction().equalsIgnoreCase(ACTION_ON_CLICK)) {
+        } else if (intent.getAction().equalsIgnoreCase(ACTION_LIST_ITEM_LICK)) {
             int widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
                 return;
@@ -155,19 +154,27 @@ public class WidgetProvider extends AppWidgetProvider {
             SharedPreferences sp = context.getSharedPreferences(WidgetProvider.WIDGET_SP, Context.MODE_PRIVATE);
             int type = sp.getInt(WidgetProvider.WIDGET_SP_LIST_TYPE + "_" + widgetId,  1);
 
-            int itemId = intent.getIntExtra(ITEM_ID, -1);
+            int itemId = intent.getIntExtra("item_id", -1);
             if (itemId != -1) {
-                launchApp(context);
+                String actionTarget = intent.getStringExtra("action_target");
 
-                JSONObject params = new JSONObject();
-                try {
-                    params.put("id", itemId);
-                    params.put("type", type);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (actionTarget.equals("item")) {
+                    launchApp(context);
+
+                    JSONObject params = new JSONObject();
+                    try {
+                        params.put("id", itemId);
+                        params.put("type", type);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    Widget.fireEvent("noteClick", params);
+                } else if (actionTarget.equals("finish")) {
+                    DBHelper.createInstance(context.getApplicationContext());
+                    NoteRepository.getInstance().triggerNoteFinishState(itemId);
+                    updateWidget(context, AppWidgetManager.getInstance(context), widgetId);
                 }
-
-                Widget.fireEvent("noteClick", params);
             }
         } else if (intent.getAction().equalsIgnoreCase(ACTION_OPEN_ADD)) {
             int widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);

@@ -125,7 +125,7 @@ public class NoteRepository {
         Cursor cursor = null;
 
         if (type == NoteTypes.Diary) {
-            String sql = "SELECT id, tag, startTime, endTime, isFinished, title, contentItems, manualOrderIndex, forkFrom"
+            String sql = "SELECT id, tag, startTime, endTime, isFinished, title, contentItems, manualOrderIndex, forkFrom, date, mode"
                     + " FROM Notes n"
                     + " LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId"
                     + " WHERE"
@@ -148,7 +148,7 @@ public class NoteRepository {
                     new String[] {"DELETE", String.valueOf(date.getTimeInMillis()), String.valueOf(date.getTimeInMillis()), "day", "week", String.valueOf(date.get(Calendar.DAY_OF_WEEK)), "any", String.valueOf(date.getTimeInMillis()), Integer.toString(NoteTypes.Diary.getValue())}
             );
         } else {
-            String sql = "SELECT id, tag, isFinished, title, contentItems, manualOrderIndex, forkFrom"
+            String sql = "SELECT id, tag, isFinished, title, contentItems, manualOrderIndex, forkFrom, date, mode"
                     + " FROM Notes"
                     + " WHERE"
                     + " lastAction != ?"
@@ -160,7 +160,7 @@ public class NoteRepository {
             );
         }
 
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             do {
                 Note note = new Note();
 
@@ -212,27 +212,23 @@ public class NoteRepository {
 
                 note.forkFrom = cursor.isNull(cursor.getColumnIndex("forkFrom")) ? null : cursor.getInt(cursor.getColumnIndex("forkFrom"));
 
+                Long noteDate = cursor.isNull(cursor.getColumnIndex("date")) ? null : cursor.getLong(cursor.getColumnIndex("date"));
+                NoteTypes noteType = NoteTypes.valueOf(cursor.getInt(cursor.getColumnIndex("mode")));
+                note.isShadow = (noteDate == null) && (noteType == NoteTypes.Diary);
+
                 notes.add(note);
             }
             while (cursor.moveToNext());
         }
         cursor.close();
 
-        String getSettingsSQL = "SELECT sortType, sortDirection FROM Settings";
+        Cursor settingsCursor = getRawSettings();
 
-        Cursor getSettingsCursor = DBHelper.getInstance().getWritableDatabase().rawQuery(getSettingsSQL, null);
+        SortType sortType = SortType.valueOf(settingsCursor.getInt(settingsCursor.getColumnIndex("sortType")));
+        SortDirection sortDirection = SortDirection.valueOf(settingsCursor.getInt(settingsCursor.getColumnIndex("sortDirection")));
+        int sortFinBehaviour = settingsCursor.getInt(settingsCursor.getColumnIndex("sortFinBehaviour"));
 
-        SortType sortType = SortType.ADDED_TIME;
-        SortDirection sortDirection = SortDirection.ASC;
-
-        if(getSettingsCursor.moveToFirst()){
-            do {
-                sortType = SortType.valueOf(getSettingsCursor.getInt(getSettingsCursor.getColumnIndex("sortType")));
-                sortDirection = SortDirection.valueOf(getSettingsCursor.getInt(getSettingsCursor.getColumnIndex("sortDirection")));
-            }
-            while (getSettingsCursor.moveToNext());
-        }
-        getSettingsCursor.close();
+        settingsCursor.close();
 
         if (sortType == SortType.NOTE_TIME) {
             Collections.sort(notes, new SortByNoteTime(sortDirection));
@@ -240,9 +236,124 @@ public class NoteRepository {
             Collections.sort(notes, new SortByAddedTime(sortDirection));
         }
 
-        Collections.sort(notes, new SortByFinished());
+        if (sortFinBehaviour == 1) {
+            Collections.sort(notes, new SortByFinished());
+        }
 
         return notes;
+    }
+
+    public void triggerNoteFinishState(int noteId) {
+        Cursor noteCursor = getRawNote(noteId);
+
+        boolean nextState = !(noteCursor.getInt(noteCursor.getColumnIndex("isFinished")) == 1);
+        boolean isShadow = noteCursor.isNull(noteCursor.getColumnIndex("date")) && (NoteTypes.valueOf(noteCursor.getInt(noteCursor.getColumnIndex("mode"))) == NoteTypes.Diary);
+
+        noteCursor.close();
+
+        if (isShadow) {
+            noteId = formShadowToReal(noteId);
+        }
+
+        Cursor settingsCursor = getRawSettings();
+
+        int sortFinBehaviour = settingsCursor.getInt(settingsCursor.getColumnIndex("sortFinBehaviour"));
+
+        settingsCursor.close();
+
+        boolean resetManualOrderIndex = false;
+        if (sortFinBehaviour == 1 && nextState) {
+            resetManualOrderIndex = true;
+        }
+
+        String sql = "UPDATE Notes"
+                + " SET isFinished = ?"
+                + (resetManualOrderIndex ? ", manualOrderIndex = null" : "")
+                + " WHERE id = ?;";
+
+        DBHelper.getInstance().getWritableDatabase().execSQL(
+                sql,
+                new String[] {Integer.toString(nextState ? 1 : 0), Integer.toString(noteId)}
+        );
+
+        updateNoteLastAction(noteId, "UPDATE");
+    }
+
+    public int getSortFinBehaviour() {
+        Cursor settingsCursor = getRawSettings();
+
+        int sortFinBehaviour = settingsCursor.getInt(settingsCursor.getColumnIndex("sortFinBehaviour"));
+
+        settingsCursor.close();
+
+        return sortFinBehaviour;
+    }
+
+    private Cursor getRawNote(int id) {
+        String sql = "SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags, lastAction, lastActionTime"
+                + " FROM Notes"
+                + " WHERE id = ?;";
+
+        Cursor cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(
+                sql,
+                new String[] {Integer.toString(id)}
+        );
+
+        cursor.moveToNext();
+
+        return cursor;
+    }
+
+    private Cursor getRawSettings() {
+        String getSettingsSQL = "SELECT sortFinBehaviour, sortType, sortDirection FROM Settings";
+        Cursor getSettingsCursor = DBHelper.getInstance().getWritableDatabase().rawQuery(getSettingsSQL, null);
+        getSettingsCursor.moveToNext();
+
+        return getSettingsCursor;
+    }
+
+    private Integer formShadowToReal(int id) {
+        Integer nextNoteId = null;
+
+        String insertSQL = "INSERT INTO Notes (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags)"
+                + " SELECT title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, ? AS forkFrom, mode, manualOrderIndex, tags"
+                + " FROM Notes"
+                + " WHERE id = ?;";
+
+        DBHelper.getInstance().getWritableDatabase().execSQL(
+                insertSQL,
+                new String[] {Integer.toString(id), Integer.toString(id)}
+        );
+
+        String idSQL = "SELECT last_insert_rowid()";
+        Cursor cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(idSQL, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                nextNoteId = cursor.getInt(0);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        updateNoteLastAction(nextNoteId, "ADD");
+
+        return nextNoteId;
+    }
+
+    private void updateNoteLastAction(int id, String action) {
+        String insertSQL = "UPDATE Notes"
+                + " SET lastAction = ?, lastActionTime = ?"
+                + " WHERE id = ?;";
+
+        DBHelper.getInstance().getWritableDatabase().execSQL(
+                insertSQL,
+                new String[]{
+                        action,
+                        Long.toString(Calendar.getInstance().getTimeInMillis()),
+                        Integer.toString(id)
+                }
+        );
     }
 
     Calendar convertFromUTCToLocal(Calendar utcDateTime) {

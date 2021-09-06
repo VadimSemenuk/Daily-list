@@ -20,6 +20,7 @@ public class WidgetListFactory implements RemoteViewsFactory {
     ArrayList<Note> data;
     Context context;
     int widgetID;
+    int sortFinBehaviour;
 
     WidgetListFactory(Context ctx, Intent intent) {
         context = ctx;
@@ -98,6 +99,7 @@ public class WidgetListFactory implements RemoteViewsFactory {
         }
 
         if (
+                sortFinBehaviour == 1 &&
                 ((position == 0) && data.get(position).isFinished)
                 || ((position != 0) && data.get(position).isFinished && !data.get(position - 1).isFinished)
         ) {
@@ -106,9 +108,17 @@ public class WidgetListFactory implements RemoteViewsFactory {
             remoteView.setInt(R.id.sublist_title, "setVisibility", View.GONE);
         }
 
-        Intent clickIntent = new Intent();
-        clickIntent.putExtra(WidgetProvider.ITEM_ID, note.id);
-        remoteView.setOnClickFillInIntent(R.id.note, clickIntent);
+        remoteView.setInt(R.id.finish_img, "setImageResource", note.isFinished ? R.drawable.checkbox_checked : R.drawable.checkbox);
+
+        Intent itemClickIntent = new Intent();
+        itemClickIntent.putExtra("item_id", note.id);
+        itemClickIntent.putExtra("action_target", "item");
+        remoteView.setOnClickFillInIntent(R.id.note, itemClickIntent);
+
+        Intent finishClickIntent = new Intent();
+        finishClickIntent.putExtra("item_id", note.id);
+        finishClickIntent.putExtra("action_target", "finish");
+        remoteView.setOnClickFillInIntent(R.id.finish, finishClickIntent);
 
         return remoteView;
     }
@@ -140,6 +150,8 @@ public class WidgetListFactory implements RemoteViewsFactory {
 
         ArrayList<Note> notes = NoteRepository.getInstance().getNotes(type, dateUTC);
         data = notes;
+
+        sortFinBehaviour = NoteRepository.getInstance().getSortFinBehaviour();
     }
 
     @Override

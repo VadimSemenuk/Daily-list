@@ -15,6 +15,7 @@ public class Note implements Serializable {
     public ArrayList<NoteContentItem> contentItems;
     public Integer manualOrderIndex;
     public Integer forkFrom;
+    public boolean isShadow;
 
     public Note() {}
 }
