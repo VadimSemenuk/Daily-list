@@ -59,5 +59,9 @@
         <source-file src="src/android/res/drawable/checkbox_checked.png" target-dir="res/drawable" />
         <source-file src="src/android/res/drawable/list.png" target-dir="res/drawable" />
         <source-file src="src/android/res/drawable/app_icon_no_background.png" target-dir="res/drawable" />
+
+        <source-file src="src/android/res/xml/values/widget_strings.xml" target-dir="res/values" />
+        <source-file src="src/android/res/xml/values-be/widget_strings.xml" target-dir="res/values-be" />
+        <source-file src="src/android/res/xml/values-en/widget_strings.xml" target-dir="res/values-en" />
     </platform>
 </plugin>

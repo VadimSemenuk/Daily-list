@@ -8,6 +8,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.RemoteViews;
@@ -20,6 +22,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class WidgetProvider extends AppWidgetProvider {
     final static String ACTION_LIST_ITEM_LICK = "com.dailylist.vadimsemenyk.widget.list_item_click";
@@ -80,6 +83,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
         widgetView.setTextViewText(R.id.date, SimpleDateFormat.getDateInstance().format(Calendar.getInstance().getTime()));
 
+        widgetView.setTextViewText(R.id.empty, getLocalizedResources(context, new Locale(NoteRepository.getInstance().getLocale())).getString(R.string.widget_list_empty));
+
         setList(widgetView, context, id);
 
         setListClick(widgetView, context, id);
@@ -125,6 +130,7 @@ public class WidgetProvider extends AppWidgetProvider {
         adapter.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         Uri data = Uri.parse(adapter.toUri(Intent.URI_INTENT_SCHEME));
         adapter.setData(data);
+        rv.setEmptyView(R.id.list, R.id.empty);
         rv.setRemoteAdapter(R.id.list, adapter);
     }
 
@@ -243,5 +249,13 @@ public class WidgetProvider extends AppWidgetProvider {
         super.onDisabled(context);
 
         unScheduleUpdateEvent(context);
+    }
+
+    static Resources getLocalizedResources(Context context, Locale desiredLocale) {
+        Configuration conf = context.getResources().getConfiguration();
+        conf = new Configuration(conf);
+        conf.setLocale(desiredLocale);
+        Context localizedContext = context.createConfigurationContext(conf);
+        return localizedContext.getResources();
     }
 }

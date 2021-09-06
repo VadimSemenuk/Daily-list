@@ -289,6 +289,16 @@ public class NoteRepository {
         return sortFinBehaviour;
     }
 
+    public String getLocale() {
+        Cursor settingsCursor = getRawSettings();
+
+        String locale = settingsCursor.getString(settingsCursor.getColumnIndex("lang"));
+
+        settingsCursor.close();
+
+        return locale;
+    }
+
     private Cursor getRawNote(int id) {
         String sql = "SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags, lastAction, lastActionTime"
                 + " FROM Notes"
@@ -305,7 +315,7 @@ public class NoteRepository {
     }
 
     private Cursor getRawSettings() {
-        String getSettingsSQL = "SELECT sortFinBehaviour, sortType, sortDirection FROM Settings";
+        String getSettingsSQL = "SELECT sortFinBehaviour, sortType, sortDirection, lang FROM Settings";
         Cursor getSettingsCursor = DBHelper.getInstance().getWritableDatabase().rawQuery(getSettingsSQL, null);
         getSettingsCursor.moveToNext();
 
