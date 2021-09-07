@@ -104,8 +104,10 @@ public class WidgetListFactory implements RemoteViewsFactory {
 
         if (
                 sortFinBehaviour == 1 &&
-                ((position == 0) && data.get(position).isFinished)
-                || ((position != 0) && data.get(position).isFinished && !data.get(position - 1).isFinished)
+                (
+                        ((position == 0) && data.get(position).isFinished)
+                        || ((position != 0) && data.get(position).isFinished && !data.get(position - 1).isFinished)
+                )
         ) {
             remoteView.setTextViewText(R.id.sublist_title, WidgetProvider.getLocalizedResources(context, new Locale(localeName)).getString(R.string.widget_list_finished_section));
             remoteView.setInt(R.id.sublist_title, "setVisibility", View.VISIBLE);
