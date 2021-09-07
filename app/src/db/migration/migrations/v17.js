@@ -190,7 +190,6 @@ export default {
                     passwordResetEmail TEXT,
                     invertHeaderPosition INTEGER,
                     noteFilters TEXT,
-                    isSidenavTagsListExpanded INTEGER,
                     isQuickAddPanelVisible INTEGER
                 );
             `);
@@ -211,7 +210,6 @@ export default {
                     notesScreenMode,
                     invertHeaderPosition,
                     noteFilters,
-                    isSidenavTagsListExpanded,
                     isQuickAddPanelVisible
                 ) 
                 SELECT 
@@ -232,7 +230,6 @@ export default {
                     1 as notesScreenMode,
                     0 as invertHeaderPosition,
                     ? as noteFilters,
-                    1 as isSidenavTagsListExpanded,
                     1 as isQuickAddPanelVisible
                 FROM Settings_OLD;
             `, [CalendarNotesCounterMode.All, sortSettings.type, sortSettings.direction, sortSettings.finSort, JSON.stringify(noteFiltersSettings)]);
