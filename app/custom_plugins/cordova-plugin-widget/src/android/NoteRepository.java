@@ -325,14 +325,17 @@ public class NoteRepository {
     private Integer formShadowToReal(int id) {
         Integer nextNoteId = null;
 
+        Calendar date = NoteRepository.convertFromLocalToUTC(Calendar.getInstance());
+        NoteRepository.startOfDay(date);
+
         String insertSQL = "INSERT INTO Notes (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags)"
-                + " SELECT title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, ? AS forkFrom, mode, manualOrderIndex, tags"
+                + " SELECT title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, ? AS date, ? AS forkFrom, mode, manualOrderIndex, tags"
                 + " FROM Notes"
                 + " WHERE id = ?;";
 
         DBHelper.getInstance().getWritableDatabase().execSQL(
                 insertSQL,
-                new String[] {Integer.toString(id), Integer.toString(id)}
+                new String[] {Long.toString(date.getTimeInMillis()), Integer.toString(id), Integer.toString(id)}
         );
 
         String idSQL = "SELECT last_insert_rowid()";
@@ -366,7 +369,7 @@ public class NoteRepository {
         );
     }
 
-    Calendar convertFromUTCToLocal(Calendar utcDateTime) {
+    public static Calendar convertFromUTCToLocal(Calendar utcDateTime) {
         int utcYear = utcDateTime.get(Calendar.YEAR);
         int utcMonth = utcDateTime.get(Calendar.MONTH);
         int utcDate = utcDateTime.get(Calendar.DATE);
@@ -379,8 +382,22 @@ public class NoteRepository {
         return dateTimeLocal;
     }
 
-    void startOfDay(Calendar dateTime) {
-        dateTime.set(Calendar.HOUR, 0);
+    public static Calendar convertFromLocalToUTC(Calendar localDateTime) {
+        int year = localDateTime.get(Calendar.YEAR);
+        int month = localDateTime.get(Calendar.MONTH);
+        int date = localDateTime.get(Calendar.DATE);
+        int hour = localDateTime.get(Calendar.HOUR_OF_DAY);
+        int minute = localDateTime.get(Calendar.MINUTE);
+
+        Calendar dateUTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        dateUTC.set(year, month, date, hour, minute, 0);
+        dateUTC.set(Calendar.MILLISECOND, 0);
+
+        return dateUTC;
+    }
+
+    public static void startOfDay(Calendar dateTime) {
+        dateTime.set(Calendar.HOUR_OF_DAY, 0);
         dateTime.set(Calendar.MINUTE, 0);
         dateTime.set(Calendar.SECOND, 0);
         dateTime.set(Calendar.MILLISECOND, 0);

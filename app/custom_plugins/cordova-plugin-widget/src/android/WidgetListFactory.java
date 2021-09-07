@@ -140,20 +140,14 @@ public class WidgetListFactory implements RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-        Calendar dateLocal = Calendar.getInstance();
-        int year = dateLocal.get(Calendar.YEAR);
-        int month = dateLocal.get(Calendar.MONTH);
-        int date = dateLocal.get(Calendar.DATE);
-
-        Calendar dateUTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        dateUTC.set(year, month, date, 0, 0, 0);
-        dateUTC.set(Calendar.MILLISECOND, 0);
-
         SharedPreferences sp = context.getSharedPreferences(WidgetProvider.WIDGET_SP, Context.MODE_PRIVATE);
         int _type = sp.getInt(WidgetProvider.WIDGET_SP_LIST_TYPE + "_" + widgetID,  1);
         NoteTypes type = NoteTypes.valueOf(_type);
 
-        ArrayList<Note> notes = NoteRepository.getInstance().getNotes(type, dateUTC);
+        Calendar date = NoteRepository.convertFromLocalToUTC(Calendar.getInstance());
+        NoteRepository.startOfDay(date);
+
+        ArrayList<Note> notes = NoteRepository.getInstance().getNotes(type, date);
         data = notes;
 
         sortFinBehaviour = NoteRepository.getInstance().getSortFinBehaviour();
