@@ -175,11 +175,13 @@ public class WidgetProvider extends AppWidgetProvider {
                         e.printStackTrace();
                     }
 
-                    Widget.fireEvent("noteClick", params);
+                    Widget.fireEvent("noteClick", params, true);
                 } else if (actionTarget.equals("finish")) {
                     DBHelper.createInstance(context.getApplicationContext());
                     NoteRepository.getInstance().triggerNoteFinishState(itemId);
                     updateWidget(context, AppWidgetManager.getInstance(context), widgetId);
+
+                    Widget.fireEvent("noteStateChange", false);
                 }
             }
         } else if (intent.getAction().equalsIgnoreCase(ACTION_OPEN_ADD)) {
@@ -199,7 +201,7 @@ public class WidgetProvider extends AppWidgetProvider {
             }
 
             launchApp(context);
-            Widget.fireEvent("addClick", params);
+            Widget.fireEvent("addClick", params, true);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_LIST_WITH_TIME) || intent.getAction().equalsIgnoreCase(ACTION_LIST_WITHOUT_TIME)) {
             int widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {

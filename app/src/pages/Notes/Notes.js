@@ -28,6 +28,7 @@ import TagImg from "../../assets/img/tag.svg";
 import BackupImg from "../../assets/img/upload-to-cloud-black.svg";
 
 import './Notes.scss';
+import {updateNotes} from "../../actions";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -44,12 +45,14 @@ class Notes extends PureComponent {
         if (window.cordova) {
             window.cordova.plugins.widget.addEventListener("addClick", this.onWidgetAddClick);
             window.cordova.plugins.widget.addEventListener("noteClick", this.onWidgetNoteClick);
+            window.cordova.plugins.widget.addEventListener("noteStateChange", this.onWidgetStateChange);
         }
     }
 
     componentWillUnmount() {
         window.cordova.plugins.widget.removeEventListener(this.onWidgetAddClick);
         window.cordova.plugins.widget.removeEventListener(this.onWidgetNoteClick);
+        window.cordova.plugins.widget.removeEventListener(this.onWidgetStateChange);
     }
 
     scrollToNote = (id) => {
@@ -60,6 +63,10 @@ class Notes extends PureComponent {
     expandNote = (id) => {
         let el = document.querySelector(`.note-wrapper[data-id='${id}'] .note`);
         el && el.classList.add("expanded");
+    }
+
+    onWidgetStateChange = () => {
+        this.props.updateNotes();
     }
 
     onWidgetAddClick = async (props) => {

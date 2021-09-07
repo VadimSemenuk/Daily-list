@@ -58,15 +58,17 @@ public class Widget extends CordovaPlugin {
         scheduledEvents.remove(event);
     }
 
-    static void fireEvent(String event) {
-        fireEvent(event, new JSONObject());
+    static void fireEvent(String event, boolean scheduleEvent) {
+        fireEvent(event, new JSONObject(), scheduleEvent);
     }
 
-    static void fireEvent(String event, JSONObject data) {
+    static void fireEvent(String event, JSONObject data, boolean scheduleEvent) {
         String js = "cordova.plugins.widget.fireEvent(" + "\"" + event + "\"," + data.toString() + ")";
 
         if (!isWebAppListenEvents || !isAppRunning()) {
-            scheduledEvents.put(event, js);
+            if (scheduleEvent) {
+                scheduledEvents.put(event, js);
+            }
             return;
         }
 
