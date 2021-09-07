@@ -385,7 +385,8 @@ export function setSetting(nextSettings) {
             if (nextSettings.noteFilters) {
                 dispatch(getFullCount());
             }
-            if (nextSettings.sortType || nextSettings.sortDirection) {
+
+            if (["sortType", "sortDirection", "sortFinBehaviour", "lang"].some((item) => nextSettings.hasOwnProperty(item))) {
                 window.cordova && window.cordova.plugins.widget.update();
             }
         } catch(err) {
