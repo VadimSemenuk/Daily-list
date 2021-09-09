@@ -23,7 +23,7 @@ public class NoteRepository {
     private NoteRepository() {
     }
 
-    class SortByAddedTime implements Comparator<Object> {
+    static class SortByAddedTime implements Comparator<Object> {
         SortDirection direction;
 
         private SortByAddedTime(SortDirection direction) {
@@ -39,9 +39,9 @@ public class NoteRepository {
                 int bVal = noteB.forkFrom != null ? noteB.forkFrom : noteB.id;
 
                 return direction == SortDirection.ASC ? aVal - bVal : bVal - aVal;
-            } else if (noteA.manualOrderIndex == null && noteB.manualOrderIndex != null) {
+            } else if (noteA.manualOrderIndex == null) {
                 return 1;
-            } else if (noteA.manualOrderIndex != null && noteB.manualOrderIndex == null) {
+            } else if (noteB.manualOrderIndex == null) {
                 return -1;
             } else {
                 return noteA.manualOrderIndex - noteB.manualOrderIndex;
@@ -49,7 +49,7 @@ public class NoteRepository {
         }
     }
 
-    class SortByNoteTime implements Comparator<Object> {
+    static class SortByNoteTime implements Comparator<Object> {
         SortDirection direction;
 
         private SortByNoteTime(SortDirection direction) {
@@ -84,7 +84,7 @@ public class NoteRepository {
         }
     }
 
-    class SortByFinished implements Comparator<Object> {
+    static class SortByFinished implements Comparator<Object> {
 
         private SortByFinished() {
         }
@@ -94,32 +94,7 @@ public class NoteRepository {
         }
     }
 
-    public ArrayList<Note> _getNotes(NoteTypes type, Calendar date) {
-        ArrayList<Note> notes = new ArrayList<>();
-
-        for (int i = 0; i < 10; i++) {
-            ArrayList<NoteContentItem> contentItems = new ArrayList<NoteContentItem>();
-
-            contentItems.add(new NoteContentItemTextArea("Text item"));
-            contentItems.add(new NoteContentItemListItem("List item 1", false));
-            contentItems.add(new NoteContentItemListItem("List item 2", true));
-            contentItems.add(new NoteContentItemListItem("List item 3", true));
-
-            Note note = new Note();
-            note.colorTag = "#c5282f";
-            note.startDateTime = Calendar.getInstance();
-            note.endDateTime = Calendar.getInstance();
-            note.isFinished = false;
-            note.title = "Title";
-            note.contentItems = contentItems;
-
-            notes.add(note);
-        }
-
-        return notes;
-    }
-
-    public ArrayList<Note> getNotes(NoteTypes type, Calendar date) {
+    public ArrayList<Note> getNotes(NoteTypes type, Calendar date, Settings settings) {
         ArrayList<Note> notes = new ArrayList<>();
 
         Cursor cursor = null;
@@ -212,31 +187,19 @@ public class NoteRepository {
 
                 note.forkFrom = cursor.isNull(cursor.getColumnIndex("forkFrom")) ? null : cursor.getInt(cursor.getColumnIndex("forkFrom"));
 
-                Long noteDate = cursor.isNull(cursor.getColumnIndex("date")) ? null : cursor.getLong(cursor.getColumnIndex("date"));
-                NoteTypes noteType = NoteTypes.valueOf(cursor.getInt(cursor.getColumnIndex("mode")));
-                note.isShadow = (noteDate == null) && (noteType == NoteTypes.Diary);
-
                 notes.add(note);
             }
             while (cursor.moveToNext());
         }
         cursor.close();
 
-        Cursor settingsCursor = getRawSettings();
-
-        SortType sortType = SortType.valueOf(settingsCursor.getInt(settingsCursor.getColumnIndex("sortType")));
-        SortDirection sortDirection = SortDirection.valueOf(settingsCursor.getInt(settingsCursor.getColumnIndex("sortDirection")));
-        int sortFinBehaviour = settingsCursor.getInt(settingsCursor.getColumnIndex("sortFinBehaviour"));
-
-        settingsCursor.close();
-
-        if (sortType == SortType.NOTE_TIME) {
-            Collections.sort(notes, new SortByNoteTime(sortDirection));
+        if (settings.sortType == SortType.NOTE_TIME) {
+            Collections.sort(notes, new SortByNoteTime(settings.sortDirection));
         } else {
-            Collections.sort(notes, new SortByAddedTime(sortDirection));
+            Collections.sort(notes, new SortByAddedTime(settings.sortDirection));
         }
 
-        if (sortFinBehaviour == 1) {
+        if (settings.sortFinBehaviour == 1) {
             Collections.sort(notes, new SortByFinished());
         }
 
@@ -255,14 +218,10 @@ public class NoteRepository {
             noteId = formShadowToReal(noteId);
         }
 
-        Cursor settingsCursor = getRawSettings();
-
-        int sortFinBehaviour = settingsCursor.getInt(settingsCursor.getColumnIndex("sortFinBehaviour"));
-
-        settingsCursor.close();
+        Settings settings = SettingsRepository.getInstance().getSettings();
 
         boolean resetManualOrderIndex = false;
-        if (sortFinBehaviour == 1 && nextState) {
+        if (settings.sortFinBehaviour == 1 && nextState) {
             resetManualOrderIndex = true;
         }
 
@@ -279,26 +238,6 @@ public class NoteRepository {
         updateNoteLastAction(noteId, "UPDATE");
     }
 
-    public int getSortFinBehaviour() {
-        Cursor settingsCursor = getRawSettings();
-
-        int sortFinBehaviour = settingsCursor.getInt(settingsCursor.getColumnIndex("sortFinBehaviour"));
-
-        settingsCursor.close();
-
-        return sortFinBehaviour;
-    }
-
-    public String getLocale() {
-        Cursor settingsCursor = getRawSettings();
-
-        String locale = settingsCursor.getString(settingsCursor.getColumnIndex("lang"));
-
-        settingsCursor.close();
-
-        return locale;
-    }
-
     private Cursor getRawNote(int id) {
         String sql = "SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags, lastAction, lastActionTime"
                 + " FROM Notes"
@@ -312,14 +251,6 @@ public class NoteRepository {
         cursor.moveToNext();
 
         return cursor;
-    }
-
-    private Cursor getRawSettings() {
-        String getSettingsSQL = "SELECT sortFinBehaviour, sortType, sortDirection, lang FROM Settings";
-        Cursor getSettingsCursor = DBHelper.getInstance().getWritableDatabase().rawQuery(getSettingsSQL, null);
-        getSettingsCursor.moveToNext();
-
-        return getSettingsCursor;
     }
 
     private Integer formShadowToReal(int id) {

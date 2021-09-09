@@ -62,8 +62,7 @@ public class WidgetProvider extends AppWidgetProvider {
     private PendingIntent getWidgetUpdateReschedulePIntent(Context context) {
         Intent intent = new Intent(context, WidgetProvider.class);
         intent.setAction(ACTION_UPDATE_RESCHEDULE);
-        PendingIntent pIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        return pIntent;
+        return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
     @Override
@@ -78,11 +77,13 @@ public class WidgetProvider extends AppWidgetProvider {
     private void updateWidget(Context context, AppWidgetManager appWidgetManager, int id) {
         DBHelper.createInstance(context.getApplicationContext());
 
+        Settings settings = SettingsRepository.getInstance().getSettings();
+
         RemoteViews widgetView = new RemoteViews(context.getPackageName(), R.layout.widget);
 
         widgetView.setTextViewText(R.id.date, SimpleDateFormat.getDateInstance().format(Calendar.getInstance().getTime()));
 
-        widgetView.setTextViewText(R.id.empty, getLocalizedResources(context, new Locale(NoteRepository.getInstance().getLocale())).getString(R.string.widget_list_empty));
+        widgetView.setTextViewText(R.id.empty, getLocalizedResources(context, new Locale(settings.lang)).getString(R.string.widget_list_empty));
 
         setList(widgetView, context, id);
 
@@ -163,7 +164,7 @@ public class WidgetProvider extends AppWidgetProvider {
             if (itemId != -1) {
                 String actionTarget = intent.getStringExtra("action_target");
 
-                if (actionTarget.equals("item")) {
+                if (actionTarget != null && actionTarget.equals("item")) {
                     launchApp(context);
 
                     JSONObject params = new JSONObject();
@@ -175,7 +176,7 @@ public class WidgetProvider extends AppWidgetProvider {
                     }
 
                     Widget.fireEvent("noteClick", params, true);
-                } else if (actionTarget.equals("finish")) {
+                } else if (actionTarget != null && actionTarget.equals("finish")) {
                     DBHelper.createInstance(context.getApplicationContext());
                     NoteRepository.getInstance().triggerNoteFinishState(itemId);
                     updateWidget(context, AppWidgetManager.getInstance(context), widgetId);
@@ -189,6 +190,8 @@ public class WidgetProvider extends AppWidgetProvider {
                 return;
             }
 
+            launchApp(context);
+
             SharedPreferences sp = context.getSharedPreferences(WidgetProvider.WIDGET_SP, Context.MODE_PRIVATE);
             int type = sp.getInt(WidgetProvider.WIDGET_SP_LIST_TYPE + "_" + widgetId,  1);
 
@@ -199,7 +202,6 @@ public class WidgetProvider extends AppWidgetProvider {
                 e.printStackTrace();
             }
 
-            launchApp(context);
             Widget.fireEvent("addClick", params, true);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_LIST_WITH_TIME) || intent.getAction().equalsIgnoreCase(ACTION_LIST_WITHOUT_TIME)) {
             int widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -210,7 +212,7 @@ public class WidgetProvider extends AppWidgetProvider {
             NoteTypes nextListType = intent.getAction().equalsIgnoreCase(ACTION_LIST_WITH_TIME) ? NoteTypes.Diary : NoteTypes.Note;
 
             SharedPreferences sp = context.getSharedPreferences(WIDGET_SP, Context.MODE_PRIVATE);
-            sp.edit().putInt(WIDGET_SP_LIST_TYPE + "_" + widgetId, nextListType.getValue()).commit();
+            sp.edit().putInt(WIDGET_SP_LIST_TYPE + "_" + widgetId, nextListType.getValue()).apply();
 
             updateWidget(context, AppWidgetManager.getInstance(context), widgetId);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_OPEN_APP)) {
@@ -242,7 +244,7 @@ public class WidgetProvider extends AppWidgetProvider {
         for (int widgetID : appWidgetIds) {
             editor.remove(WIDGET_SP_LIST_TYPE + "_" + widgetID);
         }
-        editor.commit();
+        editor.apply();
     }
 
     @Override

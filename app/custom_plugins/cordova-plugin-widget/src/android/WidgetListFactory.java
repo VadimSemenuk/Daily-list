@@ -4,14 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -23,8 +20,7 @@ public class WidgetListFactory implements RemoteViewsFactory {
     ArrayList<Note> data;
     Context context;
     int widgetID;
-    int sortFinBehaviour;
-    String localeName = "ru";
+    Settings settings;
 
     WidgetListFactory(Context ctx, Intent intent) {
         context = ctx;
@@ -103,13 +99,13 @@ public class WidgetListFactory implements RemoteViewsFactory {
         }
 
         if (
-                sortFinBehaviour == 1 &&
+                settings.sortFinBehaviour == 1 &&
                 (
                         ((position == 0) && data.get(position).isFinished)
                         || ((position != 0) && data.get(position).isFinished && !data.get(position - 1).isFinished)
                 )
         ) {
-            remoteView.setTextViewText(R.id.sublist_title, WidgetProvider.getLocalizedResources(context, new Locale(localeName)).getString(R.string.widget_list_finished_section));
+            remoteView.setTextViewText(R.id.sublist_title, WidgetProvider.getLocalizedResources(context, new Locale(settings.lang)).getString(R.string.widget_list_finished_section));
             remoteView.setInt(R.id.sublist_title, "setVisibility", View.VISIBLE);
         } else {
             remoteView.setInt(R.id.sublist_title, "setVisibility", View.GONE);
@@ -149,11 +145,9 @@ public class WidgetListFactory implements RemoteViewsFactory {
         Calendar date = NoteRepository.convertFromLocalToUTC(Calendar.getInstance());
         NoteRepository.startOfDay(date);
 
-        ArrayList<Note> notes = NoteRepository.getInstance().getNotes(type, date);
-        data = notes;
+        settings = SettingsRepository.getInstance().getSettings();
 
-        sortFinBehaviour = NoteRepository.getInstance().getSortFinBehaviour();
-        localeName = NoteRepository.getInstance().getLocale();
+        data = NoteRepository.getInstance().getNotes(type, date, settings);
     }
 
     @Override

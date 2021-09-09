@@ -1,7 +1,6 @@
 package com.dailylist.vadimsemenyk.widget;
 
 import android.app.Activity;
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 
 import org.apache.cordova.CordovaInterface;
@@ -37,9 +36,7 @@ public class Widget extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("eventAdded")) {
             isWebAppListenEvents = true;
-
-            String event = args.getString(0);
-            fireScheduledEvent(event);
+            fireScheduledEvent(args.getString(0));
             return true;
         } else if (action.equals("update")) {
             update();
@@ -54,8 +51,10 @@ public class Widget extends CordovaPlugin {
     }
 
     private static synchronized void fireScheduledEvent(String event) {
-        sendJavascript(scheduledEvents.get(event));
-        scheduledEvents.remove(event);
+        if (scheduledEvents.get(event) != null) {
+            sendJavascript(scheduledEvents.get(event));
+            scheduledEvents.remove(event);
+        }
     }
 
     static void fireEvent(String event, boolean scheduleEvent) {

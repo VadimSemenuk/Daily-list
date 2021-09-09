@@ -46,6 +46,8 @@
         <source-file src="src/android/WidgetListFactory.java" target-dir="com/dailylist/vadimsemenyk/widget" />
         <source-file src="src/android/WidgetListService.java" target-dir="com/dailylist/vadimsemenyk/widget" />
         <source-file src="src/android/WidgetProvider.java" target-dir="com/dailylist/vadimsemenyk/widget" />
+        <source-file src="src/android/Settings.java" target-dir="com/dailylist/vadimsemenyk/widget" />
+        <source-file src="src/android/SettingsRepository.java" target-dir="com/dailylist/vadimsemenyk/widget" />
 
         <source-file src="src/android/res/xml/widget_metadata.xml" target-dir="res/xml" />
         <source-file src="src/android/res/xml/list_item_content_item.xml" target-dir="res/layout" />
