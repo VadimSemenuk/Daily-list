@@ -30,6 +30,7 @@ public class WidgetProvider extends AppWidgetProvider {
     final static String ACTION_LIST_WITH_TIME = "cosetNoteFinishStatem.dailylist.vadimsemenyk.widget.set_list_with_time";
     final static String ACTION_LIST_WITHOUT_TIME = "com.dailylist.vadimsemenyk.widget.set_list_without_time";
     final static String ACTION_UPDATE = "com.dailylist.vadimsemenyk.widget.update";
+    final static String ACTION_UPDATE_LIST = "com.dailylist.vadimsemenyk.widget.update_list";
     final static String ACTION_UPDATE_RESCHEDULE = "com.dailylist.vadimsemenyk.widget.update_reschedule";
 
     final static String WIDGET_SP = "com.dailylist.vadimsemenyk.widget";
@@ -81,40 +82,44 @@ public class WidgetProvider extends AppWidgetProvider {
 
         RemoteViews widgetView = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        widgetView.setTextViewText(R.id.date, SimpleDateFormat.getDateInstance().format(Calendar.getInstance().getTime()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", new Locale(settings.lang));
+        widgetView.setTextViewText(R.id.date, dateFormat.format(Calendar.getInstance().getTime()));
 
         widgetView.setTextViewText(R.id.empty, getLocalizedResources(context, new Locale(settings.lang)).getString(R.string.widget_list_empty));
 
-        setList(widgetView, context, id);
+        setWidgetEvents(widgetView, context, id);
 
+        setList(widgetView, context, id);
         setListClick(widgetView, context, id);
 
+        appWidgetManager.updateAppWidget(id, widgetView);
+        appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.list);
+    }
+
+    private void setWidgetEvents(RemoteViews widgetView, Context context, int widgetId) {
         Intent openAddIntent = new Intent(context, WidgetProvider.class);
-        openAddIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
+        openAddIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
         openAddIntent.setAction(ACTION_OPEN_ADD);
-        PendingIntent pIntent = PendingIntent.getBroadcast(context, id, openAddIntent, 0);
+        PendingIntent pIntent = PendingIntent.getBroadcast(context, widgetId, openAddIntent, 0);
         widgetView.setOnClickPendingIntent(R.id.add, pIntent);
 
         Intent setListWithTimeIntent = new Intent(context, WidgetProvider.class);
         setListWithTimeIntent.setAction(ACTION_LIST_WITH_TIME);
-        setListWithTimeIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-        PendingIntent setListWithTimePIntent = PendingIntent.getBroadcast(context, id, setListWithTimeIntent, 0);
+        setListWithTimeIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+        PendingIntent setListWithTimePIntent = PendingIntent.getBroadcast(context, widgetId, setListWithTimeIntent, 0);
         widgetView.setOnClickPendingIntent(R.id.show_notes_with_time, setListWithTimePIntent);
 
         Intent setListWithoutTimeIntent = new Intent(context, WidgetProvider.class);
         setListWithoutTimeIntent.setAction(ACTION_LIST_WITHOUT_TIME);
-        setListWithoutTimeIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-        PendingIntent setListWithoutTimePIntent = PendingIntent.getBroadcast(context, id, setListWithoutTimeIntent, 0);
+        setListWithoutTimeIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+        PendingIntent setListWithoutTimePIntent = PendingIntent.getBroadcast(context, widgetId, setListWithoutTimeIntent, 0);
         widgetView.setOnClickPendingIntent(R.id.show_notes_without_time, setListWithoutTimePIntent);
 
         Intent openAppIntent = new Intent(context, WidgetProvider.class);
         openAppIntent.setAction(ACTION_OPEN_APP);
-        openAppIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-        PendingIntent openAppPIntent = PendingIntent.getBroadcast(context, id, openAppIntent, 0);
+        openAppIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+        PendingIntent openAppPIntent = PendingIntent.getBroadcast(context, widgetId, openAppIntent, 0);
         widgetView.setOnClickPendingIntent(R.id.app_icon, openAppPIntent);
-
-        appWidgetManager.updateAppWidget(id, widgetView);
-        appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.list);
     }
 
     private void setListClick(RemoteViews rv, Context context, int appWidgetId) {
@@ -134,13 +139,47 @@ public class WidgetProvider extends AppWidgetProvider {
         rv.setRemoteAdapter(R.id.list, adapter);
     }
 
+    private void updateAllWidgets(Context context) {
+        int ids[] = getAllWidgetIDs(context);
+        for (int id : ids) {
+            updateWidget(context, AppWidgetManager.getInstance(context), id);
+        }
+    }
+
+    private void updateWidgetList(Context context, int widgetId) {
+        DBHelper.createInstance(context.getApplicationContext());
+        AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(widgetId, R.id.list);
+    }
+
+    private void updateAllWidgetsList(Context context) {
+        int ids[] = getAllWidgetIDs(context);
+        for (int id : ids) {
+            updateWidgetList(context, id);
+        }
+    }
+
+    private int[] getAllWidgetIDs(Context context) {
+        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), getClass().getName());
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        return appWidgetManager.getAppWidgetIds(thisAppWidget);
+    }
+
+    private void launchApp(Context context) {
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.dailylist.vadimsemenyk");
+        if (launchIntent != null) {
+            context.startActivity(launchIntent);
+        }
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
         Bundle extras = intent.getExtras();
 
-        if (intent.getAction().equalsIgnoreCase(ACTION_UPDATE)) {
+        if (intent.getAction().equalsIgnoreCase(ACTION_UPDATE_LIST)) {
+            updateAllWidgetsList(context);
+        } else if (intent.getAction().equalsIgnoreCase(ACTION_UPDATE)) {
             updateAllWidgets(context);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_UPDATE_RESCHEDULE)) {
             updateAllWidgets(context);
@@ -179,7 +218,7 @@ public class WidgetProvider extends AppWidgetProvider {
                 } else if (actionTarget != null && actionTarget.equals("finish")) {
                     DBHelper.createInstance(context.getApplicationContext());
                     NoteRepository.getInstance().triggerNoteFinishState(itemId);
-                    updateWidget(context, AppWidgetManager.getInstance(context), widgetId);
+                    updateWidgetList(context, widgetId);
 
                     Widget.fireEvent("noteStateChange", false);
                 }
@@ -214,25 +253,9 @@ public class WidgetProvider extends AppWidgetProvider {
             SharedPreferences sp = context.getSharedPreferences(WIDGET_SP, Context.MODE_PRIVATE);
             sp.edit().putInt(WIDGET_SP_LIST_TYPE + "_" + widgetId, nextListType.getValue()).apply();
 
-            updateWidget(context, AppWidgetManager.getInstance(context), widgetId);
+            updateWidgetList(context, widgetId);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_OPEN_APP)) {
             launchApp(context);
-        }
-    }
-
-    private void updateAllWidgets(Context context) {
-        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), getClass().getName());
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
-        for (int appWidgetID : ids) {
-            updateWidget(context, appWidgetManager, appWidgetID);
-        }
-    }
-
-    private void launchApp(Context context) {
-        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.dailylist.vadimsemenyk");
-        if (launchIntent != null) {
-            context.startActivity(launchIntent);
         }
     }
 

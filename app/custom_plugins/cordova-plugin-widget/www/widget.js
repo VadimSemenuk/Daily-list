@@ -4,6 +4,10 @@ Widget.update = function(success, error) {
     cordova.exec(success, error, 'Widget', 'update');
 };
 
+Widget.updateList = function(success, error) {
+    cordova.exec(success, error, 'Widget', 'updateList');
+};
+
 Widget.events = {};
 
 Widget.addEventListener = function(event, callback) {

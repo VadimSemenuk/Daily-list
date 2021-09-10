@@ -41,6 +41,9 @@ public class Widget extends CordovaPlugin {
         } else if (action.equals("update")) {
             update();
             return true;
+        } else if (action.equals("updateList")) {
+            updateList();
+            return true;
         }
         return false;
     }
@@ -87,6 +90,12 @@ public class Widget extends CordovaPlugin {
     private void update() {
         Intent updateIntent = new Intent(cordova.getContext(), WidgetProvider.class);
         updateIntent.setAction(WidgetProvider.ACTION_UPDATE);
+        cordova.getContext().sendBroadcast(updateIntent);
+    }
+
+    private void updateList() {
+        Intent updateIntent = new Intent(cordova.getContext(), WidgetProvider.class);
+        updateIntent.setAction(WidgetProvider.ACTION_UPDATE_LIST);
         cordova.getContext().sendBroadcast(updateIntent);
     }
 }
