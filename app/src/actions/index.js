@@ -29,7 +29,7 @@ export function addNote(note) {
 
             dispatch(saveBackup());
 
-            window.cordova && window.cordova.plugins.widget.update();
+            window.cordova && window.cordova.plugins.widget.updateList();
         } catch(err) {
             dispatch(triggerErrorModal("error-note-add"));
             logsService.logError(
@@ -66,7 +66,7 @@ export function updateNote(note, prevNote) {
 
             dispatch(saveBackup());
 
-            window.cordova && window.cordova.plugins.widget.update();
+            window.cordova && window.cordova.plugins.widget.updateList();
         } catch(err) {
             dispatch(triggerErrorModal("error-note-update"));
             logsService.logError(
@@ -106,7 +106,7 @@ export function updateNoteDynamic(note, nextData) {
 
             dispatch(saveBackup());
 
-            window.cordova && window.cordova.plugins.widget.update();
+            window.cordova && window.cordova.plugins.widget.updateList();
         } catch(err) {
             dispatch(triggerErrorModal("error-note-update"));
             logsService.logError(
@@ -143,7 +143,7 @@ export function deleteNote(note) {
 
             dispatch(saveBackup());
 
-            window.cordova && window.cordova.plugins.widget.update();
+            window.cordova && window.cordova.plugins.widget.updateList();
         } catch(err) {
             dispatch(triggerErrorModal("error-note-delete"));
             logsService.logError(
@@ -204,7 +204,7 @@ export function restoreNote(note) {
 
             dispatch(saveBackup());
 
-            window.cordova && window.cordova.plugins.widget.update();
+            window.cordova && window.cordova.plugins.widget.updateList();
         } catch(err) {
             dispatch(triggerErrorModal("error-note-restore"));
             logsService.logError(
@@ -271,7 +271,7 @@ export function updateNotesManualSortIndex(notes) {
                 }
             });
 
-            window.cordova && window.cordova.plugins.widget.update();
+            window.cordova && window.cordova.plugins.widget.updateList();
         } catch(err) {
             dispatch(triggerErrorModal("reorder-fail"));
             logsService.logError(
