@@ -364,6 +364,26 @@ export default {
                     {
                         type: "text",
                         value: translator.t("updates-note-ci-3")
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-4")
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-5")
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-6")
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-7")
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-note-ci-8")
                     }
                 ],
             }

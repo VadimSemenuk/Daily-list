@@ -216,7 +216,8 @@ export default {
         + "Swipe the calendar to show other dates",
     "initial-note-ci-17": "In the \"Notes panel\", notes are created without reference to a date.",
     "initial-note-ci-18": "Click on the date above the calendar to go to the current day.",
-    "initial-note-ci-19": "Enjoy your use!",
+    "initial-note-ci-19": "There is the ability to add an application widget to the home screen.",
+    "initial-note-ci-20": "Enjoy your use!",
 
     // initial tags
     "initial-tag-1": "Work",
@@ -234,6 +235,7 @@ export default {
     "updates-note-ci-5": "Added search for notes",
     "updates-note-ci-6": "Added automatic backup",
     "updates-note-ci-7": "Added the ability to reset password",
+    "updates-note-ci-8": "Added the ability to add an application widget to the home screen.",
 
     // quick add
     "quick-add-placeholder": "New note...",
