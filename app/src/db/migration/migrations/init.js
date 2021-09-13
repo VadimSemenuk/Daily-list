@@ -3,7 +3,7 @@ import i18n from "../../../i18n/index"
 
 import execureSQL from "../../../utils/executeSQL";
 
-import DogImg from "../../../assets/img/initial-note-example-image.jpg"
+import InitialNoteImg from "../../../assets/img/initial-note-example-image.jpg"
 import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 
 export default {
@@ -106,7 +106,7 @@ async function addInitNote() {
             },
             {
                 type: "snapshot",
-                value: DogImg
+                value: InitialNoteImg
             },
             {
                 type: "text",
