@@ -340,7 +340,7 @@ button.google-in {
     }
 
     header {
-        &:after {
+        &:after, &:before {
             content: "";
             position: absolute;
             top: 44px;
@@ -349,6 +349,10 @@ button.google-in {
             height: 10px;
             background: #383838;
             z-index: -1;
+        }
+
+        &:before {
+            top: 0px;
         }
 
         button {

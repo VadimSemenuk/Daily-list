@@ -129,11 +129,11 @@ class Add extends Component {
     focusDynamicField = (index) => {
         let field = this.getDynamicFiledElements()[index];
         if (field) {
-            if (field.querySelector("textarea")) {
-                field.querySelector("textarea").focus();
-            } else if (field.querySelector("input")) {
-                field.querySelector("input").focus();
-            }
+            let el = field.querySelector("textarea") || field.querySelector("input");
+            el.focus();
+
+            let caretPosition = el.value ? el.value.length : 0;
+            el.setSelectionRange(caretPosition, caretPosition);
         }
     }
 

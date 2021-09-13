@@ -55,7 +55,7 @@ class NotesList extends PureComponent {
         <div
             key={note.id}
             data-id={note.id}
-            className={`note-wrapper${note.isVisible ? '' : ' hidden'}${note.isFinished ? '' : ' draggable'}`}
+            className={`note-wrapper${note.isVisible ? '' : ' hidden'}${((note.isFinished && this.props.settings.sortFinBehaviour === 1) || this.props.settings.sortType === SortType.TimeSort) ? '' : ' draggable'}`}
         >
             <Note
                 data={note}

@@ -28,7 +28,6 @@ import TagImg from "../../assets/img/tag.svg";
 import BackupImg from "../../assets/img/upload-to-cloud-black.svg";
 
 import './Notes.scss';
-import {updateNotes} from "../../actions";
 
 class Notes extends PureComponent {
     constructor(props) {
@@ -67,6 +66,7 @@ class Notes extends PureComponent {
 
     onWidgetStateChange = () => {
         this.props.updateNotes();
+        this.props.getFullCount();
     }
 
     onWidgetAddClick = async (props) => {

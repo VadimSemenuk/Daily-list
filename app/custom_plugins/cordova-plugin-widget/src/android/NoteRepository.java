@@ -120,7 +120,7 @@ public class NoteRepository {
 
             cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(
                     sql,
-                    new String[] {"DELETE", String.valueOf(date.getTimeInMillis()), String.valueOf(date.getTimeInMillis()), "day", "week", String.valueOf(date.get(Calendar.DAY_OF_WEEK)), "any", String.valueOf(date.getTimeInMillis()), Integer.toString(NoteTypes.Diary.getValue())}
+                    new String[] {"DELETE", String.valueOf(date.getTimeInMillis()), String.valueOf(date.getTimeInMillis()), "day", "week", String.valueOf(getDayOfWeekNumber(date)), "any", String.valueOf(date.getTimeInMillis()), Integer.toString(NoteTypes.Diary.getValue())}
             );
         } else {
             String sql = "SELECT id, tag, isFinished, title, contentItems, manualOrderIndex, forkFrom, date, mode"
@@ -332,5 +332,38 @@ public class NoteRepository {
         dateTime.set(Calendar.MINUTE, 0);
         dateTime.set(Calendar.SECOND, 0);
         dateTime.set(Calendar.MILLISECOND, 0);
+    }
+
+    private int getDayOfWeekNumber(Calendar date) {
+        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
+        int dayOfWeekNumber = 0;
+
+        switch(dayOfWeek) {
+            case Calendar.MONDAY:
+                dayOfWeekNumber = 1;
+                break;
+            case Calendar.TUESDAY:
+                dayOfWeekNumber = 2;
+                break;
+            case Calendar.WEDNESDAY:
+                dayOfWeekNumber = 3;
+                break;
+            case Calendar.THURSDAY:
+                dayOfWeekNumber = 4;
+                break;
+            case Calendar.FRIDAY:
+                dayOfWeekNumber = 5;
+                break;
+            case Calendar.SATURDAY:
+                dayOfWeekNumber = 6;
+                break;
+            case Calendar.SUNDAY:
+                dayOfWeekNumber = 7;
+                break;
+            default:
+                dayOfWeekNumber = 1;
+        }
+
+        return dayOfWeekNumber;
     }
 }
