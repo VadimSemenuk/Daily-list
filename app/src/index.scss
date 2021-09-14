@@ -283,6 +283,10 @@ button.google-in {
         background: #383838;
     }
 
+    .page-wrapper {
+        background: #383838;
+    }
+
     input, textarea {
         color: #eee;
     }
@@ -340,21 +344,6 @@ button.google-in {
     }
 
     header {
-        &:after, &:before {
-            content: "";
-            position: absolute;
-            top: 44px;
-            left: 0;
-            width: 100%;
-            height: 10px;
-            background: #383838;
-            z-index: -1;
-        }
-
-        &:before {
-            top: 0px;
-        }
-
         button {
             img {
                 filter: none;
@@ -364,7 +353,7 @@ button.google-in {
 
     .add-wrapper {
         .note-actions-wrapper {
-            background: #383838;
+            background: #333333;
             border-color: #292929;
 
             .content-items-actions-wrapper {
