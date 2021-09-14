@@ -12,7 +12,7 @@ class NotesService {
         let select = await executeSQL(
             `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.tags,
                         n.repeatType, n.contentItems, n.isFinished, n.forkFrom, n.date, n.manualOrderIndex, n.mode,
-                        (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
+                        (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
                         FROM Notes n
                         WHERE
                             n.id IN (${notesIDs.join(',')})
@@ -177,7 +177,7 @@ class NotesService {
                 return executeSQL(
                     `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags,
                     n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
-                    (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
+                    (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
                     FROM Notes n
                     LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
                     WHERE
@@ -319,10 +319,9 @@ class NotesService {
             nextNote = await this.formShadowToReal(nextNote);
         }
 
-        let resetManualOrderIndex = false;
         if (nextData.hasOwnProperty('isFinished') && settings.sortFinBehaviour === 1) {
-            resetManualOrderIndex = true;
             nextNote.manualOrderIndex = null;
+            await this.resetNoteManualOrderIndex(nextNote.id);
         }
 
         await executeSQL(
@@ -330,12 +329,10 @@ class NotesService {
             SET 
                 contentItems = ?,
                 isFinished = ?
-                ${resetManualOrderIndex ? ", manualOrderIndex = ?" : ""}
             WHERE id = ?;`,
             [
                 JSON.stringify(nextNote.contentItems),
                 Number(nextNote.isFinished),
-                ...(resetManualOrderIndex ? [null] : []),
                 nextNote.id
             ]
         );
@@ -356,6 +353,11 @@ class NotesService {
         nextNote.isShadow = nextNote.repeatType !== NoteRepeatType.NoRepeat;
         nextNote.forkFrom = null;
         nextNote.isFinished = false;
+
+        if ((nextNote.repeatType !== NoteRepeatType.NoRepeat) || (nextNote.date && prevNote.date && !note.date.isSame(prevNote.date))) {
+            nextNote.manualOrderIndex = null;
+            await this.resetNoteManualOrderIndex(nextNote.id);
+        }
 
         await executeSQL(
             `UPDATE Notes
@@ -416,7 +418,7 @@ class NotesService {
         let select = await executeSQL(
             `SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
                 contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date,
-                (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
+                (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
             FROM Notes n
             WHERE lastAction = ? AND
             forkFrom IS NULL
@@ -481,6 +483,15 @@ class NotesService {
         await executeSQL(sql, values);
 
         return notesInserted;
+    }
+
+    resetNoteManualOrderIndex(noteId) {
+        return executeSQL(
+            `UPDATE Notes
+            SET manualOrderIndex = ?
+            WHERE id = ?;`,
+            [null, noteId]
+        );
     }
 
     async deleteNotesTag(tagId) {

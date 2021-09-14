@@ -48,11 +48,11 @@ class LogsService {
     }
 
     logError(err, additionalInto, deviceId) {
+        console.warn(err);
+
         if (!config.logs.error) {
             return;
         }
-
-        console.warn(err);
 
         if (err.constructor && err.constructor.name === "SQLError") {
             err = new Error(`code: ${err.code}; message: ${err.message}`);
