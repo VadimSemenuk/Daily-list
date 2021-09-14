@@ -337,6 +337,9 @@ button.google-in {
         &.fab img {
             filter: none;
         }
+        &.block img {
+            filter: none;
+        }
 
         img {
             filter: invert(1);
@@ -390,12 +393,6 @@ button.google-in {
     .note-wrapper.sortable-chosen .note-content {
         border-width: 2px;
         border-color: #b4b4b4;
-    }
-
-    .profile-wrapper {
-        .log-out {
-            filter: invert(1);
-        }
     }
 
     .trash-list-page-content {
