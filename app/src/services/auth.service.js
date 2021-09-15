@@ -94,19 +94,27 @@ class AuthService {
         return this.getFormattedUser(user);
     };
 
-    googleSignOut() {
+    async googleSignOut() {
         if (!window.cordova) {
             return Promise.resolve()
         }
-        return new Promise((resolve, reject) => {
-            window.plugins.googleplus.trySilentLogin(
-                {
-                    scopes: 'https://www.googleapis.com/auth/drive.appfolder',
-                    webClientId: config.google.webClientId,
-                    offline: true
-                },
-                () => window.plugins.googleplus.logout(resolve, reject),
-                () => window.plugins.googleplus.logout(resolve, reject),
+
+        await new Promise((resolve) => window.plugins.googleplus.logout(resolve, resolve));
+
+        await new Promise((resolve) => {
+            window.plugins.googleplus.logout(
+                resolve,
+                () => {
+                    window.plugins.googleplus.login(
+                        {
+                            scopes: 'https://www.googleapis.com/auth/drive.appfolder',
+                            webClientId: config.google.webClientId,
+                            offline: true
+                        },
+                        () => window.plugins.googleplus.logout(resolve, resolve),
+                        () => window.plugins.googleplus.logout(resolve, resolve),
+                    );
+                }
             );
         });
     }
