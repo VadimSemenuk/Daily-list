@@ -104,16 +104,20 @@ class AuthService {
         await new Promise((resolve) => {
             window.plugins.googleplus.logout(
                 resolve,
-                () => {
-                    window.plugins.googleplus.login(
-                        {
-                            scopes: 'https://www.googleapis.com/auth/drive.appfolder',
-                            webClientId: config.google.webClientId,
-                            offline: true
-                        },
-                        () => window.plugins.googleplus.logout(resolve, resolve),
-                        () => window.plugins.googleplus.logout(resolve, resolve),
-                    );
+                (error) => {
+                    if (error === "Please use login or trySilentLogin before logging out") {
+                        resolve();
+                    } else {
+                        window.plugins.googleplus.login(
+                            {
+                                scopes: 'https://www.googleapis.com/auth/drive.appfolder',
+                                webClientId: config.google.webClientId,
+                                offline: true
+                            },
+                            () => window.plugins.googleplus.logout(resolve, resolve),
+                            () => window.plugins.googleplus.logout(resolve, resolve),
+                        );
+                    }
                 }
             );
         });
