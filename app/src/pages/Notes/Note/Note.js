@@ -50,7 +50,7 @@ class Note extends PureComponent {
 
         let noteEl = document.querySelector(`.note-wrapper[data-id='${this.props.data.id}'] .note`);
         if (noteEl) {
-            if (noteEl.classList.contains("expanded") !== isExpanded) {
+            if (this.props.minimize && (noteEl.classList.contains("expanded") !== isExpanded)) {
                 noteEl.classList.remove("expanded");
                 return;
             }
