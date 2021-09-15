@@ -1,5 +1,6 @@
 .quick-add {
   display: flex;
+  flex-shrink: 0;
 
   .textarea {
     flex: 1;
