@@ -53,7 +53,7 @@ export default {
     "password-reset-email": "Email для скіду пароля",
     "reset-password-email-no-user": "Ўвайдзіце што б прывязаць email для сбросса пароля",
     "reset-password": "Скінуць пароль",
-    "password-has-been-reset": "Новы пароль адпраўлены на адрас {{email}}. Праверце папку \"Спам\" калі ліст не знойдзена",
+    "password-has-been-reset": "Новы пароль адпраўлены на адрас {email}. Праверце папку \"Спам\" калі ліст не знойдзена",
     "reset-password-notification": "Пакажыце email адрас для скіду пароля. Для гэтага ўвайдзіце ў аккаутн ў раздзелах 'Рэзервовае капіраванне' ці 'Дадаць пароль'",
     "password-reset-email-subject": "Скід пароля",
     "password-reset-email-content": "Новы пароль: ",

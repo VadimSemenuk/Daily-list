@@ -67,7 +67,7 @@ class Password extends Component {
 
         this.props.triggerLoader(false);
 
-        window.cordova && window.plugins.toast.showLongBottom(this.props.t("password-has-been-reset").replace("{{email}}", emailTo));
+        window.cordova && window.plugins.toast.show(this.props.t("password-has-been-reset").replace("{email}", emailTo), 10000, 'center');
     }
 
     render () {
