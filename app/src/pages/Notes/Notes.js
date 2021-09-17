@@ -13,7 +13,7 @@ import QuickAdd from "../../components/QuickAdd/QuickAdd";
 
 import * as AppActions from '../../actions'; 
 
-import {NotesScreenMode, SortDirectionType, SortType} from "../../constants";
+import {NoteRepeatType, NotesScreenMode, SortDirectionType, SortType} from "../../constants";
 
 import AddImg from "../../assets/img/add.svg";
 import SearchImg from "../../assets/img/search.svg";
@@ -218,7 +218,20 @@ class Notes extends PureComponent {
             await this.setDate(note.date);
         }
 
-        setTimeout(() => this.scrollToNote(note.id));
+        setTimeout(() => {
+            let noteId = note.id;
+
+            if (note.repeatType !== NoteRepeatType.NoRepeat) {
+                let list = this.props.notes.find((list) => list.date.isSame(note.date));
+                let forkedNote = list.items.find((_note) => _note.forkFrom === note.forkFrom);
+
+                if (forkedNote) {
+                    noteId = forkedNote.id;
+                }
+            }
+
+            this.scrollToNote(noteId)
+        });
     }
 
     onCalendarPeriodChange = (periodName) => {
