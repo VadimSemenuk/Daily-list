@@ -19,16 +19,18 @@ export default {
         await alterSettingsTable();
         await addErrorsLogsTable();
         await addLoadsLogsTable();
-        await updateToken();
         await convertDatesToUTC();
         await addPasswordEncryption();
         await addTagsPage();
 
         if (isUpdate) {
             await addUpdatesNote();
-        }
 
-        await authService.googleSignOut()
+            if (localStorage.getItem(config.LSTokenKey)) {
+                await authService.googleSignOut();
+                authService.resetUser();
+            }
+        }
 
         async function alterTasksRepeatValuesTable () {
             await executeSQL(`
@@ -255,30 +257,6 @@ export default {
                     deviceId TEXT
                 );
             `);
-        }
-
-        async function updateToken( ) {
-            let token = JSON.parse(localStorage.getItem(config.LSTokenKey)) || {};
-            if (!token || !token.id) {
-                return
-            }
-            token.gdBackup = {
-                backupFiles: []
-            };
-            if (token.backupFile) {
-                let backupFile = token.backupFile;
-                backupFile.modifiedTime = moment(backupFile.modifiedTime).valueOf();
-                token.gdBackup.backupFiles.push(backupFile);
-            }
-            delete token.backupFile;
-            token.settings = {autoBackup: true};
-            token.gAccessToken = token.token;
-            delete token.token;
-            token.gRefreshToken = token.refreshToken;
-            delete token.refreshToken;
-            token.msGTokenExpireDateUTC = token.tokenExpireDate;
-            delete token.tokenExpireDatel;
-            localStorage.setItem(config.LSTokenKey, JSON.stringify(token));
         }
 
         async function convertDatesToUTC() {

@@ -96,23 +96,17 @@ class AuthService {
 
     async googleSignOut() {
         if (!window.cordova) {
-            return Promise.resolve()
+            return Promise.resolve();
         }
-
-        await new Promise((resolve) => window.plugins.googleplus.logout(resolve, resolve));
 
         await new Promise((resolve) => {
             window.plugins.googleplus.logout(
                 resolve,
                 (error) => {
                     if (error === "Please use login or trySilentLogin before logging out") {
-                        resolve();
-                    } else {
-                        window.plugins.googleplus.login(
+                        window.plugins.googleplus.trySilentLogin(
                             {
-                                scopes: 'https://www.googleapis.com/auth/drive.appfolder',
                                 webClientId: config.google.webClientId,
-                                offline: true
                             },
                             () => window.plugins.googleplus.logout(resolve, resolve),
                             () => window.plugins.googleplus.logout(resolve, resolve),
