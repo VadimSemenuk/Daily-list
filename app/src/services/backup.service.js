@@ -204,16 +204,18 @@ class BackupService {
             notes.push(note);
         }
 
-        await new Promise((resolve) => {
-            window.cordova.plugins.notification.local.clearAll(() => setTimeout(() => resolve()));
-        });
+        await new Promise((resolve) => window.cordova.plugins.notification.local.clearAll(resolve, resolve));
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         for(let note of notes) {
-            await new Promise((resolve) => {
-                note.isNotificationEnabled && notificationService.set(note);
-                setTimeout(resolve);
-            });
+            if (note.isNotificationEnabled) {
+                notificationService.set(note);
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
         }
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
     }
 }
 
