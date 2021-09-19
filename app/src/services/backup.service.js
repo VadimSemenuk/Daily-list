@@ -10,6 +10,8 @@ import {convertLocalDateTimeToUTC, convertUTCDateTimeToLocal} from "../utils/con
 import executeSQL from "../utils/executeSQL";
 import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
 import notificationService from "./notification.service";
+import DB from "../db/db";
+import migration from "../db/migration/migration";
 
 class BackupService {
     databaseFileName = 'com.mamindeveloper.dailylist.db';
@@ -157,6 +159,9 @@ class BackupService {
             };
             oReq.send(null);
         });
+
+        window.com_mamindeveloper_dailylist_db = await DB();
+        await migration.run();
 
         await this.updateNotifications();
     }
