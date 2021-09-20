@@ -117,7 +117,7 @@ export default {
     "edit": "Edit",
     "delete": "Delete",
     "do-copy": "Copy",
-    "move-tomorrow": "Remove on tomorrow",
+    "move-tomorrow": "Move for tomorrow",
     "finished-split": "Finished",
     "reorder-fail": "Failed to move note",
 
