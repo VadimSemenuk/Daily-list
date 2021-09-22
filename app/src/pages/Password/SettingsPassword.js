@@ -28,8 +28,6 @@ class SettingsPassword extends Component {
             window.plugins.toast.showLongBottom(this.props.t("no-space-password"));
         } else if (this.state.password0.length < 4) {
             window.plugins.toast.showLongBottom(this.props.t("min-symbols-password"));
-        } else if (!this.props.user) {
-            window.plugins.toast.showLongBottom(this.props.t("reset-password-email-no-user"));
         } else {
             return true;
         }
@@ -40,7 +38,7 @@ class SettingsPassword extends Component {
         if (this.validatePassword()) {
             this.props.setSetting({
                 password: md5(this.state.password0),
-                passwordResetEmail: this.props.user.email
+                passwordResetEmail: this.props.user ? this.props.user.email : null
             });
             this.props.history.goBack();
         }
