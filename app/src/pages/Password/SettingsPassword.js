@@ -83,8 +83,7 @@ class SettingsPassword extends Component {
                     <button
                         className="text block"
                         onClick={this.onPassSet}
-                        disabled={!this.props.user}
-                    >{t("save")}</button>       
+                    >{t("save")}</button>
                 </div>
             </div>
         );
