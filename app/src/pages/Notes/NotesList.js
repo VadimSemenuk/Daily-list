@@ -79,6 +79,7 @@ class NotesList extends PureComponent {
                 disabled: this.props.settings.sortType === SortType.TimeSort,
                 delay: 300,
                 draggable: ".draggable",
+                handle: ".drag-handle",
                 direction: 'vertical',
                 onStart: this.onDragSortModeEnable,
                 onEnd: this.onDragSortModeDisable

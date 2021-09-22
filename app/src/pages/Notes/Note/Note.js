@@ -174,7 +174,7 @@ class Note extends PureComponent {
 
                     {
                         this.props.isActionsViewVisible !== false &&
-                        <React.Fragment>
+                        <div className="actions drag-handle">
                             <div className="more-button">
                                 <button onClick={this.onDialogRequest}>
                                     <img
@@ -189,7 +189,7 @@ class Note extends PureComponent {
                                     onChange={this.onFinishTrigger}
                                 />
                             </div>
-                        </React.Fragment>
+                        </div>
                     }
                 </div>
             </div>

@@ -79,19 +79,15 @@
         }
 
         /* action buttons */
-        .more-button {
+        .actions {
             position: absolute;
-            top: 0px;
-            right: 0px;
+            top: 0;
+            right: 0;
+            bottom: 0;
 
-            img {
+            .more-button img {
                 height: 18px;
             }
-        }
-        .note-finish-checkbox {
-            position: absolute;
-            top: 42px;
-            right: 0px;
         }
 
         /* title */
