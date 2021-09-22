@@ -84,7 +84,8 @@
             top: 0;
             right: 0;
             bottom: 0;
-
+            -webkit-user-select: none;
+            
             .more-button img {
                 height: 18px;
             }
