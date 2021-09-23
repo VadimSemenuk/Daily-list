@@ -12,7 +12,7 @@ import authService from "../../../services/auth.service";
 export default {
     name: "1.7",
 
-    async run(isUpdate) {
+    async run(isUpdate, lastMigrationName) {
         await alterTasksRepeatValuesTable();
         await addMetaTable();
         await alterTasksTable();

@@ -1,7 +1,7 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 import notificationService from "./notification.service";
-import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
+import {NoteAction, NoteContentItemType, NoteMode, NoteRepeatType} from "../constants";
 import tagsService from "./tags.service";
 import {convertUTCDateTimeToLocal, convertLocalDateTimeToUTC} from "../utils/convertDateTimeLocale";
 
@@ -251,6 +251,8 @@ class NotesService {
             manualOrderIndex: null
         };
 
+        nextNote = this.parseNoteValues(nextNote);
+
         let noteId = await this.insertNote(nextNote);
         nextNote.id = noteId;
 
@@ -358,6 +360,8 @@ class NotesService {
             nextNote.manualOrderIndex = null;
             await this.resetNoteManualOrderIndex(nextNote.id);
         }
+
+        nextNote = this.parseNoteValues(nextNote);
 
         await executeSQL(
             `UPDATE Notes
@@ -568,6 +572,46 @@ class NotesService {
         };
 
         return nextNote;
+    }
+
+    parseNoteValues(note) {
+        note.parsedTitle = this.parseClickableItems(note.title);
+        note.contentItems = this.parseNoteContentItems(note.contentItems);
+
+        return note;
+    }
+
+    parseNoteContentItems(contentItems) {
+        let nextContentItems = [];
+
+        if (contentItems && contentItems.length) {
+            for (let contentItem of contentItems) {
+                let nextContentItem = {...contentItem};
+
+                if (nextContentItem.type === NoteContentItemType.ListItem || nextContentItem.type === NoteContentItemType.Text) {
+                    nextContentItem.parsedValue = this.parseClickableItems(nextContentItem.value);
+                }
+
+                nextContentItems.push(nextContentItem);
+            }
+        }
+
+        return nextContentItems;
+    }
+
+    emailMath = /(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/gi;
+    phoneMatch = /\+?\d{10,13}/gi;
+    urlMatch = /(https?:\/\/[^ ]*)/gi;
+
+    parseClickableItems(value) {
+        if (!value) {
+            return;
+        }
+
+        return value
+            .replace(this.emailMath, "<a href='mailto:$&'>$&</a>")
+            .replace(this.phoneMatch, "<a href='tel:$&'>$&</a>")
+            .replace(this.urlMatch, "<a href='$&'>$&</a");
     }
 
     tags = [

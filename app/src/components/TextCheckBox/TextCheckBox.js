@@ -14,7 +14,10 @@ export default class TextCheckBox extends PureComponent {
                     checked={this.props.checkBoxValue}
                     onChange={this.onValueChange}
                 />
-                <span className={`text ${this.props.checkBoxValue && this.props.cross !== false && 'crossed'}`}>{this.props.textValue}</span>
+                <span
+                    className={`text ${this.props.checkBoxValue && this.props.cross !== false && 'crossed'}`}
+                    dangerouslySetInnerHTML={{__html: this.props.textValue}}
+                />
             </div>
         )
     }

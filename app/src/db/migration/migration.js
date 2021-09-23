@@ -28,6 +28,20 @@ class Migration {
         }
     }
 
+    async getLastMigrationName() {
+        try {
+            let select = (await execureSQL(`SELECT name FROM Migrations;`)).rows;
+            let appliedMigrations = [];
+            for(let i = 0; i < select.length; i++) {
+                appliedMigrations.push(select.item(i));
+            }
+            return appliedMigrations[appliedMigrations.length - 1].name;
+        } catch (err) {
+            console.warn(err);
+            return null;
+        }
+    }
+
     acceptMigration(migration) {
        return execureSQL(`INSERT INTO migrations (name) VALUES (?)`, [migration.name]);
     }
@@ -40,8 +54,9 @@ class Migration {
 
         let newMigrations = await this.getNewMigrations();
         if (newMigrations) {
+            let lastMigrationName = await this.getLastMigrationName();
             for (let migration of newMigrations) {
-                await migration.run(isDbExist);
+                await migration.run(isDbExist, lastMigrationName);
                 await this.acceptMigration(migration);
             }
         }

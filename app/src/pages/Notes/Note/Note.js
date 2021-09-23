@@ -131,14 +131,15 @@ class Note extends PureComponent {
                                     <div
                                         className="item-data-text"
                                         key={i}
-                                    >{a.value}</div>
+                                        dangerouslySetInnerHTML={{__html: a.parsedValue || a.value}}
+                                    />
                                 )
                             } else if (a.type === NoteContentItemType.ListItem) {
                                 return (
                                     <TextCheckBox
                                         key={i}
                                         id={i}
-                                        textValue={a.value}
+                                        textValue={a.parsedValue || a.value}
                                         checkBoxValue={a.checked}
                                         onValueChange={this.onListItemTrigger}
                                     />

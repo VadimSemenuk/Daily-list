@@ -4,7 +4,7 @@ import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 export default {
     name: "1.6",
 
-    async run(isUpdate) {
+    async run(isUpdate, lastMigrationName) {
         await addMigrationsTable();
         await alterSettingsTable();
         await alterTasksTable();
