@@ -227,7 +227,7 @@ export default {
     // updates note
     "updates-note-title": "Version 1.7. Updates.",
     "updates-note-ci-1": "Added tags.",
-    "updates-note-ci-2": "Added moving notes manually. To move a note, hold it for a short time and then drag it to the desired position.",
+    "updates-note-ci-2": "Added moving notes manually. To move, hold it for a short time on the right side (in the area of the 'Finish' and 'Options' buttons) and drag it to the desired position",
     "updates-note-ci-3": "Added panels \"Diary \" and \"Notes \". \n"
         + "In the \"Diary\" panel, notes are created with reference to the date and are displayed for the date selected on the calendar. \n"
         + "In the \"Notes\" panel, notes are created without reference to a date.",
@@ -236,6 +236,12 @@ export default {
     "updates-note-ci-6": "Added automatic backup",
     "updates-note-ci-7": "Added the ability to reset password",
     "updates-note-ci-8": "Added the ability to add an application widget to the home screen.",
+
+    // update note v1.8
+    "updates-v1.8-note-title": "Version 1.8. Updates",
+    "updates-v1.8-note-ci-1": "Added a button 'Move to tomorrow'",
+    "updates-v1.8-note-ci-2": "Added the ability to select text",
+    "updates-v1.8-note-ci-3": "Changed the way you drag and drop notes. To move, hold it for a short time on the right side (in the area of the 'Finish' and 'Options' buttons) and drag it to the desired position",
 
     // quick add
     "quick-add-placeholder": "New note...",

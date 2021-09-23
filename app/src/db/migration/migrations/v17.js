@@ -8,6 +8,7 @@ import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 import i18n from "../../../i18n";
 import {convertLocalDateTimeToUTC} from "../../../utils/convertDateTimeLocale";
 import authService from "../../../services/auth.service";
+import NoteDragHelp from "../../../assets/img/note-drag-help.png";
 
 export default {
     name: "1.7",
@@ -338,6 +339,10 @@ export default {
                     {
                         type: "text",
                         value: translator.t("updates-note-ci-2")
+                    },
+                    {
+                        type: "snapshot",
+                        value: NoteDragHelp
                     },
                     {
                         type: "text",
