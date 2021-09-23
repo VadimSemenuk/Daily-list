@@ -314,6 +314,26 @@ class NotesService {
         `, values);
     }
 
+    async moveNoteForTomorrow(note) {
+        let nextDate = moment(note.date).add(1, "day");
+
+        await executeSQL(
+            `UPDATE Notes
+            SET date = ?, manualOrderIndex = ?
+            WHERE id = ?;`,
+            [
+                convertLocalDateTimeToUTC(nextDate).valueOf(),
+                null,
+                note.id
+            ]
+        );
+
+        let nextNote = {...note, date: nextDate, manualOrderIndex: null};
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+        return nextNote;
+    }
+
     async updateNoteDynamic(note, nextData, settings) {
         let nextNote = {...note, ...nextData};
 

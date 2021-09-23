@@ -31,8 +31,6 @@ class NotesActionsHandlerWrapper extends PureComponent {
     }
 
     onEditRequest = () => {
-        this.closeDialog();
-
         this.props.history.push({
             pathname: "/edit",
             state: {
@@ -41,20 +39,24 @@ class NotesActionsHandlerWrapper extends PureComponent {
                 }
             }
         });
+        this.closeDialog();
     };
 
     onListItemRemove = () => {
-        this.closeDialog();
-
         this.props.deleteNote(this.state.listItemDialogData.note);
+        this.closeDialog();
     };
 
-    onNoteCopyRequest = () => {
+    onNoteMoveForTomorrow = () => {
+        this.props.moveNoteForTomorrow(this.state.listItemDialogData.note);
         this.closeDialog();
+    }
 
+    onNoteCopyRequest = () => {
         this.setState({
             copyBuffer: this.state.listItemDialogData.note
         });
+        this.closeDialog();
     };
 
     pasteCopy = async () => {
@@ -125,6 +127,14 @@ class NotesActionsHandlerWrapper extends PureComponent {
                         text={t("do-copy")}
                         onClick={this.onNoteCopyRequest}
                     />
+                    {
+                        this.state.listItemDialogData && (this.state.listItemDialogData.note.repeatType === NoteRepeatType.NoRepeat) &&
+                        <ButtonListItem
+                            className="no-border"
+                            text={t("move-tomorrow")}
+                            onClick={this.onNoteMoveForTomorrow}
+                        />
+                    }
                 </Modal>
 
                 {

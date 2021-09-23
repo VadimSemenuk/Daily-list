@@ -125,6 +125,44 @@ export function updateNoteDynamic(note, nextData) {
     }
 }
 
+export function moveNoteForTomorrow(note) {
+    return async (dispatch) => {
+        try {
+            let updatedNote = await notesService.moveNoteForTomorrow(note);
+
+            dispatch({
+                type: "UPDATE_NOTE_DYNAMIC",
+                payload: {
+                    notes: [updatedNote],
+                }
+            });
+
+            if (updatedNote.mode === NotesScreenMode.WithDateTime) {
+                dispatch(getFullCount());
+            }
+            dispatch(renderNotes());
+
+            dispatch(saveBackup());
+
+            window.cordova && window.cordova.plugins.widget.updateList();
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-update"));
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> updateNoteDynamic()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        contentItems: !!note.contentItems
+                    },
+                },
+                window.device.uuid
+            );
+        }
+    }
+}
+
 export function deleteNote(note) {
     return async (dispatch) => {
         try {
