@@ -1,5 +1,7 @@
 package com.dailylist.vadimsemenyk.widget;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -12,6 +14,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.UserManager;
 import android.widget.RemoteViews;
 
 import com.dailylist.vadimsemenyk.R;
@@ -189,6 +192,11 @@ public class WidgetProvider extends AppWidgetProvider {
                 || intent.getAction().equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)
                 || intent.getAction().equalsIgnoreCase(Intent.ACTION_LOCKED_BOOT_COMPLETED)
         ) {
+            if (SDK_INT >= 24) {
+                UserManager um = (UserManager) context.getSystemService(UserManager.class);
+                if (um == null || !um.isUserUnlocked()) return;
+            }
+
             scheduleUpdateEvent(context);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_LIST_ITEM_LICK)) {
             int widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);

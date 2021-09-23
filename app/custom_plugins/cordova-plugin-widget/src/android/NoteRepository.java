@@ -170,15 +170,16 @@ public class NoteRepository {
                     for (int i = 0; i < array.size(); i++) {
                         NoteContentItem contentField = null;
 
-                        JsonObject obj = array.get(i).getAsJsonObject();
-                        String contentItemType = obj.get("type").getAsString();
-                        if (contentItemType.equals("listItem")) {
-                            contentField = gson.fromJson(array.get(i), NoteContentItemListItem.class);
-                        } else if (contentItemType.equals("text")) {
-                            contentField = gson.fromJson(array.get(i), NoteContentItemTextArea.class);
-
+                        if (array.get(i) instanceof JsonObject) {
+                            JsonObject obj = array.get(i).getAsJsonObject();
+                            String contentItemType = obj.get("type").getAsString();
+                            if (contentItemType.equals("listItem")) {
+                                contentField = gson.fromJson(array.get(i), NoteContentItemListItem.class);
+                            } else if (contentItemType.equals("text")) {
+                                contentField = gson.fromJson(array.get(i), NoteContentItemTextArea.class);
+                            }
+                            contentItems.add(contentField);
                         }
-                        contentItems.add(contentField);
                     }
                 }
                 note.contentItems = contentItems;

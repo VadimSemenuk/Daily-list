@@ -138,6 +138,8 @@ public class WidgetListFactory implements RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
+        DBHelper.createInstance(context.getApplicationContext());
+
         SharedPreferences sp = context.getSharedPreferences(WidgetProvider.WIDGET_SP, Context.MODE_PRIVATE);
         int _type = sp.getInt(WidgetProvider.WIDGET_SP_LIST_TYPE + "_" + widgetID,  1);
         NoteTypes type = NoteTypes.valueOf(_type);
