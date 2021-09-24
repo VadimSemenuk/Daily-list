@@ -328,8 +328,14 @@ class NotesService {
             ]
         );
 
-        let nextNote = {...note, date: nextDate, manualOrderIndex: null};
+        let nextNote = {
+            ...note,
+            date: nextDate,
+            manualOrderIndex: null
+        };
         nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+        nextNote.isNotificationEnabled && notificationService.set(nextNote);
 
         return nextNote;
     }

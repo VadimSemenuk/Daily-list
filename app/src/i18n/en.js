@@ -242,6 +242,7 @@ export default {
     "updates-v1.8-note-ci-1": "Added a button 'Move to tomorrow'",
     "updates-v1.8-note-ci-2": "Added the ability to select text",
     "updates-v1.8-note-ci-3": "Changed the way you drag and drop notes. To move, hold it for a short time on the right side (in the area of the 'Finish' and 'Options' buttons) and drag it to the desired position",
+    "updates-v1.8-note-ci-4": "Fixed bug when trying to log in with Google account",
 
     // quick add
     "quick-add-placeholder": "New note...",

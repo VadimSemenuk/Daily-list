@@ -93,7 +93,11 @@ export default {
                     {
                         type: "snapshot",
                         value: NoteDragHelp
-                    }
+                    },
+                    {
+                        type: "text",
+                        value: translator.t("updates-v1.8-note-ci-4")
+                    },
                 ],
             }
 
