@@ -650,7 +650,7 @@ export function uploadGDBackup(actionType) {
     }
 }
 
-export let uploadGDBackupThrottled = throttleAction(uploadGDBackup, 5000);
+export let uploadGDBackupThrottled = throttleAction(uploadGDBackup, 10000);
 
 export function restoreGDBackup(file) {
     return async (dispatch) => {
