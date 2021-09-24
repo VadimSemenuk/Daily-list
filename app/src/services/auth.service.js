@@ -43,7 +43,7 @@ class AuthService {
         let googleUser = await new Promise((resolve, reject) => {
             window.plugins.googleplus.login(
                 {
-                    scopes: 'https://www.googleapis.com/auth/drive.appfolder',
+                    scopes: 'https://www.googleapis.com/auth/drive.appdata',
                     webClientId: config.google.webClientId,
                     offline: true
                 },
