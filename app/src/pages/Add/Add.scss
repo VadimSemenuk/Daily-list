@@ -28,6 +28,8 @@
         }
 
         .note-actions-wrapper {
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
             flex-shrink: 0;
             background: #fafafa;
             border-top: 3px solid #e7e7e7;
@@ -35,6 +37,7 @@
             position: relative;
             transition: 100ms ease all;
             top: 0;
+            padding-top: 3px;
         }
 
         .content-items-actions-wrapper {
@@ -124,7 +127,7 @@
         }
 
         .tag-picker-wrapper {
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             padding-top: 5px;
             padding-left: 5px;
             overflow-x: auto;
