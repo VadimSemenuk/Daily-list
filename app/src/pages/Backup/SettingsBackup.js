@@ -40,38 +40,6 @@ class SettingsBackup extends Component {
         });
     }
 
-    // signIn = () => {
-    //     window.plugins.googleplus.login(
-    //         {
-    //             scopes: 'https://www.googleapis.com/auth/drive.appfolder',
-    //             webClientId: config.google.webClientId,
-    //             offline: true
-    //         },
-    //     );
-    // }
-    //
-    // silentSignIn = () => {
-    //     window.plugins.googleplus.login(
-    //         {
-    //             scopes: 'https://www.googleapis.com/auth/drive.appfolder',
-    //             webClientId: config.google.webClientId,
-    //             offline: true
-    //         },
-    //     );
-    // }
-    //
-    // signOut = () => {
-    //     window.plugins.googleplus.logout();
-    // }
-    //
-    // disconnect = () => {
-    //     window.plugins.googleplus.disconnect();
-    // }
-    //
-    // isAvailable = () => {
-    //     window.plugins.googleplus.isAvailable();
-    // }
-
     render () {
         let {t} = this.props;
 
@@ -79,37 +47,6 @@ class SettingsBackup extends Component {
             <div className="page-wrapper backup-page-wrapper">
                 <Header title={t("backup")}/>
                 <div className="scroll page-content padding">
-
-                    {/*<button*/}
-                    {/*    className="text block google-in img-text-button"*/}
-                    {/*    type="button"*/}
-                    {/*    onClick={this.signIn}*/}
-                    {/*><img src={GoogleImg} alt="google sign in" />sign in</button>*/}
-
-                    {/*<button*/}
-                    {/*    className="text block google-in img-text-button"*/}
-                    {/*    type="button"*/}
-                    {/*    onClick={this.silentSignIn}*/}
-                    {/*><img src={GoogleImg} alt="google sign in" />silent sign in</button>*/}
-
-                    {/*<button*/}
-                    {/*    className="text block google-in img-text-button"*/}
-                    {/*    type="button"*/}
-                    {/*    onClick={this.signOut}*/}
-                    {/*><img src={GoogleImg} alt="google sign in" />sign out</button>*/}
-
-                    {/*<button*/}
-                    {/*    className="text block google-in img-text-button"*/}
-                    {/*    type="button"*/}
-                    {/*    onClick={this.disconnect}*/}
-                    {/*><img src={GoogleImg} alt="google sign in" />disconnect</button>*/}
-
-                    {/*<button*/}
-                    {/*    className="text block google-in img-text-button"*/}
-                    {/*    type="button"*/}
-                    {/*    onClick={this.disconnect}*/}
-                    {/*><img src={GoogleImg} alt="google sign in" />is available</button>*/}
-
                     {
                         !this.props.user &&
                         <div className="not-logined-wrapper">
