@@ -3,6 +3,8 @@ package com.dailylist.vadimsemenyk.natives;
 import android.app.Activity;
 import android.content.Intent;
 
+import com.dailylist.vadimsemenyk.natives.Widget.WidgetProvider;
+
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -64,11 +66,11 @@ public class Natives extends CordovaPlugin {
         }
     }
 
-    static void fireEvent(String event, boolean scheduleEvent) {
+    public static void fireEvent(String event, boolean scheduleEvent) {
         fireEvent(event, new JSONObject(), scheduleEvent);
     }
 
-    static void fireEvent(String event, JSONObject data, boolean scheduleEvent) {
+    public static void fireEvent(String event, JSONObject data, boolean scheduleEvent) {
         String js = "cordova.plugins.natives.fireEvent(" + "\"" + event + "\"," + data.toString() + ")";
 
         if (!isWebAppListenEvents || !isAppRunning()) {

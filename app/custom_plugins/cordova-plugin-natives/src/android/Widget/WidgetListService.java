@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.natives;
+package com.dailylist.vadimsemenyk.natives.Widget;
 
 import android.content.Intent;
 import android.widget.RemoteViewsService;

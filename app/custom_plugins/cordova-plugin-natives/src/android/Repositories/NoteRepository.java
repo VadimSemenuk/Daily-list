@@ -1,7 +1,16 @@
-package com.dailylist.vadimsemenyk.natives;
+package com.dailylist.vadimsemenyk.natives.Repositories;
 
 import android.database.Cursor;
 
+import com.dailylist.vadimsemenyk.natives.DBHelper;
+import com.dailylist.vadimsemenyk.natives.Enums.NoteTypes;
+import com.dailylist.vadimsemenyk.natives.Enums.SortDirection;
+import com.dailylist.vadimsemenyk.natives.Enums.SortType;
+import com.dailylist.vadimsemenyk.natives.Models.Note;
+import com.dailylist.vadimsemenyk.natives.Models.Settings;
+import com.dailylist.vadimsemenyk.natives.Widget.NoteContentItem;
+import com.dailylist.vadimsemenyk.natives.Widget.NoteContentItemListItem;
+import com.dailylist.vadimsemenyk.natives.Widget.NoteContentItemTextArea;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

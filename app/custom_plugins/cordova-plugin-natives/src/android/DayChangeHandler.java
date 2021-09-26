@@ -8,10 +8,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import com.dailylist.vadimsemenyk.natives.Models.Settings;
+import com.dailylist.vadimsemenyk.natives.Repositories.NoteRepository;
+import com.dailylist.vadimsemenyk.natives.Repositories.SettingsRepository;
+
 import java.util.Calendar;
 
 public class DayChangeHandler {
-    final static String ACTION_DAY_CHANGED = "com.dailylist.vadimsemenyk.day_changed";
+    public final static String ACTION_DAY_CHANGED = "com.dailylist.vadimsemenyk.day_changed";
 
     public static void scheduleDayChangeEvent(Context context) {
         Calendar dateTime = Calendar.getInstance();

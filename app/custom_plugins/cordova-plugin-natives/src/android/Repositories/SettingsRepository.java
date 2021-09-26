@@ -1,6 +1,11 @@
-package com.dailylist.vadimsemenyk.natives;
+package com.dailylist.vadimsemenyk.natives.Repositories;
 
 import android.database.Cursor;
+
+import com.dailylist.vadimsemenyk.natives.DBHelper;
+import com.dailylist.vadimsemenyk.natives.Enums.SortDirection;
+import com.dailylist.vadimsemenyk.natives.Enums.SortType;
+import com.dailylist.vadimsemenyk.natives.Models.Settings;
 
 public class SettingsRepository {
     private static final SettingsRepository ourInstance = new SettingsRepository();

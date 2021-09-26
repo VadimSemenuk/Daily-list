@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.natives;
+package com.dailylist.vadimsemenyk.natives.Widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -14,6 +14,13 @@ import android.os.Bundle;
 import android.widget.RemoteViews;
 
 import com.dailylist.vadimsemenyk.R;
+import com.dailylist.vadimsemenyk.natives.DBHelper;
+import com.dailylist.vadimsemenyk.natives.DayChangeHandler;
+import com.dailylist.vadimsemenyk.natives.Enums.NoteTypes;
+import com.dailylist.vadimsemenyk.natives.Natives;
+import com.dailylist.vadimsemenyk.natives.Repositories.NoteRepository;
+import com.dailylist.vadimsemenyk.natives.Models.Settings;
+import com.dailylist.vadimsemenyk.natives.Repositories.SettingsRepository;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,16 +30,16 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class WidgetProvider extends AppWidgetProvider {
-    final static String ACTION_LIST_ITEM_LICK = "com.dailylist.vadimsemenyk.widget.list_item_click";
-    final static String ACTION_OPEN_ADD = "com.dailylist.vadimsemenyk.widget.open_add";
-    final static String ACTION_OPEN_APP = "com.dailylist.vadimsemenyk.widget.open_app";
-    final static String ACTION_LIST_WITH_TIME = "cosetNoteFinishStatem.dailylist.vadimsemenyk.widget.set_list_with_time";
-    final static String ACTION_LIST_WITHOUT_TIME = "com.dailylist.vadimsemenyk.widget.set_list_without_time";
-    final static String ACTION_UPDATE = "com.dailylist.vadimsemenyk.widget.update";
-    final static String ACTION_UPDATE_LIST = "com.dailylist.vadimsemenyk.widget.update_list";
+    public final static String ACTION_LIST_ITEM_LICK = "com.dailylist.vadimsemenyk.widget.list_item_click";
+    public final static String ACTION_OPEN_ADD = "com.dailylist.vadimsemenyk.widget.open_add";
+    public final static String ACTION_OPEN_APP = "com.dailylist.vadimsemenyk.widget.open_app";
+    public final static String ACTION_LIST_WITH_TIME = "cosetNoteFinishStatem.dailylist.vadimsemenyk.widget.set_list_with_time";
+    public final static String ACTION_LIST_WITHOUT_TIME = "com.dailylist.vadimsemenyk.widget.set_list_without_time";
+    public final static String ACTION_UPDATE = "com.dailylist.vadimsemenyk.widget.update";
+    public final static String ACTION_UPDATE_LIST = "com.dailylist.vadimsemenyk.widget.update_list";
 
-    final static String WIDGET_SP = "com.dailylist.vadimsemenyk.widget";
-    final static String WIDGET_SP_LIST_TYPE = "list_type";
+    public final static String WIDGET_SP = "com.dailylist.vadimsemenyk.widget";
+    public final static String WIDGET_SP_LIST_TYPE = "list_type";
 
     @Override
     public void onEnabled(Context context) {

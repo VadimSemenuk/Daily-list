@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.natives;
+package com.dailylist.vadimsemenyk.natives.Widget;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,11 +10,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
 import com.dailylist.vadimsemenyk.R;
+import com.dailylist.vadimsemenyk.natives.DBHelper;
+import com.dailylist.vadimsemenyk.natives.Enums.NoteTypes;
+import com.dailylist.vadimsemenyk.natives.Models.Note;
+import com.dailylist.vadimsemenyk.natives.Repositories.NoteRepository;
+import com.dailylist.vadimsemenyk.natives.Models.Settings;
+import com.dailylist.vadimsemenyk.natives.Repositories.SettingsRepository;
 
 public class WidgetListFactory implements RemoteViewsFactory {
     ArrayList<Note> data;

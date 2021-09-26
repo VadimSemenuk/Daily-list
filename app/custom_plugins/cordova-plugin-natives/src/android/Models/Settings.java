@@ -1,4 +1,7 @@
-package com.dailylist.vadimsemenyk.natives;
+package com.dailylist.vadimsemenyk.natives.Models;
+
+import com.dailylist.vadimsemenyk.natives.Enums.SortDirection;
+import com.dailylist.vadimsemenyk.natives.Enums.SortType;
 
 public class Settings {
     public int sortFinBehaviour;

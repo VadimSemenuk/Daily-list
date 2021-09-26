@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.natives;
+package com.dailylist.vadimsemenyk.natives.Enums;
 
 import java.util.HashMap;
 import java.util.Map;
