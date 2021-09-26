@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.widget;
+package com.dailylist.vadimsemenyk.natives;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
-public class Widget extends CordovaPlugin {
+public class Natives extends CordovaPlugin {
     private static WeakReference<CordovaWebView> webView = null;
     private static Boolean isWebAppListenEvents = false;
     private static HashMap<String, String> scheduledEvents = new HashMap();
@@ -24,7 +24,7 @@ public class Widget extends CordovaPlugin {
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
 
-        Widget.webView = new WeakReference<CordovaWebView>(webView);
+        Natives.webView = new WeakReference<CordovaWebView>(webView);
     }
 
     public void onDestroy() {
@@ -38,11 +38,11 @@ public class Widget extends CordovaPlugin {
             isWebAppListenEvents = true;
             fireScheduledEvent(args.getString(0));
             return true;
-        } else if (action.equals("update")) {
-            update();
+        } else if (action.equals("updateWidget")) {
+            updateWidget();
             return true;
-        } else if (action.equals("updateList")) {
-            updateList();
+        } else if (action.equals("updateWidgetList")) {
+            updateWidgetList();
             return true;
         } else if (action.equals("scheduleDayChangeNotification")) {
              DayChangeHandler.unScheduleDayChangeEvent(cordova.getContext());
@@ -69,7 +69,7 @@ public class Widget extends CordovaPlugin {
     }
 
     static void fireEvent(String event, JSONObject data, boolean scheduleEvent) {
-        String js = "cordova.plugins.widget.fireEvent(" + "\"" + event + "\"," + data.toString() + ")";
+        String js = "cordova.plugins.natives.fireEvent(" + "\"" + event + "\"," + data.toString() + ")";
 
         if (!isWebAppListenEvents || !isAppRunning()) {
             if (scheduleEvent) {
@@ -91,13 +91,13 @@ public class Widget extends CordovaPlugin {
         });
     }
 
-    private void update() {
+    private void updateWidget() {
         Intent updateIntent = new Intent(cordova.getContext(), WidgetProvider.class);
         updateIntent.setAction(WidgetProvider.ACTION_UPDATE);
         cordova.getContext().sendBroadcast(updateIntent);
     }
 
-    private void updateList() {
+    private void updateWidgetList() {
         Intent updateIntent = new Intent(cordova.getContext(), WidgetProvider.class);
         updateIntent.setAction(WidgetProvider.ACTION_UPDATE_LIST);
         cordova.getContext().sendBroadcast(updateIntent);

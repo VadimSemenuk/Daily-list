@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.widget;
+package com.dailylist.vadimsemenyk.natives;
 
 public class Settings {
     public int sortFinBehaviour;

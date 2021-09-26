@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-natives"
+        version="1.0.0">
+    <name>Natives</name>
+    <js-module src="www/natives.js" name="natives">
+        <clobbers target="cordova.plugins.natives" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <framework src="com.google.code.gson:gson:2.8.6" />
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Natives">
+                <param name="android-package" value="com.dailylist.vadimsemenyk.natives.Natives" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <receiver android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name=".natives.WidgetProvider">
+                <intent-filter>
+                    <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                </intent-filter>
+                <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_metadata" />
+            </receiver>
+
+            <receiver android:exported="false" android:name=".natives.DayChangeReceiver">
+                <intent-filter>
+                    <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                    <action android:name="android.intent.action.BOOT_COMPLETED" />
+                </intent-filter>
+            </receiver>
+
+            <service android:name=".natives.WidgetListService" android:permission="android.permission.BIND_REMOTEVIEWS" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+        </config-file>
+
+        <source-file src="src/android/Natives.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/DBHelper.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/Note.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/NoteContentItem.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/NoteContentItemListItem.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/NoteContentItemTextArea.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/NoteRepository.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/NoteTypes.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/SortDirection.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/SortType.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/WidgetListFactory.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/WidgetListService.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/WidgetProvider.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/Settings.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/SettingsRepository.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/DayChangeHandler.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/DayChangeReceiver.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+
+        <source-file src="src/android/res/xml/widget_metadata.xml" target-dir="res/xml" />
+        <source-file src="src/android/res/xml/list_item_content_item.xml" target-dir="res/layout" />
+        <source-file src="src/android/res/xml/note.xml" target-dir="res/layout" />
+        <source-file src="src/android/res/xml/text_area_content_item.xml" target-dir="res/layout" />
+        <source-file src="src/android/res/xml/widget.xml" target-dir="res/layout" />
+
+        <source-file src="src/android/res/drawable/add.png" target-dir="res/drawable" />
+        <source-file src="src/android/res/drawable/calendar.png" target-dir="res/drawable" />
+        <source-file src="src/android/res/drawable/checkbox.png" target-dir="res/drawable" />
+        <source-file src="src/android/res/drawable/checkbox_checked.png" target-dir="res/drawable" />
+        <source-file src="src/android/res/drawable/list.png" target-dir="res/drawable" />
+        <source-file src="src/android/res/drawable/app_icon_no_background.png" target-dir="res/drawable" />
+
+        <source-file src="src/android/res/xml/values/natives_strings.xml" target-dir="res/values" />
+        <source-file src="src/android/res/xml/values-be/natives_strings.xml" target-dir="res/values-be" />
+        <source-file src="src/android/res/xml/values-en/natives_strings.xml" target-dir="res/values-en" />
+    </platform>
+</plugin>

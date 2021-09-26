@@ -1,8 +1,8 @@
 {
-  "name": "cordova-plugin-widget",
+  "name": "cordova-plugin-natives",
   "version": "1.0.0",
   "cordova": {
-    "id": "cordova-plugin-widget",
+    "id": "cordova-plugin-natives",
     "platforms": [
       "android"
     ]

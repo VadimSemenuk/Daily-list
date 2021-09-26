@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.widget;
+package com.dailylist.vadimsemenyk.natives;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -180,13 +180,13 @@ public class WidgetProvider extends AppWidgetProvider {
                         e.printStackTrace();
                     }
 
-                    Widget.fireEvent("noteClick", params, true);
+                    Natives.fireEvent("noteClick", params, true);
                 } else if (actionTarget != null && actionTarget.equals("finish")) {
                     DBHelper.createInstance(context.getApplicationContext());
                     NoteRepository.getInstance().triggerNoteFinishState(itemId);
                     updateWidgetList(context, widgetId);
 
-                    Widget.fireEvent("noteStateChange", false);
+                    Natives.fireEvent("noteStateChange", false);
                 }
             }
         } else if (intent.getAction().equalsIgnoreCase(ACTION_OPEN_ADD)) {
@@ -207,7 +207,7 @@ public class WidgetProvider extends AppWidgetProvider {
                 e.printStackTrace();
             }
 
-            Widget.fireEvent("addClick", params, true);
+            Natives.fireEvent("addClick", params, true);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_LIST_WITH_TIME) || intent.getAction().equalsIgnoreCase(ACTION_LIST_WITHOUT_TIME)) {
             int widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {

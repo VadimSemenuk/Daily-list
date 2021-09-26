@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.widget;
+package com.dailylist.vadimsemenyk.natives;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

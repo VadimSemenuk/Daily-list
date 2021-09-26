@@ -42,16 +42,16 @@ class Notes extends PureComponent {
         this.setupSidenav();
 
         if (window.cordova) {
-            window.cordova.plugins.widget.addEventListener("addClick", this.onWidgetAddClick);
-            window.cordova.plugins.widget.addEventListener("noteClick", this.onWidgetNoteClick);
-            window.cordova.plugins.widget.addEventListener("noteStateChange", this.onWidgetStateChange);
+            window.cordova.plugins.natives.addEventListener("addClick", this.onWidgetAddClick);
+            window.cordova.plugins.natives.addEventListener("noteClick", this.onWidgetNoteClick);
+            window.cordova.plugins.natives.addEventListener("noteStateChange", this.onWidgetStateChange);
         }
     }
 
     componentWillUnmount() {
-        window.cordova.plugins.widget.removeEventListener(this.onWidgetAddClick);
-        window.cordova.plugins.widget.removeEventListener(this.onWidgetNoteClick);
-        window.cordova.plugins.widget.removeEventListener(this.onWidgetStateChange);
+        window.cordova.plugins.natives.removeEventListener(this.onWidgetAddClick);
+        window.cordova.plugins.natives.removeEventListener(this.onWidgetNoteClick);
+        window.cordova.plugins.natives.removeEventListener(this.onWidgetStateChange);
     }
 
     scrollToNote = (id) => {

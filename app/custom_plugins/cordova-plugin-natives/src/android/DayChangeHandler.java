@@ -1,4 +1,4 @@
-package com.dailylist.vadimsemenyk.widget;
+package com.dailylist.vadimsemenyk.natives;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.M;
@@ -49,7 +49,7 @@ public class DayChangeHandler {
         if (settings.autoMoveNotFinishedNotes) {
             NoteRepository.getInstance().moveNotFinishedNotesForToday();
 
-            Widget.fireEvent("noteStateChange", false);
+            Natives.fireEvent("noteStateChange", false);
         }
     }
 }

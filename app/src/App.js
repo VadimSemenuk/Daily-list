@@ -56,7 +56,7 @@ export default class App extends Component {
         if (!system.isDayChangeEventSet) {
             setTimeout(() => {
                 if (window.cordova) {
-                    window.cordova.plugins.widget.scheduleDayChangeNotification();
+                    window.cordova.plugins.natives.scheduleDayChangeNotification();
                     this.setSystemData({...system, isDayChangeEventSet: true});
                 }
             });
