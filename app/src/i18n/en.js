@@ -6,6 +6,7 @@ export default {
     "remove-pass": "Remove password",
     "issues": "Bug fixing",
     "default-notification": "Automatically set notification",
+    "auto-move-not-completed": "When the date changes, automatically move unfinished tasks to today",
     "backup": "Backup",
     "set-setting-error": "Failed to update setting",
     "restore-backup-confirmation": "Restore a backup?",

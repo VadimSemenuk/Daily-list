@@ -79,7 +79,8 @@ class SettingsService {
                 passwordResetEmail,
                 invertHeaderPosition,
                 noteFilters,
-                isQuickAddPanelVisible
+                isQuickAddPanelVisible,
+                autoMoveNotFinishedNotes
             FROM Settings;`
         );
 
@@ -92,7 +93,8 @@ class SettingsService {
             minimizeNotes: Boolean(result.minimizeNotes),
             invertHeaderPosition: Boolean(result.invertHeaderPosition),
             noteFilters: JSON.parse(result.noteFilters),
-            isQuickAddPanelVisible: Boolean(result.isQuickAddPanelVisible)
+            isQuickAddPanelVisible: Boolean(result.isQuickAddPanelVisible),
+            autoMoveNotFinishedNotes: Boolean(result.autoMoveNotFinishedNotes)
         };
     }
 
@@ -107,6 +109,7 @@ class SettingsService {
                 case("invertHeaderPosition"): value = Number(value); break;
                 case("noteFilters"): value = JSON.stringify(value); break;
                 case("isQuickAddPanelVisible"): value = Number(value); break;
+                case("autoMoveNotFinishedNotes"): value = Number(value); break;
                 default: break;
             }
 

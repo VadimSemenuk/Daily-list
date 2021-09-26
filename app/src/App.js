@@ -20,7 +20,7 @@ import authService from "./services/auth.service";
 import logsService from "./services/logs.service";
 import backupService from "./services/backup.service";
 import tagsService from "./services/tags.service";
-
+import config from "./config/config";
 import executeSQL from "./utils/executeSQL";
 
 window.moment = moment;
@@ -47,6 +47,20 @@ export default class App extends Component {
         await this.initApp();
 
         setTimeout(() => window.cordova && navigator.splashscreen.hide());
+
+        let system = localStorage.getItem(config.LSSystemKey);
+        if (!system) {
+            system = this.initSystemData();
+        }
+
+        if (!system.isDayChangeEventSet) {
+            setTimeout(() => {
+                if (window.cordova) {
+                    window.cordova.plugins.widget.scheduleDayChangeNotification();
+                    this.setSystemData({...system, isDayChangeEventSet: true});
+                }
+            });
+        }
 
         logsService.logLoad(window.device.uuid);
         if (deviceService.hasNetworkConnection()) {
@@ -98,6 +112,16 @@ export default class App extends Component {
         themesService.applyTheme(settings.theme);
         moment.locale(settings.lang);
         this.i18n = lang.init(settings.lang);
+    }
+
+    initSystemData() {
+        let system = {isDayChangeEventSet: false};
+        localStorage.setItem(config.LSSystemKey, JSON.stringify(system));
+        return system;
+    }
+
+    setSystemData(system) {
+        localStorage.setItem(config.LSSystemKey, JSON.stringify(system));
     }
 
     render() {

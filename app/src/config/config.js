@@ -3,6 +3,7 @@ export default {
     apiURL: "http://localhost:3001/api",
     LSUserKey: "com.dailylist.vadimsemenyk.user",
     LSTokenKey: "com.dailylist.vadimsemenyk.token",
+    LSSystemKey: "com.dailylist.vadimsemenyk.system",
     defaultLang: "en",
     db: {
         name: 'com.mamindeveloper.dailylist.db',

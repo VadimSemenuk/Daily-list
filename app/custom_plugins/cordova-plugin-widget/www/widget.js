@@ -8,6 +8,10 @@ Widget.updateList = function(success, error) {
     cordova.exec(success, error, 'Widget', 'updateList');
 };
 
+Widget.scheduleDayChangeNotification = function() {
+    cordova.exec(null, null, 'Widget', 'scheduleDayChangeNotification');
+}
+
 Widget.events = {};
 
 Widget.addEventListener = function(event, callback) {
