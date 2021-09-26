@@ -44,7 +44,11 @@ public class Widget extends CordovaPlugin {
         } else if (action.equals("updateList")) {
             updateList();
             return true;
-        }
+        } else if (action.equals("scheduleDayChangeNotification")) {
+             DayChangeHandler.unScheduleDayChangeEvent(cordova.getContext());
+             DayChangeHandler.scheduleDayChangeEvent(cordova.getContext());
+             return true;
+         }
         return false;
     }
 

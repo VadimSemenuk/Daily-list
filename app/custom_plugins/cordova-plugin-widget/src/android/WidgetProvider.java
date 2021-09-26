@@ -1,8 +1,5 @@
 package com.dailylist.vadimsemenyk.widget;
 
-import static android.os.Build.VERSION.SDK_INT;
-
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -14,7 +11,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.UserManager;
 import android.widget.RemoteViews;
 
 import com.dailylist.vadimsemenyk.R;
@@ -34,7 +30,6 @@ public class WidgetProvider extends AppWidgetProvider {
     final static String ACTION_LIST_WITHOUT_TIME = "com.dailylist.vadimsemenyk.widget.set_list_without_time";
     final static String ACTION_UPDATE = "com.dailylist.vadimsemenyk.widget.update";
     final static String ACTION_UPDATE_LIST = "com.dailylist.vadimsemenyk.widget.update_list";
-    final static String ACTION_UPDATE_RESCHEDULE = "com.dailylist.vadimsemenyk.widget.update_reschedule";
 
     final static String WIDGET_SP = "com.dailylist.vadimsemenyk.widget";
     final static String WIDGET_SP_LIST_TYPE = "list_type";
@@ -42,31 +37,6 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
-
-        scheduleUpdateEvent(context);
-    }
-
-    private void scheduleUpdateEvent(Context context) {
-        Calendar dateTime = Calendar.getInstance();
-        dateTime.set(Calendar.HOUR_OF_DAY, 0);
-        dateTime.set(Calendar.MINUTE, 0);
-        dateTime.set(Calendar.SECOND, 0);
-        dateTime.set(Calendar.MILLISECOND, 0);
-        dateTime.add(Calendar.MILLISECOND, 86400000);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC, dateTime.getTimeInMillis(), getWidgetUpdateReschedulePIntent(context));
-    }
-
-    private void unScheduleUpdateEvent(Context context) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(getWidgetUpdateReschedulePIntent(context));
-    }
-
-    private PendingIntent getWidgetUpdateReschedulePIntent(Context context) {
-        Intent intent = new Intent(context, WidgetProvider.class);
-        intent.setAction(ACTION_UPDATE_RESCHEDULE);
-        return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
     @Override
@@ -184,20 +154,8 @@ public class WidgetProvider extends AppWidgetProvider {
             updateAllWidgetsList(context);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_UPDATE)) {
             updateAllWidgets(context);
-        } else if (intent.getAction().equalsIgnoreCase(ACTION_UPDATE_RESCHEDULE)) {
+        } else if (intent.getAction().equalsIgnoreCase(DayChangeHandler.ACTION_DAY_CHANGED)) {
             updateAllWidgets(context);
-            scheduleUpdateEvent(context);
-        } else if (
-                intent.getAction().equalsIgnoreCase(Intent.ACTION_TIMEZONE_CHANGED)
-                || intent.getAction().equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)
-                || intent.getAction().equalsIgnoreCase(Intent.ACTION_LOCKED_BOOT_COMPLETED)
-        ) {
-            if (SDK_INT >= 24) {
-                UserManager um = (UserManager) context.getSystemService(UserManager.class);
-                if (um == null || !um.isUserUnlocked()) return;
-            }
-
-            scheduleUpdateEvent(context);
         } else if (intent.getAction().equalsIgnoreCase(ACTION_LIST_ITEM_LICK)) {
             int widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
@@ -281,8 +239,6 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         super.onDisabled(context);
-
-        unScheduleUpdateEvent(context);
     }
 
     static Resources getLocalizedResources(Context context, Locale desiredLocale) {

@@ -5,4 +5,5 @@ public class Settings {
     public SortType sortType;
     public SortDirection sortDirection;
     public String lang;
+    public boolean autoMoveNotFinishedNotes;
 }

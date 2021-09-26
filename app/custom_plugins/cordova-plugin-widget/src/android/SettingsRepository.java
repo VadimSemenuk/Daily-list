@@ -14,7 +14,7 @@ public class SettingsRepository {
     public Settings getSettings() {
         Settings settings = new Settings();
 
-        String sql = "SELECT sortFinBehaviour, sortType, sortDirection, lang FROM Settings;";
+        String sql = "SELECT sortFinBehaviour, sortType, sortDirection, lang, autoMoveNotFinishedNotes FROM Settings;";
         Cursor cursor = DBHelper.getInstance().getWritableDatabase().rawQuery(sql, null);
 
         if (cursor.moveToFirst()) {
@@ -24,6 +24,7 @@ public class SettingsRepository {
                 settings.sortType = SortType.valueOf(cursor.getInt(cursor.getColumnIndex("sortType")));
                 settings.sortDirection = SortDirection.valueOf(cursor.getInt(cursor.getColumnIndex("sortDirection")));
                 settings.lang = cursor.getString(cursor.getColumnIndex("lang"));
+                settings.autoMoveNotFinishedNotes = cursor.getInt(cursor.getColumnIndex("autoMoveNotFinishedNotes")) == 1;
             }
             while (cursor.moveToNext());
         }

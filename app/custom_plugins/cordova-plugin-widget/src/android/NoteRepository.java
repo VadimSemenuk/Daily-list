@@ -207,6 +207,27 @@ public class NoteRepository {
         return notes;
     }
 
+    public void moveNotFinishedNotesForToday() {
+        Calendar todayDateTime = convertFromLocalToUTC(startOfDay(Calendar.getInstance()));
+
+        String sql = "UPDATE Notes"
+                + " SET date = ?"
+                + ", manualOrderIndex = null"
+                + ", lastAction = ?, lastActionTime = ?"
+                + " WHERE repeatType = ? AND isFinished = 0 AND date < ?;";
+
+        DBHelper.getInstance().getWritableDatabase().execSQL(
+                sql,
+                new String[] {
+                        Long.toString(todayDateTime.getTimeInMillis()),
+                        "UPDATE",
+                        Long.toString(Calendar.getInstance().getTimeInMillis()),
+                        "no-repeat",
+                        Long.toString(Calendar.getInstance().getTimeInMillis()),
+                }
+        );
+    }
+
     public void triggerNoteFinishState(int noteId) {
         Cursor noteCursor = getRawNote(noteId);
 
@@ -328,11 +349,13 @@ public class NoteRepository {
         return dateUTC;
     }
 
-    public static void startOfDay(Calendar dateTime) {
+    public static Calendar startOfDay(Calendar dateTime) {
         dateTime.set(Calendar.HOUR_OF_DAY, 0);
         dateTime.set(Calendar.MINUTE, 0);
         dateTime.set(Calendar.SECOND, 0);
         dateTime.set(Calendar.MILLISECOND, 0);
+
+        return dateTime;
     }
 
     private int getDayOfWeekNumber(Calendar date) {
