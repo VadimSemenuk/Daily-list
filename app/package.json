@@ -83,7 +83,7 @@
     "webpack-dev-server": "3.1.9",
     "webpack-manifest-plugin": "2.0.4",
     "workbox-webpack-plugin": "3.6.3",
-    "cordova-plugin-camera": "^5.0.2",
+    "cordova-plugin-camera": "^5.0.3",
     "cordova-plugin-googleplus": "^8.5.2",
     "cordova-plugin-local-notification": "file:custom_plugins/cordova-plugin-local-notifications",
     "com-sarriaroman-photoviewer": "git+https://github.com/sarriaroman/photoviewer.git"
@@ -169,7 +169,9 @@
         "ANDROID_SUPPORT_V4_VERSION": "26.+"
       },
       "com-sarriaroman-photoviewer": {},
-      "cordova-plugin-camera": {},
+      "cordova-plugin-camera": {
+        "ANDROID_SUPPORT_V4_VERSION": "27.+"
+      },
       "cordova-plugin-googleplus": {},
       "cordova-plugin-natives": {}
     }
