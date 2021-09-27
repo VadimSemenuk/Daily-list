@@ -45,7 +45,7 @@
 
         <source-file src="src/android/Natives.java" target-dir="com/dailylist/vadimsemenyk/natives" />
         <source-file src="src/android/DBHelper.java" target-dir="com/dailylist/vadimsemenyk/natives" />
-        <source-file src="src/android/Models/Note.java" target-dir="com/dailylist/vadimsemenyk/native/Models" />
+        <source-file src="src/android/Models/Note.java" target-dir="com/dailylist/vadimsemenyk/natives/Models" />
         <source-file src="src/android/Widget/NoteContentItem.java" target-dir="com/dailylist/vadimsemenyk/natives/Widget" />
         <source-file src="src/android/Widget/NoteContentItemListItem.java" target-dir="com/dailylist/vadimsemenyk/natives/Widget" />
         <source-file src="src/android/Widget/NoteContentItemTextArea.java" target-dir="com/dailylist/vadimsemenyk/natives/Widget" />
@@ -56,7 +56,7 @@
         <source-file src="src/android/Widget/WidgetListFactory.java" target-dir="com/dailylist/vadimsemenyk/natives/Widget" />
         <source-file src="src/android/Widget/WidgetListService.java" target-dir="com/dailylist/vadimsemenyk/natives/Widget" />
         <source-file src="src/android/Widget/WidgetProvider.java" target-dir="com/dailylist/vadimsemenyk/natives/Widget" />
-        <source-file src="src/android/Models/Settings.java" target-dir="com/dailylist/vadimsemenyk/natives" />
+        <source-file src="src/android/Models/Settings.java" target-dir="com/dailylist/vadimsemenyk/natives/Models" />
         <source-file src="src/android/Repositories/SettingsRepository.java" target-dir="com/dailylist/vadimsemenyk/natives/Repositories" />
         <source-file src="src/android/DayChangeHandler.java" target-dir="com/dailylist/vadimsemenyk/natives" />
         <source-file src="src/android/DayChangeReceiver.java" target-dir="com/dailylist/vadimsemenyk/natives" />
