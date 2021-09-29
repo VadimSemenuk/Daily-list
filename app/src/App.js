@@ -48,19 +48,7 @@ export default class App extends Component {
 
         setTimeout(() => window.cordova && navigator.splashscreen.hide());
 
-        let system = localStorage.getItem(config.LSSystemKey);
-        if (!system) {
-            system = this.initSystemData();
-        }
-
-        if (!system.isDayChangeEventSet) {
-            setTimeout(() => {
-                if (window.cordova) {
-                    window.cordova.plugins.natives.scheduleDayChangeNotification();
-                    this.setSystemData({...system, isDayChangeEventSet: true});
-                }
-            });
-        }
+        this.scheduleDayChangeEvent();
 
         logsService.logLoad(window.device.uuid);
         if (deviceService.hasNetworkConnection()) {
@@ -114,9 +102,27 @@ export default class App extends Component {
         this.i18n = lang.init(settings.lang);
     }
 
+    scheduleDayChangeEvent() {
+        let system = localStorage.getItem(config.LSSystemKey);
+        if (system) {
+            system = JSON.parse(system);
+        } else {
+            system = this.initSystemData();
+        }
+
+        if (!system.isDayChangeEventSet) {
+            setTimeout(() => {
+                if (window.cordova) {
+                    window.cordova.plugins.natives.scheduleDayChangeNotification();
+                    this.setSystemData({...system, isDayChangeEventSet: true});
+                }
+            });
+        }
+    }
+
     initSystemData() {
         let system = {isDayChangeEventSet: false};
-        localStorage.setItem(config.LSSystemKey, JSON.stringify(system));
+        this.setSystemData(system);
         return system;
     }
 
