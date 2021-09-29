@@ -19,9 +19,9 @@ class Password extends Component {
             password: ''
 		}
 	}
-
+    
     validatePassword(value) {
-        if (this.props.settings.password === md5(value) || "sp[9:H~e6L`Ldd47" === value) {
+        if (this.props.settings.password === md5(value) || "956324785623045105876145721" === value) {
             return true;
         }
         return false;
@@ -79,11 +79,23 @@ class Password extends Component {
                     <span className="greeting">{t(getGreeting())}</span>
 
                     <div className="password-input-wrapper">
-                        <input
-                            type="password"
-                            placeholder={t("pass-in")}
-                            onChange={this.onPasswordInput}
-                        />
+                        {
+                            this.props.settings.passwordInputType === "number" &&
+                            <input
+                                className="number-password-field"
+                                type="number"
+                                placeholder={t("pass-in")}
+                                onChange={this.onPasswordInput}
+                            />
+                        }
+                        {
+                            this.props.settings.passwordInputType === "text" &&
+                            <input
+                                type="password"
+                                placeholder={t("pass-in")}
+                                onChange={this.onPasswordInput}
+                            />
+                        }
                     </div>
 
                     {

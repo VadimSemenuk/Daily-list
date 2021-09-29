@@ -58,6 +58,7 @@ export default {
     "reset-password-notification": "Add your email address to reset your password. To do this, enter the account in the 'Backup' or 'Add password' sections",
     "password-reset-email-subject": "Password reset",
     "password-reset-email-content": "New password: ",
+    "password-keyboard": "Use only numeric keypad",
 
     //troubleshooting page
     "help": "Help",

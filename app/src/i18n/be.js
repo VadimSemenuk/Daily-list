@@ -58,6 +58,7 @@ export default {
     "reset-password-notification": "Пакажыце email адрас для скіду пароля. Для гэтага ўвайдзіце ў аккаутн ў раздзелах 'Рэзервовае капіраванне' ці 'Дадаць пароль'",
     "password-reset-email-subject": "Скід пароля",
     "password-reset-email-content": "Новы пароль: ",
+    "password-keyboard": "Выкарыстоўваць толькі лічбавую клавіятуру",
 
     //troubleshooting page
     "help": "Дапамога",

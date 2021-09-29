@@ -80,7 +80,8 @@ class SettingsService {
                 invertHeaderPosition,
                 noteFilters,
                 isQuickAddPanelVisible,
-                autoMoveNotFinishedNotes
+                autoMoveNotFinishedNotes,
+                passwordInputType
             FROM Settings;`
         );
 

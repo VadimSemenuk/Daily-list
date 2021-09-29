@@ -58,6 +58,7 @@ export default {
     "reset-password-notification": "Укажите email адрес для сброса пароля. Для этого войдите в аккаутн в разделах 'Резервное копирование' или 'Установка пароля'",
     "password-reset-email-subject": "Сброс пароля",
     "password-reset-email-content": "Новый пароль: ",
+    "password-keyboard": "Использовать только цифровую клавиатуру",
 
     //troubleshooting page
     "help": "Помощь",

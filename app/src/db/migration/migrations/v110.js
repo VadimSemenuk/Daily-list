@@ -1,9 +1,6 @@
 import executeSQL from "../../../utils/executeSQL";
-import noteService from "../../../services/notes.service";
 import {
-    CalendarNotesCounterMode,
     NoteAction,
-    NoteContentItemType,
     NoteRepeatType,
     NotesScreenMode
 } from "../../../constants";
@@ -45,7 +42,8 @@ export default {
                     invertHeaderPosition INTEGER,
                     noteFilters TEXT,
                     isQuickAddPanelVisible INTEGER,
-                    autoMoveNotFinishedNotes INTEGER
+                    autoMoveNotFinishedNotes INTEGER,
+                    passwordInputType TEXT
                 );
             `);
             await executeSQL(`
@@ -66,7 +64,8 @@ export default {
                     invertHeaderPosition,
                     noteFilters,
                     isQuickAddPanelVisible,
-                    autoMoveNotFinishedNotes
+                    autoMoveNotFinishedNotes,
+                    passwordInputType
                 ) 
                 SELECT 
                     defaultNotification,
@@ -85,7 +84,8 @@ export default {
                     invertHeaderPosition,
                     noteFilters,
                     isQuickAddPanelVisible,
-                    0 as autoMoveNotFinishedNotes
+                    0 as autoMoveNotFinishedNotes,
+                    'text' as passwordInputType
                 FROM Settings_OLD;
             `);
             await executeSQL(`DROP TABLE Settings_OLD;`);

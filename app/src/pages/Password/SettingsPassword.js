@@ -10,6 +10,7 @@ import Header from "../../components/Header/Header";
 
 import './SettingsPassword.scss';
 import GoogleImg from "../../assets/img/google.svg";
+import TextCheckBox from "../../components/TextCheckBox/TextCheckBox";
 
 class SettingsPassword extends Component {
 	constructor(props) {
@@ -17,7 +18,8 @@ class SettingsPassword extends Component {
   
         this.state = {
             password0: '',
-            password1: ''            
+            password1: '',
+            passwordInputType: "text"
         }  
     }
 
@@ -38,7 +40,8 @@ class SettingsPassword extends Component {
         if (this.validatePassword()) {
             this.props.setSetting({
                 password: md5(this.state.password0),
-                passwordResetEmail: this.props.user ? this.props.user.email : null
+                passwordResetEmail: this.props.user ? this.props.user.email : null,
+                passwordInputType: this.state.passwordInputType
             });
             this.props.history.goBack();
         }
@@ -51,16 +54,52 @@ class SettingsPassword extends Component {
             <div className="page-wrapper settings-password-page-wrapper">
                 <Header title={t("password")} />
                 <div className="scroll page-content padding">
-                    <input
-                        type="password"
-                        placeholder={t("new-password")}
-                        onChange={(e) => this.setState({password0: e.target.value})}
-                    />
-                    <input
-                        type="password"
-                        placeholder={t("repeat-password")}
-                        onChange={(e) => this.setState({password1: e.target.value})}
-                    />
+                    {
+                        this.state.passwordInputType === "number" &&
+                        <React.Fragment>
+                            <input
+                                className="number-password-field"
+                                type="number"
+                                placeholder={t("new-password")}
+                                onChange={(e) => this.setState({password0: e.target.value})}
+                            />
+                            <input
+                                className="number-password-field"
+                                type="number"
+                                placeholder={t("repeat-password")}
+                                onChange={(e) => this.setState({password1: e.target.value})}
+                            />
+                        </React.Fragment>
+                    }
+                    {
+                        this.state.passwordInputType === "text" &&
+                        <React.Fragment>
+                            <input
+                                type="password"
+                                placeholder={t("new-password")}
+                                onChange={(e) => this.setState({password0: e.target.value})}
+                            />
+                            <input
+                                type="password"
+                                placeholder={t("repeat-password")}
+                                onChange={(e) => this.setState({password1: e.target.value})}
+                            />
+                        </React.Fragment>
+                    }
+                    <div className="keyboard-check-wrapper">
+                        <TextCheckBox
+                            textValue={t("password-keyboard")}
+                            cross={false}
+                            checkBoxValue={this.state.passwordInputType === "number"}
+                            onValueChange={(id, value) => {
+                                this.setState({
+                                    password0: '',
+                                    password1: '',
+                                    passwordInputType: value ? "number" : "text"
+                                })
+                            }}
+                        />
+                    </div>
                     <div className="reset-password-wrapper">
                         {
                             this.props.user &&
