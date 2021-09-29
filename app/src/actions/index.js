@@ -424,7 +424,7 @@ export function setSetting(nextSettings) {
                 dispatch(getFullCount());
             }
 
-            if (["sortType", "sortDirection", "sortFinBehaviour", "lang"].some((item) => nextSettings.hasOwnProperty(item))) {
+            if (["sortType", "sortDirection", "sortFinBehaviour", "lang", "password"].some((item) => nextSettings.hasOwnProperty(item))) {
                 window.cordova && window.cordova.plugins.natives.updateWidget();
             }
         } catch(err) {
