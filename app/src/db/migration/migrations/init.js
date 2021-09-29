@@ -5,6 +5,7 @@ import execureSQL from "../../../utils/executeSQL";
 
 import InitialNoteImg from "../../../assets/img/initial-note-example-image.jpg"
 import getDefaultLanguage from "../../../utils/getDefaultLanguage";
+import NoteDragHelp from "../../../assets/img/note-drag-help.png";
 
 export default {
     name: "init",
@@ -79,11 +80,11 @@ async function addInitNote() {
             },
             {
                 type: "text",
-                value: `  ${translator.t("initial-note-ci-3")}`
+                value: `- ${translator.t("initial-note-ci-3")}`
             },
             {
                 type: "text",
-                value: `  ${translator.t("initial-note-ci-4")}`
+                value: `- ${translator.t("initial-note-ci-4")}`
             },
             {
                 type: "listItem",
@@ -96,13 +97,8 @@ async function addInitNote() {
                 checked: true
             },
             {
-                type: "listItem",
-                value: translator.t("initial-note-ci-7"),
-                checked: false
-            },
-            {
                 type: "text",
-                value: `  ${translator.t("initial-note-ci-8")}`
+                value: `- ${translator.t("initial-note-ci-8")}`
             },
             {
                 type: "snapshot",
@@ -113,28 +109,40 @@ async function addInitNote() {
                 value: translator.t("initial-note-ci-9")
             },
             {
-                type: "listItem",
-                value: translator.t("initial-note-ci-10"),
-                checked: false
+                type: "text",
+                value: `- ${translator.t("initial-note-ci-10")}`,
             },
             {
-                type: "listItem",
-                value: translator.t("initial-note-ci-11"),
-                checked: false
+                type: "text",
+                value: `- ${translator.t("initial-note-ci-11")}`,
             },
             {
-                type: "listItem",
-                value: translator.t("initial-note-ci-12"),
-                checked: false
+                type: "text",
+                value: `- ${translator.t("initial-note-ci-12")}`,
             },
             {
-                type: "listItem",
-                value: translator.t("initial-note-ci-13"),
-                checked: false
+                type: "text",
+                value: `- ${translator.t("initial-note-ci-13")}`,
             },
             {
                 type: "text",
                 value: translator.t("initial-note-ci-14")
+            },
+            {
+                type: "snapshot",
+                value: NoteDragHelp
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-18")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-19")
+            },
+            {
+                type: "text",
+                value: translator.t("initial-note-ci-21")
             },
             {
                 type: "text",
@@ -147,14 +155,6 @@ async function addInitNote() {
             {
                 type: "text",
                 value: translator.t("initial-note-ci-17")
-            },
-            {
-                type: "text",
-                value: translator.t("initial-note-ci-18")
-            },
-            {
-                type: "text",
-                value: translator.t("initial-note-ci-19")
             },
             {
                 type: "text",

@@ -210,7 +210,7 @@ export default {
     "initial-note-ci-11": "Tag",
     "initial-note-ci-12": "Notification",
     "initial-note-ci-13": "Automatic repeat",
-    "initial-note-ci-14": "To move a note, hold it for a short time and then drag it to the target position",
+    "initial-note-ci-14": "To move, hold it for a short time on the right side (in the area of the 'Finish' and 'Options' buttons) and drag it to the desired position",
     "initial-note-ci-15": "The application has two panels.",
     "initial-note-ci-16": "In the \"Diary\" panel, notes are created with reference to the date and are displayed for the date selected on the calendar. \n"
         + "To change the day, tap a date on the calendar, or swipe left or right on the panel with a list of notes. Click on the arrow to display the expanded calendar. \n"
@@ -219,6 +219,7 @@ export default {
     "initial-note-ci-18": "Click on the date above the calendar to go to the current day.",
     "initial-note-ci-19": "There is the ability to add an application widget to the home screen.",
     "initial-note-ci-20": "Enjoy your use!",
+    "initial-note-ci-21": "There is a possibility of automatic transfer of unfinished tasks to the next day",
 
     // initial tags
     "initial-tag-1": "Work",
