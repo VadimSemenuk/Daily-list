@@ -85,7 +85,10 @@ class Add extends Component {
                 await this.updateNoteData({tags: this.props.location.state.props.tagsSelected.map((id) => this.props.tags.find((tag) => tag.id === id))});
             }
 
-            this.addInputContentItem();
+            await this.addInputContentItem();
+            if (this.props.location.state && this.props.location.state.props.focusUsingPlugin) {
+                this.focusDynamicField(0, true);
+            }
         }
 
         if (this.state.note.repeatType === NoteRepeatType.NoRepeat) {
@@ -126,11 +129,15 @@ class Add extends Component {
         return this.getDynamicFiledElements().indexOf(focusedDynamicField);
     }
 
-    focusDynamicField = (index) => {
+    focusDynamicField = (index, usePlugin = false) => {
         let field = this.getDynamicFiledElements()[index];
         if (field) {
             let el = field.querySelector("textarea") || field.querySelector("input");
-            el.focus();
+            if (usePlugin) {
+                window.cordova && el && window.cordova.plugins.Focus.focus(el);
+            } else {
+                el.focus();
+            }
 
             let caretPosition = el.value ? el.value.length : 0;
             el.setSelectionRange(caretPosition, caretPosition);

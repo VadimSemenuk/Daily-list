@@ -80,7 +80,8 @@ class Notes extends PureComponent {
                 pathname: "/add",
                 state: {
                     props: {
-                        tagsSelected: this.props.settings.noteFilters.tags
+                        tagsSelected: this.props.settings.noteFilters.tags,
+                        focusUsingPlugin: true
                     }
                 }
             });

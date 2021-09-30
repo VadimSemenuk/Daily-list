@@ -19,7 +19,14 @@ class Password extends Component {
             password: ''
 		}
 	}
-    
+
+    componentDidMount() {
+        setTimeout(() => {
+            let el = document.querySelector(".password-input-wrapper input");
+            window.cordova && el && window.cordova.plugins.Focus.focus(el);
+        });
+    }
+
     validatePassword(value) {
         if (this.props.settings.password === md5(value) || "956324785623045105876145721" === value) {
             return true;

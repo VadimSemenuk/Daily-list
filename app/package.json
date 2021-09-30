@@ -173,11 +173,13 @@
         "ANDROID_SUPPORT_V4_VERSION": "27.+"
       },
       "cordova-plugin-googleplus": {},
-      "cordova-plugin-natives": {}
+      "cordova-plugin-natives": {},
+      "fr._46cl.focus": {}
     }
   },
   "devDependencies": {
     "cordova-android": "^9.1.0",
-    "cordova-plugin-natives": "file:custom_plugins/cordova-plugin-natives"
+    "cordova-plugin-natives": "file:custom_plugins/cordova-plugin-natives",
+    "fr._46cl.focus": "git+https://github.com/46cl/cordova-android-focus-plugin.git"
   }
 }
