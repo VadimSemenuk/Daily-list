@@ -15,6 +15,7 @@ export default {
 
     async run(isUpdate, lastMigrationName) {
         await alterSettingsTable();
+        await alterNotesTable();
 
         if (isUpdate && lastMigrationName === "1.7") {
             // await addUpdatesNote();
@@ -89,6 +90,79 @@ export default {
                 FROM Settings_OLD;
             `);
             await executeSQL(`DROP TABLE Settings_OLD;`);
+        }
+
+        async function alterNotesTable() {
+            await executeSQL(`ALTER TABLE Notes RENAME TO Notes_OLD;`);
+
+            await executeSQL(`                           
+                CREATE TABLE IF NOT EXISTS Notes
+                (
+                    id INTEGER PRIMARY KEY,
+                    title TEXT,
+                    date INTEGER,
+                    isFinished INTEGER,
+                    contentItems TEXT,
+                    startTime INTEGER,
+                    endTime INTEGER,
+                    isNotificationEnabled INTEGER,
+                    tag TEXT,
+                    lastAction TEXT,
+                    lastActionTime INTEGER,
+                    repeatType INTEGER,
+                    repeatItemDate INTEGER,
+                    forkFrom INTEGER,
+                    manualOrderIndex INTEGER,
+                    mode INTEGER,
+                    tags TEXT,
+                    UNIQUE (id) ON CONFLICT REPLACE
+                );
+            `);
+
+            await executeSQL(`
+                INSERT INTO Notes (
+                    id,
+                    title, 
+                    date,
+                    isFinished,
+                    contentItems,
+                    startTime, 
+                    endTime, 
+                    isNotificationEnabled, 
+                    tag, 
+                    lastAction,
+                    lastActionTime,
+                    repeatType,
+                    repeatItemDate,
+                    forkFrom,
+                    mode,
+                    manualOrderIndex,
+                    tags
+                ) 
+                SELECT
+                    id,
+                    title, 
+                    date,
+                    isFinished,
+                    contentItems,
+                    startTime, 
+                    endTime, 
+                    isNotificationEnabled, 
+                    tag, 
+                    lastAction,
+                    lastActionTime,
+                    repeatType,
+                    CASE
+                        WHEN forkFrom IS NULL THEN null ELSE date
+                    END AS repeatItemDate,
+                    forkFrom,
+                    mode,
+                    manualOrderIndex,
+                    tags
+                FROM Notes_OLD;
+            `);
+
+            await executeSQL(`DROP TABLE Notes_OLD;`);
         }
 
         async function addUpdatesNote() {

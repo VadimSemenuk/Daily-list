@@ -160,6 +160,7 @@ class NotesService {
             isNotificationEnabled: Boolean(note.isNotificationEnabled),
             isShadow: Boolean(note.date === null),
             repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? convertUTCDateTimeToLocal(Number(a)).valueOf() : Number(a)) : [],
+            repeatItemDate: note.repeatItemDate ? convertUTCDateTimeToLocal(note.repeatItemDate) : note.repeatItemDate,
         };
     }
 
@@ -185,7 +186,7 @@ class NotesService {
                         AND (
                             n.date = ?
                             OR (
-                                n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND date = ?)
+                                n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND repeatItemDate = ?)
                                 AND (
                                     n.repeatType = ?
                                     OR (n.repeatType = ? AND rep.value = ?)
@@ -248,7 +249,8 @@ class NotesService {
             ...note,
             forkFrom: null,
             isShadow: note.repeatType !== NoteRepeatType.NoRepeat,
-            manualOrderIndex: null
+            manualOrderIndex: null,
+            repeatItemDate: null
         };
 
         nextNote = this.parseNoteValues(nextNote);
@@ -268,8 +270,8 @@ class NotesService {
     async insertNote(note) {
         let insert = await executeSQL(
             `INSERT INTO Notes
-            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags, repeatItemDate)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
                 note.startTime ? convertLocalDateTimeToUTC(note.startTime, "second").valueOf() : note.startTime,
@@ -283,7 +285,8 @@ class NotesService {
                 note.forkFrom,
                 note.mode,
                 note.manualOrderIndex,
-                note.tags.map((tag) => tag.id).join(",")
+                note.tags.map((tag) => tag.id).join(","),
+                note.repeatItemDate ? convertLocalDateTimeToUTC(note.repeatItemDate).valueOf() : note.repeatItemDate,
             ]
         );
 
@@ -315,7 +318,19 @@ class NotesService {
     }
 
     async moveNoteForTomorrow(note) {
+        let nextNote = {...note};
+
+        if (nextNote.isShadow) {
+            nextNote = await this.fromShadowToReal(nextNote);
+        }
+
         let nextDate = moment(note.date).add(1, "day");
+
+        nextNote = {
+            ...nextNote,
+            date: nextDate,
+            manualOrderIndex: null
+        }
 
         await executeSQL(
             `UPDATE Notes
@@ -324,15 +339,10 @@ class NotesService {
             [
                 convertLocalDateTimeToUTC(nextDate).valueOf(),
                 null,
-                note.id
+                nextNote.id
             ]
         );
 
-        let nextNote = {
-            ...note,
-            date: nextDate,
-            manualOrderIndex: null
-        };
         nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
         nextNote.isNotificationEnabled && notificationService.set(nextNote);
@@ -344,7 +354,7 @@ class NotesService {
         let nextNote = {...note, ...nextData};
 
         if (nextNote.isShadow) {
-            nextNote = await this.formShadowToReal(nextNote);
+            nextNote = await this.fromShadowToReal(nextNote);
         }
 
         if (nextData.hasOwnProperty('isFinished') && settings.sortFinBehaviour === 1) {
@@ -498,7 +508,7 @@ class NotesService {
         let notesInserted = [];
         for (let note of nextNotes) {
             if (note.isShadow) {
-                note = await this.formShadowToReal(note);
+                note = await this.fromShadowToReal(note);
                 notesInserted.push(note);
             }
         }
@@ -573,11 +583,12 @@ class NotesService {
         return nextNote;
     }
 
-    async formShadowToReal(note) {
+    async fromShadowToReal(note) {
         let nextNote = {
             ...note,
             forkFrom: note.id,
             isShadow: false,
+            repeatItemDate: moment(note.date)
         };
 
         let noteId = await this.insertNote(nextNote);

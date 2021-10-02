@@ -127,14 +127,11 @@ class NotesActionsHandlerWrapper extends PureComponent {
                         text={t("do-copy")}
                         onClick={this.onNoteCopyRequest}
                     />
-                    {
-                        this.state.listItemDialogData && (this.state.listItemDialogData.note.repeatType === NoteRepeatType.NoRepeat) &&
-                        <ButtonListItem
-                            className="no-border"
-                            text={t("move-tomorrow")}
-                            onClick={this.onNoteMoveForTomorrow}
-                        />
-                    }
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("move-tomorrow")}
+                        onClick={this.onNoteMoveForTomorrow}
+                    />
                 </Modal>
 
                 {

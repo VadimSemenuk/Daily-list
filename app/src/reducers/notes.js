@@ -40,7 +40,7 @@ function getReceiveNoteFn(note) {
         }
         default: {
             fn = (list) => {
-                if (!list.date || (list.date.valueOf() === note.date.valueOf())) {
+                if (!list.date || (list.date.isSame(note.date))) {
                     return assignFn(list)
                 }
                 return list
@@ -49,6 +49,15 @@ function getReceiveNoteFn(note) {
     }
 
     return fn;
+}
+
+function fromShadowToReal(state, note) {
+    return state.map((list) => {
+        if (list.date.isSame(note.repeatItemDate)) {
+            return {...list, items: list.items.filter((item) => item.id !== note.forkFrom)}
+        }
+        return list;
+    });
 }
 
 function notes (state = init, action) {
@@ -72,19 +81,19 @@ function notes (state = init, action) {
         case 'UPDATE_NOTE_DYNAMIC': {
             let nextState = state.slice();
 
+            if (action.payload.fromShadowToReal) {
+                action.payload.notes.forEach((note) => {
+                    if (note.repeatItemDate !== null) {
+                        nextState = fromShadowToReal(nextState, note);
+                    }
+                });
+            }
+
             action.payload.notes.forEach((note) => {
-                if (note.forkFrom !== null) {
-                    nextState = nextState.map((list) => {
-                        if (list.date.valueOf() === note.date.valueOf()) {
-                            return {...list, items: list.items.filter((item) => item.id !== note.forkFrom)}
-                        }
-                        return list;
-                    });
-                }
                 nextState = nextState
                     .map((list) => ({...list, items: list.items.filter((item) => item.id !== note.id)}))
                     .map((list) => {
-                        if (!list.date || (list.date.valueOf() === note.date.valueOf())) {
+                        if (!list.date || (list.date.isSame(note.date))) {
                             return {
                                 date: list.date,
                                 items: [...list.items, note]

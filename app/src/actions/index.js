@@ -88,17 +88,18 @@ export function updateNote(note, prevNote) {
 export function updateNoteDynamic(note, nextData) {
     return async (dispatch, getState) => {
         try {
-            let updatedNote = await notesService.updateNoteDynamic(note, nextData, getState().settings);
+            let nextNote = await notesService.updateNoteDynamic(note, nextData, getState().settings);
 
             dispatch({
                 type: "UPDATE_NOTE_DYNAMIC",
                 payload: {
-                    notes: [updatedNote],
+                    notes: [nextNote],
+                    fromShadowToReal: note.isShadow && !nextNote.isShadow
                 }
             });
 
             if (nextData.hasOwnProperty('isFinished')) {
-                if (updatedNote.mode === NotesScreenMode.WithDateTime) {
+                if (nextNote.mode === NotesScreenMode.WithDateTime) {
                     dispatch(getFullCount());
                 }
                 dispatch(renderNotes());
@@ -128,16 +129,17 @@ export function updateNoteDynamic(note, nextData) {
 export function moveNoteForTomorrow(note) {
     return async (dispatch) => {
         try {
-            let updatedNote = await notesService.moveNoteForTomorrow(note);
+            let nextNote = await notesService.moveNoteForTomorrow(note);
 
             dispatch({
                 type: "UPDATE_NOTE_DYNAMIC",
                 payload: {
-                    notes: [updatedNote],
+                    notes: [nextNote],
+                    fromShadowToReal: note.isShadow && !nextNote.isShadow
                 }
             });
 
-            if (updatedNote.mode === NotesScreenMode.WithDateTime) {
+            if (nextNote.mode === NotesScreenMode.WithDateTime) {
                 dispatch(getFullCount());
             }
             dispatch(renderNotes());
@@ -305,7 +307,8 @@ export function updateNotesManualSortIndex(notes) {
             dispatch({
                 type: "UPDATE_NOTE_DYNAMIC",
                 payload: {
-                    notes: insertedNotes
+                    notes: insertedNotes,
+                    fromShadowToReal: true
                 }
             });
 

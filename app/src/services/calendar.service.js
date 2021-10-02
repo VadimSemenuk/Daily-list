@@ -17,18 +17,17 @@ class CalendarService {
         let msIntervalEndDateUTC = convertLocalDateTimeToUTC(msIntervalEndDate).valueOf();
 
         let select = await executeSQL(`
-            SELECT n.date, n.repeatType, rep.value as repeatValue, n.isFinished, n.tags
+            SELECT n.date, n.repeatType, n.repeatItemDate, rep.value as repeatValue, n.isFinished, n.tags
             FROM Notes n
             LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
             WHERE
                 n.lastAction != ? 
                 AND (
                     ((n.repeatType = ? OR n.forkFrom IS NOT NULL) AND n.date >= ? AND n.date <= ?)
-                    OR (n.repeatType = ? AND n.forkFrom IS NULL AND rep.value >= ? AND rep.value <= ?)
-                    OR (n.forkFrom IS NULL AND n.repeatType IN (?, ?))
+                    OR (n.forkFrom IS NULL AND n.repeatType IN (?, ?, ?))
                 )
                 AND n.mode = ?;
-        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Any, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, NoteMode.WithDateTime]);
+        `, [NoteAction.Delete, NoteRepeatType.NoRepeat, msIntervalStartDateUTC, msIntervalEndDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, NoteRepeatType.Any, NoteMode.WithDateTime]);
 
         let dates = {};
         let dateInitial = {
@@ -38,14 +37,12 @@ class CalendarService {
         for (let date = moment(msIntervalStartDate); moment(msIntervalEndDate).isSameOrAfter(date); date = moment(date).add(1, 'day').startOf("day")) {
             dates[date.valueOf()] = {...dateInitial};
         }
-        // console.log(Object.keys(dates).map((date) => moment(+date).format("MMMM DD HH")));
 
         let repeatableDay = 0;
         let repeatableWeek = {};
 
         for (let i = 0; i < select.rows.length; i++) {
             let note = select.rows.item(i);
-            // let date = note.date;
 
             if (
                 noteFilters.tags.length
@@ -57,27 +54,20 @@ class CalendarService {
             if (note.date) {
                 note.date = convertUTCDateTimeToLocal(note.date).valueOf();
             }
+            if (note.repeatItemDate) {
+                note.repeatItemDate = convertUTCDateTimeToLocal(note.repeatItemDate).valueOf();
+            }
             if (note.repeatType === NoteRepeatType.Any) {
                 note.repeatValue = convertUTCDateTimeToLocal(note.repeatValue).valueOf();
             }
 
-            if (note.isFinished) {
-                if (note.repeatType !== NoteRepeatType.NoRepeat) {
-                    dates[note.date].notFinished = dates[note.date].notFinished - 1;
-                }
-                dates[note.date].finished = dates[note.date].finished + 1;
-                continue;
-            }
-
             if (note.date !== null) {
-                if (note.repeatType === NoteRepeatType.NoRepeat) {
-                    // try {
-                    //     dates[note.date].notFinished = dates[note.date].notFinished + 1;
-                    // } catch(err) {
-                    //     console.log(note, date);
-                    // }
-                    dates[note.date].notFinished = dates[note.date].notFinished + 1;
+                if (note.repeatType !== NoteRepeatType.NoRepeat) {
+                    dates[note.repeatItemDate].notFinished = dates[note.repeatItemDate].notFinished - 1;
                 }
+
+                let field = note.isFinished ? 'finished' : 'notFinished';
+                dates[note.date][field] = dates[note.date][field] + 1;
             } else {
                 if (note.repeatType === NoteRepeatType.Week) {
                     repeatableWeek[note.repeatValue] = (repeatableWeek[note.repeatValue] || 0) + 1;
