@@ -254,6 +254,7 @@ class NotesService {
     async addNote(note) {
         let nextNote = {
             ...note,
+            isFinished: false,
             forkFrom: null,
             isShadow: note.repeatType !== NoteRepeatType.NoRepeat,
             manualOrderIndex: null,
@@ -387,13 +388,13 @@ class NotesService {
         return nextNote;
     }
 
-    async updateNote(note, originalNote, noteUpdateType) {
-        let nextNote = {...note};
+    async updateNote(data, originalNote, noteUpdateType) {
+        let nextNote = {...originalNote, ...data};
         nextNote = this.parseNoteValues(nextNote);
 
         if (noteUpdateType === NoteUpdateType.NO_REPEAT) {
             // reset manualOrderIndex on date change
-            if (nextNote.date && originalNote.date && !nextNote.date.isSame(originalNote.date)) {
+            if (!nextNote.date.isSame(originalNote.date)) {
                 nextNote.manualOrderIndex = null;
                 await this.resetNoteManualOrderIndex(nextNote.id);
             }
@@ -407,19 +408,28 @@ class NotesService {
 
             return nextNote;
         } else if (noteUpdateType === NoteUpdateType.REPEAT_TYPE_CHANGE) {
-            let shadowNoteId = nextNote.isShadow ? nextNote.id : nextNote.forkFrom;
+            if (originalNote.repeatType === NoteRepeatType.NoRepeat) {
+                // remove initial note
+                await executeSQL(`DELETE FROM Notes WHERE id = ?`, [originalNote.id]);
 
-            // remove shadow note, set forked as no-repeat
-            await executeSQL(`DELETE FROM Notes WHERE id = ?`, [shadowNoteId]);
-            await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [shadowNoteId]);
-            // TODO: clear notification
+                // TODO: clear notification
+            } else {
+                // remove shadow note and forked not-finished, set forked finished as no-repeat
+                let shadowNoteId = originalNote.isShadow ? originalNote.id : originalNote.forkFrom;
+                await executeSQL(`DELETE FROM Notes WHERE id = ? OR (forkFrom = ? AND isFinished = ?)`, [shadowNoteId, shadowNoteId, Number(false)]);
+                await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [shadowNoteId]);
 
-            await executeSQL(`
-                        UPDATE Notes 
-                        SET repeatType = ?, forkFrom = ?
-                    `, [NoteRepeatType.NoRepeat, null]
-            );
-            // TODO: set notifications for future dates
+                // TODO: clear notification
+
+                // TODO: separate function
+                await executeSQL(`
+                    UPDATE Notes 
+                    SET repeatType = ?, forkFrom = ?
+                    WHERE forkFrom = ? AND isFinished = ?
+                `, [NoteRepeatType.NoRepeat, null, shadowNoteId, Number(true)]
+                );
+                // TODO: set notifications for future dates
+            }
 
             // add new note
             nextNote = await this.addNote(nextNote);
@@ -429,9 +439,6 @@ class NotesService {
         } else if (noteUpdateType === NoteUpdateType.REPEAT_ALL) {
             let shadowNoteId = nextNote.isShadow ? nextNote.id : nextNote.forkFrom;
 
-            console.log(shadowNoteId);
-            console.log(nextNote);
-
             // update all repeat notes
             await update(shadowNoteId, nextNote, false);
 
@@ -440,7 +447,9 @@ class NotesService {
 
             return null;
         } else if (noteUpdateType === NoteUpdateType.REPEAT_CURRENT) {
-            if (nextNote.isShadow) {
+            nextNote.date = moment(originalNote.date);
+
+            if (originalNote.isShadow) {
                 nextNote = await this.fromShadowToReal(nextNote);
             } else {
                 await update(nextNote.id, nextNote, false);
@@ -659,10 +668,12 @@ class NotesService {
     }
 
     parseNoteValues(note) {
-        note.parsedTitle = this.parseClickableItems(note.title);
-        note.contentItems = this.parseNoteContentItems(note.contentItems);
+        let nextNote = {...note};
 
-        return note;
+        nextNote.parsedTitle = this.parseClickableItems(note.title);
+        nextNote.contentItems = this.parseNoteContentItems(note.contentItems);
+
+        return nextNote;
     }
 
     parseNoteContentItems(contentItems) {

@@ -68,18 +68,20 @@ function notes (state = init, action) {
         }
         case 'UPDATE_NOTE': {
             return state
+                // remove original note
                 .map((list) => {
-                    if (!list.date || (list.date.isSame(action.payload.note.date))) {
-                        return {
-                            ...list,
-                            items: [
-                                ...list.items.filter((note) => (note.id !== action.payload.note.id) && (note.id !== action.payload.note.forkFrom)),
-                                action.payload.note
-                            ]
-                        }
+                    if (!list.date || (list.date.isSame(action.payload.originalNote.date))) {
+                        return {...list, items: list.items.filter((note) => note.id !== action.payload.originalNote.id)}
                     }
                     return list
-                });
+                })
+                // add next note
+                .map((list) => {
+                    if (!list.date || (list.date.isSame(action.payload.nextNote.date))) {
+                        return {...list, items: [...list.items, action.payload.nextNote]}
+                    }
+                    return list
+                })
         }
         case 'UPDATE_NOTE_DYNAMIC': {
             let nextState = state.slice();

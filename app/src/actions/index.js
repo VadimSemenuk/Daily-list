@@ -48,10 +48,10 @@ export function addNote(note) {
     }
 }
 
-export function updateNote(note, originalNote, noteUpdateType) {
+export function updateNote(data, originalNote, noteUpdateType) {
     return async (dispatch) => {
         try {
-            let updatedNote = await notesService.updateNote(note, originalNote, noteUpdateType);
+            let updatedNote = await notesService.updateNote(data, originalNote, noteUpdateType);
 
             if (updatedNote === null) {
                 dispatch(updateNotes());
@@ -61,7 +61,8 @@ export function updateNote(note, originalNote, noteUpdateType) {
                 dispatch({
                     type: "UPDATE_NOTE",
                     payload: {
-                        note: updatedNote,
+                        nextNote: updatedNote,
+                        originalNote: originalNote
                     }
                 });
 
@@ -80,9 +81,9 @@ export function updateNote(note, originalNote, noteUpdateType) {
                 {
                     path: "action/index.js -> updateNote()",
                     note: {
-                        ...note,
-                        title: !!note.title,
-                        contentItems: !!note.contentItems
+                        ...data,
+                        title: !!data.title,
+                        contentItems: !!data.contentItems
                     },
                 },
                 window.device.uuid

@@ -45,13 +45,23 @@ class Add extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            note: this.getDefaultNoteData(),
+        let initialDate = moment(this.props.date);
 
+        let mode = this.props.match.path === "/edit" ? "edit" : "add";
+        let note = this.getDefaultNoteData(initialDate);
+
+        if (mode === "edit") {
+            this.originalNote = deepCopy(this.props.location.state.props.note);
+            note = this.getNoteData(this.props.location.state.props.note);
+        }
+
+        this.state = {
+            note: note,
+            calendarValue: initialDate,
             isCalendarOpen: false,
             isRepeatTypeSelectModalOpen: false,
             isNotificationWasUnchecked: false,
-            mode: 'add',
+            mode: mode,
             calendarPeriod: null,
             busyTimePeriods: [],
             isSaveTypeModalVisible: false
@@ -63,7 +73,25 @@ class Add extends Component {
         this.saveTypeSelectResolve = null;
     }
 
-    getDefaultNoteData = () => {
+    getNoteData = (originalNote) => {
+        let note = deepCopy(originalNote);
+
+        return {
+            title: note.title,
+            contentItems: note.contentItems,
+            isNotificationEnabled: note.isNotificationEnabled,
+            startTime: note.startTime,
+            endTime: note.endTime,
+            tag: note.tag,
+            date: note.repeatType === NoteRepeatType.NoRepeat ? note.date : null,
+            repeatType: note.repeatType,
+            repeatValues: note.repeatValues,
+            mode: note.mode,
+            tags: note.tags
+        }
+    }
+
+    getDefaultNoteData = (initialDate) => {
         return {
             title: "",
             contentItems: [],
@@ -71,8 +99,7 @@ class Add extends Component {
             startTime: null,
             endTime: null,
             tag: 'transparent',
-            date: moment(this.props.date),
-            isFinished: false,
+            date: moment(initialDate),
             repeatType: NoteRepeatType.NoRepeat,
             repeatValues: [],
             mode: this.props.settings.notesScreenMode,
@@ -81,15 +108,7 @@ class Add extends Component {
     }
 
     async componentDidMount() {
-        if (this.props.match.path === "/edit") {
-            this.setState({
-                note: deepCopy(this.props.location.state.props.note),
-                mode: 'edit'
-            });
-            this.prevNote = deepCopy(this.props.location.state.props.note);
-        }
-
-        if (this.props.match.path === "/add") {
+        if (this.state.mode === "add") {
             if (this.props.location.state && this.props.location.state.props.tagsSelected.length && this.props.location.state.props.tagsSelected.length) {
                 await this.updateNoteData({tags: this.props.location.state.props.tagsSelected.map((id) => this.props.tags.find((tag) => tag.id === id))});
             }
@@ -108,6 +127,10 @@ class Add extends Component {
     }
 
     getBusyTimePeriods = async () => {
+        if (!this.state.note.date) {
+            return [];
+        }
+
         let notes = (await notesService.getNotesWithTime([this.state.note.date]))[0].items;
         return notes
             .filter((note) => note.startTime && note.endTime && (note.id !== this.state.note.id))
@@ -302,17 +325,6 @@ class Add extends Component {
         }
     };
 
-    updateNoteData = async (nextData) => {
-        await new Promise((resolve) => {
-            this.setState({
-                note: {
-                    ...this.state.note,
-                    ...nextData
-                }
-            }, resolve);
-        });
-    }
-
     addImage = async (sourceType) => {
         let url = await this.getPicture(sourceType)
             .catch((err) => {
@@ -340,7 +352,7 @@ class Add extends Component {
         });
     }
 
-    getNoteData = () => {
+    getSubmitData = () => {
         let contentItems = this.state.note.contentItems.filter((a) => a !== null);
         return {
             ...this.state.note,
@@ -349,48 +361,39 @@ class Add extends Component {
     };
 
     submit = async () => {
-        let note = this.getNoteData();
+        let data = this.getSubmitData();
 
         if (this.state.mode === "add") {
-            await this.add(note);
+            await this.add(data);
         } else {
-            await this.update(note);
+            await this.update(data);
         }
 
         this.props.history.goBack();
     };
 
     add = async (note) => {
-        note.date = this.state.note.repeatType === NoteRepeatType.NoRepeat ? note.date : null;
-
         await this.props.addNote(note);
     }
 
-    update = async (note) => {
-        if (note.repeatType === NoteRepeatType.NoRepeat && this.prevNote.repeatType === NoteRepeatType.NoRepeat) {
+    update = async (data) => {
+        if (data.repeatType === NoteRepeatType.NoRepeat && this.originalNote.repeatType === NoteRepeatType.NoRepeat) {
             // no-repeat
-            await this.props.updateNote(note, this.prevNote, NoteUpdateType.NO_REPEAT);
+            await this.props.updateNote(data, this.originalNote, NoteUpdateType.NO_REPEAT);
         } else if (
-            (note.repeatType !== this.prevNote.repeatType)
-            || (JSON.stringify(note.repeatValues.sort()) !== JSON.stringify(this.prevNote.repeatValues.sort()))
+            (data.repeatType !== this.originalNote.repeatType)
+            || (JSON.stringify(data.repeatValues.sort()) !== JSON.stringify(this.originalNote.repeatValues.sort()))
         ) {
             // repeat type change
-            note.date = this.state.note.repeatType === NoteRepeatType.NoRepeat ? note.date : null;
-
-            await this.props.updateNote(note, this.prevNote, NoteUpdateType.REPEAT_TYPE_CHANGE);
+            await this.props.updateNote(data, this.originalNote, NoteUpdateType.REPEAT_TYPE_CHANGE);
         } else {
             // repeat
             let updateType = await this.selectNoteUpdateType();
-
-            if (updateType === NoteUpdateType.REPEAT_ALL) {
-                note.date = null;
-            } else if (updateType === NoteUpdateType.REPEAT_CURRENT) {
-                note.date = moment(this.prevNote.date);
-            } else {
+            if (!updateType) {
                 return;
             }
 
-            await this.props.updateNote(note, this.prevNote, updateType);
+            await this.props.updateNote(data, this.originalNote, updateType);
         }
     }
 
@@ -475,12 +478,32 @@ class Add extends Component {
     }
 
     onDateSet = async (date) => {
-        await this.updateNoteData({date});
+        await this.updateNoteData({date: moment(date)});
+        await this.setState({calendarValue: moment(date)})
         if (this.state.note.repeatType === NoteRepeatType.NoRepeat) {
             this.setState({
                 busyTimePeriods: await this.getBusyTimePeriods()
             });
         }
+    }
+
+    onRepeatTypeChange = async (data) => {
+        await this.updateNoteData({
+            repeatType: data.repeatType,
+            repeatValues: data.repeatValues,
+            date: data.repeatType === NoteRepeatType.NoRepeat ? moment(this.state.calendarValue) : null
+        });
+    }
+
+    updateNoteData = async (nextData) => {
+        await new Promise((resolve) => {
+            this.setState({
+                note: {
+                    ...this.state.note,
+                    ...nextData
+                }
+            }, resolve);
+        });
     }
 
     onContentWrapperClick = (e) => {
@@ -538,7 +561,7 @@ class Add extends Component {
                             img: CheckedImg
                         }
                     ]}
-                    title={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && this.state.note.date && this.state.note.date.format('DD MMMM YYYY')}
+                    title={(this.props.settings.notesScreenMode === NotesScreenMode.WithDateTime) && this.state.calendarValue && this.state.calendarValue.format('DD MMMM YYYY')}
                 />
                 {
                     this.state.isCalendarOpen &&
@@ -549,7 +572,7 @@ class Add extends Component {
                         }
 
                         <Calendar
-                            currentDate={this.state.note.date}
+                            currentDate={this.state.calendarValue}
                             calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                             onDateSet={this.onDateSet}
                             onCloseRequest={this.triggerCalendar}
@@ -690,12 +713,12 @@ class Add extends Component {
 
                                         <RepeatTypeSelectModal
                                             isOpen={this.state.isRepeatTypeSelectModalOpen}
-                                            defaultDate={moment(this.state.note.date)}
+                                            defaultDate={moment(this.state.calendarValue)}
                                             repeatType={this.state.note.repeatType}
                                             repeatValues={this.state.note.repeatValues}
                                             calendarNotesCounterMode={this.props.settings.calendarNotesCounterMode}
                                             onSubmit={async (data) => {
-                                                await this.updateNoteData({repeatType: data.repeatType, repeatValues: data.repeatValues});
+                                                await this.onRepeatTypeChange(data);
 
                                                 if (this.state.isCalendarOpen) {
                                                     this.setState({
