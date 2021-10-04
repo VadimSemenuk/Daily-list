@@ -48,20 +48,26 @@ export function addNote(note) {
     }
 }
 
-export function updateNote(note, prevNote) {
+export function updateNote(note, originalNote, noteUpdateType) {
     return async (dispatch) => {
         try {
-            let updatedNote = await notesService.updateNote(note, prevNote);
+            let updatedNote = await notesService.updateNote(note, originalNote, noteUpdateType);
 
-            dispatch({
-                type: "UPDATE_NOTE",
-                payload: {
-                    note: updatedNote,
-                }
-            });
+            if (updatedNote === null) {
+                dispatch(updateNotes());
 
-            if (updatedNote.mode === NotesScreenMode.WithDateTime) {
                 dispatch(getFullCount());
+            } else {
+                dispatch({
+                    type: "UPDATE_NOTE",
+                    payload: {
+                        note: updatedNote,
+                    }
+                });
+
+                if (updatedNote.mode === NotesScreenMode.WithDateTime) {
+                    dispatch(getFullCount());
+                }
             }
 
             dispatch(saveBackup());

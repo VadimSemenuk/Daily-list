@@ -31,9 +31,15 @@ import WarningImg from "../../assets/img/warning.svg";
 
 import deepCopy from '../../utils/deepCopyObject'
 
-import {NoteContentItemType, NoteRepeatType, NotesScreenMode} from "../../constants";
+import {
+    NoteContentItemType,
+    NoteRepeatType,
+    NotesScreenMode,
+    NoteUpdateType,
+} from "../../constants";
 
 import './Add.scss';
+import Modal from "../../components/Modal/Modal";
 
 class Add extends Component {
     constructor(props) {
@@ -47,11 +53,14 @@ class Add extends Component {
             isNotificationWasUnchecked: false,
             mode: 'add',
             calendarPeriod: null,
-            busyTimePeriods: []
+            busyTimePeriods: [],
+            isSaveTypeModalVisible: false
         };
 
         this.repeatTypeOptions = notesService.getRepeatTypeOptions();
         this.tags = notesService.getTags();
+
+        this.saveTypeSelectResolve = null;
     }
 
     getDefaultNoteData = () => {
@@ -335,25 +344,55 @@ class Add extends Component {
         let contentItems = this.state.note.contentItems.filter((a) => a !== null);
         return {
             ...this.state.note,
-            contentItems
+            contentItems,
         }
     };
 
     submit = async () => {
         let note = this.getNoteData();
 
-        if (note.repeatType !== NoteRepeatType.NoRepeat) {
-            note.date = null;
-        }
-
-        if (this.state.mode === "edit") {
-            await this.props.updateNote(note, this.prevNote);
+        if (this.state.mode === "add") {
+            await this.add(note);
         } else {
-            await this.props.addNote(note);
+            await this.update(note);
         }
 
         this.props.history.goBack();
     };
+
+    add = async (note) => {
+        note.date = this.state.note.repeatType === NoteRepeatType.NoRepeat ? note.date : null;
+
+        await this.props.addNote(note);
+    }
+
+    update = async (note) => {
+        if (note.repeatType === NoteRepeatType.NoRepeat && this.prevNote.repeatType === NoteRepeatType.NoRepeat) {
+            // no-repeat
+            await this.props.updateNote(note, this.prevNote, NoteUpdateType.NO_REPEAT);
+        } else if (
+            (note.repeatType !== this.prevNote.repeatType)
+            || (JSON.stringify(note.repeatValues.sort()) !== JSON.stringify(this.prevNote.repeatValues.sort()))
+        ) {
+            // repeat type change
+            note.date = this.state.note.repeatType === NoteRepeatType.NoRepeat ? note.date : null;
+
+            await this.props.updateNote(note, this.prevNote, NoteUpdateType.REPEAT_TYPE_CHANGE);
+        } else {
+            // repeat
+            let updateType = await this.selectNoteUpdateType();
+
+            if (updateType === NoteUpdateType.REPEAT_ALL) {
+                note.date = null;
+            } else if (updateType === NoteUpdateType.REPEAT_CURRENT) {
+                note.date = moment(this.prevNote.date);
+            } else {
+                return;
+            }
+
+            await this.props.updateNote(note, this.prevNote, updateType);
+        }
+    }
 
     scrollToBottom = () => {
         let el = document.querySelector(".add-content-wrapper");
@@ -459,6 +498,19 @@ class Add extends Component {
                 || (this.state.note.endTime && (period[0].isSameOrBefore(this.state.note.endTime)) && (period[1].isSameOrAfter(this.state.note.endTime)))
                 || ((period[0].isSameOrAfter(this.state.note.startTime)) && this.state.note.endTime && (period[1].isSameOrBefore(this.state.note.endTime)))
             ));
+    }
+
+    selectNoteUpdateType = async () => {
+        this.setState({
+            isSaveTypeModalVisible: true
+        });
+        let repeatNoteUpdateType = await new Promise((resolve) => this.saveTypeSelectResolve = resolve);
+        this.setState({
+            isSaveTypeModalVisible: false
+        });
+        this.saveTypeSelectResolve = null;
+
+        return repeatNoteUpdateType;
     }
 
     render() {
@@ -747,6 +799,22 @@ class Add extends Component {
                         </div>
                     </div>
                 </div>
+
+                <Modal
+                    isOpen={this.state.isSaveTypeModalVisible}
+                    onRequestClose={() => this.saveTypeSelectResolve(null)}
+                >
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("repeat-note-save-type-current")}
+                        onClick={() => this.saveTypeSelectResolve(NoteUpdateType.REPEAT_CURRENT)}
+                    />
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("repeat-note-save-type-all")}
+                        onClick={() => this.saveTypeSelectResolve(NoteUpdateType.REPEAT_ALL)}
+                    />
+                </Modal>
             </div>
         );
     }

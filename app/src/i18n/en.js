@@ -122,6 +122,8 @@ export default {
     "move-tomorrow": "Move for tomorrow",
     "finished-split": "Finished",
     "reorder-fail": "Failed to move note",
+    "repeat-note-save-type-current": "Update only current",
+    "repeat-note-save-type-all": "Update everything in the chain",
 
     // add
     "notify": "Remind",

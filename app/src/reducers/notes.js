@@ -1,3 +1,4 @@
+import moment from "moment";
 import {NoteRepeatType} from "../constants";
 
 let init = [];
@@ -9,7 +10,7 @@ function getReceiveNoteFn(note) {
             ...list.items, 
             {
                 ...note,
-                date: list.date
+                date: moment(list.date)
             }
         ] 
     });
@@ -68,15 +69,17 @@ function notes (state = init, action) {
         case 'UPDATE_NOTE': {
             return state
                 .map((list) => {
-                    return {
-                        ...list,
-                        items: list.items.filter((note) => (
-                            (note.id !== action.payload.note.id) &&
-                            (note.forkFrom !== action.payload.note.id)
-                        ))
+                    if (!list.date || (list.date.isSame(action.payload.note.date))) {
+                        return {
+                            ...list,
+                            items: [
+                                ...list.items.filter((note) => (note.id !== action.payload.note.id) && (note.id !== action.payload.note.forkFrom)),
+                                action.payload.note
+                            ]
+                        }
                     }
-                })
-                .map(getReceiveNoteFn(action.payload.note));
+                    return list
+                });
         }
         case 'UPDATE_NOTE_DYNAMIC': {
             let nextState = state.slice();

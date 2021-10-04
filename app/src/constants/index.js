@@ -64,3 +64,10 @@ export const SortDirectionType = {
     DESC: 1,
     ASC: 2
 };
+
+export const NoteUpdateType = {
+    NO_REPEAT: 1,
+    REPEAT_TYPE_CHANGE: 2,
+    REPEAT_CURRENT: 3,
+    REPEAT_ALL: 4
+};

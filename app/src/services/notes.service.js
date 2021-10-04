@@ -1,7 +1,13 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
 import notificationService from "./notification.service";
-import {NoteAction, NoteContentItemType, NoteMode, NoteRepeatType} from "../constants";
+import {
+    NoteAction,
+    NoteContentItemType,
+    NoteMode,
+    NoteRepeatType,
+    NoteUpdateType,
+} from "../constants";
 import tagsService from "./tags.service";
 import {convertUTCDateTimeToLocal, convertLocalDateTimeToUTC} from "../utils/convertDateTimeLocale";
 
@@ -175,6 +181,7 @@ class NotesService {
         let selects = await Promise.all(
             dates.map((date) => {
                 let msDateUTC = convertLocalDateTimeToUTC(date).valueOf();
+                let msDateUTCDayEnd = convertLocalDateTimeToUTC(date).endOf("day").valueOf();
                 return executeSQL(
                     `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags,
                     n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
@@ -184,18 +191,18 @@ class NotesService {
                     WHERE
                         n.lastAction != ?
                         AND (
-                            n.date = ?
+                            (n.date >= ? AND n.date <= ?)
                             OR (
-                                n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND repeatItemDate = ?)
+                                n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND (date >= ? AND date <= ?))
                                 AND (
                                     n.repeatType = ?
                                     OR (n.repeatType = ? AND rep.value = ?)
-                                    OR (n.repeatType = ? AND rep.value = ?)
+                                    OR (n.repeatType = ? AND (rep.value >= ? AND rep.value <= ?))
                                 )
                             )
                         )
                         AND n.mode == ?;`,
-                    [NoteAction.Delete, msDateUTC, msDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, date.isoWeekday(), NoteRepeatType.Any, msDateUTC, NoteMode.WithDateTime]
+                    [NoteAction.Delete, msDateUTC, msDateUTCDayEnd, msDateUTC, msDateUTCDayEnd, NoteRepeatType.Day, NoteRepeatType.Week, date.isoWeekday(), NoteRepeatType.Any, msDateUTC, msDateUTCDayEnd, NoteMode.WithDateTime]
                 );
             })
         );
@@ -380,53 +387,93 @@ class NotesService {
         return nextNote;
     }
 
-    async updateNote(note, prevNote) {
+    async updateNote(note, originalNote, noteUpdateType) {
         let nextNote = {...note};
-        if (prevNote.repeatType !== NoteRepeatType.NoRepeat) {
-            if (!nextNote.isShadow) {
-                nextNote.id = nextNote.forkFrom;
-            }
-            await executeSQL(`DELETE FROM Notes WHERE forkFrom = ?`, [nextNote.id]);
-        }
-        nextNote.isShadow = nextNote.repeatType !== NoteRepeatType.NoRepeat;
-        nextNote.forkFrom = null;
-        nextNote.isFinished = false;
-
-        if ((nextNote.repeatType !== NoteRepeatType.NoRepeat) || (nextNote.date && prevNote.date && !note.date.isSame(prevNote.date))) {
-            nextNote.manualOrderIndex = null;
-            await this.resetNoteManualOrderIndex(nextNote.id);
-        }
-
         nextNote = this.parseNoteValues(nextNote);
 
-        await executeSQL(
-            `UPDATE Notes
-            SET title = ?, date = ?, startTime = ?, endTime = ?, isNotificationEnabled = ?, tag = ?, repeatType = ?, 
-                contentItems = ?, isFinished = ?, tags = ?
-            WHERE id = ?;`,
-            [
-                nextNote.title,
-                nextNote.date ? (nextNote.isShadow ? null : convertLocalDateTimeToUTC(nextNote.date).valueOf()) : null,
-                nextNote.startTime ? convertLocalDateTimeToUTC(nextNote.startTime, "second").valueOf() : nextNote.startTime,
-                nextNote.endTime ? convertLocalDateTimeToUTC(nextNote.endTime, "second").valueOf() : nextNote.endTime,
-                Number(nextNote.isNotificationEnabled),
-                nextNote.tag,
-                nextNote.repeatType,
-                JSON.stringify(nextNote.contentItems),
-                Number(nextNote.isFinished),
-                note.tags.map((tag) => tag.id).join(","),
-                nextNote.id,
-            ]
-        );
+        if (noteUpdateType === NoteUpdateType.NO_REPEAT) {
+            // reset manualOrderIndex on date change
+            if (nextNote.date && originalNote.date && !nextNote.date.isSame(originalNote.date)) {
+                nextNote.manualOrderIndex = null;
+                await this.resetNoteManualOrderIndex(nextNote.id);
+            }
 
-        await this.addNoteRepeatValues(nextNote);
+            await update(nextNote.id, nextNote, true);
 
-        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+            nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
-        notificationService.clear({...prevNote, id: nextNote.id});
-        nextNote.isNotificationEnabled && notificationService.set(nextNote);
+            notificationService.clear({...originalNote, id: nextNote.id});
+            nextNote.isNotificationEnabled && notificationService.set(nextNote);
 
-        return nextNote;
+            return nextNote;
+        } else if (noteUpdateType === NoteUpdateType.REPEAT_TYPE_CHANGE) {
+            let shadowNoteId = nextNote.isShadow ? nextNote.id : nextNote.forkFrom;
+
+            // remove shadow note, set forked as no-repeat
+            await executeSQL(`DELETE FROM Notes WHERE id = ?`, [shadowNoteId]);
+            await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [shadowNoteId]);
+            // TODO: clear notification
+
+            await executeSQL(`
+                        UPDATE Notes 
+                        SET repeatType = ?, forkFrom = ?
+                    `, [NoteRepeatType.NoRepeat, null]
+            );
+            // TODO: set notifications for future dates
+
+            // add new note
+            nextNote = await this.addNote(nextNote);
+            await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+            return null;
+        } else if (noteUpdateType === NoteUpdateType.REPEAT_ALL) {
+            let shadowNoteId = nextNote.isShadow ? nextNote.id : nextNote.forkFrom;
+
+            console.log(shadowNoteId);
+            console.log(nextNote);
+
+            // update all repeat notes
+            await update(shadowNoteId, nextNote, false);
+
+            // TODO: update note last action
+            // TODO: update notifications
+
+            return null;
+        } else if (noteUpdateType === NoteUpdateType.REPEAT_CURRENT) {
+            if (nextNote.isShadow) {
+                nextNote = await this.fromShadowToReal(nextNote);
+            } else {
+                await update(nextNote.id, nextNote, false);
+            }
+
+            nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+            notificationService.clear({...originalNote, id: nextNote.id});
+            nextNote.isNotificationEnabled && notificationService.set(nextNote);
+
+            return nextNote;
+        }
+
+        function update(id, note, updateDate) {
+            return executeSQL(
+                `UPDATE Notes
+                        SET title = ?, contentItems = ?,${updateDate ? " date = ?," : ""} startTime = ?, endTime = ?, isNotificationEnabled = ?, repeatType = ?, tag = ?, tags = ?
+                        WHERE id = ? OR forkFrom = ?;`,
+                [
+                    note.title,
+                    JSON.stringify(note.contentItems),
+                    ...(updateDate ? [note.date ? convertLocalDateTimeToUTC(note.date, "second").valueOf() : note.date] : []),
+                    note.startTime ? convertLocalDateTimeToUTC(note.startTime, "second").valueOf() : note.startTime,
+                    note.endTime ? convertLocalDateTimeToUTC(note.endTime, "second").valueOf() : note.endTime,
+                    Number(note.isNotificationEnabled),
+                    note.repeatType,
+                    note.tag,
+                    note.tags.map((tag) => tag.id).join(","),
+                    id,
+                    id
+                ]
+            );
+        }
     }
 
     async deleteNote(note) {

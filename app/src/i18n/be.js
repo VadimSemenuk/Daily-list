@@ -122,6 +122,8 @@ export default {
     "move-tomorrow": "Перамясціць на заўтра",
     "finished-split": "Завершаныя",
     "reorder-fail": "Не атрымалася перанесьці заметку",
+    "repeat-note-save-type-current": "Обновить только текущую",
+    "repeat-note-save-type-all": "Обновить все в цепочке",
 
     // add
     "notify": "Нагадаць",
