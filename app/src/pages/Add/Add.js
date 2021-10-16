@@ -40,6 +40,7 @@ import {
 
 import './Add.scss';
 import Modal from "../../components/Modal/Modal";
+import {getTime} from "../../utils/timeFromDateTime";
 
 class Add extends Component {
     constructor(props) {
@@ -432,13 +433,13 @@ class Add extends Component {
                 window.cordova.plugins.DateTimePicker.show({
                     mode: 'time',
                     date: (this.state.note[field] || moment()).toDate(),
-                    success: (data) => resolve(moment(data)),
+                    success: (data) => resolve(getTime(moment(data))),
                     cancel: () => this.resetTime(field),
                     error: (err) => reject(err)
                 })
             });
         } else {
-            dateTime = moment()
+            dateTime = getTime(moment());
             if (field === 'endTime') {
                 dateTime.add(1, 'hour');
             }

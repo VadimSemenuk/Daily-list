@@ -6,9 +6,10 @@ import {
 } from "../../../constants";
 import getDefaultLanguage from "../../../utils/getDefaultLanguage";
 import i18n from "../../../i18n";
-import {convertLocalDateTimeToUTC} from "../../../utils/convertDateTimeLocale";
+import {convertLocalDateTimeToUTC, convertUTCDateTimeToLocal} from "../../../utils/convertDateTimeLocale";
 import moment from "moment";
 import NoteDragHelp from "../../../assets/img/note-drag-help.png";
+import {getTime} from "../../../utils/timeFromDateTime";
 
 export default {
     name: "1.10",
@@ -16,6 +17,7 @@ export default {
     async run(isUpdate, lastMigrationName) {
         await alterSettingsTable();
         await alterNotesTable();
+        await updateNoteStartEndTime();
 
         if (isUpdate && lastMigrationName === "1.7") {
             // await addUpdatesNote();
@@ -163,6 +165,56 @@ export default {
             `);
 
             await executeSQL(`DROP TABLE Notes_OLD;`);
+        }
+
+        async function updateNoteStartEndTime() {
+            let select = await executeSQL(`SELECT id, startTime, endTime from Notes WHERE startTime IS NOT NULL OR endTime IS NOT NULL;`);
+
+            let startTimeData = [];
+            let endTimeData = [];
+            for(let i = 0; i < select.rows.length; i++) {
+                let item = select.rows.item(i);
+
+                if (item.startTime !== null) {
+                    startTimeData.push({
+                        id: item.id,
+                        startTime: convertLocalDateTimeToUTC(getTime(convertUTCDateTimeToLocal(item.startTime, "minute")), "minute").valueOf()
+                    });
+                }
+
+                if (item.endTime !== null) {
+                    endTimeData.push({
+                        id: item.id,
+                        endTime: convertLocalDateTimeToUTC(getTime(convertUTCDateTimeToLocal(item.endTime, "minute")), "minute").valueOf()
+                    });
+                }
+            }
+
+            if (startTimeData.length !== 0) {
+                let sql = `
+                    UPDATE Notes
+                    SET startTime = CASE id
+                    ${startTimeData.map((dataItem) => `WHEN ${dataItem.id} THEN "${dataItem.startTime}"`).join(" ")}
+                    ELSE startTime
+                    END
+                    WHERE id IN(${startTimeData.map((dataItem) => dataItem.id).join(",")})
+                `;
+
+                await executeSQL(sql);
+            }
+
+            if (endTimeData.length !== 0) {
+                let sql = `
+                    UPDATE Notes
+                    SET endTime = CASE id
+                    ${endTimeData.map((dataItem) => `WHEN ${dataItem.id} THEN "${dataItem.endTime}"`).join(" ")}
+                    ELSE endTime
+                    END
+                    WHERE id IN(${endTimeData.map((dataItem) => dataItem.id).join(",")})
+                `;
+
+                await executeSQL(sql);
+            }
         }
 
         async function addUpdatesNote() {

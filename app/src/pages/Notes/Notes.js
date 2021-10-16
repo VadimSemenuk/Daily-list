@@ -388,8 +388,8 @@ function filter(items, settings) {
 function sort(items, settings) {
     if (settings.notesScreenMode === NotesScreenMode.WithDateTime && settings.sortType === SortType.TimeSort) {
         items.sort((a, b) => {
-            let aVal = a.startTime ? (a.startTime.valueOf() - moment(a.startTime).startOf('day').valueOf()) : 0;
-            let bVal = b.startTime ? (b.startTime.valueOf() - moment(b.startTime).startOf('day').valueOf()) : 0;
+            let aVal = a.startTime || 0;
+            let bVal = b.startTime || 0;
 
             return settings.sortDirection === SortDirectionType.ASC ? aVal - bVal : bVal - aVal;
         });
