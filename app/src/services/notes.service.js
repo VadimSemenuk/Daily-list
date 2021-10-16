@@ -184,7 +184,7 @@ class NotesService {
                 let msDateUTCDayEnd = convertLocalDateTimeToUTC(date).endOf("day").valueOf();
                 return executeSQL(
                     `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags,
-                    n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime,
+                    n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime, n.repeatItemDate,
                     (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
                     FROM Notes n
                     LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
@@ -193,7 +193,7 @@ class NotesService {
                         AND (
                             (n.date >= ? AND n.date <= ?)
                             OR (
-                                n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND (date >= ? AND date <= ?))
+                                n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND (repeatItemDate >= ? AND repeatItemDate <= ?))
                                 AND (
                                     n.repeatType = ?
                                     OR (n.repeatType = ? AND rep.value = ?)
