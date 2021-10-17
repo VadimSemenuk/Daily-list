@@ -126,3 +126,14 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+
+.note-actions-modal {
+    .note-action-move {
+        button {
+            margin-left: 10px;
+        }
+        button:first-of-type {
+            margin-left: 20px;
+        }
+    }
+}

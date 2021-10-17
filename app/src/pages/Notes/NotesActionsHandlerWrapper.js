@@ -12,9 +12,8 @@ import deepCopyObject from "../../utils/deepCopyObject";
 import {NoteRepeatType} from "../../constants";
 
 import Modal from "../../components/Modal/Modal";
-import {ButtonListItem} from "../../components/ListItem/ListItem";
+import {ButtonListItem, ListItem} from "../../components/ListItem/ListItem";
 import Fab from "../../components/Fab/Fab";
-import {moveNoteForDate} from "../../actions";
 
 class NotesActionsHandlerWrapper extends PureComponent {
     constructor(props) {
@@ -120,6 +119,7 @@ class NotesActionsHandlerWrapper extends PureComponent {
                     onDialogRequest={this.openDialog}
                 />
                 <Modal
+                    className={"note-actions-modal"}
                     isOpen={this.state.isListItemDialogVisible}
                     onRequestClose={this.closeDialog}
                 >
@@ -138,15 +138,21 @@ class NotesActionsHandlerWrapper extends PureComponent {
                         text={t("do-copy")}
                         onClick={this.onNoteCopyRequest}
                     />
-                    <ButtonListItem
-                        className="no-border"
-                        text={t("move-tomorrow")}
-                        onClick={this.onNoteMoveForTomorrow}
-                    />
-                    <ButtonListItem
-                        className="no-border"
-                        text={t("move-yesterday")}
-                        onClick={this.onNoteMoveForYesterday}
+                    <ListItem
+                        className={"note-action-move"}
+                        text={t("move-for-date") + ":"}
+                        ValElement={() => (
+                            <React.Fragment>
+                                <button
+                                    className="text block"
+                                    onClick={this.onNoteMoveForYesterday}
+                                >{t("yesterday")}</button>
+                                <button
+                                    className="text block"
+                                    onClick={this.onNoteMoveForTomorrow}
+                                >{t("tomorrow")}</button>
+                            </React.Fragment>
+                        )}
                     />
                     {
                         this.state.listItemDialogData && (this.state.listItemDialogData.note.repeatType !== NoteRepeatType.NoRepeat) &&

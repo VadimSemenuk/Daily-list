@@ -69,7 +69,7 @@ export let ButtonListItem = (props) => (
 
 export let ListItem = (props) => (
     <div 
-        className={`list-item ${props.className}`}
+        className={`list-item${props.className ? " " + props.className : ""}`}
         style={props.style}                              
     >
         <span className="list-item-text">{props.text}</span>
