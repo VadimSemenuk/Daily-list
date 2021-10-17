@@ -118,6 +118,10 @@ class Note extends PureComponent {
                                 />
                             </div>
                         }
+                        {
+                            this.props.data.repeatItemDate !== null && !this.props.data.date.isSame(this.props.data.repeatItemDate) &&
+                            <div className="moved-from-date">Перенесено с {this.props.data.repeatItemDate.format('DD.MM')}</div>
+                        }
                     </div>
                     <div className="title-wrapper">
                         {!!this.props.data.title && <div className="note-title">{this.props.data.title}</div>}

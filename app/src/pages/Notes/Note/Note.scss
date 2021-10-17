@@ -50,9 +50,9 @@
             }
             .note-header-time-divider {
                 display: inline-block;
-                padding: 0 5px;
+                padding: 0 3px;
                 font-size: 11px;
-                color: #6f6868; 
+                color: #6f6868;
             }
 
             .notification-identifier {
@@ -63,6 +63,12 @@
             .repeat-identifier {
                 height: 12px;
                 display: block;
+                margin-right: 10px;
+            }
+
+            .moved-from-date {
+                font-size: 11px;
+                color: #6f6868;
             }
 
             .tags-wrapper {
