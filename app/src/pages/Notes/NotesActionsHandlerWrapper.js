@@ -14,6 +14,7 @@ import {NoteRepeatType} from "../../constants";
 import Modal from "../../components/Modal/Modal";
 import {ButtonListItem} from "../../components/ListItem/ListItem";
 import Fab from "../../components/Fab/Fab";
+import {moveNoteForDate} from "../../actions";
 
 class NotesActionsHandlerWrapper extends PureComponent {
     constructor(props) {
@@ -48,7 +49,12 @@ class NotesActionsHandlerWrapper extends PureComponent {
     };
 
     onNoteMoveForTomorrow = () => {
-        this.props.moveNoteForTomorrow(this.state.listItemDialogData.note);
+        this.props.moveNoteForDate(this.state.listItemDialogData.note, moment(this.state.listItemDialogData.note.date).add(1, "day").startOf("day"));
+        this.closeDialog();
+    }
+
+    onNoteMoveForYesterday = () => {
+        this.props.moveNoteForDate(this.state.listItemDialogData.note, moment(this.state.listItemDialogData.note.date).subtract(1, "day").startOf("day"));
         this.closeDialog();
     }
 
@@ -140,7 +146,7 @@ class NotesActionsHandlerWrapper extends PureComponent {
                     <ButtonListItem
                         className="no-border"
                         text={t("move-yesterday")}
-                        onClick={this.onNoteMoveForTomorrow}
+                        onClick={this.onNoteMoveForYesterday}
                     />
                     {
                         this.state.listItemDialogData && (this.state.listItemDialogData.note.repeatType !== NoteRepeatType.NoRepeat) &&

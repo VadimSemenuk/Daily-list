@@ -133,10 +133,10 @@ export function updateNoteDynamic(note, nextData) {
     }
 }
 
-export function moveNoteForTomorrow(note) {
+export function moveNoteForDate(note, date) {
     return async (dispatch) => {
         try {
-            let nextNote = await notesService.moveNoteForTomorrow(note);
+            let nextNote = await notesService.moveNoteForDate(note, date);
 
             dispatch({
                 type: "UPDATE_NOTE_DYNAMIC",
@@ -149,7 +149,6 @@ export function moveNoteForTomorrow(note) {
             if (nextNote.mode === NotesScreenMode.WithDateTime) {
                 dispatch(getFullCount());
             }
-            // dispatch(renderNotes());
 
             dispatch(saveBackup());
 

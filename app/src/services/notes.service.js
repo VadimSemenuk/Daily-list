@@ -331,18 +331,16 @@ class NotesService {
         `, values);
     }
 
-    async moveNoteForTomorrow(note) {
+    async moveNoteForDate(note, date) {
         let nextNote = {...note};
 
         if (nextNote.isShadow) {
             nextNote = await this.fromShadowToReal(nextNote);
         }
 
-        let nextDate = moment(note.date).add(1, "day");
-
         nextNote = {
             ...nextNote,
-            date: nextDate,
+            date: moment(date),
             manualOrderIndex: null
         }
 
@@ -351,8 +349,8 @@ class NotesService {
             SET date = ?, manualOrderIndex = ?
             WHERE id = ?;`,
             [
-                convertLocalDateTimeToUTC(nextDate).valueOf(),
-                null,
+                convertLocalDateTimeToUTC(nextNote.date).valueOf(),
+                nextNote.manualOrderIndex,
                 nextNote.id
             ]
         );
