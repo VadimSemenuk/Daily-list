@@ -120,6 +120,8 @@ export default {
     "delete": "Выдаліць",
     "do-copy": "Капіяваць",
     "move-tomorrow": "Перамясціць на заўтра",
+    "move-yesterday": "Перамясціць на ўчора",
+    "finish-repeat": "Завяршыць паўтор на бягучай задачы",
     "finished-split": "Завершаныя",
     "reorder-fail": "Не атрымалася перанесьці заметку",
     "repeat-note-save-type-current": "Обновить только текущую",

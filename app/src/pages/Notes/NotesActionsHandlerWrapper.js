@@ -78,6 +78,11 @@ class NotesActionsHandlerWrapper extends PureComponent {
         });
     };
 
+    setNoteRepeatEndDate = async () => {
+        this.props.setNoteRepeatEndDate(this.state.listItemDialogData.note);
+        this.closeDialog();
+    }
+
     openDialog = (data) => {
         this.setState({
             isListItemDialogVisible: true,
@@ -132,6 +137,19 @@ class NotesActionsHandlerWrapper extends PureComponent {
                         text={t("move-tomorrow")}
                         onClick={this.onNoteMoveForTomorrow}
                     />
+                    <ButtonListItem
+                        className="no-border"
+                        text={t("move-yesterday")}
+                        onClick={this.onNoteMoveForTomorrow}
+                    />
+                    {
+                        this.state.listItemDialogData && (this.state.listItemDialogData.note.repeatType !== NoteRepeatType.NoRepeat) &&
+                        <ButtonListItem
+                            className="no-border"
+                            text={t("finish-repeat")}
+                            onClick={this.setNoteRepeatEndDate}
+                        />
+                    }
                 </Modal>
 
                 {

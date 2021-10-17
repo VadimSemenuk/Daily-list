@@ -166,7 +166,7 @@ class NotesService {
             isNotificationEnabled: Boolean(note.isNotificationEnabled),
             isShadow: Boolean(note.date === null),
             repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? convertUTCDateTimeToLocal(Number(a)).valueOf() : Number(a)) : [],
-            repeatItemDate: note.repeatItemDate ? convertUTCDateTimeToLocal(note.repeatItemDate) : note.repeatItemDate,
+            repeatItemDate: note.repeatItemDate ? convertUTCDateTimeToLocal(note.repeatItemDate) : note.repeatItemDate
         };
     }
 
@@ -182,9 +182,10 @@ class NotesService {
             dates.map((date) => {
                 let msDateUTC = convertLocalDateTimeToUTC(date).valueOf();
                 let msDateUTCDayEnd = convertLocalDateTimeToUTC(date).endOf("day").valueOf();
+
                 return executeSQL(
-                    `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags,
-                    n.contentItems, n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime, n.repeatItemDate,
+                    `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags, n.contentItems, 
+                    n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime, n.repeatItemDate, n.repeatEndDate,
                     (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
                     FROM Notes n
                     LEFT JOIN NotesRepeatValues rep ON n.id = rep.noteId
@@ -193,7 +194,9 @@ class NotesService {
                         AND (
                             (n.date >= ? AND n.date <= ?)
                             OR (
-                                n.date IS NULL AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND (repeatItemDate >= ? AND repeatItemDate <= ?))
+                                n.date IS NULL
+                                AND n.repeatStartDate <= ? AND (n.repeatEndDate IS NULL OR n.repeatEndDate >= ?) 
+                                AND NOT EXISTS (SELECT forkFrom FROM Notes WHERE forkFrom = n.id AND (repeatItemDate >= ? AND repeatItemDate <= ?))
                                 AND (
                                     n.repeatType = ?
                                     OR (n.repeatType = ? AND rep.value = ?)
@@ -202,7 +205,7 @@ class NotesService {
                             )
                         )
                         AND n.mode == ?;`,
-                    [NoteAction.Delete, msDateUTC, msDateUTCDayEnd, msDateUTC, msDateUTCDayEnd, NoteRepeatType.Day, NoteRepeatType.Week, date.isoWeekday(), NoteRepeatType.Any, msDateUTC, msDateUTCDayEnd, NoteMode.WithDateTime]
+                    [NoteAction.Delete, msDateUTC, msDateUTCDayEnd, msDateUTC, msDateUTC, msDateUTC, msDateUTCDayEnd, NoteRepeatType.Day, NoteRepeatType.Week, date.isoWeekday(), NoteRepeatType.Any, msDateUTC, msDateUTCDayEnd, NoteMode.WithDateTime]
                 );
             })
         );
@@ -261,6 +264,7 @@ class NotesService {
             repeatItemDate: null
         };
 
+        nextNote = this.getNoteRepeatStartEndTime(nextNote);
         nextNote = this.parseNoteValues(nextNote);
 
         let noteId = await this.insertNote(nextNote);
@@ -278,8 +282,8 @@ class NotesService {
     async insertNote(note) {
         let insert = await executeSQL(
             `INSERT INTO Notes
-            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags, repeatItemDate)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            (title, startTime, endTime, isNotificationEnabled, tag, repeatType, contentItems, isFinished, date, forkFrom, mode, manualOrderIndex, tags, repeatItemDate, repeatStartDate, repeatEndDate)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 note.title,
                 note.startTime ? convertLocalDateTimeToUTC(note.startTime, "second").valueOf() : note.startTime,
@@ -295,6 +299,8 @@ class NotesService {
                 note.manualOrderIndex,
                 note.tags.map((tag) => tag.id).join(","),
                 note.repeatItemDate ? convertLocalDateTimeToUTC(note.repeatItemDate).valueOf() : note.repeatItemDate,
+                note.repeatStartDate ? convertLocalDateTimeToUTC(note.repeatStartDate).valueOf() : note.repeatStartDate,
+                note.repeatEndDate ? convertLocalDateTimeToUTC(note.repeatEndDate).valueOf() : note.repeatEndDate,
             ]
         );
 
@@ -422,12 +428,7 @@ class NotesService {
                 // TODO: clear notification
 
                 // TODO: separate function
-                await executeSQL(`
-                    UPDATE Notes 
-                    SET repeatType = ?, forkFrom = ?
-                    WHERE forkFrom = ? AND isFinished = ?
-                `, [NoteRepeatType.NoRepeat, null, shadowNoteId, Number(true)]
-                );
+                await this.fromForkedRepeatToNoRepeat(shadowNoteId);
                 // TODO: set notifications for future dates
             }
 
@@ -466,7 +467,8 @@ class NotesService {
         function update(id, note, updateDate) {
             return executeSQL(
                 `UPDATE Notes
-                        SET title = ?, contentItems = ?,${updateDate ? " date = ?," : ""} startTime = ?, endTime = ?, isNotificationEnabled = ?, repeatType = ?, tag = ?, tags = ?
+                        SET title = ?, contentItems = ?,${updateDate ? " date = ?," : ""} startTime = ?, endTime = ?, isNotificationEnabled = ?, 
+                        repeatType = ?, tag = ?, tags = ?
                         WHERE id = ? OR forkFrom = ?;`,
                 [
                     note.title,
@@ -581,6 +583,13 @@ class NotesService {
         return notesInserted;
     }
 
+    async setNoteRepeatEndDate(note) {
+        let id = note.forkFrom || note.id;
+        let dateUTCMS = convertLocalDateTimeToUTC(note.date).valueOf();
+        await executeSQL(`UPDATE Notes SET repeatEndDate = ? WHERE id = ?`, [dateUTCMS, id]);
+        await executeSQL(`DELETE FROM Notes WHERE forkFrom = ? AND date > ?`, [id, dateUTCMS]);
+    }
+
     resetNoteManualOrderIndex(noteId) {
         return executeSQL(
             `UPDATE Notes
@@ -644,7 +653,9 @@ class NotesService {
             ...note,
             forkFrom: note.id,
             isShadow: false,
-            repeatItemDate: moment(note.date)
+            repeatItemDate: moment(note.date),
+            repeatStartDate: null,
+            repeatEndDate: null
         };
 
         let noteId = await this.insertNote(nextNote);
@@ -661,10 +672,26 @@ class NotesService {
             id: note.forkFrom,
             isShadow: true,
             forkFrom: null,
-            manualOrderIndex: null
+            manualOrderIndex: null,
+            repeatItemDate: null
         };
 
         return nextNote;
+    }
+
+    async fromForkedRepeatToNoRepeat(noteId) {
+        let nextData = {
+            forkFrom: null,
+            repeatType: NoteRepeatType.NoRepeat,
+            repeatItemDate: null,
+        };
+
+        await executeSQL(`
+                    UPDATE Notes 
+                    SET repeatType = ?, forkFrom = ?, repeatItemDate = ?
+                    WHERE forkFrom = ? AND isFinished = ?
+                `, [nextData.repeatType, nextData.forkFrom, nextData.repeatItemDate, noteId, Number(true)]
+        );
     }
 
     parseNoteValues(note) {
@@ -707,6 +734,26 @@ class NotesService {
             .replace(this.emailMath, "<a href='mailto:$&'>$&</a>")
             .replace(this.phoneMatch, "<a href='tel:$&'>$&</a>")
             .replace(this.urlMatch, "<a href='$&'>$&</a");
+    }
+
+    getNoteRepeatStartEndTime(note) {
+        let nextNote = {...note};
+
+        if (nextNote.repeatType === NoteRepeatType.NoRepeat) {
+            nextNote.repeatStartDate = null;
+            nextNote.repeatEndDate = null;
+        } else {
+            if (nextNote.repeatType === NoteRepeatType.Any) {
+                let repeatValues = note.repeatValues.sort();
+                nextNote.repeatStartDate = convertLocalDateTimeToUTC(repeatValues[0]);
+                nextNote.repeatEndDate = convertLocalDateTimeToUTC(repeatValues[repeatValues.length - 1]);
+            } else {
+                nextNote.repeatStartDate = moment().startOf("day");
+                nextNote.repeatEndDate = null;
+            }
+        }
+
+        return nextNote;
     }
 
     tags = [

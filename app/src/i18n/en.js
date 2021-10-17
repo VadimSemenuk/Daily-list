@@ -120,6 +120,8 @@ export default {
     "delete": "Delete",
     "do-copy": "Copy",
     "move-tomorrow": "Move for tomorrow",
+    "move-yesterday": "Move for yesterday",
+    "finish-repeat": "Finish repeating on current note",
     "finished-split": "Finished",
     "reorder-fail": "Failed to move note",
     "repeat-note-save-type-current": "Update only current",

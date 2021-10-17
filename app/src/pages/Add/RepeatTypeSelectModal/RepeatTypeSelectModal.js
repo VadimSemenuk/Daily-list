@@ -51,6 +51,14 @@ class RepeatTypeSelectModal extends Component {
         this.setState({repeatValues: date});
     }
 
+    isSaveEnabled = () => {
+        if (this.state.repeatType === NoteRepeatType.NoRepeat || this.state.repeatType === NoteRepeatType.Day) {
+            return true;
+        } else {
+            return this.state.repeatValues.length > 0;
+        }
+    }
+
     render() {
         let {t} = this.props;
 
@@ -65,7 +73,8 @@ class RepeatTypeSelectModal extends Component {
                     },
                     {
                         text: t("ok"),
-                        onClick: () => this.props.onSubmit({repeatType: this.state.repeatType, repeatValues: this.state.repeatValues})
+                        onClick: () => this.props.onSubmit({repeatType: this.state.repeatType, repeatValues: this.state.repeatValues}),
+                        disabled: !this.isSaveEnabled()
                     }
                 ]}
             >

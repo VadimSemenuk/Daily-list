@@ -113,6 +113,8 @@ export default {
                     lastActionTime INTEGER,
                     repeatType INTEGER,
                     repeatItemDate INTEGER,
+                    repeatStartDate INTEGER,
+                    repeatEndDate INTEGER,
                     forkFrom INTEGER,
                     manualOrderIndex INTEGER,
                     mode INTEGER,
@@ -136,6 +138,8 @@ export default {
                     lastActionTime,
                     repeatType,
                     repeatItemDate,
+                    repeatStartDate,
+                    repeatEndDate,
                     forkFrom,
                     mode,
                     manualOrderIndex,
@@ -157,6 +161,8 @@ export default {
                     CASE
                         WHEN forkFrom IS NULL THEN null ELSE date
                     END AS repeatItemDate,
+                    null as repeatStartDate,
+                    null as repeatEndDate,
                     forkFrom,
                     mode,
                     manualOrderIndex,

@@ -120,6 +120,8 @@ export default {
     "delete": "Удалить",
     "do-copy": "Копировать",
     "move-tomorrow": "Переместить на завтра",
+    "move-yesterday": "Переместить на вчера",
+    "finish-repeat": "Завершить повторение на текущей задаче",
     "finished-split": "Завершенные",
     "reorder-fail": "Не удалось переместить заметку",
     "repeat-note-save-type-current": "Обновить только текущую",

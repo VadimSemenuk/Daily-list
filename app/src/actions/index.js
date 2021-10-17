@@ -149,7 +149,7 @@ export function moveNoteForTomorrow(note) {
             if (nextNote.mode === NotesScreenMode.WithDateTime) {
                 dispatch(getFullCount());
             }
-            dispatch(renderNotes());
+            // dispatch(renderNotes());
 
             dispatch(saveBackup());
 
@@ -159,7 +159,37 @@ export function moveNoteForTomorrow(note) {
             logsService.logError(
                 err,
                 {
-                    path: "action/index.js -> updateNoteDynamic()",
+                    path: "action/index.js -> moveNoteForTomorrow()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        contentItems: !!note.contentItems
+                    },
+                },
+                window.device.uuid
+            );
+        }
+    }
+}
+
+export function setNoteRepeatEndDate(note) {
+    return async (dispatch) => {
+        try {
+            await notesService.setNoteRepeatEndDate(note);
+
+            dispatch(updateNotes());
+
+            dispatch(getFullCount());
+
+            dispatch(saveBackup());
+
+            window.cordova && window.cordova.plugins.natives.updateWidgetList();
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-update"));
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> moveNoteForTomorrow()",
                     note: {
                         ...note,
                         title: !!note.title,
