@@ -1,6 +1,5 @@
 import executeSQL from '../utils/executeSQL';
 import moment from 'moment';
-import notificationService from "./notification.service";
 import {
     NoteAction,
     NoteContentItemType,
@@ -10,6 +9,7 @@ import {
 } from "../constants";
 import tagsService from "./tags.service";
 import {convertUTCDateTimeToLocal, convertLocalDateTimeToUTC} from "../utils/convertDateTimeLocale";
+import notificationService from "./notification.service";
 
 class NotesService {
     async processSearchResultNotesWithTime(notesIDs) {
@@ -254,6 +254,24 @@ class NotesService {
         }
     }
 
+    async getNote(id) {
+        let select = executeSQL(
+            `SELECT n.id, n.title, n.startTime, n.endTime, n.isNotificationEnabled, n.tag, n.repeatType, n.tags, n.contentItems, 
+            n.isFinished, n.forkFrom, n.manualOrderIndex, n.date, n.mode, n.lastAction, n.lastActionTime, n.repeatItemDate, n.repeatEndDate,
+            (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
+            FROM Notes n
+            WHERE id = ?`,
+            [id]
+        );
+
+        if (select.rows.length === 0) {
+            return null;
+        }
+
+        let note = select.rows.item(0);
+        return note.mode === NoteMode.WithDateTime ? this.parseNoteWithTime(note) : this.parseNoteWithoutTime(note);
+    }
+
     async addNote(note) {
         let nextNote = {
             ...note,
@@ -274,7 +292,7 @@ class NotesService {
 
         await this.addNoteRepeatValues(nextNote);
 
-        nextNote.isNotificationEnabled && notificationService.set(nextNote);
+        notificationService.schedule(nextNote.id);
 
         return nextNote;
     }
@@ -357,7 +375,7 @@ class NotesService {
 
         nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
-        nextNote.isNotificationEnabled && notificationService.set(nextNote);
+        notificationService.schedule(nextNote.isShadow ? nextNote.forkFrom : nextNote.id);
 
         return nextNote;
     }
@@ -370,8 +388,7 @@ class NotesService {
         }
 
         if (nextData.hasOwnProperty('isFinished') && settings.sortFinBehaviour === 1) {
-            nextNote.manualOrderIndex = null;
-            await this.resetNoteManualOrderIndex(nextNote.id);
+            nextNote = await this.resetNoteManualOrderIndex(nextNote);
         }
 
         await executeSQL(
@@ -399,34 +416,35 @@ class NotesService {
         if (noteUpdateType === NoteUpdateType.NO_REPEAT) {
             // reset manualOrderIndex on date change
             if (!nextNote.date.isSame(originalNote.date)) {
-                nextNote.manualOrderIndex = null;
-                await this.resetNoteManualOrderIndex(nextNote.id);
+                nextNote = await this.resetNoteManualOrderIndex(nextNote);
             }
-
             await update(nextNote.id, nextNote, true);
 
             nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
-            notificationService.clear({...originalNote, id: nextNote.id});
-            nextNote.isNotificationEnabled && notificationService.set(nextNote);
+            notificationService.clear(nextNote.id);
+            notificationService.schedule(nextNote.id);
 
             return nextNote;
         } else if (noteUpdateType === NoteUpdateType.REPEAT_TYPE_CHANGE) {
             if (originalNote.repeatType === NoteRepeatType.NoRepeat) {
                 // remove initial note
                 await executeSQL(`DELETE FROM Notes WHERE id = ?`, [originalNote.id]);
-
-                // TODO: clear notification
+                notificationService.clear(originalNote.id);
             } else {
                 // remove shadow note and forked not-finished, set forked finished as no-repeat
                 let shadowNoteId = originalNote.isShadow ? originalNote.id : originalNote.forkFrom;
                 await executeSQL(`DELETE FROM Notes WHERE id = ? OR (forkFrom = ? AND isFinished = ?)`, [shadowNoteId, shadowNoteId, Number(false)]);
                 await executeSQL(`DELETE FROM NotesRepeatValues WHERE noteId = ?`, [shadowNoteId]);
+                notificationService.clear(shadowNoteId);
 
-                // TODO: clear notification
-
-                // TODO: separate function
-                await this.fromForkedRepeatToNoRepeat(shadowNoteId);
+                // make finished forked notes no-repeat
+                await executeSQL(
+                    `UPDATE Notes 
+                    SET repeatType = ?, forkFrom = ?, repeatItemDate = ?
+                    WHERE forkFrom = ? AND isFinished = ?`,
+                    [NoteRepeatType.NoRepeat, null, null, shadowNoteId, Number(true)]
+                );
                 // TODO: set notifications for future dates
             }
 
@@ -442,7 +460,9 @@ class NotesService {
             await update(shadowNoteId, nextNote, false);
 
             // TODO: update note last action
-            // TODO: update notifications
+
+            notificationService.clear(shadowNoteId);
+            notificationService.schedule(shadowNoteId);
 
             return null;
         } else if (noteUpdateType === NoteUpdateType.REPEAT_CURRENT) {
@@ -456,8 +476,8 @@ class NotesService {
 
             nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
-            notificationService.clear({...originalNote, id: nextNote.id});
-            nextNote.isNotificationEnabled && notificationService.set(nextNote);
+            notificationService.clear(nextNote.forkFrom);
+            notificationService.schedule(nextNote.forkFrom);
 
             return nextNote;
         }
@@ -488,24 +508,14 @@ class NotesService {
     async deleteNote(note) {
         let nextNote = {...note};
         if (nextNote.repeatType !== NoteRepeatType.NoRepeat && !nextNote.isShadow) {
-            nextNote = this.fromRealToShadow(nextNote);
+            nextNote = await this.getNote(nextNote.forkFrom);
         }
 
-        await executeSQL(`
-            UPDATE Notes
-            SET manualOrderIndex = ?
-            WHERE id = ? OR forkFrom = ?;
-        `,
-            [
-                null,
-                nextNote.id,
-                nextNote.id
-            ]
-        );
+        nextNote = this.resetNoteManualOrderIndex(nextNote.id);
 
         nextNote = await this.updateNoteLastAction(NoteAction.Delete, nextNote);
 
-        notificationService.clear(nextNote);
+        notificationService.clear(nextNote.id);
 
         return nextNote;
     }
@@ -531,14 +541,11 @@ class NotesService {
     }
 
     async restoreNote(note) {
-        let nextNote = {
-            ...note,
-            isShadow: note.date === null
-        };
+        let nextNote = {...note};
 
         nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
-        nextNote.isNotificationEnabled && notificationService.set(nextNote);
+        notificationService.schedule(nextNote.id);
 
         return nextNote;
     }
@@ -586,15 +593,22 @@ class NotesService {
         let dateUTCMS = convertLocalDateTimeToUTC(note.date).valueOf();
         await executeSQL(`UPDATE Notes SET repeatEndDate = ? WHERE id = ?`, [dateUTCMS, id]);
         await executeSQL(`DELETE FROM Notes WHERE forkFrom = ? AND date > ?`, [id, dateUTCMS]);
+
+        notificationService.schedule(id);
     }
 
-    resetNoteManualOrderIndex(noteId) {
+    resetNoteManualOrderIndex(note) {
+        let nextNote = {...note};
+        nextNote.manualOrderIndex = null;
+
         return executeSQL(
             `UPDATE Notes
             SET manualOrderIndex = ?
-            WHERE id = ?;`,
-            [null, noteId]
+            WHERE id = ? OR forkFrom = ?;`,
+            [nextNote.manualOrderIndex, nextNote.id, nextNote.id]
         );
+
+        return nextNote;
     }
 
     async deleteNotesTag(tagId) {
@@ -662,34 +676,6 @@ class NotesService {
         nextNote = await this.updateNoteLastAction(NoteAction.Add, nextNote);
 
         return nextNote;
-    }
-
-    fromRealToShadow(note) {
-        let nextNote = {
-            ...note,
-            id: note.forkFrom,
-            isShadow: true,
-            forkFrom: null,
-            manualOrderIndex: null,
-            repeatItemDate: null
-        };
-
-        return nextNote;
-    }
-
-    async fromForkedRepeatToNoRepeat(noteId) {
-        let nextData = {
-            forkFrom: null,
-            repeatType: NoteRepeatType.NoRepeat,
-            repeatItemDate: null,
-        };
-
-        await executeSQL(`
-                    UPDATE Notes 
-                    SET repeatType = ?, forkFrom = ?, repeatItemDate = ?
-                    WHERE forkFrom = ? AND isFinished = ?
-                `, [nextData.repeatType, nextData.forkFrom, nextData.repeatItemDate, noteId, Number(true)]
-        );
     }
 
     parseNoteValues(note) {

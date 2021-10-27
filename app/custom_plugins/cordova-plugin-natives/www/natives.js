@@ -1,15 +1,31 @@
 var Natives = {};
 
-Natives.updateWidget = function(success, error) {
-    cordova.exec(success, error, 'Natives', 'updateWidget');
+Natives.updateWidget = function() {
+    cordova.exec(null, null, 'Natives', 'updateWidget');
 };
 
-Natives.updateWidgetList = function(success, error) {
-    cordova.exec(success, error, 'Natives', 'updateWidgetList');
+Natives.updateWidgetList = function() {
+    cordova.exec(null, null, 'Natives', 'updateWidgetList');
 };
 
 Natives.scheduleDayChangeNotification = function() {
     cordova.exec(null, null, 'Natives', 'scheduleDayChangeNotification');
+}
+
+Natives.scheduleNotification = function(props) {
+    cordova.exec(null, null, 'Natives', 'scheduleNotification', props);
+}
+
+Natives.scheduleNotificationAll = function(success) {
+    cordova.exec(success, null, 'Natives', 'scheduleNotificationAll');
+}
+
+Natives.clearNotification = function(props) {
+    cordova.exec(null, null, 'Natives', 'clearNotification', props);
+}
+
+Natives.clearNotificationAll = function(success) {
+    cordova.exec(success, null, 'Natives', 'clearNotificationAll');
 }
 
 Natives.events = {};

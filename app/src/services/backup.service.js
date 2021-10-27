@@ -6,9 +6,6 @@ import authService from "./auth.service";
 import deviceService from "./device.service";
 import CustomError from "../common/CustomError";
 import apiService from "./api.service";
-import {convertLocalDateTimeToUTC, convertUTCDateTimeToLocal} from "../utils/convertDateTimeLocale";
-import executeSQL from "../utils/executeSQL";
-import {NoteAction, NoteMode, NoteRepeatType} from "../constants";
 import notificationService from "./notification.service";
 import DB from "../db/db";
 import migration from "../db/migration/migration";
@@ -143,79 +140,31 @@ class BackupService {
 
         let token = authService.getAuthorizationToken();
 
-        await new Promise((resolve, reject) => {
+        let blob = await new Promise((resolve, reject) => {
             let oReq = new XMLHttpRequest();
             oReq.open("GET", `https://www.googleapis.com/drive/v3/files/${backupFile.id}?alt=media`, true);
             if (token && token.google) {
                 oReq.setRequestHeader("Authorization", token.google.accessToken);
             }
             oReq.responseType = "blob";
-            oReq.onload = async () => {
-                let blob = oReq.response;
-
-                let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);
-                await filesService.writeFile(fileEntry, blob).catch(reject);
-                resolve();
-            };
+            oReq.onload = () => resolve(oReq.response);
+            oReq.onerror = () => reject();
             oReq.send(null);
         });
+
+        if (!blob) {
+            return;
+        }
+
+        await notificationService.clearAll();
+
+        let fileEntry = await filesService.getFileEntry(`${this.databasesDirectory}${this.databaseFileName}`);
+        await filesService.writeFile(fileEntry, blob);
 
         window.com_mamindeveloper_dailylist_db = await DB();
         await migration.run();
 
-        await this.updateNotifications();
-    }
-
-    async updateNotifications() {
-        let msDateUTC = convertLocalDateTimeToUTC(moment().startOf("day").valueOf()).valueOf();
-        let select = await executeSQL(
-            `SELECT n.id, n.title, n.startTime, n.repeatType, n.contentItems, n.date, n.isNotificationEnabled,
-                    (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id) as repeatValues
-                    FROM Notes n
-                    WHERE
-                        n.lastAction != ?
-                        AND ((n.repeatType = ? AND n.date >= ?) OR (n.repeatType IN (?, ?, ?)))
-                        AND n.mode == ?;`,
-            [NoteAction.Delete, NoteRepeatType.NoRepeat, msDateUTC, NoteRepeatType.Day, NoteRepeatType.Week, NoteRepeatType.Any, NoteMode.WithDateTime]
-        );
-
-        let notes = [];
-        for(let i = 0; i < select.rows.length; i++) {
-            let note = select.rows.item(i);
-
-            let repeatValues = [];
-            if (note.repeatValues) {
-                repeatValues = note.repeatValues.split(",").map((item) => Number(item));
-                if (note.repeatType === NoteRepeatType.Any) {
-                    repeatValues = repeatValues
-                        .map((item) => convertUTCDateTimeToLocal(item).valueOf())
-                        .filter((item) => item > msDateUTC);
-                }
-            }
-
-            note = {
-                ...note,
-                date: note.date ? convertUTCDateTimeToLocal(note.date) : note.date,
-                startTime: note.startTime ? convertUTCDateTimeToLocal(note.startTime, "second") : note.startTime,
-                repeatValues,
-                contentItems: JSON.parse(note.contentItems),
-                isNotificationEnabled: Boolean(note.isNotificationEnabled)
-            };
-            notes.push(note);
-        }
-
-        await new Promise((resolve) => window.cordova.plugins.notification.local.clearAll(resolve, resolve));
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        for(let note of notes) {
-            if (note.isNotificationEnabled) {
-                notificationService.set(note);
-                await new Promise((resolve) => setTimeout(resolve, 200));
-            }
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await notificationService.scheduleAll();
     }
 }
 
