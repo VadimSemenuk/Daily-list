@@ -1,11 +1,13 @@
 export default {
     // settings page
+    "note-settings": "Notes",
     "view": "Display",
     "interface": "Interface",
     "add-pass": "Add password",
     "remove-pass": "Remove password",
     "issues": "Bug fixing",
     "default-notification": "Automatically set notification",
+    "finished-notes-notifications": "Show notification for finished notes",
     "auto-move-not-completed": "When the date changes, automatically move unfinished tasks to today",
     "backup": "Backup",
     "set-setting-error": "Failed to update setting",

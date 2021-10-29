@@ -81,7 +81,8 @@ class SettingsService {
                 noteFilters,
                 isQuickAddPanelVisible,
                 autoMoveNotFinishedNotes,
-                passwordInputType
+                passwordInputType,
+                showNotificationForFinishedNotes
             FROM Settings;`
         );
 
@@ -95,7 +96,8 @@ class SettingsService {
             invertHeaderPosition: Boolean(result.invertHeaderPosition),
             noteFilters: JSON.parse(result.noteFilters),
             isQuickAddPanelVisible: Boolean(result.isQuickAddPanelVisible),
-            autoMoveNotFinishedNotes: Boolean(result.autoMoveNotFinishedNotes)
+            autoMoveNotFinishedNotes: Boolean(result.autoMoveNotFinishedNotes),
+            showNotificationForFinishedNotes: Boolean(result.showNotificationForFinishedNotes)
         };
     }
 
@@ -111,6 +113,7 @@ class SettingsService {
                 case("noteFilters"): value = JSON.stringify(value); break;
                 case("isQuickAddPanelVisible"): value = Number(value); break;
                 case("autoMoveNotFinishedNotes"): value = Number(value); break;
+                case("showNotificationForFinishedNotes"): value = Number(value); break;
                 default: break;
             }
 

@@ -21,6 +21,7 @@ import Modal from "./components/Modal/Modal";
 import NotesSearch from "./pages/NotesSearch/NotesSearch";
 import SideNav from "./components/SideNav/SideNav";
 import Tags from "./pages/Tags/Tags";
+import NotesSettings from "./pages/NotesSettings/NotesSettings";
 
 class Root extends Component {
     componentDidMount() {
@@ -87,6 +88,11 @@ class Root extends Component {
                     <Route 
                         path="/settings" 
                         component={Settings} 
+                    />
+                    <Route
+                        exact
+                        path="/settings/notes-settings"
+                        component={NotesSettings}
                     />
                     <Route 
                         exact 

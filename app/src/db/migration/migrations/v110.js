@@ -19,7 +19,7 @@ export default {
         await alterNotesTable();
         await updateNoteStartEndTime();
 
-        if (isUpdate && lastMigrationName === "1.7") {
+        if (isUpdate) {
             // await addUpdatesNote();
         }
 
@@ -46,7 +46,8 @@ export default {
                     noteFilters TEXT,
                     isQuickAddPanelVisible INTEGER,
                     autoMoveNotFinishedNotes INTEGER,
-                    passwordInputType TEXT
+                    passwordInputType TEXT,
+                    showNotificationForFinishedNotes INTEGER
                 );
             `);
             await executeSQL(`
@@ -68,7 +69,8 @@ export default {
                     noteFilters,
                     isQuickAddPanelVisible,
                     autoMoveNotFinishedNotes,
-                    passwordInputType
+                    passwordInputType,
+                    showNotificationForFinishedNotes
                 ) 
                 SELECT 
                     defaultNotification,
@@ -88,7 +90,8 @@ export default {
                     noteFilters,
                     isQuickAddPanelVisible,
                     0 as autoMoveNotFinishedNotes,
-                    'text' as passwordInputType
+                    'text' as passwordInputType,
+                    0 as showNotificationForFinishedNotes
                 FROM Settings_OLD;
             `);
             await executeSQL(`DROP TABLE Settings_OLD;`);
