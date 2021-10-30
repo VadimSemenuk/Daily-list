@@ -71,3 +71,19 @@ export const NoteUpdateType = {
     REPEAT_CURRENT: 3,
     REPEAT_ALL: 4
 };
+
+export const ColorTags = [
+    'transparent',
+    '#00213C',
+    '#c5282f',
+    '#62A178',
+    '#3498DB',
+    '#BF0FB9',
+    '#9A6B00',
+    '#9CECC5',
+    '#e2dd2d',
+    '#e23494',
+    '#7e17dc',
+    '#333',
+    "#bfbfbf"
+];

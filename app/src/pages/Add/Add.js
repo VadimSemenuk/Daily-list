@@ -32,6 +32,7 @@ import WarningImg from "../../assets/img/warning.svg";
 import deepCopy from '../../utils/deepCopyObject'
 
 import {
+    ColorTags,
     NoteContentItemType,
     NoteRepeatType,
     NotesScreenMode,
@@ -69,7 +70,6 @@ class Add extends Component {
         };
 
         this.repeatTypeOptions = notesService.getRepeatTypeOptions();
-        this.tags = notesService.getTags();
 
         this.saveTypeSelectResolve = null;
     }
@@ -804,9 +804,9 @@ class Add extends Component {
 
                             <div className="color-picker-wrapper">
                                 <ColorPicker
-                                    onSelect={(e) => this.updateNoteData({tag: notesService.getTagByIndex(e.index)})}
+                                    onSelect={(e) => this.updateNoteData({tag: ColorTags[e.index]})}
                                     value={this.state.note.tag}
-                                    colors={this.tags}
+                                    colors={ColorTags}
                                 />
                             </div>
 

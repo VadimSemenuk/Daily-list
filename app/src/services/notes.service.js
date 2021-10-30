@@ -12,6 +12,39 @@ import {convertUTCDateTimeToLocal, convertLocalDateTimeToUTC} from "../utils/con
 import notificationService from "./notification.service";
 
 class NotesService {
+    // region parse note
+    parseNoteCommon(note) {
+        return {
+            contentItems: JSON.parse(note.contentItems),
+            isFinished: Boolean(note.isFinished),
+            lastActionTime: moment(note.lastActionTime),
+            tags: (note.tags ? note.tags.split(",") : []).map((id) => tagsService.tags[id])
+        }
+    }
+
+    parseNoteWithTime(note) {
+        return {
+            ...note,
+            ...this.parseNoteCommon(note),
+            startTime: note.startTime ? convertUTCDateTimeToLocal(note.startTime, "second") : note.startTime,
+            endTime: note.endTime ? convertUTCDateTimeToLocal(note.endTime, "second") : note.endTime,
+            date: note.date ? convertUTCDateTimeToLocal(note.date) : note.date,
+            isNotificationEnabled: Boolean(note.isNotificationEnabled),
+            isShadow: Boolean(note.date === null),
+            repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? convertUTCDateTimeToLocal(Number(a)).valueOf() : Number(a)) : [],
+            repeatItemDate: note.repeatItemDate ? convertUTCDateTimeToLocal(note.repeatItemDate) : note.repeatItemDate
+        };
+    }
+
+    parseNoteWithoutTime(note) {
+        return {
+            ...note,
+            ...this.parseNoteCommon(note)
+        }
+    }
+    // endregion
+
+    // region search note
     async processSearchResultNotesWithTime(notesIDs) {
         let currentDate = moment().startOf("day");
 
@@ -146,37 +179,9 @@ class NotesService {
             return this.processSearchResultNotesWithoutTime(filteredNotesIDs);
         }
     }
+    // endregion
 
-    parseNoteCommon(note) {
-        return {
-            contentItems: JSON.parse(note.contentItems),
-            isFinished: Boolean(note.isFinished),
-            lastActionTime: moment(note.lastActionTime),
-            tags: (note.tags ? note.tags.split(",") : []).map((id) => tagsService.tags[id])
-        }
-    }
-
-    parseNoteWithTime(note) {
-        return {
-            ...note,
-            ...this.parseNoteCommon(note),
-            startTime: note.startTime ? convertUTCDateTimeToLocal(note.startTime, "second") : note.startTime,
-            endTime: note.endTime ? convertUTCDateTimeToLocal(note.endTime, "second") : note.endTime,
-            date: note.date ? convertUTCDateTimeToLocal(note.date) : note.date,
-            isNotificationEnabled: Boolean(note.isNotificationEnabled),
-            isShadow: Boolean(note.date === null),
-            repeatValues: note.repeatValues ? note.repeatValues.split(",").map(a => note.repeatType === NoteRepeatType.Any ? convertUTCDateTimeToLocal(Number(a)).valueOf() : Number(a)) : [],
-            repeatItemDate: note.repeatItemDate ? convertUTCDateTimeToLocal(note.repeatItemDate) : note.repeatItemDate
-        };
-    }
-
-    parseNoteWithoutTime(note) {
-        return {
-            ...note,
-            ...this.parseNoteCommon(note)
-        }
-    }
-
+    // region query notes
     async getNotesWithTime(dates) {
         let selects = await Promise.all(
             dates.map((date) => {
@@ -271,7 +276,9 @@ class NotesService {
         let note = select.rows.item(0);
         return note.mode === NoteMode.WithDateTime ? this.parseNoteWithTime(note) : this.parseNoteWithoutTime(note);
     }
+    // endregion
 
+    // region add note
     async addNote(note) {
         let nextNote = {
             ...note,
@@ -293,6 +300,26 @@ class NotesService {
         await this.addNoteRepeatValues(nextNote);
 
         notificationService.schedule(nextNote.id);
+
+        return nextNote;
+    }
+
+    getNoteRepeatStartEndTime(note) {
+        let nextNote = {...note};
+
+        if (nextNote.repeatType === NoteRepeatType.NoRepeat) {
+            nextNote.repeatStartDate = null;
+            nextNote.repeatEndDate = null;
+        } else {
+            if (nextNote.repeatType === NoteRepeatType.Any) {
+                let repeatValues = note.repeatValues.sort();
+                nextNote.repeatStartDate = convertLocalDateTimeToUTC(repeatValues[0]);
+                nextNote.repeatEndDate = convertLocalDateTimeToUTC(repeatValues[repeatValues.length - 1]);
+            } else {
+                nextNote.repeatStartDate = moment().startOf("day");
+                nextNote.repeatEndDate = null;
+            }
+        }
 
         return nextNote;
     }
@@ -348,76 +375,9 @@ class NotesService {
             ${params};
         `, values);
     }
+    // endregion
 
-    async moveNoteForDate(note, date) {
-        let nextNote = {...note};
-
-        if (nextNote.isShadow) {
-            nextNote = await this.fromShadowToReal(nextNote);
-        }
-
-        nextNote = {
-            ...nextNote,
-            date: moment(date),
-            manualOrderIndex: null
-        }
-
-        await executeSQL(
-            `UPDATE Notes
-            SET date = ?, manualOrderIndex = ?
-            WHERE id = ?;`,
-            [
-                convertLocalDateTimeToUTC(nextNote.date).valueOf(),
-                nextNote.manualOrderIndex,
-                nextNote.id
-            ]
-        );
-
-        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
-
-        notificationService.schedule(nextNote.isShadow ? nextNote.forkFrom : nextNote.id);
-
-        return nextNote;
-    }
-
-    async triggerNoteFinishState(note, resetManualOrderIndex) {
-        let nextNote = {...note, isFinished: !note.isFinished};
-
-        if (nextNote.isShadow) {
-            nextNote = await this.fromShadowToReal(nextNote);
-        }
-
-        if (resetManualOrderIndex) {
-            nextNote = await this.resetNoteManualOrderIndex(nextNote);
-        }
-
-        await executeSQL(
-            `UPDATE Notes SET isFinished = ? WHERE id = ?;`,
-            [Number(nextNote.isFinished), nextNote.id]
-        );
-
-        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
-
-        return nextNote;
-    }
-
-    async updateNoteContentItems(note, nextContentItems) {
-        let nextNote = {...note, contentItems: nextContentItems};
-
-        if (nextNote.isShadow) {
-            nextNote = await this.fromShadowToReal(nextNote);
-        }
-
-        await executeSQL(
-            `UPDATE Notes SET contentItems = ? WHERE id = ?;`,
-            [JSON.stringify(nextNote.contentItems), nextNote.id]
-        );
-
-        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
-
-        return nextNote;
-    }
-
+    // region updates note
     async updateNote(data, originalNote, noteUpdateType) {
         let nextNote = {...originalNote, ...data};
         nextNote = this.parseNoteValues(nextNote);
@@ -514,65 +474,73 @@ class NotesService {
         }
     }
 
-    async deleteNote(note) {
+    async moveNoteForDate(note, date) {
         let nextNote = {...note};
-        if (nextNote.repeatType !== NoteRepeatType.NoRepeat && !nextNote.isShadow) {
-            nextNote = await this.getNote(nextNote.forkFrom);
+
+        if (nextNote.isShadow) {
+            nextNote = await this.fromShadowToReal(nextNote);
         }
 
-        nextNote = this.resetNoteManualOrderIndex(nextNote.id);
-
-        nextNote = await this.updateNoteLastAction(NoteAction.Delete, nextNote);
-
-        notificationService.clear(nextNote.id);
-
-        return nextNote;
-    }
-
-    async getDeletedNotes() {
-        let select = await executeSQL(
-            `SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
-                contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date,
-                (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
-            FROM Notes n
-            WHERE lastAction = ? AND
-            forkFrom IS NULL
-            ORDER BY lastActionTime
-            LIMIT 100;`
-        , [NoteAction.Delete]);
-
-        let notes = [];
-        for(let i = 0; i < select.rows.length; i++) {
-            notes.push(this.parseNoteWithTime(select.rows.item(i)));
+        nextNote = {
+            ...nextNote,
+            date: moment(date),
+            manualOrderIndex: null
         }
 
-        return notes;
-    }
-
-    async restoreNote(note) {
-        let nextNote = {...note};
+        await executeSQL(
+            `UPDATE Notes
+            SET date = ?, manualOrderIndex = ?
+            WHERE id = ?;`,
+            [
+                convertLocalDateTimeToUTC(nextNote.date).valueOf(),
+                nextNote.manualOrderIndex,
+                nextNote.id
+            ]
+        );
 
         nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
 
-        notificationService.schedule(nextNote.id);
+        notificationService.schedule(nextNote.isShadow ? nextNote.forkFrom : nextNote.id);
 
         return nextNote;
     }
 
-    async removeDeletedNotes(untilDate) {
-        await executeSQL(`
-            DELETE FROM NotesRepeatValues
-            WHERE noteId IN (
-                SELECT noteId FROM NotesRepeatValues
-                LEFT JOIN Notes ON NotesRepeatValues.noteId = Notes.id
-                WHERE lastAction = ?${untilDate ? ' AND lastActionTime <= ?' : ''}
-            );
-        `, [NoteAction.Delete, ...(untilDate ? [untilDate] : [])]);
+    async triggerNoteFinishState(note, resetManualOrderIndex) {
+        let nextNote = {...note, isFinished: !note.isFinished};
 
-        return executeSQL(`
-            DELETE FROM Notes 
-            WHERE lastAction = ?${untilDate ? ' AND lastActionTime <= ?' : ''}
-        `, [NoteAction.Delete, ...(untilDate ? [untilDate] : [])]);
+        if (nextNote.isShadow) {
+            nextNote = await this.fromShadowToReal(nextNote);
+        }
+
+        if (resetManualOrderIndex) {
+            nextNote = await this.resetNoteManualOrderIndex(nextNote);
+        }
+
+        await executeSQL(
+            `UPDATE Notes SET isFinished = ? WHERE id = ?;`,
+            [Number(nextNote.isFinished), nextNote.id]
+        );
+
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+        return nextNote;
+    }
+
+    async updateNoteContentItems(note, nextContentItems) {
+        let nextNote = {...note, contentItems: nextContentItems};
+
+        if (nextNote.isShadow) {
+            nextNote = await this.fromShadowToReal(nextNote);
+        }
+
+        await executeSQL(
+            `UPDATE Notes SET contentItems = ? WHERE id = ?;`,
+            [JSON.stringify(nextNote.contentItems), nextNote.id]
+        );
+
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+        return nextNote;
     }
 
     async updateNotesManualSortIndex(notes) {
@@ -597,22 +565,13 @@ class NotesService {
         return notesInserted;
     }
 
-    async setNoteRepeatEndDate(note) {
-        let id = note.forkFrom || note.id;
-        let dateUTCMS = convertLocalDateTimeToUTC(note.date).valueOf();
-        await executeSQL(`UPDATE Notes SET repeatEndDate = ? WHERE id = ?`, [dateUTCMS, id]);
-        await executeSQL(`DELETE FROM Notes WHERE forkFrom = ? AND date > ?`, [id, dateUTCMS]);
-
-        notificationService.schedule(id);
-    }
-
-    resetNoteManualOrderIndex(note) {
+    async resetNoteManualOrderIndex(note) {
         let nextNote = {
             ...note,
             manualOrderIndex: null
         };
 
-        executeSQL(
+        await executeSQL(
             `UPDATE Notes
             SET manualOrderIndex = ?
             WHERE id = ? OR forkFrom = ?;`,
@@ -620,6 +579,15 @@ class NotesService {
         );
 
         return nextNote;
+    }
+
+    async setNoteRepeatEndDate(note) {
+        let id = note.forkFrom || note.id;
+        let dateUTCMS = convertLocalDateTimeToUTC(note.date).valueOf();
+        await executeSQL(`UPDATE Notes SET repeatEndDate = ? WHERE id = ?`, [dateUTCMS, id]);
+        await executeSQL(`DELETE FROM Notes WHERE forkFrom = ? AND date > ?`, [id, dateUTCMS]);
+
+        notificationService.schedule(id);
     }
 
     async deleteNotesTag(tagId) {
@@ -688,7 +656,72 @@ class NotesService {
 
         return nextNote;
     }
+    // endregion
 
+    // region delete, restore note
+    async deleteNote(note) {
+        let nextNote = {...note};
+        if (nextNote.repeatType !== NoteRepeatType.NoRepeat && !nextNote.isShadow) {
+            nextNote = await this.getNote(nextNote.forkFrom);
+        }
+
+        nextNote = await this.resetNoteManualOrderIndex(nextNote.id);
+
+        nextNote = await this.updateNoteLastAction(NoteAction.Delete, nextNote);
+
+        notificationService.clear(nextNote.id);
+
+        return nextNote;
+    }
+
+    async getDeletedNotes() {
+        let select = await executeSQL(
+            `SELECT id, title, startTime, endTime, isNotificationEnabled, tag, repeatType, 
+                contentItems, isFinished, forkFrom, manualOrderIndex, lastActionTime, date,
+                (select GROUP_CONCAT(rep.value, ',') from NotesRepeatValues rep where rep.noteId = n.id OR rep.noteId = n.forkFrom) as repeatValues
+            FROM Notes n
+            WHERE lastAction = ? AND
+            forkFrom IS NULL
+            ORDER BY lastActionTime
+            LIMIT 100;`
+        , [NoteAction.Delete]);
+
+        let notes = [];
+        for(let i = 0; i < select.rows.length; i++) {
+            notes.push(this.parseNoteWithTime(select.rows.item(i)));
+        }
+
+        return notes;
+    }
+
+    async restoreNote(note) {
+        let nextNote = {...note};
+
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+        notificationService.schedule(nextNote.id);
+
+        return nextNote;
+    }
+
+    async removeDeletedNotes(untilDate) {
+        await executeSQL(`
+            DELETE FROM NotesRepeatValues
+            WHERE noteId IN (
+                SELECT noteId FROM NotesRepeatValues
+                LEFT JOIN Notes ON NotesRepeatValues.noteId = Notes.id
+                WHERE lastAction = ?${untilDate ? ' AND lastActionTime <= ?' : ''}
+            );
+        `, [NoteAction.Delete, ...(untilDate ? [untilDate] : [])]);
+
+        return executeSQL(`
+            DELETE FROM Notes 
+            WHERE lastAction = ?${untilDate ? ' AND lastActionTime <= ?' : ''}
+        `, [NoteAction.Delete, ...(untilDate ? [untilDate] : [])]);
+    }
+    // endregion
+
+    // region on insert, update parse note
     parseNoteValues(note) {
         let nextNote = {...note};
 
@@ -730,42 +763,7 @@ class NotesService {
             .replace(this.phoneMatch, "<a href='tel:$&'>$&</a>")
             .replace(this.urlMatch, "<a href='$&'>$&</a");
     }
-
-    getNoteRepeatStartEndTime(note) {
-        let nextNote = {...note};
-
-        if (nextNote.repeatType === NoteRepeatType.NoRepeat) {
-            nextNote.repeatStartDate = null;
-            nextNote.repeatEndDate = null;
-        } else {
-            if (nextNote.repeatType === NoteRepeatType.Any) {
-                let repeatValues = note.repeatValues.sort();
-                nextNote.repeatStartDate = convertLocalDateTimeToUTC(repeatValues[0]);
-                nextNote.repeatEndDate = convertLocalDateTimeToUTC(repeatValues[repeatValues.length - 1]);
-            } else {
-                nextNote.repeatStartDate = moment().startOf("day");
-                nextNote.repeatEndDate = null;
-            }
-        }
-
-        return nextNote;
-    }
-
-    tags = [
-        'transparent',
-        '#00213C',
-        '#c5282f',
-        '#62A178',
-        '#3498DB',
-        '#BF0FB9',
-        '#9A6B00',
-        '#9CECC5',
-        '#e2dd2d',
-        '#e23494',
-        '#7e17dc',
-        '#333',
-        "#bfbfbf"
-    ];
+    // endregion
 
     repeatOptions = [
         { val: NoteRepeatType.NoRepeat, translateId: "repeat-type-no-repeat" },
@@ -783,14 +781,6 @@ class NotesService {
         { val: 6, translateId: "saturday" },
         { val: 7, translateId: "sunday" }
     ];
-
-    getTags() {
-        return [...this.tags];
-    }
-
-    getTagByIndex(index) {
-        return this.tags[index];
-    }
 
     getRepeatTypeOptions() {
         return [...this.repeatOptions]
