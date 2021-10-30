@@ -20,6 +20,40 @@ export const NoteRepeatType = {
     Week: 'week',
     Month: 'month',
     Any: 'any',
+
+    WeekValues: [
+        { val: 1, translateId: "monday" },
+        { val: 2, translateId: "tuesday" },
+        { val: 3, translateId: "wednesday" },
+        { val: 4, translateId: "thursday" },
+        { val: 5, translateId: "friday" },
+        { val: 6, translateId: "saturday" },
+        { val: 7, translateId: "sunday" }
+    ],
+
+    toTranslateId(repeatType) {
+        switch(repeatType) {
+            case NoteRepeatType.NoRepeat:
+                return "repeat-type-no-repeat";
+            case NoteRepeatType.Day:
+                return "repeat-type-day";
+            case NoteRepeatType.Week:
+                return "repeat-type-week";
+            case NoteRepeatType.Month:
+                return "repeat-type-month";
+            case NoteRepeatType.Any:
+                return "repeat-type-any";
+        }
+    },
+
+    toArray() {
+        return [
+            NoteRepeatType.NoRepeat,
+            NoteRepeatType.Day,
+            NoteRepeatType.Week,
+            NoteRepeatType.Any
+        ]
+    }
 };
 
 export const NoteContentItemType = {

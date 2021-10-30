@@ -764,31 +764,6 @@ class NotesService {
             .replace(this.urlMatch, "<a href='$&'>$&</a");
     }
     // endregion
-
-    repeatOptions = [
-        { val: NoteRepeatType.NoRepeat, translateId: "repeat-type-no-repeat" },
-        { val: NoteRepeatType.Day, translateId: "repeat-type-day" },
-        { val: NoteRepeatType.Week, translateId: "repeat-type-week" },
-        { val: NoteRepeatType.Any, translateId: "repeat-type-any" }
-    ];
-
-    weekRepeatOptions = [
-        { val: 1, translateId: "monday" },
-        { val: 2, translateId: "tuesday" },
-        { val: 3, translateId: "wednesday" },
-        { val: 4, translateId: "thursday" },
-        { val: 5, translateId: "friday" },
-        { val: 6, translateId: "saturday" },
-        { val: 7, translateId: "sunday" }
-    ];
-
-    getRepeatTypeOptions() {
-        return [...this.repeatOptions]
-    }
-
-    getWeekRepeatOptions() {
-        return [...this.weekRepeatOptions]
-    }
 }
 
 let noteService = new NotesService();

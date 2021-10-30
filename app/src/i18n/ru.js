@@ -140,6 +140,7 @@ export default {
     "repeat-type-no-repeat": "Не повторять",
     "repeat-type-day": "Каждый день",
     "repeat-type-week": "Каждую неделю",
+    "repeat-type-month": "Каждый месяц",
     "repeat-type-any": "Выбрать даты",
     "input-placeholder-title": "Заголовок",
     "input-placeholder-text": "Текст",

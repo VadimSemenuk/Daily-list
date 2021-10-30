@@ -140,6 +140,7 @@ export default {
     "repeat-type-no-repeat": "Не паўтараць",
     "repeat-type-day": "Кожны дзень",
     "repeat-type-week": "Кожны тыдзень",
+    "repeat-type-month": "Кожны месяц",
     "repeat-type-any": "Выбраць даты",
     "input-placeholder-title": "Загаловак",
     "input-placeholder-text": "Тэкст",

@@ -69,8 +69,6 @@ class Add extends Component {
             isSaveTypeModalVisible: false
         };
 
-        this.repeatTypeOptions = notesService.getRepeatTypeOptions();
-
         this.saveTypeSelectResolve = null;
     }
 
@@ -540,8 +538,6 @@ class Add extends Component {
     render() {
         let {t} = this.props;
 
-        let selectedRepeatTypeOption = this.repeatTypeOptions.find((a) => a.val === this.state.note.repeatType);
-
         return (
             <div className="add-wrapper page-wrapper">
                 <Header
@@ -709,7 +705,7 @@ class Add extends Component {
                                                 src={RepeatImg}
                                                 alt="repeat"
                                             />
-                                            {t(selectedRepeatTypeOption.translateId)}
+                                            {t(NoteRepeatType.toTranslateId(this.state.note.repeatType))}
                                         </button>
 
                                         <RepeatTypeSelectModal

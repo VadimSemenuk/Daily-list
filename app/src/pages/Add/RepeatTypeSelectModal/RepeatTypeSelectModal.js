@@ -7,8 +7,6 @@ import TextCheckBox from "../../../components/TextCheckBox/TextCheckBox";
 import Calendar from "../../../components/Calendar/Calendar/Calendar";
 import Modal from "../../../components/Modal/Modal";
 
-import notesService from "../../../services/notes.service";
-
 import {NoteRepeatType} from "../../../constants";
 
 import './RepeatTypeSelectModal.scss';
@@ -22,9 +20,6 @@ class RepeatTypeSelectModal extends Component {
             repeatValues: [],
             calendarPeriod: null
         };
-
-        this.repeatTypeOptions = notesService.getRepeatTypeOptions();
-        this.weekRepeatOptions = notesService.getWeekRepeatOptions();
     }
 
     setStateValuesFromProps() {
@@ -80,12 +75,12 @@ class RepeatTypeSelectModal extends Component {
             >
                 <div className="radio-group">
                     {
-                        this.repeatTypeOptions.map((repeatTypeOption, i) => (
+                        NoteRepeatType.toArray().map((noteRepeatType, i) => (
                             <div key={i}>
                                 <Radio
                                     name="repeat-type"
-                                    checked={this.state.repeatType === repeatTypeOption.val}
-                                    value={repeatTypeOption.val}
+                                    checked={this.state.repeatType === noteRepeatType}
+                                    value={noteRepeatType}
                                     onChange={(e) => {
                                         let nextRepeatValues = [];
                                         if (e === NoteRepeatType.Any) {
@@ -99,12 +94,12 @@ class RepeatTypeSelectModal extends Component {
                                             repeatValues: nextRepeatValues
                                         })
                                     }}
-                                    text={t(repeatTypeOption.translateId)}
+                                    text={t(NoteRepeatType.toTranslateId(noteRepeatType))}
                                 />
 
                                 {
-                                    repeatTypeOption.val === NoteRepeatType.Week && this.state.repeatType === repeatTypeOption.val &&
-                                    this.weekRepeatOptions.map((weekRepeatOption, i) => (
+                                    noteRepeatType === NoteRepeatType.Week && this.state.repeatType === noteRepeatType &&
+                                    NoteRepeatType.WeekValues.map((weekRepeatOption, i) => (
                                         <TextCheckBox
                                             key={i}
                                             id={weekRepeatOption.val}

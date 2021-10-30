@@ -140,6 +140,7 @@ export default {
     "repeat-type-no-repeat": "Don't repeat",
     "repeat-type-day": "Every day",
     "repeat-type-week": "Every week",
+    "repeat-type-month": "Every month",
     "repeat-type-any": "Choose dates",
     "input-placeholder-title": "Title",
     "input-placeholder-text": "Text",
