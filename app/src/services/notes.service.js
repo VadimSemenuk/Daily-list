@@ -380,28 +380,37 @@ class NotesService {
         return nextNote;
     }
 
-    async updateNoteDynamic(note, nextData, settings) {
-        let nextNote = {...note, ...nextData};
+    async triggerNoteFinishState(note, resetManualOrderIndex) {
+        let nextNote = {...note, isFinished: !note.isFinished};
 
         if (nextNote.isShadow) {
             nextNote = await this.fromShadowToReal(nextNote);
         }
 
-        if (nextData.hasOwnProperty('isFinished') && settings.sortFinBehaviour === 1) {
+        if (resetManualOrderIndex) {
             nextNote = await this.resetNoteManualOrderIndex(nextNote);
         }
 
         await executeSQL(
-            `UPDATE Notes
-            SET 
-                contentItems = ?,
-                isFinished = ?
-            WHERE id = ?;`,
-            [
-                JSON.stringify(nextNote.contentItems),
-                Number(nextNote.isFinished),
-                nextNote.id
-            ]
+            `UPDATE Notes SET isFinished = ? WHERE id = ?;`,
+            [Number(nextNote.isFinished), nextNote.id]
+        );
+
+        nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
+
+        return nextNote;
+    }
+
+    async updateNoteContentItems(note, nextContentItems) {
+        let nextNote = {...note, contentItems: nextContentItems};
+
+        if (nextNote.isShadow) {
+            nextNote = await this.fromShadowToReal(nextNote);
+        }
+
+        await executeSQL(
+            `UPDATE Notes SET contentItems = ? WHERE id = ?;`,
+            [JSON.stringify(nextNote.contentItems), nextNote.id]
         );
 
         nextNote = await this.updateNoteLastAction(NoteAction.Edit, nextNote);
@@ -598,10 +607,12 @@ class NotesService {
     }
 
     resetNoteManualOrderIndex(note) {
-        let nextNote = {...note};
-        nextNote.manualOrderIndex = null;
+        let nextNote = {
+            ...note,
+            manualOrderIndex: null
+        };
 
-        return executeSQL(
+        executeSQL(
             `UPDATE Notes
             SET manualOrderIndex = ?
             WHERE id = ? OR forkFrom = ?;`,

@@ -61,7 +61,8 @@ class NotesList extends PureComponent {
                 data={note}
                 minimize={this.props.settings.minimizeNotes}
                 fontSize={this.props.settings.fontSize}
-                onNoteChange={this.props.onNoteChange}
+                onFinishStateTrigger={this.props.onFinishStateTrigger}
+                onContentItemsChange={this.props.onContentItemsChange}
                 onDialogRequest={this.props.onDialogRequest}
             />
         </div>

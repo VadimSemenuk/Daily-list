@@ -73,7 +73,8 @@ class NotesListSwipable extends PureComponent {
                                 settings={this.props.settings}
                                 onDragSortModeTrigger={this.onDragSortModeTrigger}
                                 onOrderChange={this.props.onOrderChange}
-                                onNoteChange={this.props.onNoteChange}
+                                onFinishStateTrigger={this.props.onFinishStateTrigger}
+                                onContentItemsChange={this.props.onContentItemsChange}
                                 onDialogRequest={this.props.onDialogRequest}
                             />
                         </div>

@@ -32,11 +32,11 @@ class Note extends PureComponent {
             ...this.props.data.contentItems.slice(listItemIndex + 1)
         ];
 
-        this.props.onNoteChange(this.props.data, {contentItems: nextContentItems});
+        this.props.onContentItemsChange(this.props.data, nextContentItems);
     };
 
-    onFinishTrigger = (v) => {
-        this.props.onNoteChange(this.props.data, {isFinished: v});
+    onFinishStateTrigger = () => {
+        this.props.onFinishStateTrigger(this.props.data);
     };
 
     onDialogRequest = (e) => {
@@ -191,7 +191,7 @@ class Note extends PureComponent {
                             <div className="note-finish-checkbox">
                                 <CustomCheckBox
                                     checked={this.props.data.isFinished}
-                                    onChange={this.onFinishTrigger}
+                                    onChange={this.onFinishStateTrigger}
                                 />
                             </div>
                         </div>

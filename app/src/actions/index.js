@@ -92,10 +92,10 @@ export function updateNote(data, originalNote, noteUpdateType) {
     }
 }
 
-export function updateNoteDynamic(note, nextData) {
-    return async (dispatch, getState) => {
+export function triggerNoteFinishState(note, resetManualOrderIndex) {
+    return async (dispatch) => {
         try {
-            let nextNote = await notesService.updateNoteDynamic(note, nextData, getState().settings);
+            let nextNote = await notesService.triggerNoteFinishState(note, resetManualOrderIndex);
 
             dispatch({
                 type: "UPDATE_NOTE_DYNAMIC",
@@ -105,12 +105,10 @@ export function updateNoteDynamic(note, nextData) {
                 }
             });
 
-            if (nextData.hasOwnProperty('isFinished')) {
-                if (nextNote.mode === NotesScreenMode.WithDateTime) {
-                    dispatch(getFullCount());
-                }
-                dispatch(renderNotes());
+            if (nextNote.mode === NotesScreenMode.WithDateTime) {
+                dispatch(getFullCount());
             }
+
 
             dispatch(saveBackup());
 
@@ -120,7 +118,41 @@ export function updateNoteDynamic(note, nextData) {
             logsService.logError(
                 err,
                 {
-                    path: "action/index.js -> updateNoteDynamic()",
+                    path: "action/index.js -> triggerNoteFinishState()",
+                    note: {
+                        ...note,
+                        title: !!note.title,
+                        contentItems: !!note.contentItems
+                    },
+                },
+                window.device.uuid
+            );
+        }
+    }
+}
+
+export function updateNoteContentItems(note, nextContentItems) {
+    return async (dispatch) => {
+        try {
+            let nextNote = await notesService.updateNoteContentItems(note, nextContentItems);
+
+            dispatch({
+                type: "UPDATE_NOTE_DYNAMIC",
+                payload: {
+                    notes: [nextNote],
+                    fromShadowToReal: note.isShadow && !nextNote.isShadow
+                }
+            });
+
+            dispatch(saveBackup());
+
+            window.cordova && window.cordova.plugins.natives.updateWidgetList();
+        } catch(err) {
+            dispatch(triggerErrorModal("error-note-update"));
+            logsService.logError(
+                err,
+                {
+                    path: "action/index.js -> triggerNoteFinishState()",
                     note: {
                         ...note,
                         title: !!note.title,

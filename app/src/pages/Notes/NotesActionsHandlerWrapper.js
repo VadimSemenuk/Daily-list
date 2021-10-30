@@ -14,6 +14,7 @@ import {NoteRepeatType} from "../../constants";
 import Modal from "../../components/Modal/Modal";
 import {ButtonListItem, ListItem} from "../../components/ListItem/ListItem";
 import Fab from "../../components/Fab/Fab";
+import {triggerNoteFinishState, updateNoteContentItems} from "../../actions";
 
 class NotesActionsHandlerWrapper extends PureComponent {
     constructor(props) {
@@ -26,8 +27,12 @@ class NotesActionsHandlerWrapper extends PureComponent {
         };
     }
 
-    onNoteChange = (itemData, updatedState) => {
-        this.props.updateNoteDynamic(itemData, updatedState);
+    onFinishStateTrigger = (note) => {
+        this.props.triggerNoteFinishState(note, this.props.settings.sortFinBehaviour === 1);
+    }
+
+    onContentItemsChange = (note, nextContentItems) => {
+        this.props.updateNoteContentItems(note, nextContentItems);
     }
 
     onEditRequest = () => {
@@ -115,7 +120,8 @@ class NotesActionsHandlerWrapper extends PureComponent {
                     ref={this.props.listRef}
                     {...this.props}
                     onOrderChange={this.onOrderChange}
-                    onNoteChange={this.onNoteChange}
+                    onFinishStateTrigger={this.onFinishStateTrigger}
+                    onContentItemsChange={this.onContentItemsChange}
                     onDialogRequest={this.openDialog}
                 />
                 <Modal
@@ -175,7 +181,8 @@ class NotesActionsHandlerWrapper extends PureComponent {
 
 function mapStateToProps(state) {
     return {
-        date: state.date
+        date: state.date,
+        settings: state.settings
     }
 }
 
