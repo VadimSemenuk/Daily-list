@@ -1,9 +1,11 @@
 import React from 'react';
+import moment from "moment";
 import {Link, withRouter} from 'react-router-dom';
 
 import './Header.scss';
 
 import LeftArrowImg from "../../assets/img/left-arrow.svg";
+import EmptyCalendarImg from "../../assets/img/empty-calendar.svg";
 
 let Header = (props) => (
     <header className={`theme-header-background${props.noBorderRadius ? ' no-border-radius' : ''}`}>
@@ -32,12 +34,24 @@ let Header = (props) => (
 
         {
             props.multiFloorTitle &&
-            <div
-                className="multi-floor-title clickable"
-                onClick={props.onMultiFloorTitleClick}
-            >
-                <div className="top-section">{props.multiFloorTitle.top}</div>
-                <div className="bottom-section">{props.multiFloorTitle.bottom}</div>
+            <div className="multi-floor-title-wrapper">
+                <button
+                    className="today-button"
+                    onClick={props.onMultiFloorTitleClick}
+                >
+                    <img
+                        src={EmptyCalendarImg}
+                        alt="button"
+                    />
+                    <span className="today-button-value">{moment().date()}</span>
+                </button>
+                <div
+                    className="multi-floor-title clickable"
+                    onClick={props.onMultiFloorTitleClick}
+                >
+                    <div className="top-section">{props.multiFloorTitle.top}</div>
+                    <div className="bottom-section">{props.multiFloorTitle.bottom}</div>
+                </div>
             </div>
         }
 

@@ -42,12 +42,26 @@ header {
         }
     }
 
-    .multi-floor-title {
+    .multi-floor-title-wrapper {
+        display: flex;
         text-align: center;
         position: absolute;
-        left: 50%;
+        left: calc(50% - 21px);
         top: calc(50% - 3px);
         transform: translate(-50%, -50%);
+
+        .today-button {
+            position: relative;
+
+            .today-button-value {
+                color: #fff;
+                position: absolute;
+                top: 18px;
+                left: 50%;
+                transform: translate(-50%, 0);
+                font-size: 10px;
+            }
+        }
 
         .top-section {
             font-size: 19px;
